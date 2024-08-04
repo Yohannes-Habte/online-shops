@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 import * as Action from '../../../redux/reducers/userReducer';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
-// import { GoogleAuthProvider, getAuth, signInWithPopup } from '@firebase/auth';
-// import { app } from '../../../utils/firebase';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from '@firebase/auth';
+import { app } from '../../../utils/firebase';
 import { API } from '../../../utils/security/secreteKey';
 
 const GoogleSignupLogin = ({ login, signup }) => {
@@ -17,16 +17,16 @@ const GoogleSignupLogin = ({ login, signup }) => {
     // dispatch(Action.loginStart());
     try {
       // Google Provider
-      // const provider = new GoogleAuthProvider();
-      // const auth = getAuth(app);
-      // const result = await signInWithPopup(auth, provider);
-      // console.log('Google Result', result);
+      const provider = new GoogleAuthProvider();
+      const auth = getAuth(app);
+      const result = await signInWithPopup(auth, provider);
+      console.log('Google Result', result);
 
       // User dataq
       const userData = {
-        // name: result.user.displayName,
-        // email: result.user.email,
-        // image: result.user.photoURL,
+        name: result.user.displayName,
+        email: result.user.email,
+        image: result.user.photoURL,
         agree: true,
       };
       const { data } = await axios.post(`${API}/auths/google`, userData);

@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import './ProductCard.scss';
+import "./ProductCard.scss";
 import {
   AiFillHeart,
   AiOutlineEye,
   AiOutlineHeart,
   AiOutlineShoppingCart,
-} from 'react-icons/ai';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
-import Ratings from '../ratings/Ratings';
-import ProductCartDetails from '../productCardDetails/ProductCardDetails';
-import { addToCart } from '../../../redux/reducers/cartReducer';
+} from "react-icons/ai";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import Ratings from "../ratings/Ratings";
+import ProductCartDetails from "../productCardDetails/ProductCardDetails";
+import { addToCart } from "../../../redux/reducers/cartReducer";
 import {
   addToWishlist,
   removeFromWishlist,
-} from '../../../redux/reducers/wishListReducer';
-import { ShortenText } from '../../../utils/textHandler/text';
+} from "../../../redux/reducers/wishListReducer";
+import { ShortenText } from "../../../utils/textHandler/text";
 
 // The product in the ProductCard.jsx component comes from ShopProfile.jsx component
 const ProductCard = ({ product, isEvent }) => {
@@ -55,13 +54,13 @@ const ProductCard = ({ product, isEvent }) => {
   const addToCartHandler = (id) => {
     const isItemExists = cart && cart.find((item) => item._id === id);
     if (isItemExists) {
-      toast.error('Item already in cart!');
+      toast.error("Item already in cart!");
     } else if (product.stock < 1) {
-      toast.error('Product is out of stock!');
+      toast.error("Product is out of stock!");
     } else {
       const cartData = { ...product, qty: 1 };
       dispatch(addToCart(cartData));
-      toast.success('Item added to cart successfully!');
+      toast.success("Item added to cart successfully!");
     }
   };
 
@@ -101,20 +100,21 @@ const ProductCard = ({ product, isEvent }) => {
       >
         <h4 className="product-name">
           {product.name.length > 40
-            ? product.name.slice(0, 40) + '...'
+            ? product.name.slice(0, 40) + "..."
             : product.name}
         </h4>
 
         <p className="product-description">
           {ShortenText(product.description, 100)}
         </p>
-
+        <div className="rating-wrapper">
+          <Ratings averageRating={product?.ratings} />
+        </div>
         {/* Ratings component */}
-        <Ratings averageRating={product?.ratings} />
 
         <article className="product-price-wrapper">
           <h5 className={`price`}>
-            Current Price{' '}
+            Current Price{" "}
             <span className="current-price">
               $
               {product.originalPrice === 0
@@ -134,16 +134,16 @@ const ProductCard = ({ product, isEvent }) => {
       <figure className="icon-container">
         {click ? (
           <AiFillHeart
-            className={click ? 'active' : 'passive'}
+            className={click ? "active" : "passive"}
             onClick={() => removeFromWishlistHandler(product._id)}
-            color={click ? 'red' : 'black'}
+            color={click ? "red" : "black"}
             title="Remove from wishlist"
           />
         ) : (
           <AiOutlineHeart
-            className={click ? 'active' : 'passive'}
+            className={click ? "active" : "passive"}
             onClick={() => addToWishlistHandler(product)}
-            color={click ? 'active' : 'passive'}
+            color={click ? "active" : "passive"}
             title="Add to wishlist"
           />
         )}

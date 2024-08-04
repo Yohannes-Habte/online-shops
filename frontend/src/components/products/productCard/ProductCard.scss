@@ -1,5 +1,5 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
 .product-card {
   position: relative;
@@ -21,6 +21,10 @@
       border-radius: $radius;
       object-fit: cover;
     }
+  }
+
+  .rating-wrapper {
+    display: flex;
   }
 
   .product-price-wrapper {

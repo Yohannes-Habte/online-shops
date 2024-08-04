@@ -1,4 +1,3 @@
-import React from 'react';
 import './Ratings.scss';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
