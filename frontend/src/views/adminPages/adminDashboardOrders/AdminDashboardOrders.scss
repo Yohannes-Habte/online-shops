@@ -1,0 +1,63 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.admin-dashboard-orders-page {
+  .admin-dashboard-orders-page-container {
+    .admin-dashboard-orders-page-title {
+      @include title;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+
+      .orders-table {
+        width: $mobile;
+        margin: auto;
+        @include shadow3;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-orders-page {
+    .admin-dashboard-orders-page-container {
+      .admin-dashboard-orders-page-title {
+        @include title;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+
+        .orders-table {
+          width: $mobile;
+          margin: auto;
+          @include shadow3;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-dashboard-orders-page {
+    .admin-dashboard-orders-page-container {
+      .admin-dashboard-orders-page-title {
+        @include title;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+
+        .orders-table {
+          width: $mobile;
+          margin: auto;
+          @include shadow3;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.admin-withdraws-container {
+  position: relative;
+  width: $mobile;
+  margin: auto;
+  @include shadow3;
+
+  .admin-withdraws-title {
+    @include subTitle;
+  }
+
+  .admin-update-withdraw-status-wrapper {
+    background-color: $delete-confirmation-bg;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    @include shadow1;
+    padding: 1rem;
+
+    .close-icon {
+      @include close;
+      margin-top: 0.5rem;
+    }
+
+    .update-withdraw-status {
+      @include subTitle;
+    }
+
+    .section-field {
+      @include inputField;
+    }
+
+    .admin-update-withdraw-btn {
+      @include button5;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-withdraws-container {
+    position: relative;
+    width: $tablet;
+    margin: auto;
+    @include shadow3;
+
+    .admin-withdraws-title {
+      @include subTitle;
+    }
+
+    .admin-update-withdraw-status-wrapper {
+      background-color: $delete-confirmation-bg;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+      @include shadow1;
+      padding: 1rem;
+
+      .close-icon {
+        @include close;
+        margin-top: 0.5rem;
+      }
+
+      .update-withdraw-status {
+        @include subTitle;
+      }
+
+      .section-field {
+        @include inputField;
+      }
+
+      .admin-update-withdraw-btn {
+        @include button5;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-withdraws-container {
+    position: relative;
+    width: $laptop;
+    margin: auto;
+    @include shadow3;
+
+    .admin-withdraws-title {
+      @include subTitle;
+    }
+
+    .admin-update-withdraw-status-wrapper {
+      background-color: $delete-confirmation-bg;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+      @include shadow1;
+      padding: 1rem;
+
+      .close-icon {
+        @include close;
+        margin-top: 0.5rem;
+      }
+
+      .update-withdraw-status {
+        @include subTitle;
+      }
+
+      .section-field {
+        @include inputField;
+      }
+
+      .admin-update-withdraw-btn {
+        @include button5;
+      }
+    }
+  }
+}

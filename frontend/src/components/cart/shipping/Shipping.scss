@@ -1,0 +1,326 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.shipping-wrapper {
+  flex: 2;
+  @include shadow3;
+
+  .subTitle {
+    @include subTitle;
+    font-size: $one;
+  }
+
+  // Shipping form
+  .shipping-form {
+    display: flex;
+    flex-direction: column;
+
+    .input-container {
+      position: relative;
+      @include inputContainer;
+
+      .input-field {
+        @include inputField;
+        margin-bottom: $radius;
+        padding-left: 2rem;
+
+        &::placeholder {
+          color: gray;
+        }
+      }
+
+      .input-label {
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        color: rgba(204, 204, 204, 0);
+      }
+
+      .input-highlight {
+        position: absolute;
+        bottom: 0.2rem;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background-color: $yellow;
+        transition: all 0.3s ease;
+      }
+
+      .input-field:focus + .input-label {
+        top: -5px;
+        font-size: 12px;
+        color: #007bff;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        position: absolute;
+        top: 1.1rem;
+        left: 0.5rem;
+        font-size: 1rem;
+        color: $green;
+      }
+
+      // displaying password
+      .password-display {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translatey(-50%);
+        font-size: 1.3rem;
+        cursor: pointer;
+      }
+    }
+
+    .select-container {
+      .select-options {
+        @include inputField;
+      }
+    }
+  }
+
+  .saved-address {
+    @include googleButton;
+  }
+
+  .user-infos-wrapper {
+    .address-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.2rem;
+
+      .input-checkbox {
+        width: 1.4rem;
+        height: 1.4rem;
+        cursor: pointer;
+      }
+
+      .address-type {
+        @include subTitle;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shipping-wrapper {
+    flex: 2;
+    @include shadow3;
+
+    .subTitle {
+      @include subTitle;
+      font-size: $aafs;
+    }
+
+    // Shipping form
+    .shipping-form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 1rem;
+
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          margin-bottom: $radius;
+          padding-left: 2rem;
+
+          &::placeholder {
+            color: gray;
+          }
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.2rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $yellow;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          top: -5px;
+          font-size: 12px;
+          color: #007bff;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1.1rem;
+          left: 0.5rem;
+          font-size: 1rem;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      .select-container {
+        .select-options {
+          @include inputField;
+        }
+      }
+    }
+
+    .saved-address {
+      @include googleButton;
+    }
+
+    .user-infos-wrapper {
+      .address-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.2rem;
+
+        .input-checkbox {
+          width: 1.4rem;
+          height: 1.4rem;
+          cursor: pointer;
+        }
+
+        .address-type {
+          @include subTitle;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shipping-wrapper {
+    flex: 2;
+    @include shadow3;
+
+    .subTitle {
+      @include subTitle;
+      font-size: $aafs;
+    }
+
+    // Shipping form
+    .shipping-form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 1rem;
+
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          margin-bottom: $radius;
+          padding-left: 2rem;
+
+          &::placeholder {
+            color: gray;
+          }
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.2rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $yellow;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          top: -5px;
+          font-size: 12px;
+          color: #007bff;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1.1rem;
+          left: 0.5rem;
+          font-size: 1rem;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      .select-container {
+        .select-options {
+          @include inputField;
+        }
+      }
+    }
+
+    .saved-address {
+      @include googleButton;
+    }
+
+    .user-infos-wrapper {
+      .address-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.2rem;
+
+        .input-checkbox {
+          width: 1.4rem;
+          height: 1.4rem;
+          cursor: pointer;
+        }
+
+        .address-type {
+          @include subTitle;
+        }
+      }
+    }
+  }
+}

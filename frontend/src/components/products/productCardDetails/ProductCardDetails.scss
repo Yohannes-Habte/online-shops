@@ -1,0 +1,411 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.product-cart-details-modal {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: $popup-display-bg;
+  padding: 1rem;
+  z-index: 999;
+  overflow: scroll;
+
+  .all-product-details-container {
+    position: relative;
+    width: $mobile;
+    height: fit-content;
+    margin: 1rem auto;
+    background-color: $white;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    @include shadow3;
+
+    .close-icon {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+
+      &:hover {
+        color: $red;
+      }
+    }
+
+    // Left box *
+    .left-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .image-container {
+        .image {
+          width: 20rem;
+          height: 15rem;
+          border-radius: $radius;
+          object-fit: cover;
+        }
+      }
+
+      .info-wrapper {
+        .product-name {
+        }
+        .rating {
+        }
+
+        .send-message-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          @include button1;
+          width: fit-content;
+        }
+
+        .sold-out {
+          color: $tomato;
+          font-weight: $aafw;
+        }
+      }
+    }
+
+    // Right box
+    .right-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .product-title {
+        @include subTitle;
+      }
+
+      .description {
+        @include paragraph;
+      }
+
+      .price-wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+
+        .old-price {
+          color: $red;
+          text-decoration: line-through;
+          font-size: $afs;
+          font-weight: $aafw;
+        }
+
+        .new-price {
+          font-size: $afs;
+          font-weight: $aafw;
+        }
+
+        .quantity-management {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+
+          .quantity-btn {
+            @include delete;
+            padding: 0 1rem;
+          }
+        }
+
+        .wishlist {
+          .wishlist-icon {
+            font-size: $aafs;
+          }
+        }
+
+        // addd button
+        .add-to-cart-btn {
+          @include flexCenter;
+          @include button1;
+
+          .add-icon {
+            padding-left: 0.2rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .product-cart-details-modal {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $popup-display-bg;
+    padding: 1rem;
+    z-index: 999;
+    overflow: scroll;
+
+    .all-product-details-container {
+      position: relative;
+      width: $laptop;
+      height: fit-content;
+      margin: 1rem auto;
+      background-color: $white;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      @include shadow3;
+
+      .close-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+
+        &:hover {
+          color: $red;
+        }
+      }
+
+      // Left box *
+      .left-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .image-container {
+          margin-top: 5rem;
+          .image {
+            width: 12rem;
+            height: 10rem;
+            border-radius: $radius;
+            object-fit: cover;
+          }
+        }
+
+        .info-wrapper {
+          .product-name {
+          }
+          .rating {
+          }
+
+          .send-message-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            @include button1;
+            width: fit-content;
+          }
+
+          .sold-out {
+            color: $tomato;
+            font-weight: $aafw;
+          }
+        }
+      }
+
+      // Right box
+      .right-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        .product-title {
+          @include subTitle;
+        }
+
+        .description {
+          @include paragraph;
+          line-height: $afs;
+          text-align: justify;
+        }
+
+        .price-wrapper {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+
+          .old-price {
+            color: $red;
+            text-decoration: line-through;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+
+          .new-price {
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+
+          .quantity-management {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+
+            .quantity-btn {
+              @include delete;
+              padding: 0 1rem;
+            }
+          }
+
+          .wishlist {
+            .wishlist-icon {
+              font-size: $aafs;
+            }
+          }
+
+          // addd button
+          .add-to-cart-btn {
+            @include flexCenter;
+            @include button1;
+
+            .add-icon {
+              padding-left: 0.2rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .product-cart-details-modal {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $popup-display-bg;
+    padding: 1rem;
+    z-index: 999;
+    overflow: scroll;
+
+    .all-product-details-container {
+      position: relative;
+      width: 70%;
+      height: fit-content;
+      margin: 1rem auto;
+      background-color: $white;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      @include shadow3;
+
+      .close-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+
+        &:hover {
+          color: $red;
+        }
+      }
+
+      // Left box *
+      .left-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .image-container {
+          margin-top: 5rem;
+          .image {
+            width: 20rem;
+            height: 15rem;
+            border-radius: $radius;
+            object-fit: cover;
+          }
+        }
+
+        .info-wrapper {
+          .product-name {
+          }
+          .rating {
+          }
+
+          .send-message-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            @include button1;
+            width: fit-content;
+          }
+
+          .sold-out {
+            color: $tomato;
+            font-weight: $aafw;
+          }
+        }
+      }
+
+      // Right box
+      .right-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        .product-title {
+          @include subTitle;
+        }
+
+        .description {
+          @include paragraph;
+        }
+
+        .price-wrapper {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+
+          .old-price {
+            color: $red;
+            text-decoration: line-through;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+
+          .new-price {
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+
+          .quantity-management {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+
+            .quantity-btn {
+              @include delete;
+              padding: 0 1rem;
+            }
+          }
+
+          .wishlist {
+            .wishlist-icon {
+              font-size: $aafs;
+            }
+          }
+
+          // addd button
+          .add-to-cart-btn {
+            @include flexCenter;
+            @include button1;
+
+            .add-icon {
+              padding-left: 0.2rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

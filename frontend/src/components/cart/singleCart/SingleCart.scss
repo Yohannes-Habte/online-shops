@@ -1,0 +1,177 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.single-cart-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  @include shadow3;
+
+  .quantity-management-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    @include shadow3;
+
+    .decrease-quantity {
+      @include cartQuantity;
+      font-size: $one;
+    }
+
+    .quantity {
+      @include subTitle;
+      font-size: $one;
+    }
+
+    .increase-quantity {
+      @include cartQuantity;
+      font-size: $one;
+    }
+  }
+
+  .image-container {
+    .image {
+      width: 3rem;
+      height: 3rem;
+      object-fit: cover;
+    }
+  }
+
+  .price-wrapper {
+    .name {
+      @include subTitle;
+      font-size: $one;
+    }
+
+    .price {
+      color: $blue;
+      font-weight: $aafw;
+      font-size: $one;
+    }
+  }
+
+  .delete-icon {
+    @include deleteIcon;
+    font-size: $one;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .single-cart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    @include shadow3;
+  
+    .quantity-management-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      @include shadow3;
+  
+      .decrease-quantity {
+        @include cartQuantity;
+        font-size: $one;
+      }
+  
+      .quantity {
+        @include subTitle;
+        font-size: $one;
+      }
+  
+      .increase-quantity {
+        @include cartQuantity;
+        font-size: $one;
+      }
+    }
+  
+    .image-container {
+      .image {
+        width: 6rem;
+        height: 6rem;
+        object-fit: cover;
+      }
+    }
+  
+    .price-wrapper {
+      .name {
+        @include subTitle;
+      }
+  
+      .price {
+        color: $blue;
+        font-weight: $aafw;
+      }
+    }
+  
+    .delete-icon {
+      @include deleteIcon;
+    }
+  }
+}
+
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px)  {
+  .single-cart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    @include shadow3;
+  
+    .quantity-management-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      @include shadow3;
+  
+      .decrease-quantity {
+        @include cartQuantity;
+       
+      }
+  
+      .quantity {
+        @include subTitle;
+      }
+  
+      .increase-quantity {
+        @include cartQuantity;
+      
+      }
+    }
+  
+    .image-container {
+      .image {
+        width: 6rem;
+        height: 6rem;
+        object-fit: cover;
+      }
+    }
+  
+    .price-wrapper {
+      .name {
+        @include subTitle;
+      }
+  
+      .price {
+        color: $blue;
+        font-weight: $aafw;
+      }
+    }
+  
+    .delete-icon {
+      @include deleteIcon;
+    }
+  }
+}

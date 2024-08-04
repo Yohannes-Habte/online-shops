@@ -1,0 +1,141 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.fast-contact-tools {
+  @include shadow3;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 1rem;
+  row-gap: 1rem;
+
+  .sub-title {
+    @include subTitle;
+    font-size: 1.4rem;
+  }
+
+  .contact-tools {
+    display: flex;
+    gap: 0.2rem;
+
+    .contact-icon {
+      font-size: 1.6rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      color: $green;
+    }
+
+    .link-container {
+      .link {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .image-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    .image {
+      width: 12rem;
+      height: 12rem;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .fast-contact-tools {
+    @include shadow3;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .sub-title {
+      @include subTitle;
+      font-size: 1.4rem;
+    }
+
+    .contact-tools {
+      display: flex;
+      gap: 0.2rem;
+
+      .contact-icon {
+        font-size: 1.6rem;
+        margin-right: 1rem;
+        cursor: pointer;
+        color: $green;
+      }
+
+      .link-container {
+        .link {
+          font-weight: bold;
+        }
+      }
+    }
+
+    .image-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1rem;
+      .image {
+        width: 12rem;
+        height: 12rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .fast-contact-tools {
+    @include shadow3;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .sub-title {
+      @include subTitle;
+      font-size: 1.4rem;
+    }
+
+    .contact-tools {
+      display: flex;
+      gap: 0.2rem;
+
+      .contact-icon {
+        font-size: 1.6rem;
+        margin-right: 1rem;
+        cursor: pointer;
+        color: $green;
+      }
+
+      .link-container {
+        .link {
+          font-weight: bold;
+        }
+      }
+    }
+
+    .image-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1rem;
+      .image {
+        width: 12rem;
+        height: 12rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+  }
+}

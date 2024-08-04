@@ -1,0 +1,151 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.profile-infos-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: $sidebar-bg;
+  @include shadow3;
+  margin-top: 1rem;
+
+  .tab-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+
+    &:hover {
+      color: $red;
+    }
+
+    .active-icon {
+      color: $tomato;
+    }
+
+    .passive-icon {
+      color: $black;
+    }
+
+    .active {
+      display: none;
+    }
+
+    .passive {
+      display: none;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .profile-infos-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1.5rem;
+    background-color: $sidebar-bg;
+    @include shadow3;
+    margin-top: 1rem;
+
+
+    .tab-box {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+
+      &:hover {
+        color: $red;
+      }
+
+      .active-icon {
+        color: $tomato;
+      }
+
+      .passive-icon {
+        color: $black;
+      }
+
+      .active {
+        display: block;
+        font-size: $afs;
+        color: $red;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -0.2rem;
+          width: 100%;
+          height: 2px;
+          background-color: $red;
+        }
+      }
+
+      .passive {
+        display: block;
+        color: $black;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .profile-infos-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: $sidebar-bg;
+    @include shadow3;
+    margin-top: 1rem;
+
+    .tab-box {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+
+      &:hover {
+        color: $red;
+      }
+
+      .active-icon {
+        color: $tomato;
+      }
+
+      .passive-icon {
+        color: $black;
+      }
+
+      .active {
+        display: block;
+        font-size: $afs;
+        color: $red;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -0.2rem;
+          width: 100%;
+          height: 2px;
+          background-color: $red;
+        }
+      }
+
+      .passive {
+        display: block;
+        color: $black;
+      }
+    }
+  }
+}

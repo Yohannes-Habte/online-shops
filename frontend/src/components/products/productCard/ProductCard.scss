@@ -1,0 +1,80 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.product-card {
+  position: relative;
+  @include shadow3;
+
+  .product-card-link {
+    color: $black;
+
+    .shop-name {
+      font-size: $afs;
+      text-align: center;
+    }
+  }
+
+  .image-container {
+    .image {
+      width: 20rem;
+      height: 15rem;
+      border-radius: $radius;
+      object-fit: cover;
+    }
+  }
+
+  .product-price-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    .price {
+      color: $black;
+      font-size: $one;
+    }
+
+    .current-price {
+      color: $blue;
+      font-size: $one;
+    }
+    .old-price {
+      color: $red;
+      text-decoration: line-through;
+    }
+
+    .sold-product {
+    }
+  }
+
+  .icon-container {
+    position: absolute;
+    top: 3rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+
+    .icon {
+      font-size: $aafs;
+      color: $blue;
+      cursor: pointer;
+
+      &:hover {
+        color: $red;
+      }
+    }
+
+    .active {
+      color: $red;
+      font-size: $aafs;
+      cursor: pointer;
+    }
+
+    .passive {
+      color: $blue;
+      font-size: $aafs;
+      cursor: pointer;
+    }
+  }
+}

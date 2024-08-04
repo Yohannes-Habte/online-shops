@@ -1,0 +1,431 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.register-page {
+  @include page;
+
+  .register-container {
+    width: $mobile;
+    margin: auto;
+    @include shadow3;
+
+    .error-message {
+      color: $tomato;
+      background-color: $error-bg;
+      @include paragraph;
+    }
+
+    .register-title {
+      @include title;
+      font-size: $afs;
+    }
+
+    .image-container {
+      @include flexCenter;
+
+      .image {
+        width: 3rem;
+        height: 3rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    .register-fieldset {
+      @include fieldset;
+
+      .register-legend {
+        @include legend;
+      }
+
+      .register-form {
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            margin-bottom: $radius;
+            padding-left: 2rem;
+
+            &::placeholder {
+              color: gray;
+            }
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.2rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 1.1rem;
+            left: 0.5rem;
+            font-size: 1rem;
+            color: $green;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .file-container {
+          position: relative;
+          @include inputContainer;
+          z-index: 1;
+
+          .input-field {
+            display: none;
+          }
+
+          .file-label {
+            @include inputField;
+            cursor: pointer;
+
+            .uploading-image {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              gap: 1rem;
+              z-index: 999;
+              .image-close-icon {
+                @include deleteIcon;
+                font-size: $one;
+              }
+            }
+          }
+
+          .icon {
+            position: absolute;
+            top: 1.1rem;
+            left: 0.5rem;
+            font-size: 1rem;
+            color: $green;
+          }
+        }
+
+        .register-consent {
+          display: flex;
+          flex-direction: row;
+          margin-bottom: 1rem;
+
+          .register-consent-checkbox {
+            margin-right: 0.5rem;
+          }
+
+          // styling the checkbox
+          .register-consent-checkbox[type='checkbox'] {
+            width: 20px;
+            height: 20px;
+          }
+
+          .accept {
+            font-size: $afs;
+          }
+
+          .terms-of-user {
+            font-weight: $afw;
+            color: $blue;
+            padding-left: 0.5rem;
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+
+        .register-button {
+          @include button3;
+        }
+
+        .haveAccount {
+          font-weight: $afw;
+          display: flex;
+          flex-direction: row;
+          gap: 0.5rem;
+
+          .link-to {
+            font-weight: $aafw;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .register-page {
+    .register-container {
+      width: 80%;
+      margin: auto;
+      @include shadow3;
+
+      .register-title {
+        @include title;
+      }
+
+      .image-container {
+        @include flexCenter;
+
+        .image {
+          width: 3rem;
+          height: 3rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      .register-fieldset {
+        width: $laptop;
+        margin: auto;
+
+        .register-form {
+          .register-checkbox-forget-password {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+
+            .register-checkbox-keep-signed-in {
+              margin-top: 1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .register-page {
+    @include page;
+
+    .register-container {
+      width: 50%;
+      margin: auto;
+      @include shadow3;
+
+      .register-title {
+        @include title;
+        color: $green;
+      }
+
+      .image-container {
+        @include flexCenter;
+
+        .image {
+          width: 3rem;
+          height: 3rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      .register-icon-container {
+        width: 12%;
+        margin: auto;
+      }
+
+      .register-fieldset {
+        width: 90%;
+        margin: auto;
+        @include fieldset;
+
+        .register-legend {
+          @include legend;
+        }
+
+        .register-form {
+          .input-container {
+            position: relative;
+            @include inputContainer;
+
+            .input-field {
+              @include inputField;
+              margin-bottom: $radius;
+              padding-left: 2rem;
+
+              &::placeholder {
+                color: gray;
+              }
+            }
+
+            .input-label {
+              position: absolute;
+              top: 0;
+              left: 2rem;
+              color: rgba(204, 204, 204, 0);
+            }
+
+            .input-highlight {
+              position: absolute;
+              bottom: 0.2rem;
+              left: 0;
+              height: 2px;
+              width: 0;
+              background-color: $green;
+              transition: all 0.3s ease;
+            }
+
+            .input-field:focus + .input-label {
+              top: -15px;
+              font-size: 12px;
+            }
+
+            .input-field:focus + .input-label + .input-highlight {
+              width: 100%;
+            }
+
+            .icon {
+              position: absolute;
+              top: 1.1rem;
+              left: 0.5rem;
+              font-size: 1rem;
+              color: $green;
+            }
+
+            // displaying password
+            .password-display {
+              position: absolute;
+              top: 50%;
+              right: 1rem;
+              transform: translatey(-50%);
+              font-size: 1.3rem;
+              cursor: pointer;
+            }
+          }
+
+          .file-container {
+            position: relative;
+            @include inputContainer;
+            z-index: 1;
+
+            .input-field {
+              display: none;
+            }
+
+            .file-label {
+              @include inputField;
+              cursor: pointer;
+
+              .uploading-image {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 1rem;
+                z-index: 999;
+                .image-close-icon {
+                  @include deleteIcon;
+                  font-size: $one;
+                }
+              }
+            }
+
+            .icon {
+              position: absolute;
+              top: 1.1rem;
+              left: 0.5rem;
+              font-size: 1rem;
+              color: $green;
+            }
+          }
+
+          .register-consent {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 1rem;
+
+            .register-consent-checkbox {
+              margin-right: 0.5;
+            }
+
+            // styling the checkbox
+            .register-consent-checkbox[type='checkbox'] {
+              width: 20px;
+              height: 20px;
+            }
+
+            .accept {
+              font-size: $afs;
+            }
+
+            .terms-of-user {
+              font-weight: $afw;
+              color: $blue;
+              padding-left: 0.5rem;
+              &:hover {
+                color: $tomato;
+              }
+            }
+          }
+
+          .register-button {
+            @include button3;
+          }
+
+          .haveAccount {
+            font-weight: $afw;
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+
+            .link-to {
+              font-weight: $aafw;
+              color: $blue;
+
+              &:hover {
+                color: $tomato;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styling email and password validation
+
+.errorInvisible {
+  display: none;
+}
+
+.errorVisible {
+  display: block;
+  color: red;
+}

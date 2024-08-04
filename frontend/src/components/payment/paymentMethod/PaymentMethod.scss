@@ -1,0 +1,87 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.payment-methods-wrapper {
+  width: 100%;
+  min-height: 100vh;
+
+  .header-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .add-payment-methods-title {
+      @include subTitle;
+    }
+
+    .add-new {
+      @include button1;
+    }
+  }
+
+  .paymentInfo-cardData-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .payment-methods-wrapper {
+    width: 100%;
+    min-height: 100vh;
+  
+    .header-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+  
+      .add-payment-methods-title {
+        @include subTitle;
+      }
+  
+      .add-new {
+        @include button1;
+      }
+    }
+  
+    .paymentInfo-cardData-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .payment-methods-wrapper {
+    width: 100%;
+    min-height: 100vh;
+  
+    .header-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+  
+      .add-payment-methods-title {
+        @include subTitle;
+      }
+  
+      .add-new {
+        @include button1;
+      }
+    }
+  
+    .paymentInfo-cardData-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-detials-page {
+  .shop-details-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-detials-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-details-container {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-detials-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-details-container {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+}

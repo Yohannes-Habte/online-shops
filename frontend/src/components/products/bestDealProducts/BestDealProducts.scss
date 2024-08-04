@@ -1,0 +1,44 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.best-deals-container {
+  .subTitle {
+    @include subTitle;
+  }
+
+  .product-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .best-deals-container {
+    .subTitle {
+      @include subTitle;
+      font-size: $aafs;
+    }
+
+    .product-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 1rem;
+      row-gap: 1rem;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .best-deals-container {
+    .subTitle {
+      @include subTitle;
+      font-size: $aafs;
+    }
+
+    .product-wrapper {
+      @include productsGrid;
+    }
+  }
+}

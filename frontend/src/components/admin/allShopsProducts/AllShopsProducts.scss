@@ -1,0 +1,39 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.all-products-container {
+  width: $mobile;
+  margin: auto;
+  @include shadow3;
+
+  .all-products-title {
+    @include subTitle;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .all-products-container {
+    width: $tablet;
+    margin: auto;
+    @include shadow3;
+
+    .all-products-title {
+      @include subTitle;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .all-products-container {
+    width: $laptop;
+    margin: auto;
+    @include shadow3;
+
+    .all-products-title {
+      @include subTitle;
+    }
+  }
+}

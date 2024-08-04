@@ -1,0 +1,517 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-login-wrapper {
+  @include mobileDashboardScreen;
+
+  .title {
+    @include title;
+    font-size: $one;
+  }
+
+  .error-message {
+    @include shadow3;
+    width: 50%;
+    margin: auto;
+    @include paragraph;
+    color: $red;
+    background-color: #f1b7ad;
+  }
+
+  .seller-login-form {
+    @include shadow3;
+    width: 50%;
+    margin: auto;
+
+    // Seller image
+    .image-container {
+      @include flexCenter;
+      .image {
+        width: 4rem;
+        height: 4rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    // Seller name
+    .seller-name {
+      @include flexCenter;
+      padding: 0.2rem 0;
+      font-size: $one;
+    }
+
+    // Input container
+    .input-container {
+      position: relative;
+      @include inputContainer;
+
+      .input-field {
+        @include inputField;
+        margin-bottom: $radius;
+        padding-left: 2rem;
+        font-size: $one;
+
+        &::placeholder {
+          color: gray;
+        }
+      }
+
+      .input-label {
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        color: rgba(204, 204, 204, 0);
+      }
+
+      .input-highlight {
+        position: absolute;
+        bottom: 0.2rem;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background-color: $green;
+        transition: all 0.3s ease;
+      }
+
+      .input-field:focus + .input-label {
+        top: -5px;
+        font-size: 12px;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        position: absolute;
+        top: 1.1rem;
+        left: 0.5rem;
+        font-size: 1rem;
+        color: $green;
+      }
+
+      // displaying password
+      .password-display {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translatey(-50%);
+        font-size: 1.3rem;
+        cursor: pointer;
+      }
+    }
+
+    // Keep me sign in and forgot password
+    .keep-me-login--and-forgot-password-wrapper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      // Keep me sigin
+      .keep-me-login-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        .login-checkbox {
+          height: 1.2rem;
+          width: 1.6rem;
+          display: flex;
+          align-items: center;
+        }
+
+        .keep-me-login {
+          font-size: $one;
+        }
+      }
+
+      // Forgot password
+      .forgot-password-wrapper {
+        display: flex;
+        align-items: center;
+
+        .link {
+          margin-top: 1rem;
+          font-size: $one;
+          color: $blue;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+
+    // Button
+    .shop-login-button {
+      @include button3;
+      font-size: $one;
+    }
+
+    // Have no account
+    .haveNoAccount {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      font-size: $one;
+      margin-top: 1rem;
+
+      .link {
+        font-weight: $afw;
+        color: $blue;
+
+        &:hover {
+          color: $tomato;
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-login-wrapper {
+    @include tabletDashboardScreen;
+
+    .title {
+      @include title;
+      font-size: $one;
+    }
+
+    .error-message {
+      @include shadow3;
+      width: 50%;
+      margin: auto;
+      @include paragraph;
+      color: $red;
+      background-color: #f1b7ad;
+    }
+
+    .seller-login-form {
+      @include shadow3;
+      width: 50%;
+      margin: auto;
+
+      // Seller image
+      .image-container {
+        @include flexCenter;
+        .image {
+          width: 4rem;
+          height: 4rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      // Seller name
+      .seller-name {
+        @include flexCenter;
+        padding: 0.2rem 0;
+        font-size: $one;
+      }
+
+      // Input container
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          margin-bottom: $radius;
+          padding-left: 2rem;
+          font-size: $one;
+
+          &::placeholder {
+            color: gray;
+          }
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.2rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $green;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          top: -5px;
+          font-size: 12px;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1.1rem;
+          left: 0.5rem;
+          font-size: 1rem;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      // Keep me sign in and forgot password
+      .keep-me-login--and-forgot-password-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        // Keep me sigin
+        .keep-me-login-wrapper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+
+          .login-checkbox {
+            height: 1.2rem;
+            width: 1.6rem;
+            display: flex;
+            align-items: center;
+          }
+
+          .keep-me-login {
+            font-size: $one;
+          }
+        }
+
+        // Forgot password
+        .forgot-password-wrapper {
+          display: flex;
+          align-items: center;
+
+          .link {
+            margin-top: 1rem;
+            font-size: $one;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+
+      // Button
+      .shop-login-button {
+        @include button1;
+        font-size: $one;
+      }
+
+      // Have no account
+      .haveNoAccount {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-size: $one;
+        margin-top: 1rem;
+
+        .link {
+          font-weight: $afw;
+          color: $blue;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-login-wrapper {
+    @include desktopDashboardScreen;
+
+    .title {
+      @include title;
+    }
+
+    .error-message {
+      @include shadow3;
+      width: 50%;
+      margin: auto;
+      @include paragraph;
+      color: $red;
+      background-color: #f1b7ad;
+    }
+
+    .seller-login-form {
+      @include shadow3;
+      width: 50%;
+      margin: auto;
+
+      // Seller image
+      .image-container {
+        @include flexCenter;
+        .image {
+          width: 4rem;
+          height: 4rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      // Seller name
+      .seller-name {
+        @include flexCenter;
+        padding: 0.2rem 0;
+      }
+
+      // Input container
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          margin-bottom: $radius;
+          padding-left: 2rem;
+
+          &::placeholder {
+            color: gray;
+          }
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.2rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $green;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          top: -5px;
+          font-size: 12px;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1.1rem;
+          left: 0.5rem;
+          font-size: 1rem;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      // Keep me sign in and forgot password
+      .keep-me-login--and-forgot-password-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        // Keep me sigin
+        .keep-me-login-wrapper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+
+          .login-checkbox {
+            height: 1.2rem;
+            width: 1.6rem;
+            display: flex;
+            align-items: center;
+          }
+
+          .keep-me-login {
+            font-size: 1.2rem;
+          }
+        }
+
+        // Forgot password
+        .forgot-password-wrapper {
+          display: flex;
+          align-items: center;
+
+          .link {
+            margin-top: 1rem;
+            font-size: $afs;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+
+      // Button
+      .shop-login-button {
+        @include button3;
+      }
+
+      // Have no account
+      .haveNoAccount {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-size: $afs;
+        margin-top: 1rem;
+
+        .link {
+          font-weight: $afw;
+          color: $blue;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}

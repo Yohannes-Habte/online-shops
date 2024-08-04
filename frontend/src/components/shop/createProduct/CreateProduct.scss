@@ -1,0 +1,137 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.create-product-wrapper {
+  @include mobileDashboardScreen;
+  .subTitle {
+    @include title;
+    font-size: $one;
+  }
+
+  .error {
+    @include paragraph;
+    color: $red;
+    padding: 0 1rem;
+  }
+
+  .form {
+    width: $mobile;
+    margin: auto;
+    @include shadow3;
+    padding: 1rem 2rem;
+
+    .input-container {
+      position: relative;
+      @include inputContainer;
+
+      .input-field {
+        @include inputField;
+        font-size: $one;
+      }
+
+      .input-label {
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        color: rgba(204, 204, 204, 0);
+      }
+
+      .input-highlight {
+        position: absolute;
+        bottom: 0.5rem;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background-color: $green;
+        transition: all 0.3s ease;
+      }
+
+      .input-field:focus + .input-label {
+        top: 0;
+        font-size: 12px;
+        color: #81a3e6;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        position: absolute;
+        top: 1rem;
+        left: 0.5rem;
+        font-size: $afs;
+        color: $green;
+      }
+
+      // displaying password
+      .password-display {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translatey(-50%);
+        font-size: 1.3rem;
+        cursor: pointer;
+      }
+    }
+
+    .file-container {
+      .input-field {
+        display: none;
+      }
+
+      .image-label {
+        @include inputField;
+        font-size: $one;
+        display: flex;
+        gap: 1rem;
+        padding-left: 1rem;
+
+        .icon {
+          color: $green;
+        }
+      }
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .image {
+        width: 3rem;
+        height: 3rem;
+        border-radius: $radius;
+      }
+    }
+
+    .create-product-btn {
+      @include button1;
+      font-size: $one;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .create-product-wrapper {
+    @include tabletDashboardScreen;
+
+    .subTitle {
+      @include title;
+      font-size: $one;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .create-product-wrapper {
+    @include desktopDashboardScreen;
+
+    .subTitle {
+      @include title;
+    }
+  }
+}

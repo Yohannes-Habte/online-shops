@@ -1,0 +1,21 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.related-product-container {
+  @include mobileProducts;
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .related-product-container {
+    @include tabletProductsGrid;
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px)  {
+  .related-product-container {
+    @include productsGrid;
+  }
+}

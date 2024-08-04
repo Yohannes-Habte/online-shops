@@ -1,0 +1,220 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile Screen Size
+.navbar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+  flex: 3;
+
+  // List items
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-menu.active-navbar-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: absolute;
+    top: 1.5rem;
+    left: -2rem;
+    width: 250px;
+    background-color: $yellow;
+    border-radius: 0 0 $radius 0;
+    padding: 2rem;
+    transition: 0.5s;
+    z-index: 999;
+
+    .list-item {
+      padding: 1rem;
+
+      &:hover {
+        background-color: $navbar-hover5;
+      }
+      .active {
+        color: $red;
+        font-size: $afs;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -1rem;
+          width: 100%;
+          height: 2px;
+          background-color: $red;
+        }
+      }
+
+      .not-active {
+        color: $black;
+        font-size: $afs;
+      }
+    }
+  }
+
+  .active-navbar-menu {
+    left: 0px;
+  }
+
+  // Screen size management
+  .icon-screen-size-handler-wrapper {
+    display: block;
+    z-index: 999;
+
+    .open-menu-icon {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
+
+    .close-menu-icon {
+      position: absolute;
+      top: 2rem;
+      right: 0;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .navbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    flex: 3;
+
+    // List items
+    .navbar-menu {
+      display: none;
+    }
+
+    .navbar-menu.active-navbar-menu {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      position: absolute;
+      top: 1.5rem;
+      left: -2rem;
+      width: 250px;
+      background-color: $yellow;
+      border-radius: 0 0 $radius 0;
+      padding: 2rem;
+      transition: 0.5s;
+      z-index: 999;
+
+      .list-item {
+        padding: 1rem;
+
+        &:hover {
+          background-color: $navbar-hover5;
+        }
+        .active {
+          color: $red;
+          font-size: $afs;
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1rem;
+            width: 100%;
+            height: 2px;
+            background-color: $red;
+          }
+        }
+
+        .not-active {
+          color: $black;
+          font-size: $afs;
+        }
+      }
+    }
+
+    .active-navbar-menu {
+      left: 0px;
+    }
+
+    // Screen size management
+    .icon-screen-size-handler-wrapper {
+      display: block;
+      z-index: 999;
+
+      .open-menu-icon {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+      }
+
+      .close-menu-icon {
+        position: absolute;
+        top: 2rem;
+        right: 6rem;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .navbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    flex: 3;
+
+    // List items
+    .navbar-menu {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+
+      .list-item {
+        padding: 0.5rem 1rem;
+
+        &:hover {
+          background-color: $navbar-hover5;
+        }
+        .active {
+          color: $red;
+          font-size: $afs;
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1rem;
+            width: 100%;
+            height: 2px;
+            background-color: $red;
+          }
+        }
+
+        .not-active {
+          color: $white;
+          font-size: $afs;
+        }
+      }
+    }
+
+    // Screen size management
+    .icon-screen-size-handler-wrapper {
+      display: none;
+      .icon-screen-size-handler {
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+@import '../../styles/Variables.scss';
+@import '../../styles/Mixins.scss';
+
+.home-page {
+
+  .home-page-container {
+    width: 100%;
+    min-height: 100vh;
+    @include laptopPageContainer;
+  }
+}

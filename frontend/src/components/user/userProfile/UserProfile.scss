@@ -1,0 +1,479 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.profile-form-page {
+  position: relative;
+
+  .profile-form-container {
+    width: 100%;
+    margin: 1rem auto;
+    @include shadow3;
+
+    .profile-form-title {
+      @include subTitle;
+      text-align: center;
+      font-size: $afs;
+    }
+
+    .image-container {
+      @include flexCenter;
+      margin: 1rem 0 2rem 0;
+      position: relative;
+
+      .image {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .image-upload {
+        color: $red;
+        position: absolute;
+        bottom: -1.6rem;
+
+        .image-upload-error {
+          color: $red;
+        }
+
+        .percentage-upload {
+          color: $green;
+        }
+
+        .successful-upload {
+          color: $green;
+        }
+      }
+    }
+
+    // Form styling
+    .profile-fieldset {
+      @include fieldset;
+
+      .profile-legend {
+        @include legend;
+        font-size: $afs;
+      }
+
+      .profile-form {
+        width: $mobile;
+        margin: auto;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            margin-bottom: $radius;
+
+            &::placeholder {
+              color: gray;
+            }
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.2rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $yellow;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+            color: #007bff;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 1.1rem;
+            left: 0.5rem;
+            font-size: 1rem;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .input-consent {
+          @include inputContainer;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          gap: 0.5rem;
+
+          .profile-consent-input {
+            height: 1.6rem;
+            width: 1.3rem;
+          }
+
+          .accept {
+            font-size: $afs;
+          }
+
+          .terms-of-user {
+            font-size: $afs;
+            color: $blue;
+          }
+        }
+
+        .profile-button {
+          width: 100%;
+          @include button3;
+          margin: 0 0 1rem 0;
+          align-self: flex-start;
+        }
+      }
+    }
+  }
+
+  .profile-informamtion-container {
+    width: 100%;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .profile-form-page {
+    position: relative;
+
+    .profile-form-container {
+      width: 100%;
+      margin: 1rem auto;
+      @include shadow3;
+
+      .profile-form-title {
+        @include subTitle;
+        text-align: center;
+      }
+
+      .image-container {
+        @include flexCenter;
+        margin: 1rem 0 2rem 0;
+        position: relative;
+
+        .image {
+          width: 5rem;
+          height: 5rem;
+          object-fit: cover;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .image-upload {
+          color: $red;
+          position: absolute;
+          bottom: -1.6rem;
+
+          .image-upload-error {
+            color: $red;
+          }
+
+          .percentage-upload {
+            color: $green;
+          }
+
+          .successful-upload {
+            color: $green;
+          }
+        }
+      }
+
+      // Form styling
+      .profile-fieldset {
+        @include fieldset;
+
+        .profile-legend {
+          @include legend;
+        }
+
+        .profile-form {
+          width: $tablet;
+          margin: auto;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          .input-container {
+            position: relative;
+            @include inputContainer;
+
+            .input-field {
+              @include inputField;
+              margin-bottom: $radius;
+              padding-left: 2rem;
+
+              &::placeholder {
+                color: gray;
+              }
+            }
+
+            .input-label {
+              position: absolute;
+              top: 0;
+              left: 2rem;
+              color: rgba(204, 204, 204, 0);
+            }
+
+            .input-highlight {
+              position: absolute;
+              bottom: 0.2rem;
+              left: 0;
+              height: 2px;
+              width: 0;
+              background-color: $yellow;
+              transition: all 0.3s ease;
+            }
+
+            .input-field:focus + .input-label {
+              top: -5px;
+              font-size: 12px;
+              color: #007bff;
+            }
+
+            .input-field:focus + .input-label + .input-highlight {
+              width: 100%;
+            }
+
+            .icon {
+              position: absolute;
+              top: 1.1rem;
+              left: 0.5rem;
+              font-size: 1rem;
+            }
+
+            // displaying password
+            .password-display {
+              position: absolute;
+              top: 50%;
+              right: 1rem;
+              transform: translatey(-50%);
+              font-size: 1.3rem;
+              cursor: pointer;
+            }
+          }
+
+          .input-consent {
+            @include inputContainer;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 0.5rem;
+
+            .profile-consent-input {
+              height: 1.6rem;
+              width: 1.3rem;
+            }
+
+            .accept {
+              font-size: $afs;
+            }
+
+            .terms-of-user {
+              font-size: $afs;
+              color: $blue;
+            }
+          }
+
+          .profile-button {
+            width: 100%;
+            @include button3;
+            margin: 0 0 1rem 0;
+            align-self: flex-start;
+          }
+        }
+      }
+    }
+
+    .profile-informamtion-container {
+      width: $tablet;
+      margin: auto;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .profile-form-page {
+    position: relative;
+
+    .profile-form-container {
+      width: 100%;
+      margin: 1rem auto;
+      @include shadow3;
+
+      .profile-form-title {
+        @include subTitle;
+        text-align: center;
+      }
+
+      .image-container {
+        @include flexCenter;
+        margin: 1rem 0 2rem 0;
+        position: relative;
+
+        .image {
+          width: 5rem;
+          height: 5rem;
+          object-fit: cover;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .image-upload {
+          color: $red;
+          position: absolute;
+          bottom: -1.6rem;
+
+          .image-upload-error {
+            color: $red;
+          }
+
+          .percentage-upload {
+            color: $green;
+          }
+
+          .successful-upload {
+            color: $green;
+          }
+        }
+      }
+
+      // Form styling
+      .profile-fieldset {
+        @include fieldset;
+
+        .profile-legend {
+          @include legend;
+        }
+
+        .profile-form {
+          width: $laptop;
+          margin: auto;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          column-gap: 1rem;
+
+          .input-container {
+            position: relative;
+            @include inputContainer;
+
+            .input-field {
+              @include inputField;
+              margin-bottom: $radius;
+              padding-left: 2rem;
+
+              &::placeholder {
+                color: gray;
+              }
+            }
+
+            .input-label {
+              position: absolute;
+              top: 0;
+              left: 2rem;
+              color: rgba(204, 204, 204, 0);
+            }
+
+            .input-highlight {
+              position: absolute;
+              bottom: 0.2rem;
+              left: 0;
+              height: 2px;
+              width: 0;
+              background-color: $yellow;
+              transition: all 0.3s ease;
+            }
+
+            .input-field:focus + .input-label {
+              top: -5px;
+              font-size: 12px;
+              color: #007bff;
+            }
+
+            .input-field:focus + .input-label + .input-highlight {
+              width: 100%;
+            }
+
+            .icon {
+              position: absolute;
+              top: 1.1rem;
+              left: 0.5rem;
+              font-size: 1rem;
+            }
+
+            // displaying password
+            .password-display {
+              position: absolute;
+              top: 50%;
+              right: 1rem;
+              transform: translatey(-50%);
+              font-size: 1.3rem;
+              cursor: pointer;
+            }
+          }
+
+          .input-consent {
+            @include inputContainer;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 0.5rem;
+            padding-left: 0.5rem;
+
+            .profile-consent-input {
+              height: 1.6rem;
+              width: 1.3rem;
+            }
+
+            .accept {
+              font-size: $afs;
+            }
+
+            .terms-of-user {
+              font-size: $afs;
+              color: $blue;
+            }
+          }
+
+          .profile-button {
+            width: 100%;
+            @include button3;
+            margin: 0 0 1rem 0;
+            align-self: flex-start;
+          }
+        }
+      }
+    }
+
+    .profile-informamtion-container {
+      width: $laptop;
+      margin: auto;
+    }
+  }
+}

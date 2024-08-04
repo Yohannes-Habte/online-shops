@@ -1,0 +1,49 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.admin-dashboard-page {
+  .admin-dashboard-page-container {
+    .admin-dashboard-page-title {
+      @include title;
+      font-size: $afs;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-page {
+    .admin-dashboard-page-container {
+      .admin-dashboard-page-title {
+        @include title;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-dashboard-page {
+    .admin-dashboard-page-container {
+      .admin-dashboard-page-title {
+        @include title;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}

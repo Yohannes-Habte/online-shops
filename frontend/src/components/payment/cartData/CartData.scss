@@ -1,0 +1,29 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.cart-data-wrapper {
+  flex: 1;
+  @include shadow3;
+
+  .box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .cart-data-subTitle {
+      @include subTitle;
+    }
+
+    .cart-data-paragraph {
+      @include paragraph;
+      font-weight: $aafw;
+    }
+  }
+
+  .cart-data-total-price {
+    font-size: $aafs;
+    text-align: right;
+    margin-top: 0.5rem;
+  }
+}

@@ -1,0 +1,137 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.sidebar-dashboar {
+  width: 10%;
+  @include shadow3;
+  background-color: $sidebar-bg;
+
+  .sidebar-dashboard-items {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1rem;
+
+    .sidebar-dashboard-item {
+      &:hover {
+        color: $tomato;
+        background: $sidebar-hover;
+      }
+
+      .active-sidebar-dashboard-icon {
+        .sidebar-dashboard-icon {
+          font-size: 1.4rem;
+          color: $red;
+        }
+      }
+
+      .passive-sidebar-dashboard-icon {
+        font-size: 1.4rem;
+        color: $green;
+      }
+
+      .active-sidebar-dashboard-link {
+        display: none;
+      }
+
+      .passive-sidebar-dashboard-link {
+        display: none;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .sidebar-dashboar {
+    width: 20%;
+    @include shadow3;
+    background-color: $sidebar-bg;
+
+    .sidebar-dashboard-items {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1rem;
+
+      .sidebar-dashboard-item {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-size: $afs;
+        padding: 0.5rem 0;
+
+        &:hover {
+          color: $tomato;
+          background: $sidebar-hover;
+        }
+
+        .sidebar-dashboard-icon {
+          font-size: 1.4rem;
+          color: $green;
+        }
+
+        .active-sidebar-dashboard-link {
+          display: block;
+          color: $red;
+        }
+
+        .passive-sidebar-dashboard-link {
+          display: block;
+          color: $gray;
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .sidebar-dashboar {
+    width: 15%;
+    @include shadow3;
+    background-color: $sidebar-bg;
+
+    .sidebar-dashboard-items {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1rem;
+
+      .sidebar-dashboard-item {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-size: $afs;
+        padding: 0.5rem 0;
+
+        &:hover {
+          color: $tomato;
+          background: $sidebar-hover;
+        }
+
+        .sidebar-dashboard-icon {
+          font-size: 1.4rem;
+          color: $green;
+        }
+
+        .active-sidebar-dashboard-link {
+          display: block;
+          color: $red;
+        }
+
+        .passive-sidebar-dashboard-link {
+          display: block;
+          color: $gray;
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}

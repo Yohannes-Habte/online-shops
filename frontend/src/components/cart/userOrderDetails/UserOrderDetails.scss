@@ -1,0 +1,212 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.user-order-details-container {
+  .title {
+    @include subTitle;
+  }
+
+  // Order id and date
+  .order-id-and-date {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .order-id {
+      @include paragraph;
+      color: $gray;
+    }
+
+    .order-placed-date {
+      color: $blue;
+    }
+  }
+
+  // ordered wrapper
+  .ordered-items-wrapper {
+    @include productsGrid;
+
+    .image-name-quantity-wrapper {
+      @include shadow3;
+
+      .image-container {
+        .image {
+          @include image;
+        }
+      }
+
+      .name-price-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 0.5rem;
+      }
+
+      .review-btn {
+        @include button1;
+      }
+    }
+  }
+
+  // review popup
+  .modal-container {
+    width: 100%;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    background-color: $popup-bg;
+
+    .review-order-wrapper {
+      position: relative;
+      width: 50%;
+      margin: 1rem auto;
+      background-color: $white;
+      @include shadow3;
+
+      .close-icon {
+        @include close;
+        top: 0.5rem;
+      }
+
+      .review-title {
+        @include subTitle;
+      }
+
+      .selected-item-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+
+        .image-container {
+          .image {
+            @include image;
+          }
+        }
+
+        .name-quantity-rating {
+          .name-and-quantity {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+          }
+        }
+      }
+
+      .rating {
+        @include subTitle;
+        padding: 0;
+      }
+
+      // Rating icon
+
+      .star-rating-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+
+        .rated-icon {
+          color: $yellow;
+          font-size: $afs;
+        }
+
+        .unratedicon {
+          font-size: $afs;
+          color: $yellow;
+        }
+      }
+
+      // Form
+      .form {
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .text-area {
+            @include inputField;
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .text-area:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+            color: #81a3e6;
+          }
+
+          .text-area:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 0.1;
+            left: 0.5rem;
+            font-size: 1rem;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .comment-btn {
+          @include button1;
+        }
+      }
+    }
+  }
+
+  .hr {
+    @include hr;
+  }
+
+  // Total price
+  .total-price {
+    text-align: right;
+  }
+  // Shipping address and others
+  .shipping-paymentinfo-refund-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    @include shadow3;
+
+    .shipping-address {
+    }
+
+    .status-wrapper {
+      .give-refund-btn {
+        @include button1;
+      }
+    }
+  }
+  .send-message-btn {
+    @include button1;
+  }
+}

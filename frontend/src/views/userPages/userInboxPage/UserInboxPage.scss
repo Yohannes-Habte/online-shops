@@ -1,0 +1,28 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.user-inbox-page {
+  width: 100%;
+  .user-inbox-container {
+    width: 100%;
+    max-height: 73vh;
+    display: grid;
+    grid-template-columns: 20% 78%;
+    column-gap: 1rem;
+
+    .chats-lists-wrapper {
+      @include shadow3;
+    }
+
+    .chat-messages-container {
+      width: 100%;
+      @include shadow3;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {}

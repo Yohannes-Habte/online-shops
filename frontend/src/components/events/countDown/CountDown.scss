@@ -1,0 +1,14 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.event-timer {
+  .time-up {
+    @include subTitle;
+  }
+}
+
+.timer {
+  font-weight: $aafw;
+  color: $tomato;
+  padding: 0.3rem;
+}

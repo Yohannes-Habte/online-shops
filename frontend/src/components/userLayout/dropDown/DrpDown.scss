@@ -1,0 +1,19 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.categories-data-wrapper {
+
+  position: absolute;
+  top: 2.8rem;
+  left: 0;
+  width: 100%;
+  background-color: $white;
+  @include shadow3;
+  cursor: pointer;
+  z-index: 99;
+
+  .subTitle {
+    @include subTitle;
+    font-size: $afs;
+  }
+}

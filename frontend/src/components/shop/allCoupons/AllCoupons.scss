@@ -1,0 +1,335 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.coupons-wrapper {
+  @include mobileDashboardScreen;
+  @include shadow3;
+
+  .create-coupon-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .subTitle {
+      @include subTitle;
+      font-size: $one;
+    }
+    .add-coupon-btn {
+      @include button1;
+      font-size: $one;
+    }
+  }
+
+  .create-coupon-code-form-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $popup-display-bg;
+    width: 100%;
+    height: 100%;
+    @include flexCenter;
+
+    .form {
+      position: relative;
+      width: 50%;
+      margin: auto;
+      background-color: $white;
+      @include shadow1;
+
+      .close-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+      }
+
+      .subTitle {
+        @include subTitle;
+        font-size: $one;
+      }
+
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          font-size: $one;
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.5rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $green;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          top: -5px;
+          font-size: 12px;
+          color: $white;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1rem;
+          left: 0.5rem;
+          font-size: $afs;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      .coupon-btn {
+        @include button1;
+        font-size: $one;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .coupons-wrapper {
+    @include tabletDashboardScreen;
+    .create-coupon-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .subTitle {
+        @include subTitle;
+        font-size: $one;
+      }
+      .add-coupon-btn {
+        @include button1;
+        font-size: $one;
+      }
+    }
+
+    .create-coupon-code-form-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: $popup-display-bg;
+      width: 100%;
+      height: 100%;
+      @include flexCenter;
+
+      .form {
+        position: relative;
+        width: 50%;
+        margin: auto;
+        background-color: $white;
+        @include shadow1;
+
+        .close-icon {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          cursor: pointer;
+        }
+
+        .subTitle {
+          @include subTitle;
+          font-size: $one;
+        }
+
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            font-size: $one;
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+            color: $white;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 1rem;
+            left: 0.5rem;
+            font-size: $afs;
+            color: $green;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .coupon-btn {
+          @include button1;
+          font-size: $one;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .coupons-wrapper {
+    @include desktopDashboardScreen;
+
+    .create-coupon-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .subTitle {
+        @include subTitle;
+        font-size: $aafs;
+      }
+      .add-coupon-btn {
+        @include button1;
+      }
+    }
+
+    .create-coupon-code-form-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: $popup-display-bg;
+      width: 100%;
+      height: 100%;
+      @include flexCenter;
+
+      .form {
+        position: relative;
+        width: 50%;
+        margin: auto;
+        background-color: $white;
+        @include shadow1;
+
+        .close-icon {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          cursor: pointer;
+        }
+
+        .subTitle {
+          @include subTitle;
+        }
+
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+            color: $white;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 1rem;
+            left: 0.5rem;
+            font-size: $afs;
+            color: $green;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .coupon-btn {
+          @include button1;
+        }
+      }
+    }
+  }
+}

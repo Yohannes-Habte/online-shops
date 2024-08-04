@@ -1,0 +1,131 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.admin-dashboard-shidebar-wrapper {
+  width: 10%;
+  @include shadow3;
+  .admin-dashboard-sidebar-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .admin-dashboard-sidebar-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+
+      .passive-icon-status {
+        .admin-icon {
+          font-size: $afs;
+          color: $green;
+        }
+      }
+
+      .active-icon-status {
+        .admin-icon {
+          font-size: $afs;
+          color: red;
+        }
+      }
+
+      .active-tab-text {
+        color: $red;
+        font-size: $one;
+      }
+
+      .passive-tab-text {
+        color: $black;
+        font-size: $one;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-shidebar-wrapper {
+    width: 20%;
+    @include shadow3;
+    .admin-dashboard-sidebar-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      .admin-dashboard-sidebar-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        .active-tab-icon {
+          .icon {
+            font-size: $afs;
+            color: $red;
+          }
+        }
+
+        .passive-tab-icon {
+          .icon {
+            font-size: $afs;
+            color: $black;
+          }
+        }
+
+        .active-tab-text {
+          color: $red;
+          font-size: $one;
+        }
+
+        .passive-tab-text {
+          color: $black;
+          font-size: $one;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-dashboard-shidebar-wrapper {
+    width: 15%;
+    @include shadow3;
+    .admin-dashboard-sidebar-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      .admin-dashboard-sidebar-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        .active-tab-icon {
+          .icon {
+            font-size: $aafs;
+          }
+        }
+
+        .passive-tab-icon {
+          .icon {
+            font-size: $afs;
+            color: $black;
+          }
+        }
+
+        .active-tab-text {
+          color: $red;
+          font-size: $one;
+        }
+
+        .passive-tab-text {
+          color: $black;
+          font-size: $one;
+        }
+      }
+    }
+  }
+}

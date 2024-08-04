@@ -1,0 +1,310 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile styling
+.single-product-details {
+  min-height: 100vh;
+
+  .product-title {
+    @include title;
+    font-size: $afs;
+  }
+
+  // Product details
+  .product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    // Product image
+    .image-container {
+      .image {
+        @include MobileImage;
+      }
+    }
+
+    // Product description
+    .product-description {
+      @include shadow3;
+
+      .subTitle {
+        @include subTitle;
+      }
+
+      .description {
+        @include paragraph;
+      }
+
+      // Add to cart
+      .quantity-add-to-cart-wishlist {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+
+        .quantity-wrapper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          .icon-add-to-cart {
+            @include addIcon;
+          }
+
+          .amount-subTitle {
+            @include subTitle;
+          }
+        }
+
+        .add-to-cart-btn {
+          @include button1;
+          font-size: $sfs;
+        }
+
+        .active-wishlist {
+          font-size: $aafs;
+          color: $red;
+          cursor: pointer;
+        }
+
+        .passive-wishlist {
+          font-size: $aafs;
+          color: $blue;
+          cursor: pointer;
+        }
+      }
+
+      // Product rating
+      .product-rating {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+
+        .product-name {
+          display: none;
+        }
+
+        .rating {
+          position: absolute;
+          left: 0;
+        }
+
+        .send-message {
+          @include button2;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.1rem;
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .single-product-details {
+    min-height: 100vh;
+
+    .product-title {
+      @include title;
+    }
+
+    // Product details
+    .product-details {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      // Product image
+      .image-container {
+        .image {
+         @include MobileImage;
+        }
+      }
+
+      // Product description
+      .product-description {
+        @include shadow3;
+
+        .subTitle {
+          @include subTitle;
+        }
+
+        .description {
+          @include paragraph;
+          line-height: $afs;
+          text-align: justify;
+        }
+
+        // Add to cart
+        .quantity-add-to-cart-wishlist {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          gap: 2rem;
+
+          .quantity-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            .icon-add-to-cart {
+              @include addIcon;
+            }
+
+            .amount-subTitle {
+              @include subTitle;
+            }
+          }
+
+          .add-to-cart-btn {
+            @include button1;
+          }
+
+          .active-wishlist {
+            font-size: $aafs;
+            color: $red;
+            cursor: pointer;
+          }
+
+          .passive-wishlist {
+            font-size: $aafs;
+            color: $blue;
+            cursor: pointer;
+          }
+        }
+
+        // Product rating
+        .product-rating {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 1rem;
+
+          .rating {
+            @include paragraph;
+          }
+
+          .send-message {
+            @include button2;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .single-product-details {
+    min-height: 100vh;
+
+    .product-title {
+      @include title;
+    }
+
+    // Product details
+    .product-details {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      // Product image
+      .image-container {
+        .image {
+          border-radius: $radius;
+        }
+      }
+
+      // Product description
+      .product-description {
+        @include shadow3;
+
+        .subTitle {
+          @include subTitle;
+        }
+
+        .description {
+          @include paragraph;
+        }
+
+        // Add to cart
+        .quantity-add-to-cart-wishlist {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          gap: 2rem;
+
+          .quantity-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            .icon-add-to-cart {
+              @include addIcon;
+            }
+
+            .amount-subTitle {
+              @include subTitle;
+            }
+          }
+
+          .add-to-cart-btn {
+            @include button1;
+          }
+
+          .active-wishlist {
+            font-size: $aafs;
+            color: $red;
+            cursor: pointer;
+          }
+
+          .passive-wishlist {
+            font-size: $aafs;
+            color: $blue;
+            cursor: pointer;
+          }
+        }
+
+        // Product rating
+        .product-rating {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 1rem;
+
+          .product-name {
+            display: block;
+            @include subTitle;
+          }
+
+          .rating {
+            @include paragraph;
+          }
+
+          .send-message {
+            @include button2;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.1rem;
+          }
+        }
+      }
+    }
+  }
+}

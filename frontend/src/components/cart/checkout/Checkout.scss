@@ -1,0 +1,60 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.cart-checkout-wrapper {
+  width: 100%;
+  min-height: 100vh;
+
+  .shipping-and-cart-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .proceed-payment {
+    @include button1;
+    width: fit-content;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .cart-checkout-wrapper {
+    width: 100%;
+    min-height: 100vh;
+
+    .shipping-and-cart-info-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .proceed-payment {
+      @include button1;
+      width: fit-content;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .cart-checkout-wrapper {
+    width: 100%;
+    min-height: 100vh;
+
+    .shipping-and-cart-info-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .proceed-payment {
+      @include button1;
+      width: fit-content;
+    }
+  }
+}

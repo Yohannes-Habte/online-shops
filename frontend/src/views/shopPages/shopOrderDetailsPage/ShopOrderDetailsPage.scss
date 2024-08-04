@@ -1,0 +1,45 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-order-details-page {
+  .shop-order-details-container {
+    width: $laptop;
+    min-height: 100vh;
+    margin: 1rem auto;
+    .title {
+      @include title;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-order-details-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-order-details-container {
+      width: $laptop;
+      min-height: 100vh;
+      margin: 1rem auto;
+      .title {
+        @include title;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-order-details-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-order-details-container {
+      width: $laptop;
+      min-height: 100vh;
+      margin: 1rem auto;
+      .title {
+        @include title;
+      }
+    }
+  }
+}

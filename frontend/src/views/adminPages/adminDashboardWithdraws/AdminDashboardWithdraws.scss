@@ -1,0 +1,45 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.admin-dashboard-withdraws-page {
+  .admin-dashboard-withdraws-page-container {
+    .admin-dashboard-withdraws-page-title {
+      @include title;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-withdraws-page {
+    .admin-dashboard-withdraws-page-container {
+      .admin-dashboard-withdraws-page-title {
+        @include title;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-dashboard-withdraws-page {
+    .admin-dashboard-withdraws-page-container {
+      .admin-dashboard-withdraws-page-title {
+        @include title;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}

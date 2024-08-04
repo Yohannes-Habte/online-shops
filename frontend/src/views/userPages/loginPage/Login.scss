@@ -1,0 +1,315 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.lagin-page {
+  @include page;
+
+  .login-container {
+    width: $mobile;
+    margin: auto;
+    @include shadow3;
+
+    .login-title {
+      @include title;
+      font-size: $afs;
+    }
+
+    .login-icon-container {
+      width: 24%;
+      margin: auto;
+      .login-icon {
+        align-items: center;
+        font-size: 4rem;
+        padding-top: 1rem;
+      }
+    }
+
+    .login-fieldset {
+      @include fieldset;
+
+      .login-legend {
+        @include legend;
+      }
+
+      .login-form {
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            top: -5px;
+            font-size: 12px;
+            color: #81a3e6;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 0.1;
+            left: 0.5rem;
+            font-size: 1rem;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+
+        .login-checkbox-forget-password {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 2rem;
+
+          .login-checkbox-keep-signed-in {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+
+            .login-checkbox {
+              height: 1.2rem;
+              width: 1.6rem;
+              display: flex;
+              align-items: center;
+            }
+
+            .keep-me-login {
+              font-size: 1.2rem;
+            }
+          }
+
+          .forget-password {
+            width: $laptop;
+            display: flex;
+            align-items: center;
+
+            .link {
+              margin-top: 1rem;
+              font-size: $afs;
+              color: $blue;
+
+              &:hover {
+                color: $tomato;
+              }
+            }
+          }
+        }
+
+        .login-button {
+          @include button3;
+        }
+
+        .haveNoAccount {
+          font-size: $afs;
+          margin-top: 1rem;
+
+          .link-to {
+            font-weight: $afw;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .lagin-page {
+    .login-title {
+      @include title;
+    }
+
+    .login-container {
+      width: 80%;
+      margin: auto;
+      @include shadow3;
+
+      .login-icon-container {
+        width: 12%;
+        margin: 2rem auto;
+      }
+
+      .login-fieldset {
+        width: $laptop;
+        margin: auto;
+
+        .login-form {
+          .login-checkbox-forget-password {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+
+            .login-checkbox-keep-signed-in {
+              margin-top: 1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Laptop screen size */
+@media screen and (min-width: 1024px) {
+  .lagin-page {
+    @include page;
+
+    .login-container {
+      width: 50%;
+      margin: auto;
+      @include shadow3;
+
+      .error-message {
+        @include paragraph;
+        color: $red;
+        background-color: #f1b7ad;
+      }
+
+      .login-title {
+        @include title;
+        color: $green;
+      }
+
+      .login-icon-container {
+        width: 12%;
+        margin: auto;
+      }
+
+      .login-fieldset {
+        width: 90%;
+        margin: auto;
+
+        .login-legend {
+          @include legend;
+        }
+
+        .login-form {
+          .input-container {
+            position: relative;
+            @include inputContainer;
+
+            .input-field {
+              @include inputField;
+              margin-bottom: $radius;
+              padding-left: 2rem;
+
+              &::placeholder {
+                color: gray;
+              }
+            }
+
+            .input-label {
+              position: absolute;
+              top: 0;
+              left: 2rem;
+              color: rgba(204, 204, 204, 0);
+            }
+
+            .input-highlight {
+              position: absolute;
+              bottom: 0.2rem;
+              left: 0;
+              height: 2px;
+              width: 0;
+              background-color: $green;
+              transition: all 0.3s ease;
+            }
+
+            .input-field:focus + .input-label {
+              top: -5px;
+              font-size: 12px;
+            }
+
+            .input-field:focus + .input-label + .input-highlight {
+              width: 100%;
+            }
+
+            .icon {
+              position: absolute;
+              top: 1.1rem;
+              left: 0.5rem;
+              font-size: 1rem;
+              color: $green;
+            }
+
+            // displaying password
+            .password-display {
+              position: absolute;
+              top: 50%;
+              right: 1rem;
+              transform: translatey(-50%);
+              font-size: 1.3rem;
+              cursor: pointer;
+            }
+          }
+          .login-checkbox-forget-password {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+
+            .login-checkbox-keep-signed-in {
+              margin-top: 1rem;
+            }
+          }
+
+          .login-button {
+            @include button3;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styling email and password validation
+
+.errorInvisible {
+  display: none;
+}
+
+.errorVisible {
+  display: block;
+  color: red;
+}

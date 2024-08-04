@@ -1,0 +1,20 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-orders-wrappe{
+    @include mobileDashboardScreen;
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    .shop-orders-wrappe{
+        @include tabletDashboardScreen;
+    }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+    .shop-orders-wrappe{
+        @include desktopDashboardScreen;
+    }
+}

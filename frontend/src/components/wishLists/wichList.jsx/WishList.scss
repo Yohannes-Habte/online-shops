@@ -1,0 +1,54 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.whilist {
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: $popup-bg;
+
+  .wishlist-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100vh;
+    background-color: $popup-display-bg;
+    @include shadow1;
+    overflow: scroll;
+    scrollbar-color: $red $yellow;
+    scrollbar-width: thin;
+
+    // When there is no order
+    .empty-wishlist-wrapper {
+      position: relative;
+
+      .close-empty-icon {
+        @include close;
+      }
+
+      .empty-cart {
+        @include subTitle;
+      }
+    }
+    // When there is an order
+
+    .wishlist-order-wrapper {
+      position: relative;
+
+      .close-order-icon {
+        @include close;
+      }
+
+      .wishlist-items {
+        @include subTitle;
+      }
+
+      .single-cart-wrapper {
+      }
+    }
+  }
+}

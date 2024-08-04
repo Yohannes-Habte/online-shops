@@ -1,0 +1,149 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen size
+.all-users-wrapper {
+  position: relative;
+  width: $laptop;
+  margin: auto;
+  @include shadow3;
+
+  .all-users-title {
+    @include subTitle;
+  }
+
+  .user-delete-confirmation-wrapper {
+    background-color: $delete-confirmation-bg;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    @include shadow1;
+    padding: 1rem;
+
+    .delete-icon {
+      @include close;
+      margin-top: 0.5rem;
+    }
+    .you-want-delete-user {
+      @include paragraph;
+      margin: 1rem 0;
+    }
+
+    .cancel-or-confirm-delete {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 1rem;
+
+      .cancel-delete {
+        @include button5;
+      }
+
+      .confirm-delete {
+        @include button5;
+      }
+    }
+  }
+}
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .all-users-wrapper {
+    position: relative;
+    width: $laptop;
+    margin: auto;
+    @include shadow3;
+
+    .all-users-title {
+      @include subTitle;
+    }
+
+    .user-delete-confirmation-wrapper {
+      background-color: $delete-confirmation-bg;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+      @include shadow1;
+      padding: 1rem;
+
+      .delete-icon {
+        @include close;
+        margin-top: 0.5rem;
+      }
+      .you-want-delete-user {
+        @include paragraph;
+        margin: 1rem 0;
+      }
+
+      .cancel-or-confirm-delete {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 1rem;
+
+        .cancel-delete {
+          @include button5;
+        }
+
+        .confirm-delete {
+          @include button5;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .all-users-wrapper {
+    position: relative;
+    width: $laptop;
+    margin: auto;
+    @include shadow3;
+
+    .all-users-title {
+      @include subTitle;
+    }
+
+    .user-delete-confirmation-wrapper {
+      background-color: $delete-confirmation-bg;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+      @include shadow1;
+      padding: 1rem;
+
+      .delete-icon {
+        @include close;
+        margin-top: 0.5rem;
+      }
+      .you-want-delete-user {
+        @include paragraph;
+        margin: 1rem 0;
+      }
+
+      .cancel-or-confirm-delete {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 1rem;
+
+        .cancel-delete {
+          @include button5;
+        }
+
+        .confirm-delete {
+          @include button5;
+        }
+      }
+    }
+  }
+}

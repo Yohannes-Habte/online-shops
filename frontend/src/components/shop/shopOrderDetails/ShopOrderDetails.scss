@@ -1,0 +1,456 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.order-detail-wrapper {
+  @include mobileDashboardScreen;
+
+  .order-details-list-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .subTitle {
+      @include subTitle;
+      font-size: $one;
+    }
+
+    .order-list {
+      @include button1;
+      font-size: $one;
+
+      .link {
+        color: $white;
+        font-weight: $aafw;
+        font-size: $one;
+      }
+    }
+  }
+  .order-id-and-date {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .order-id {
+      @include paragraph;
+      color: $gray;
+      font-size: $one;
+    }
+
+    .order-placed-date {
+      color: $blue;
+      font-size: $one;
+    }
+  }
+
+  // Order items
+  .order-items-wrapper {
+    @include productsGrid;
+
+    .order {
+      @include shadow3;
+
+      .image-container {
+        .image {
+          @include image;
+        }
+      }
+
+      .name-and-quantity {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        font-size: $one;
+        padding: 0 0.5rem;
+      }
+    }
+  }
+
+  .hr {
+    @include hr;
+  }
+
+  // Total price
+  .total-price {
+    text-align: right;
+    font-size: $one;
+  }
+
+  // Shipping address and payment status
+  .shipping-address-and-payment-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    @include shadow3;
+    margin: 1rem 0;
+
+    // Shipping -address
+    .shipping-address-wrapper {
+      .shipping-address-title {
+        @include subTitle;
+        font-size: $one;
+      }
+      .address {
+        font-size: $one;
+        padding-left: 0.5rem;
+
+        .addrress-span {
+          margin-left: $radius;
+          color: $blue;
+        }
+      }
+    }
+
+    // Payment info status
+    .payment-info-status {
+      @include subTitle;
+      font-size: $one;
+
+      .status-result {
+        font-size: $one;
+        color: $blue;
+        font-weight: $afw;
+      }
+    }
+  }
+
+  // Order Processing and refunding
+  .order-status {
+    @include subTitle;
+    font-size: $one;
+  }
+
+  .form-process-and-refund-order {
+    .section-order-process {
+      @include inputField;
+      padding: 1rem;
+      font-size: $one;
+      cursor: pointer;
+
+      .option-order-process {
+        color: $blue;
+
+        &:hover {
+          color: $red;
+          background-color: $popup-bg;
+        }
+
+        &::before {
+          content: '>';
+          padding-right: 10px;
+          padding-left: 5px;
+        }
+      }
+    }
+  }
+
+  .update-status-btn {
+    @include button1;
+    width: fit-content;
+    font-size: $one;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .order-detail-wrapper {
+    @include tabletDashboardScreen;
+
+    .order-details-list-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .subTitle {
+        @include subTitle;
+        font-size: $one;
+      }
+
+      .order-list {
+        @include button1;
+        font-size: $one;
+
+        .link {
+          color: $white;
+          font-weight: $aafw;
+          font-size: $one;
+        }
+      }
+    }
+    .order-id-and-date {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .order-id {
+        @include paragraph;
+        color: $gray;
+        font-size: $one;
+      }
+
+      .order-placed-date {
+        color: $blue;
+        font-size: $one;
+      }
+    }
+
+    // Order items
+    .order-items-wrapper {
+      @include productsGrid;
+
+      .order {
+        @include shadow3;
+
+        .image-container {
+          .image {
+            @include image;
+          }
+        }
+
+        .name-and-quantity {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          font-size: $one;
+          padding: 0 0.5rem;
+        }
+      }
+    }
+
+    .hr {
+      @include hr;
+    }
+
+    // Total price
+    .total-price {
+      text-align: right;
+      font-size: $one;
+    }
+
+    // Shipping address and payment status
+    .shipping-address-and-payment-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      @include shadow3;
+      margin: 1rem 0;
+
+      // Shipping -address
+      .shipping-address-wrapper {
+        .shipping-address-title {
+          @include subTitle;
+          font-size: $one;
+        }
+        .address {
+          font-size: $one;
+          padding-left: 0.5rem;
+
+          .addrress-span {
+            margin-left: $radius;
+            color: $blue;
+          }
+        }
+      }
+
+      // Payment info status
+      .payment-info-status {
+        @include subTitle;
+        font-size: $one;
+
+        .status-result {
+          font-size: $one;
+          color: $blue;
+          font-weight: $afw;
+        }
+      }
+    }
+
+    // Order Processing and refunding
+    .order-status {
+      @include subTitle;
+      font-size: $one;
+    }
+
+    .form-process-and-refund-order {
+      .section-order-process {
+        @include inputField;
+        padding: 1rem;
+        font-size: $one;
+        cursor: pointer;
+
+        .option-order-process {
+          color: $blue;
+
+          &:hover {
+            color: $red;
+            background-color: $popup-bg;
+          }
+
+          &::before {
+            content: '>';
+            padding-right: 10px;
+            padding-left: 5px;
+          }
+        }
+      }
+    }
+
+    .update-status-btn {
+      @include button1;
+      width: fit-content;
+      font-size: $one;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .order-detail-wrapper {
+    @include desktopDashboardScreen;
+    .order-details-list-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .subTitle {
+        @include subTitle;
+      }
+
+      .order-list {
+        @include button1;
+
+        .link {
+          color: $white;
+          font-weight: $aafw;
+        }
+      }
+    }
+    .order-id-and-date {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .order-id {
+        @include paragraph;
+        color: $gray;
+      }
+
+      .order-placed-date {
+        color: $blue;
+      }
+    }
+
+    // Order items
+    .order-items-wrapper {
+      @include productsGrid;
+
+      .order {
+        @include shadow3;
+
+        .image-container {
+          .image {
+            @include image;
+          }
+        }
+
+        .name-and-quantity {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          font-size: $afs;
+          padding: 0 0.5rem;
+        }
+      }
+    }
+
+    .hr {
+      @include hr;
+    }
+
+    // Total price
+    .total-price {
+      text-align: right;
+    }
+
+    // Shipping address and payment status
+    .shipping-address-and-payment-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      @include shadow3;
+      margin: 1rem 0;
+
+      // Shipping -address
+      .shipping-address-wrapper {
+        .shipping-address-title {
+          @include subTitle;
+        }
+        .address {
+          font-size: $afs;
+          padding-left: 0.5rem;
+
+          .addrress-span {
+            margin-left: $radius;
+            color: $blue;
+          }
+        }
+      }
+
+      // Payment info status
+      .payment-info-status {
+        @include subTitle;
+
+        .status-result {
+          font-size: $afs;
+          color: $blue;
+          font-weight: $afw;
+        }
+      }
+    }
+
+    // Order Processing and refunding
+    .order-status {
+      @include subTitle;
+    }
+
+    .form-process-and-refund-order {
+      .section-order-process {
+        @include inputField;
+        padding: 1rem;
+        font-size: $afs;
+        cursor: pointer;
+
+        .option-order-process {
+          color: $blue;
+
+          &:hover {
+            color: $red;
+            background-color: $popup-bg;
+          }
+
+          &::before {
+            content: '>';
+            padding-right: 10px;
+            padding-left: 5px;
+          }
+        }
+      }
+    }
+
+    .update-status-btn {
+      @include button1;
+      width: fit-content;
+    }
+  }
+}

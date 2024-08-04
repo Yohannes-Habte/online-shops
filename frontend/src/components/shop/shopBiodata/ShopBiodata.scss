@@ -1,0 +1,131 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-biodata-container {
+  @include mobileDashboardScreen;
+  @include shadow3;
+  background-color: $sidebar-bg;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .article-box {
+    @include shadow3;
+
+    .image-container {
+      .image {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    .subTitle {
+      @include subTitle;
+      padding: 0;
+      font-size: $one;
+    }
+
+    .text {
+    }
+
+    .edit-shop {
+      @include edit;
+      margin-bottom: 1rem;
+      font-size: $one;
+    }
+
+    .logout {
+      @include edit;
+      font-size: $one;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-biodata-container {
+    @include tabletDashboardScreen;
+    @include shadow3;
+    background-color: $sidebar-bg;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .article-box {
+      @include shadow3;
+
+      .image-container {
+        .image {
+          width: 5rem;
+          height: 5rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      .subTitle {
+        @include subTitle;
+        padding: 0;
+        font-size: $one;
+      }
+
+      .text {
+      }
+
+      .edit-shop {
+        @include edit;
+        margin-bottom: 1rem;
+        font-size: $one;
+      }
+
+      .logout {
+        @include edit;
+        font-size: $one;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-biodata-container {
+    width: 20%;
+    @include shadow3;
+    background-color: $sidebar-bg;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .article-box {
+      @include shadow3;
+
+      .image-container {
+        .image {
+          width: 5rem;
+          height: 5rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      .subTitle {
+        @include subTitle;
+        padding: 0;
+      }
+
+      .text {
+      }
+
+      .edit-shop {
+        @include edit;
+        margin-bottom: 1rem;
+      }
+
+      .logout {
+        @include edit;
+      }
+    }
+  }
+}

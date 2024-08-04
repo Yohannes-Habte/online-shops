@@ -1,0 +1,33 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-products-page {
+  .shop-products-container {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-products-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-products-container {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-products-page {
+    width: 100%;
+    min-width: 100vh;
+    .shop-products-container {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+}

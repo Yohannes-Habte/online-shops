@@ -1,0 +1,198 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.admin-dashboard-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $header-bg;
+  padding: 0 1rem;
+  .admin-logo {
+    @include subTitle;
+  }
+
+  .admin-dashboard-header-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    .active-admin-header-dashboard-icon {
+      .admin-header-dashboard-icon {
+        color: $red;
+        font-size: $afs;
+      }
+    }
+
+    .passive-admin-header-dashboard-icon {
+      .admin-header-dashboard-icon {
+        font-size: $afs;
+        color: $green;
+      }
+    }
+
+    .image-container {
+      .image {
+        width: 1.3rem;
+        height: 1.3rem;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+
+    .shop-profile-logout-wrapper {
+      position: absolute;
+      top: 2.8rem;
+      right: 0;
+      background-color: $header-bg;
+      width: 15rem;
+      height: 100vh;
+      z-index: 999;
+
+      .item {
+        padding: 0.5rem 1rem;
+        border-radius: 0 0 0 $radius;
+
+        .link {
+          font-size: $afs;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $header-bg;
+    padding: 0 1rem;
+    .admin-logo {
+      @include subTitle;
+    }
+
+    .admin-dashboard-header-icons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      .active-admin-header-dashboard-icon {
+        .admin-header-dashboard-icon {
+          color: $red;
+        }
+      }
+
+      .passive-admin-header-dashboard-icon {
+        .admin-header-dashboard-icon {
+          color: $black;
+        }
+      }
+
+      .image-container {
+        .image {
+          width: 1.3rem;
+          height: 1.3rem;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+
+      .shop-profile-logout-wrapper {
+        position: absolute;
+        top: 2.8rem;
+        right: 0;
+        background-color: $header-bg;
+        width: 15rem;
+        height: 100vh;
+        z-index: 999;
+
+        .item {
+          padding: 0.5rem 1rem;
+          border-radius: 0 0 0 $radius;
+
+          .link {
+            font-size: $afs;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .admin-dashboard-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $header-bg;
+    padding: 0 1rem;
+    .admin-logo {
+      @include subTitle;
+    }
+
+    .admin-dashboard-header-icons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      .active-admin-header-dashboard-icon {
+        .admin-header-dashboard-icon {
+          color: $red;
+          font-size: $afs;
+        }
+      }
+
+      .passive-admin-header-dashboard-icon {
+        .admin-header-dashboard-icon {
+          font-size: $afs;
+          color: $green;
+        }
+      }
+
+      .image-container {
+        .image {
+          width: 1.3rem;
+          height: 1.3rem;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+
+      .shop-profile-logout-wrapper {
+        position: absolute;
+        top: 2.8rem;
+        right: 0;
+        background-color: $header-bg;
+        width: 15rem;
+        height: 100vh;
+        z-index: 999;
+
+        .item {
+          padding: 0.5rem 1rem;
+          border-radius: 0 0 0 $radius;
+
+          .link {
+            font-size: $afs;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+@import '../../styles/Variables.scss';
+@import '../../styles/Mixins.scss';
+
+.not-found-page {
+  @include page;
+  .title {
+    @include title;
+  }
+
+  .go-back-home-page {
+    @include paragraph;
+
+    .link {
+      color: $blue;
+      font-size: $afs;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+}

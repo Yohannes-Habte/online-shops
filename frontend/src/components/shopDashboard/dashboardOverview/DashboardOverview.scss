@@ -1,0 +1,185 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.overview-dashboard-wrapper {
+  @include mobileDashboardScreen;
+  .overview-dashboard-title {
+    @include title;
+    font-size: $one;
+  }
+
+  .summary-overview {
+    display: flex;
+    flex-direction: column;
+
+    .article-box {
+      @include shadow3;
+
+      .aside-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0;
+
+        .icon {
+          font-size: $afs;
+          color: $green;
+        }
+
+        .subTitle {
+          @include subTitle;
+          font-size: $one;
+        }
+
+        .service {
+          @include paragraph;
+          font-size: $one;
+        }
+      }
+
+      .subTitle {
+        @include subTitle;
+        font-size: $one;
+      }
+
+      .link {
+        font-size: $one;
+      }
+    }
+  }
+
+  .latest-orders {
+    @include subTitle;
+    font-size: $one;
+    margin-top: 2rem;
+  }
+
+  .data-grid-wrapper {
+    font-size: $one;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .overview-dashboard-wrapper {
+    @include tabletDashboardScreen;
+    .overview-dashboard-title {
+      @include title;
+      font-size: $one;
+    }
+
+    .summary-overview {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .article-box {
+        width: 100%;
+        @include shadow3;
+
+        .aside-box {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-start;
+
+          .icon {
+            font-size: $afs;
+            color: $green;
+          }
+
+          .subTitle {
+            @include subTitle;
+            font-size: $one;
+          }
+
+          .service {
+            @include paragraph;
+            font-size: $one;
+          }
+        }
+
+        .subTitle {
+          @include subTitle;
+          font-size: $one;
+        }
+
+        .link {
+          font-size: $one;
+        }
+      }
+    }
+
+    .latest-orders {
+      @include subTitle;
+      font-size: $one;
+      margin-top: 2rem;
+    }
+
+    .data-grid-wrapper {
+      font-size: $one;
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .overview-dashboard-wrapper {
+    @include desktopDashboardScreen;
+
+    .overview-dashboard-title {
+      @include title;
+    }
+
+    .summary-overview {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      @include productsGrid;
+
+      .article-box {
+        @include shadow3;
+
+        .aside-box {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 0;
+
+          .icon {
+            font-size: $aafs;
+            color: $green;
+          }
+
+          .subTitle {
+            @include subTitle;
+          }
+
+          .service {
+            @include paragraph;
+          }
+        }
+
+        .subTitle {
+          @include subTitle;
+        }
+
+        .link {
+        }
+      }
+    }
+
+    .latest-orders {
+      @include subTitle;
+      font-size: $aafs;
+      margin-top: 2rem;
+    }
+
+    .data-grid-wrapper {
+    }
+  }
+}

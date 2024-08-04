@@ -1,0 +1,65 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.track-order-card {
+  .subTitle {
+    @include subTitle;
+  }
+
+  // Traking order information
+  .paragraph {
+    @include paragraph;
+
+    .tracking-user-info {
+      color: $blue;
+    }
+
+    .tracking-shop-info {
+      color: $blue;
+    }
+
+    .tracking-order-info {
+      color: $yellow;
+      text-decoration: underline;
+    }
+  }
+
+  // user order details
+  .order-details {
+    @include shadow3;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+
+    .image-container {
+      .image {
+        height: 15rem;
+        width: 20rem;
+        object-fit: cover;
+        border-radius: $radius;
+      }
+    }
+
+    .product {
+      .product-name {
+        @include subTitle;
+      }
+
+      .description {
+        @include paragraph;
+      }
+    }
+  }
+
+  // User address
+  .shoppping-address {
+    .subTitle {
+      @include subTitle;
+    }
+
+    .address {
+      @include paragraph;
+      line-height: 1rem;
+    }
+  }
+}

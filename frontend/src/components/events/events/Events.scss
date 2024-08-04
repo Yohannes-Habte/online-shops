@@ -1,0 +1,49 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.popular-events-wrapper {
+  .subTitle {
+    @include subTitle;
+    font-size: 1.8rem;
+  }
+
+  .event-cards-wrapper {
+    .subTitle {
+      @include subTitle;
+    }
+  }
+}
+
+
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .popular-events-wrapper {
+    .subTitle {
+      @include subTitle;
+      font-size: 1.8rem;
+    }
+  
+    .event-cards-wrapper {
+      .subTitle {
+        @include subTitle;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .popular-events-wrapper {
+    .subTitle {
+      @include subTitle;
+      font-size: 1.8rem;
+    }
+  
+    .event-cards-wrapper {
+      .subTitle {
+        @include subTitle;
+      }
+    }
+  }
+}

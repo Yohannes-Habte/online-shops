@@ -1,0 +1,9 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.ratings-icon {
+  color: $star;
+  font-size: $mfs;
+  margin-right: 0.3rem;
+  cursor: pointer;
+}

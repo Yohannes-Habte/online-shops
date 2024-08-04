@@ -1,0 +1,460 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.create-shop-wrapper {
+  @include mobileDashboardScreen;
+
+  .title {
+    @include title;
+    font-size: $one;
+  }
+
+  .seller-signup-form {
+    width: $mobile;
+    margin: auto;
+    @include shadow3;
+
+    // Seller image
+    .image-container {
+      @include flexCenter;
+      .image {
+        width: 4rem;
+        height: 4rem;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    // Seller profile
+    .seller-profile {
+      @include flexCenter;
+      padding: 0.2rem 0;
+    }
+
+    // Inpute container
+    .input-container {
+      position: relative;
+      @include inputContainer;
+
+      .input-field {
+        @include inputField;
+        padding-left: 2rem;
+        font-size: $one;
+      }
+
+      .input-label {
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        color: rgba(204, 204, 204, 0);
+      }
+
+      .input-highlight {
+        position: absolute;
+        bottom: 0.5rem;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background-color: $green;
+        transition: all 0.3s ease;
+      }
+
+      .input-field:focus + .input-label {
+        font-size: 12px;
+        color: #81a3e6;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        position: absolute;
+        top: 1rem;
+        left: 0.5rem;
+        font-size: 1rem;
+        color: $green;
+      }
+
+      // displaying password
+      .password-display {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translatey(-50%);
+        font-size: 1.3rem;
+        cursor: pointer;
+      }
+    }
+
+    // File container
+    .file-container {
+      position: relative;
+
+      .image-label {
+        @include inputField;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        padding-left: 0.5rem;
+
+        .icon {
+          color: $green;
+          font-size: 1rem;
+        }
+      }
+
+      .input-field {
+        display: none;
+      }
+    }
+
+    .shop-register-consent {
+      display: flex;
+      flex-direction: row;
+      margin-top: 1rem;
+
+      .register-consent-input {
+        margin-right: 1rem;
+      }
+
+      // styling the checkbox
+      .register-consent-input[type='checkbox'] {
+        width: 30px;
+        height: 20px;
+      }
+
+      .accept {
+        font-size: 1.3rem;
+      }
+
+      .terms-of-user {
+        font-weight: $afw;
+        color: $blue;
+        padding-left: 0.5rem;
+        &:hover {
+          color: $tomato;
+        }
+      }
+    }
+
+    // Send button
+    .create-shop-btn {
+      @include button3;
+      font-size: $one;
+    }
+
+    // Already have an acount
+    .already-have-account-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      font-weight: $afw;
+      .already-have-account {
+        font-size: $one;
+      }
+
+      .sign-in {
+        .link {
+          font-weight: $aafw;
+          font-size: $one;
+          color: $blue;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .create-shop-wrapper {
+    @include tabletDashboardScreen;
+
+    .title {
+      @include title;
+      font-size: $one;
+    }
+
+    .seller-signup-form {
+      width: $tablet;
+      margin: auto;
+      @include shadow3;
+
+      // Seller image
+      .image-container {
+        @include flexCenter;
+        .image {
+          width: 4rem;
+          height: 4rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      // Seller profile
+      .seller-profile {
+        @include flexCenter;
+        padding: 0.2rem 0;
+      }
+
+      // Inpute container
+      .input-container {
+        position: relative;
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          padding-left: 2rem;
+          font-size: $one;
+        }
+
+        .input-label {
+          position: absolute;
+          top: 0;
+          left: 2rem;
+          color: rgba(204, 204, 204, 0);
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 0.5rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $green;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label {
+          font-size: 12px;
+          color: #81a3e6;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+
+        .icon {
+          position: absolute;
+          top: 1rem;
+          left: 0.5rem;
+          font-size: 1rem;
+          color: $green;
+        }
+
+        // displaying password
+        .password-display {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translatey(-50%);
+          font-size: 1.3rem;
+          cursor: pointer;
+        }
+      }
+
+      // File container
+      .file-container {
+        position: relative;
+
+        .image-label {
+          @include inputField;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+          padding-left: 0.5rem;
+
+          .icon {
+            color: $green;
+            font-size: 1rem;
+          }
+        }
+
+        .input-field {
+          display: none;
+        }
+      }
+
+      // Send button
+      .create-shop-btn {
+        @include button3;
+        font-size: $one;
+      }
+
+      // Already have an acount
+      .already-have-account-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-weight: $afw;
+        .already-have-account {
+          font-size: $afs;
+          font-size: $one;
+        }
+
+        .sign-in {
+          .link {
+            font-weight: $aafw;
+            font-size: $afs;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .create-shop-wrapper {
+    @include desktopDashboardScreen;
+
+    .title {
+      @include title;
+    }
+
+    .seller-signup-form {
+      width: 70%;
+      margin: auto;
+      @include shadow3;
+
+      // Seller image
+      .image-container {
+        @include flexCenter;
+        .image {
+          width: 4rem;
+          height: 4rem;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      // Seller profile
+      .seller-profile {
+        @include flexCenter;
+        padding: 0.2rem 0;
+      }
+
+      .wrapper {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 1rem;
+        // Inpute container
+        .input-container {
+          position: relative;
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            padding-left: 2rem;
+          }
+
+          .input-label {
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            color: rgba(204, 204, 204, 0);
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $green;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus + .input-label {
+            font-size: 12px;
+            color: #81a3e6;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+
+          .icon {
+            position: absolute;
+            top: 1rem;
+            left: 0.5rem;
+            font-size: 1rem;
+            color: $green;
+          }
+
+          // displaying password
+          .password-display {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translatey(-50%);
+            font-size: 1.3rem;
+            cursor: pointer;
+          }
+        }
+      }
+
+      // File container
+      .file-container {
+        position: relative;
+
+        .image-label {
+          @include inputField;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+          padding-left: 0.5rem;
+
+          .icon {
+            color: $green;
+            font-size: 1rem;
+          }
+        }
+
+        .input-field {
+          display: none;
+        }
+      }
+
+      // Send button
+      .create-shop-btn {
+        @include button3;
+      }
+
+      // Already have an acount
+      .already-have-account-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-weight: $afw;
+        .already-have-account {
+          font-size: $afs;
+        }
+
+        .sign-in {
+          .link {
+            font-weight: $aafw;
+            font-size: $afs;
+            color: $blue;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}

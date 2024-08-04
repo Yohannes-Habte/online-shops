@@ -1,0 +1,34 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+.shop-refunds-container {
+  @include mobileDashboardScreen;
+ 
+  .shop-refunds-title {
+    @include title;
+    font-size: $one;
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .shop-refunds-container {
+    @include tabletDashboardScreen;
+
+  .shop-refunds-title {
+    @include title;
+    font-size: $one;
+  }
+}
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .shop-refunds-container {
+    @include desktopDashboardScreen;
+
+  .shop-refunds-title {
+    @include title;
+  }
+}
+}
