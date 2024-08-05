@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import './ShopInfo.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import Ratings from '../../products/ratings/Ratings';
-import { eventsShopFetchSuccess } from '../../../redux/reducers/eventReducer';
-import { productsShopFetchSuccess } from '../../../redux/reducers/productReducer';
-import ProductCard from '../../products/productCard/ProductCard';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey';
+import React, { useEffect, useState } from "react";
+import "./ShopInfo.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import Ratings from "../../products/ratings/Ratings";
+import { eventsShopFetchSuccess } from "../../../redux/reducers/eventReducer";
+import { productsShopFetchSuccess } from "../../../redux/reducers/productReducer";
+import ProductCard from "../../products/productCard/ProductCard";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
 
 // The isOwner comes from ShopHome.jsx page
 const ShopInfo = ({ isOwner }) => {
@@ -18,7 +18,7 @@ const ShopInfo = ({ isOwner }) => {
   const { events } = useSelector((state) => state.event);
   const dispatch = useDispatch();
 
-  console.log('Shop is', currentSeller);
+  console.log("Shop is", currentSeller);
 
   // Local state variables
   const [active, setActive] = useState(1);
@@ -82,21 +82,21 @@ const ShopInfo = ({ isOwner }) => {
       <article className="tabs-wrapper">
         <h3
           onClick={() => setActive(1)}
-          className={active === 1 ? 'active' : 'passive'}
+          className={active === 1 ? "active" : "passive"}
         >
           Shop Products
         </h3>
 
         <p
           onClick={() => setActive(2)}
-          className={active === 2 ? 'active' : 'passive'}
+          className={active === 2 ? "active" : "passive"}
         >
           Running Events
         </p>
 
         <p
           onClick={() => setActive(3)}
-          className={active === 3 ? 'active' : 'passive'}
+          className={active === 3 ? "active" : "passive"}
         >
           Shop Reviews
         </p>
@@ -147,7 +147,9 @@ const ShopInfo = ({ isOwner }) => {
                 </figure>
                 <section className="user-rating">
                   <h3 className="reviewer-name">{reviewer.user.name}</h3>
-                  <Ratings averageRating={reviewer.rating} />
+                  <div className="rating-wrapper">
+                    <Ratings averageRating={reviewer.rating} />
+                  </div>
 
                   <p className="comment">{reviewer?.comment}</p>
                   <p className="review-date">2days ago</p>

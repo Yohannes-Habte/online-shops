@@ -1,4 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import Cookies from "js-cookie";
+import axios from "axios";
+import { API } from '../../utils/security/secreteKey';
 
 const initialState = {
   currentUser: null,
@@ -6,6 +9,16 @@ const initialState = {
   loading: false,
   addressLoading: false,
   successMessage: null,
+};
+
+const setLoading = (state) => {
+  state.loading = true;
+  state.error = null;
+};
+
+const setError = (state, action) => {
+  state.error = action.payload;
+  state.loading = false;
 };
 
 const userReducer = createSlice({
@@ -48,7 +61,7 @@ const userReducer = createSlice({
       state.currentUser = action.payload;
       state.loading = false;
     },
-    changeUserPasswordFilure: (state, action) => {
+    changeUserPasswordFailure: (state, action) => {
       state.error = action.payload;
       state.loading = false;
     },
@@ -107,6 +120,14 @@ const userReducer = createSlice({
       state.error = action.payload;
     },
 
+     // Fetch User Data 
+     fetchUserDataStart: setLoading,
+     fetchUserDataSuccess: (state, action) => {
+       state.currentUser = action.payload;
+       state.loading = false;
+     },
+     fetchUserDataFailure: setError,
+
     // Clear errors
     clearErrors: (state) => {
       state.error = null;
@@ -144,8 +165,30 @@ export const {
   deleteUserAddressSuccess,
   deleteUserAddressFilure,
 
+  fetchUserDataStart,
+  fetchUserDataSuccess,
+  fetchUserDataFailure,
+
   clearErrors,
 } = userReducer.actions;
+
+export const fetchUserData = () => async (dispatch) => {
+  dispatch(fetchUserDataStart());
+
+  try {
+    const token = Cookies.get("token");
+    console.log("token from redux =", token)
+
+    if (!token) throw new Error("No token found");
+    const res = await axios.get(`${API}/users/user`, {
+      withCredentials: true,
+    });
+    console.log("user data=", res);
+    dispatch(fetchUserDataSuccess(res.data.user));
+  } catch (error) {
+    dispatch(fetchUserDataFailure(error.message));
+  }
+};
 
 // export userSlice
 export default userReducer.reducer;

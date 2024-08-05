@@ -77,6 +77,13 @@
           border-radius: 50%;
         }
       }
+
+      .reviewer-rating-comment{
+        .ratings-wrapper {
+          display: flex;
+          flex-direction: row
+        }
+      }
     }
 
     .no-product-review {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import './ProductInfos.scss';
-import Ratings from '../ratings/Ratings';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import "./ProductInfos.scss";
+import Ratings from "../ratings/Ratings";
+import { Link } from "react-router-dom";
 
 const ProductInfos = ({
   data,
@@ -15,21 +15,21 @@ const ProductInfos = ({
     <div className="product-infos">
       <article className="tabs-wrapper">
         <h5
-          className={active === 1 ? 'active' : 'passive'}
+          className={active === 1 ? "active" : "passive"}
           onClick={() => setActive(1)}
         >
           Product Details
         </h5>
 
         <h5
-          className={active === 2 ? 'active' : 'passive'}
+          className={active === 2 ? "active" : "passive"}
           onClick={() => setActive(2)}
         >
           Product Reviews
         </h5>
 
         <h5
-          className={active === 3 ? 'active' : 'passive'}
+          className={active === 3 ? "active" : "passive"}
           onClick={() => setActive(3)}
         >
           Shop Information
@@ -48,8 +48,8 @@ const ProductInfos = ({
       {active === 2 ? (
         <section className="product-reviews-wrapper">
           {data &&
-            data.reviews.map((item) => (
-              <div className="single-review-container">
+            data.reviews.map((item, index) => (
+              <div key={index} className="single-review-container">
                 <figure className="image-container">
                   <img
                     src={`${item.user.image}`}
@@ -61,7 +61,10 @@ const ProductInfos = ({
                 <article className="reviewer-rating-comment">
                   <h3 className="subTitle">{item.user.name}</h3>
                   {/* Ratings Component */}
-                  <Ratings averageRating={data?.ratings} />
+                  <div className="ratings-wrapper">
+                    <Ratings averageRating={data?.ratings} />
+                  </div>
+
                   <p className="comment">{item.comment}</p>
                 </article>
               </div>
@@ -92,7 +95,7 @@ const ProductInfos = ({
             <Link to={`/shop/preview/${data.shop._id}`} className="link">
               <h3 className={`shop-name`}>{data.name}</h3>
               <p className="shop-rating">Average Rating: {averageRating}</p>
-              <p className="product-description">{data.description}</p>{' '}
+              <p className="product-description">{data.description}</p>{" "}
             </Link>
           </article>
 

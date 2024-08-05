@@ -51,9 +51,17 @@ import AdminDashboardEvents from './views/adminPages/adminDashboardEvents/AdminD
 import AdminDashboardWithdraws from './views/adminPages/adminDashboardWithdraws/AdminDashboardWithdraws';
 import ShopForgotpassword from './views/shopPages/shopPasswordPage/ShopForgotpassword';
 import ShopResetPassword from './views/shopPages/shopPasswordPage/ShopResetPassword';
+import { useDispatch } from 'react-redux';
+import { fetchUserData } from './redux/reducers/userReducer';
 
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
   const [stripeApikey, setStripeApiKey] = useState('');
 
   const getStripeApikey = async () => {

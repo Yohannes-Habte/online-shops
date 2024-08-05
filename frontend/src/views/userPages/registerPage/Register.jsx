@@ -1,54 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import './Register.scss';
-import axios from 'axios';
-import { FaUser, FaUserAlt } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { IoClose } from 'react-icons/io5';
-import { HiOutlineEye } from 'react-icons/hi';
-import { toast } from 'react-toastify';
-import { Helmet } from 'react-helmet-async';
-import { useDispatch, useSelector } from 'react-redux';
-import ButtonLoader from '../../../utils/loader/ButtonLoader.jsx';
+import { useEffect, useState } from "react";
+import "./Register.scss";
+import axios from "axios";
+import { FaUser, FaUserAlt } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { NavLink, useNavigate } from "react-router-dom";
+import { AiFillEyeInvisible } from "react-icons/ai";
+import { IoClose } from "react-icons/io5";
+import { HiOutlineEye } from "react-icons/hi";
+import { toast } from "react-toastify";
+import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
+import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   validEmail,
   validPassword,
-} from '../../../utils/validators/Validate.js';
+} from "../../../utils/validators/Validate.js";
 import {
   API,
   cloud_URL,
   cloud_name,
   upload_preset,
-} from '../../../utils/security/secreteKey.js';
-import GoogleSignupLogin from '../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin.jsx';
+} from "../../../utils/security/secreteKey.js";
+import GoogleSignupLogin from "../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin.jsx";
+import Cookies from "js-cookie";
 
 const Register = () => {
   const navigate = useNavigate();
   // Global state variables
   const { currentUser } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
 
   // If user is logged in, uer will not access the sign up page
   useEffect(() => {
     if (currentUser) {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate, currentUser]);
 
   // Local State variables
-  const [image, setImage] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
+  const [image, setImage] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  console.log('Image=', image);
+  console.log("Image=", image);
 
   // Update image
   const updateImage = (e) => {
@@ -57,25 +57,25 @@ const Register = () => {
 
   // Deleting uploading image
   const deleteUploadingImage = () => {
-    setImage(image.name === '');
+    setImage(image.name === "");
   };
 
   // Update input data
   const updateChange = (e) => {
     switch (e.target.name) {
-      case 'name':
+      case "name":
         setName(e.target.value);
         break;
-      case 'email':
+      case "email":
         setEmail(e.target.value);
         break;
-      case 'password':
+      case "password":
         setPassword(e.target.value);
         break;
-      case 'phone':
+      case "phone":
         setPhone(e.target.value);
         break;
-      case 'agree':
+      case "agree":
         setAgree(e.target.checked);
         break;
       default:
@@ -85,10 +85,10 @@ const Register = () => {
 
   // Reset input values
   const reset = () => {
-    setName('');
-    setEmail('');
-    setPassword('');
-    setPhone('');
+    setName("");
+    setEmail("");
+    setPassword("");
+    setPhone("");
     setAgree(false);
     setError(false);
   };
@@ -103,12 +103,12 @@ const Register = () => {
     event.preventDefault();
 
     if (!validEmail(email)) {
-      return toast.error('Please enter a valid email');
+      return toast.error("Please enter a valid email");
     }
 
     if (!validPassword(password)) {
       return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
+        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
       );
     }
 
@@ -116,9 +116,9 @@ const Register = () => {
       setLoading(true);
       // Image validation
       const userPhoto = new FormData();
-      userPhoto.append('file', image);
-      userPhoto.append('cloud_name', cloud_name);
-      userPhoto.append('upload_preset', upload_preset);
+      userPhoto.append("file", image);
+      userPhoto.append("cloud_name", cloud_name);
+      userPhoto.append("upload_preset", upload_preset);
 
       // Save image to cloudinary
       const response = await axios.post(cloud_URL, userPhoto);
@@ -133,10 +133,20 @@ const Register = () => {
         agree: agree,
       };
 
-      const { data } = await axios.post(`${API}/auths/register`, newUser);
+      const { data } = await axios.post(`${API}/auths/register`, newUser, {
+        withCredentials: true,
+      });
+
+      // Set token in cookies
+      const token = data.token;
+      Cookies.set("token", token, {
+        expires: 1,
+        secure: true,
+        sameSite: "strict",
+      });
 
       reset();
-      navigate('/login');
+      navigate("/login");
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -178,8 +188,8 @@ const Register = () => {
               <FaUserAlt className="icon" />
               <input
                 type="text"
-                name={'name'}
-                id={'name'}
+                name={"name"}
+                id={"name"}
                 autoComplete="name"
                 required
                 value={name}
@@ -188,7 +198,7 @@ const Register = () => {
                 className="input-field"
               />
 
-              <label htmlFor={'firstName'} className="input-label">
+              <label htmlFor={"firstName"} className="input-label">
                 First Name
               </label>
               <span className="input-highlight"></span>
@@ -216,7 +226,7 @@ const Register = () => {
             <div className="input-container">
               <RiLockPasswordFill className="icon" />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 autoComplete="current-password"
@@ -268,14 +278,14 @@ const Register = () => {
               <label htmlFor="image" className="file-label">
                 {image ? (
                   <span className="uploading-image">
-                    {image.name}{' '}
+                    {image.name}{" "}
                     <IoClose
                       onClick={deleteUploadingImage}
                       className="image-close-icon"
                     />
                   </span>
                 ) : (
-                  'Upload Photo'
+                  "Upload Photo"
                 )}
               </label>
             </div>
@@ -290,7 +300,7 @@ const Register = () => {
                 className="register-consent-checkbox"
               />
               <span className="accept">I accept</span>
-              <NavLink className={'terms-of-user'}> Terms of Use</NavLink>
+              <NavLink className={"terms-of-user"}> Terms of Use</NavLink>
             </div>
 
             <button
@@ -304,11 +314,11 @@ const Register = () => {
               {!loading && <span>Sign Up</span>}
             </button>
 
-            <GoogleSignupLogin signup={'signup'} />
+            <GoogleSignupLogin signup={"signup"} />
 
             <p className="haveAccount">
               Already have an account?
-              <NavLink to="/login" className={'link-to'}>
+              <NavLink to="/login" className={"link-to"}>
                 Log In
               </NavLink>
             </p>

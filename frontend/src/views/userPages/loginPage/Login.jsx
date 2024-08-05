@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import './Login.scss';
-import axios from 'axios';
-import { FaUserAlt } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { HiOutlineEye } from 'react-icons/hi';
-import { Helmet } from 'react-helmet-async';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import "./Login.scss";
+import axios from "axios";
+import { FaUserAlt } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { AiFillEyeInvisible } from "react-icons/ai";
+import { HiOutlineEye } from "react-icons/hi";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchUserData,
   loginFailure,
   loginStart,
   loginSuccess,
-} from '../../../redux/reducers/userReducer';
-import { validEmail, validPassword } from '../../../utils/validators/Validate';
-import { toast } from 'react-toastify';
-import ButtonLoader from '../../../utils/loader/ButtonLoader';
-import { API } from '../../../utils/security/secreteKey';
-import GoogleSignupLogin from '../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin';
+} from "../../../redux/reducers/userReducer";
+import { validEmail, validPassword } from "../../../utils/validators/Validate";
+import { toast } from "react-toastify";
+import ButtonLoader from "../../../utils/loader/ButtonLoader";
+import { API } from "../../../utils/security/secreteKey";
+import GoogleSignupLogin from "../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,25 +28,30 @@ const Login = () => {
   const { loading, error, currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
   // Local State variables
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // If user is logged in, uer will not see the login page
   useEffect(() => {
     if (currentUser) {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate, currentUser]);
 
   // Update input data
   const updateChange = (e) => {
     switch (e.target.name) {
-      case 'email':
+      case "email":
         setEmail(e.target.value);
         break;
-      case 'password':
+      case "password":
         setPassword(e.target.value);
         break;
       default:
@@ -59,8 +66,8 @@ const Login = () => {
 
   // Reset all state variables for the login form
   const resetVariables = () => {
-    setEmail('');
-    setPassword('');
+    setEmail("");
+    setPassword("");
   };
 
   // Submit logged in user Function
@@ -68,12 +75,12 @@ const Login = () => {
     event.preventDefault();
 
     if (!validEmail(email)) {
-      return toast.error('Please enter a valid email');
+      return toast.error("Please enter a valid email");
     }
 
     if (!validPassword(password)) {
       return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
+        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
       );
     }
 
@@ -83,8 +90,11 @@ const Login = () => {
       const loginUser = {
         email: email,
         password: password,
+        rememberMe: rememberMe,
       };
-      const { data } = await axios.post(`${API}/auths/login`, loginUser);
+      const { data } = await axios.post(`${API}/auths/login`, loginUser, {
+        withCredentials: true,
+      });
 
       if (data.success === false) {
         dispatch(loginFailure(data.user.message));
@@ -93,8 +103,18 @@ const Login = () => {
 
       dispatch(loginSuccess(data.user));
 
+      // Set token in cookies
+      const token = data?.token;
+      console.log("login token=", token);
+
+      Cookies.set("token", token, {
+        expires: rememberMe ? 30 : 1,
+        secure: true,
+        sameSite: "strict",
+      });
+
       resetVariables();
-      navigate('/');
+      navigate("/");
     } catch (err) {
       dispatch(loginFailure(err.response.data.message));
     }
@@ -137,7 +157,7 @@ const Login = () => {
             <div className="input-container">
               <RiLockPasswordFill className="icon" />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 autoComplete="current-password"
@@ -161,13 +181,15 @@ const Login = () => {
               <div className="login-checkbox-keep-signed-in">
                 <input
                   type="checkbox"
-                  name="login"
+                  name="rememberMe"
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
                   className="login-checkbox"
                 />
                 <span className="keep-me-login">Keep me signed in</span>
               </div>
               <div className="forget-password">
-                <Link className="link" to={'/forgot-password'}>
+                <Link className="link" to={"/forgot-password"}>
                   Forgot your password?
                 </Link>
               </div>
@@ -184,15 +206,14 @@ const Login = () => {
               {!loading && <span>Log In</span>}
             </button>
 
-            <GoogleSignupLogin login={'login'} />
+            <GoogleSignupLogin login={"login"} />
 
             <p className="haveNoAccount">
-              Don't have an account?{' '}
-              <NavLink to="/register" className={'link-to'}>
+              {" Don't have an account? "}
+              <NavLink to="/register" className={"link-to"}>
                 Sign Up
               </NavLink>
             </p>
-
           </form>
         </fieldset>
       </section>

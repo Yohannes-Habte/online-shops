@@ -1,9 +1,9 @@
-import User from '../models/userModel.js';
-import createError from 'http-errors';
-import bcrypt from 'bcryptjs';
-import userToken from '../middleware/userToken.js';
-import crypto from 'crypto';
-import sendEmail from '../utils/sendMail.js';
+import User from "../models/userModel.js";
+import createError from "http-errors";
+import bcrypt from "bcryptjs";
+import userToken from "../middleware/userToken.js";
+import crypto from "crypto";
+import sendEmail from "../utils/sendMail.js";
 
 //=========================================================================
 // Create an account
@@ -16,7 +16,7 @@ export const createAccount = async (req, res, next) => {
     // If user does not exist in the data base, ....
     if (user) {
       return next(
-        createError(400, 'Email has been taken! Please Try another one')
+        createError(400, "Email has been taken! Please Try another one")
       );
     }
 
@@ -35,25 +35,25 @@ export const createAccount = async (req, res, next) => {
     try {
       await newUser.save();
     } catch (error) {
-      return next(createError(500, 'User could not be saved'));
+      return next(createError(500, "User could not be saved"));
     }
 
     // generate user token
     const userRegisterToken = userToken(newUser._id);
 
     return res
-      .cookie('user_token', userRegisterToken, {
-        path: '/',
+      .cookie("user_token", userRegisterToken, {
+        path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 60 * 60 * 1000),
-        sameSite: 'none',
+        sameSite: "none",
         secure: true,
       })
       .status(201)
       .json({ success: true, user: newUser });
   } catch (error) {
     console.log(error);
-    next(createError(500, 'User could not sign up. Please try again!'));
+    next(createError(500, "User could not sign up. Please try again!"));
   }
 };
 
@@ -69,11 +69,11 @@ export const googleRegisterLogin = async (req, res, next) => {
       const { password, role, ...otherDetails } = user._doc;
 
       return res
-        .cookie('user_token', googleLoginToken, {
-          path: '/',
+        .cookie("user_token", googleLoginToken, {
+          path: "/",
           httpOnly: true,
           expires: new Date(Date.now() + 1000 * 3600),
-          sameSite: 'none',
+          sameSite: "none",
           secure: true,
         })
         .status(200)
@@ -88,30 +88,30 @@ export const googleRegisterLogin = async (req, res, next) => {
 
       const newUser = new User({
         name:
-          req.body.name.split(' ').join('').toLowerCase() +
+          req.body.name.split(" ").join("").toLowerCase() +
           Math.random().toString(36).slice(-4),
         email: req.body.email,
         password: hashedPassword,
         image: req.body.image,
         agree: req.body.agree,
       });
-      console.log('new User', newUser);
+      console.log("new User", newUser);
 
       try {
         await newUser.save();
       } catch (error) {
-        next(createError(500, 'User could not save!'));
+        next(createError(500, "User could not save!"));
       }
 
       const googleLoginSignup = userToken(newUser._id);
       const { password, role, ...otherDetails } = newUser._doc;
 
       return res
-        .cookie('user_token', googleLoginSignup, {
-          path: '/',
+        .cookie("user_token", googleLoginSignup, {
+          path: "/",
           httpOnly: true,
           expires: new Date(Date.now() + 1000 * 3600),
-          sameSite: 'none',
+          sameSite: "none",
           secure: true,
         })
         .status(200)
@@ -119,7 +119,7 @@ export const googleRegisterLogin = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    next(createError(500, 'User could not sign up or login using google!'));
+    next(createError(500, "User could not sign up or login using google!"));
   }
 };
 
@@ -135,14 +135,14 @@ export const loginUser = async (req, res, next) => {
     // If user does not exist in the database, then ....
     if (!user) {
       return next(
-        createError(400, 'This email does not exist! Please sign up!')
+        createError(400, "This email does not exist! Please sign up!")
       );
     }
 
     // If user exist in the database, then check password validity
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return next(createError(400, 'Invalid password! Please sign up!'));
+      return next(createError(400, "Invalid password! Please sign up!"));
     }
 
     if (user && isPasswordValid) {
@@ -152,11 +152,11 @@ export const loginUser = async (req, res, next) => {
       const loginToken = userToken(user._id);
 
       return res
-        .cookie('user_token', loginToken, {
-          path: '/',
+        .cookie("user_token", loginToken, {
+          path: "/",
           httpOnly: true,
           expires: new Date(Date.now() + 60 * 60 * 1000),
-          sameSite: 'none',
+          sameSite: "none",
           secure: true,
         })
         .status(200)
@@ -164,7 +164,7 @@ export const loginUser = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    next(createError(500, 'User could not login. Please try again!'));
+    next(createError(500, "User could not login. Please try again!"));
   }
 };
 
@@ -184,7 +184,7 @@ export const forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      res.status(404).send('User email does not exist! Please try again!');
+      res.status(404).send("User email does not exist! Please try again!");
     }
 
     // 2. Generate a random reset token
@@ -208,7 +208,7 @@ export const forgotPassword = async (req, res, next) => {
         <p> Customer Service Team </p>
         `;
 
-    const subject = 'Password Reset Request';
+    const subject = "Password Reset Request";
     const send_to = user.email;
     // const sent_from = process.env.EMAIL_USER;
 
@@ -221,18 +221,18 @@ export const forgotPassword = async (req, res, next) => {
 
       res.status(200).json({
         success: true,
-        message: 'Reset password link has been sent to the your email',
+        message: "Reset password link has been sent to the your email",
       });
     } catch (error) {
       user.passwordResetToken = undefined;
       user.passwordResetTokenExpires = undefined;
       user.save({ validateBeforeSave: false });
       console.log(error);
-      return next(createError(500, 'Error sending password reset email!'));
+      return next(createError(500, "Error sending password reset email!"));
     }
   } catch (error) {
     console.log(error);
-    return next(createError(500, 'Forgotten password not reset!'));
+    return next(createError(500, "Forgotten password not reset!"));
   }
 };
 
@@ -244,9 +244,9 @@ export const resetForgotPassword = async (req, res, next) => {
   const token = req.params.token;
   // Since the token is encrypted in the database, we need to encrypt this token as well
   const encryptedToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(token)
-    .digest('hex');
+    .digest("hex");
 
   try {
     // First find the user who wants to reset password from the database using passwordResetToken. Then, check whether the password reset token is expired or not
@@ -256,7 +256,7 @@ export const resetForgotPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400).send('Token is invalid or it is expired!');
+      res.status(400).send("Token is invalid or it is expired!");
     }
     // If user exist, rest the user password
     user.password = req.body.password;
@@ -273,18 +273,18 @@ export const resetForgotPassword = async (req, res, next) => {
     const loginToken = userToken(user._id);
 
     return res
-      .cookie('user_token', loginToken, {
-        path: '/',
+      .cookie("user_token", loginToken, {
+        path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 60 * 60 * 1000),
-        sameSite: 'none',
+        sameSite: "none",
         secure: true,
       })
       .status(200)
       .json({ success: true, user: rest });
   } catch (error) {
     next(
-      createError(500, 'The password has not been reset! Please try again!')
+      createError(500, "The password has not been reset! Please try again!")
     );
   }
 };
@@ -295,26 +295,11 @@ export const resetForgotPassword = async (req, res, next) => {
 
 export const userLogout = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      next(createError(400, 'User not found!'));
-    }
-
-    // First Option to log out a user
     res.clearCookie('user_token');
-    res.status(200).json(`You have successfully logged out`);
-
-    // Second option to log out a user:
-    /** 
-    res.cookie('user_token', null, {
-      httpOnly: true,
-      expires: new Date(0), // cookie is expired
-      sameSite: 'none',
-      secure: true,
+    res.status(200).json({
+      success: true,
+      message: 'You have successfully logged out.',
     });
-   res.status(200).json(`${user.name} has successfully logged out`);
-    */
   } catch (error) {
     next(createError(500, 'User could not logout. Please try again!'));
   }
@@ -327,17 +312,17 @@ export const userLogout = async (req, res, next) => {
 export const updateUserProfile = async (req, res, next) => {
   try {
     const { name, email, password, phone, image } = req.body;
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return next(createError(400, 'User not found'));
+      return next(createError(400, "User not found"));
     }
 
     // If user exist in the database, check password validity
     const isPasswordValid = bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return next(createError(400, 'Invalid password'));
+      return next(createError(400, "Invalid password"));
     }
 
     // Update user data
@@ -350,13 +335,13 @@ export const updateUserProfile = async (req, res, next) => {
     try {
       await user.save();
     } catch (error) {
-      return next(createError(500, 'User could not be saved'));
+      return next(createError(500, "User could not be saved"));
     }
 
     return res.status(201).json({ success: true, update: user });
   } catch (error) {
     console.log(error);
-    next(createError(500, 'User account could not update! Please try again!'));
+    next(createError(500, "User account could not update! Please try again!"));
   }
 };
 
@@ -366,10 +351,10 @@ export const updateUserProfile = async (req, res, next) => {
 
 export const changeUserPassword = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select('+password');
+    const user = await User.findById(req.params.id).select("+password");
 
     if (!user) {
-      return next(createError(400, 'User not found'));
+      return next(createError(400, "User not found"));
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -377,17 +362,17 @@ export const changeUserPassword = async (req, res, next) => {
       user.password
     );
     if (!isPasswordValid) {
-      return next(createError(400, 'Invalid old password! Please try again!'));
+      return next(createError(400, "Invalid old password! Please try again!"));
     }
 
     user.password = req.body.newPassword;
 
     await user.save();
 
-    res.status(200).json('Password updated successfully!');
+    res.status(200).json("Password updated successfully!");
   } catch (error) {
     console.log(error);
-    next(createError(500, 'User password could not update! Please try again!'));
+    next(createError(500, "User password could not update! Please try again!"));
   }
 };
 
@@ -402,14 +387,14 @@ export const deleteAccount = async (req, res, next) => {
     if (user) {
       await User.findByIdAndDelete(req.params.account);
 
-      res.clearCookie('user_token');
+      res.clearCookie("user_token");
       res.status(200).json(`User has been successfully deleted!`);
     } else {
-      return next(createError(404, 'User not found!'));
+      return next(createError(404, "User not found!"));
     }
   } catch (error) {
     return next(
-      createError(500, 'User could not delete account. Please try again!')
+      createError(500, "User could not delete account. Please try again!")
     );
   }
 };

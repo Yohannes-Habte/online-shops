@@ -6,7 +6,7 @@ import createError from 'http-errors';
 //====================================================================
 export const getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return next(createError(404, 'User is not found!'));
     }

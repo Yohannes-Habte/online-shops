@@ -1,39 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { FaBars, FaSearch } from 'react-icons/fa';
-import { RiArrowRightSLine } from 'react-icons/ri';
-import { AiOutlineHeart } from 'react-icons/ai';
-import { BiUserCircle } from 'react-icons/bi';
-import { MdKeyboardArrowDown } from 'react-icons/md';
-import { BsCart } from 'react-icons/bs';
-import './Header.scss';
-import axios from 'axios';
-import DropDown from '../dropDown/DropDown';
-import Navbar from '../navbar/Navbar';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  userLogoutFailure,
-  userLogoutStart,
-  userLogoutSuccess,
-} from '../../../redux/reducers/userReducer';
-import WishList from '../../wishLists/wichList.jsx/WishList';
-import Cart from '../../cart/cart/Cart';
-import { API } from '../../../utils/security/secreteKey';
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FaBars, FaSearch } from "react-icons/fa";
+import { RiArrowRightSLine } from "react-icons/ri";
+import { AiOutlineHeart } from "react-icons/ai";
+import { BiUserCircle } from "react-icons/bi";
+import { MdKeyboardArrowDown } from "react-icons/md";
+import { BsCart } from "react-icons/bs";
+import "./Header.scss";
+import axios from "axios";
+import DropDown from "../dropDown/DropDown";
+import Navbar from "../navbar/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserData } from "../../../redux/reducers/userReducer";
+import WishList from "../../wishLists/wichList.jsx/WishList";
+import Cart from "../../cart/cart/Cart";
+import Logout from "../../../utils/globalFunction/Logout";
 
 const Header = () => {
   const navigate = useNavigate();
 
   // Global state variables using redux
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const { currentSeller } = useSelector((state) => state.seller);
-  const { products } = useSelector((state) => state.product);
   const { cart } = useSelector((state) => state.cart);
-  const { wishList } = useSelector((state) => state.wishList); 
+  const { wishList } = useSelector((state) => state.wishList);
 
   const dispatch = useDispatch();
+  const { signOut } = Logout();
+
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut(); // This will trigger the logout process
+  };
 
   // Local state variables
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [dropDown, setDropDown] = useState(false);
   const [openUser, setOpenUser] = useState(false);
@@ -61,7 +66,7 @@ const Header = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
 
-    urlParams.set('searchItem', searchTerm);
+    urlParams.set("searchItem", searchTerm);
     const searchQuery = urlParams.toString();
 
     navigate(`/search?${searchQuery}`);
@@ -70,27 +75,11 @@ const Header = () => {
   //! If you want to display on the search bar what you write on url, you need to apply useEffect hook
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const searchTermFromUrl = urlParams.get('searchTerm');
+    const searchTermFromUrl = urlParams.get("searchTerm");
     if (searchTermFromUrl) {
       setSearchTerm(searchTermFromUrl);
     }
   }, [window.location.search]);
-
-  // Log out user function
-  const handleLogout = async () => {
-    try {
-      dispatch(userLogoutStart());
-      const { data } = await axios.get(
-        `${API}/auths/logout/${currentUser._id}`
-      );
-
-      dispatch(userLogoutSuccess());
-
-      navigate('/login');
-    } catch (error) {
-      dispatch(userLogoutFailure(error.response.data.message));
-    }
-  };
 
   // Handle search
   const handleSearchChange = (e) => {
@@ -107,14 +96,14 @@ const Header = () => {
 
   // Handle on click for the search bar
   const handleClick = () => {
-    setSearchTerm('');
-    setSearchData('');
+    setSearchTerm("");
+    setSearchData("");
   };
 
   return (
     <header className="header">
       <section className="wrapper">
-        <NavLink to={'/'}>
+        <NavLink to={"/"}>
           <h1 className="logo">
             Lisa <span className="shopping">Shopping</span>
           </h1>
@@ -162,11 +151,11 @@ const Header = () => {
         {/* Become Seller */}
         <article className="become-seller">
           <Link
-            to={currentSeller ? '/dashboard' : '/login-shop'}
+            to={currentSeller ? "/dashboard" : "/login-shop"}
             className="link"
           >
             <h3 className="sub-title">
-              {currentSeller ? 'Shop Dashboard' : 'Create Online Shop'}
+              {currentSeller ? "Shop Dashboard" : "Create Online Shop"}
             </h3>
           </Link>
           <RiArrowRightSLine className="icon" />
@@ -230,14 +219,14 @@ const Header = () => {
                 {openUser && (
                   <ul className="user-history">
                     <li className="list-item">
-                      <NavLink to={`/profile`} className={'link'}>
+                      <NavLink to={`/profile`} className={"link"}>
                         User Profile
                       </NavLink>
                     </li>
 
                     {currentSeller && (
                       <li className="list-item">
-                        <NavLink to={`/dashboard`} className={'link'}>
+                        <NavLink to={`/dashboard`} className={"link"}>
                           Shop Dashboard
                         </NavLink>
                       </li>
@@ -250,7 +239,7 @@ const Header = () => {
                 )}
               </React.Fragment>
             ) : (
-              <Link to={'/login'} className="link">
+              <Link to={"/login"} className="link">
                 <BiUserCircle className="icon" />
               </Link>
             )}

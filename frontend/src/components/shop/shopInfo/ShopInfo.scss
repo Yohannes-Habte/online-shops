@@ -86,6 +86,10 @@
         .reviewer-name {
         }
 
+        .rating-wrapper {
+          display: flex;
+          flex-direction: row;
+        }
         .comment {
           font-size: $one;
         }

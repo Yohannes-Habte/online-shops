@@ -28,11 +28,11 @@ authRouter.post(
 );
 authRouter.post('/google', googleRegisterLogin);
 authRouter.post('/login', loginUser);
+authRouter.get('/logout', userLogout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.patch('/reset-password/:token', resetForgotPassword);
 authRouter.put('/update-user-profile', updateUserProfile);
 authRouter.put('/:id/change-user-password', changeUserPassword);
-authRouter.get('/logout/:id', userLogout);
 authRouter.delete('/delete-account/:account', authUser, deleteAccount);
 
 // Export auth Router
