@@ -54,7 +54,7 @@ const UserProfile = ({ active }) => {
     if (!currentUser) {
       navigate('/login');
     }
-  });
+  }, [currentUser]);
 
   // Display error on browser
   useEffect(() => {
@@ -64,7 +64,7 @@ const UserProfile = ({ active }) => {
       // To clear error
       dispatch(clearErrors());
     }
-  });
+  }, []);
 
   // Update image
   const updateImage = (e) => {

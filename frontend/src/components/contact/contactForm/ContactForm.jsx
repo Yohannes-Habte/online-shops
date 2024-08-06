@@ -32,7 +32,7 @@ const ContactForm = () => {
     if (!currentUser) {
       navigate('/login');
     }
-  });
+  },[currentUser]);
 
   // Function that handle input change
   const handleInputChange = (event) => {
