@@ -1,70 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import './UserProfile.scss';
-import axios from 'axios';
-import { FaUser, FaUserAlt } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { HiOutlineEye } from 'react-icons/hi';
-import { toast } from 'react-toastify';
-import { Helmet } from 'react-helmet-async';
-import AllRefundOrders from '../refunds/AllRefundOrders';
-import ChangePassword from '../changePassword/ChangePassword';
-import TrackOrderTable from '../trackOrderTable/TrackOrderTable';
-import Address from '../address/Address';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  clearErrors,
-  updateUserFilure,
-  updateUserStart,
-  updateUserSuccess,
-} from '../../../redux/reducers/userReducer';
-import UserOrders from '../allOrders/UserOrders';
-import UserInboxPage from '../../../views/userPages/userInboxPage/UserInboxPage';
+import { useState } from "react";
+import "./UserProfile.scss";
+import axios from "axios";
+import { FaUser, FaUserAlt } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+import { AiFillEyeInvisible } from "react-icons/ai";
+import { HiOutlineEye } from "react-icons/hi";
+import { toast } from "react-toastify";
+import { Helmet } from "react-helmet-async";
+import AllRefundOrders from "../refunds/AllRefundOrders";
+import ChangePassword from "../changePassword/ChangePassword";
+import TrackOrderTable from "../trackOrderTable/TrackOrderTable";
+import Address from "../address/Address";
+import { useDispatch } from "react-redux";
+import UserOrders from "../allOrders/UserOrders";
+import UserInboxPage from "../../../views/userPages/userInboxPage/UserInboxPage";
 import {
   validEmail,
   validPassword,
-} from '../../../utils/validators/Validate.js';
-import ButtonLoader from '../../../utils/loader/ButtonLoader.jsx';
+} from "../../../utils/validators/Validate.js";
+import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   API,
   cloud_URL,
   cloud_name,
   upload_preset,
-} from '../../../utils/security/secreteKey.js';
+} from "../../../utils/security/secreteKey.js";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} from "../../../redux/reducers/userReducer.js";
 
-const UserProfile = ({ active }) => {
+const UserProfile = ({ active, currentUser, loading }) => {
   const navigate = useNavigate();
-  // Global state variables
-  const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   // Local State variables
-  const [name, setName] = useState(currentUser.name || '');
-  const [email, setEmail] = useState(currentUser.email || '');
-  const [phone, setPhone] = useState(currentUser.phone || '');
-  const [password, setPassword] = useState('');
-  const [image, setImage] = useState('');
+  const [name, setName] = useState(currentUser?.name || "");
+  const [email, setEmail] = useState(currentUser?.email || "");
+  const [phone, setPhone] = useState(currentUser?.phone || "");
+  const [password, setPassword] = useState("");
+  const [image, setImage] = useState("");
   const [agree, setAgree] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // If user is not logged in, user will not access profile page
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login');
-    }
-  }, [currentUser]);
-
-  // Display error on browser
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-
-      // To clear error
-      dispatch(clearErrors());
-    }
-  }, []);
 
   // Update image
   const updateImage = (e) => {
@@ -74,19 +54,19 @@ const UserProfile = ({ active }) => {
   // Update input data
   const updateChange = (e) => {
     switch (e.target.name) {
-      case 'name':
+      case "name":
         setName(e.target.value);
         break;
-      case 'email':
+      case "email":
         setEmail(e.target.value);
         break;
-      case 'password':
+      case "password":
         setPassword(e.target.value);
         break;
-      case 'phone':
+      case "phone":
         setPhone(e.target.value);
         break;
-      case 'agree':
+      case "agree":
         setAgree(e.target.checked);
         break;
       default:
@@ -101,8 +81,8 @@ const UserProfile = ({ active }) => {
 
   // Reset all state variables for the profile form
   const resetVariables = () => {
-    setEmail('');
-    setPassword('');
+    setEmail("");
+    setPassword("");
   };
 
   // Submit logged in user Function
@@ -110,22 +90,20 @@ const UserProfile = ({ active }) => {
     event.preventDefault();
 
     if (!validEmail(email)) {
-      return toast.error('Please enter a valid email');
+      return toast.error("Please enter a valid email");
     }
 
     if (!validPassword(password)) {
-      return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
-      );
+      return toast.error("In valid password");
     }
 
     try {
       dispatch(updateUserStart());
       // Image validation
       const userPhoto = new FormData();
-      userPhoto.append('file', image);
-      userPhoto.append('cloud_name', cloud_name);
-      userPhoto.append('upload_preset', upload_preset);
+      userPhoto.append("file", image);
+      userPhoto.append("cloud_name", cloud_name);
+      userPhoto.append("upload_preset", upload_preset);
 
       // Save image to cloudinary
       const response = await axios.post(cloud_URL, userPhoto);
@@ -140,15 +118,15 @@ const UserProfile = ({ active }) => {
       };
 
       const { data } = await axios.put(
-        `${API}/auths/update-user-profile`,
+        `${API}/auths/update/profile`,
         newUser
       );
 
       dispatch(updateUserSuccess(data.update));
       resetVariables();
-      navigate('/profile');
+      navigate("/profile");
     } catch (err) {
-      dispatch(updateUserFilure(err.response.data.message));
+      dispatch(updateUserFailure(err.response.data.message));
     }
   };
 
@@ -160,7 +138,7 @@ const UserProfile = ({ active }) => {
 
       {active === 1 && (
         <section className="profile-form-container">
-          {error ? <p className="error-message"> {error} </p> : null}
+          {/* {error ? <p className="error-message"> {error} </p> : null} */}
           <h1 className="profile-form-title">Update Your Profile</h1>
 
           <figure className="image-container">
@@ -181,15 +159,15 @@ const UserProfile = ({ active }) => {
 
           <fieldset className="profile-fieldset">
             <legend className="profile-legend">
-              {currentUser ? currentUser.name : 'User Profile'}
+              {currentUser ? currentUser.name : "User Profile"}
             </legend>
             <form onSubmit={submitUpdatedUserProfile} className="profile-form">
               <div className="input-container">
                 <FaUserAlt className="icon" />
                 <input
                   type="text"
-                  name={'name'}
-                  id={'name'}
+                  name={"name"}
+                  id={"name"}
                   autoComplete="name"
                   required
                   value={name}
@@ -198,7 +176,7 @@ const UserProfile = ({ active }) => {
                   className="input-field"
                 />
 
-                <label htmlFor={'firstName'} className="input-label">
+                <label htmlFor={"firstName"} className="input-label">
                   First Name
                 </label>
                 <span className="input-highlight"></span>
@@ -226,7 +204,7 @@ const UserProfile = ({ active }) => {
               <div className="input-container">
                 <RiLockPasswordFill className="icon" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   id="password"
                   autoComplete="current-password"
@@ -250,8 +228,8 @@ const UserProfile = ({ active }) => {
                 <FaUserAlt className="icon" />
                 <input
                   type="text"
-                  name={'phone'}
-                  id={'phone'}
+                  name={"phone"}
+                  id={"phone"}
                   autoComplete="phone"
                   required
                   value={phone}
@@ -260,7 +238,7 @@ const UserProfile = ({ active }) => {
                   className="input-field"
                 />
 
-                <label htmlFor={'phone'} className="input-label">
+                <label htmlFor={"phone"} className="input-label">
                   Phone Number
                 </label>
                 <span className="input-highlight"></span>
@@ -280,46 +258,61 @@ const UserProfile = ({ active }) => {
               <div className="input-consent">
                 <input
                   type="checkbox"
+                  id="consent"
                   name="agree"
-                  id="agree"
+                  required
                   checked={agree}
                   onChange={updateChange}
-                  className="profile-consent-input"
                 />
-                <label htmlFor="agree" className="accept">
-                  I accept
+                <label htmlFor="consent" className="consent-label">
+                  I consent to the processing of my data in accordance with the
+                  privacy policy.
                 </label>
-
-                <NavLink className={'terms-of-user'}> Terms of Use</NavLink>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="profile-button"
-              >
-                {loading && <ButtonLoader />}
-                {loading && <span>Loading...</span>}
-                {!loading && <span> Update </span>}
+              <button type="submit" className="btn-profile">
+                {loading ? <ButtonLoader /> : "Update Profile"}
               </button>
             </form>
           </fieldset>
         </section>
       )}
 
-      <section className="profile-informamtion-container">
-        {active === 2 && <UserOrders />}
+      {active === 2 && (
+        <div className="profile-orders">
+          <UserOrders />
+        </div>
+      )}
 
-        {active === 3 && <AllRefundOrders />}
+      {active === 3 && (
+        <div className="profile-track-orders">
+          <TrackOrderTable />
+        </div>
+      )}
 
-        {active === 5 && <TrackOrderTable />}
+      {active === 4 && (
+        <div className="profile-refund-orders">
+          <AllRefundOrders />
+        </div>
+      )}
 
-        {active === 6 && <ChangePassword />}
+      {active === 5 && (
+        <div className="profile-change-password">
+          <ChangePassword />
+        </div>
+      )}
 
-        {active === 7 && <Address />}
+      {active === 6 && (
+        <div className="profile-inbox">
+          <UserInboxPage />
+        </div>
+      )}
 
-        {active === 8 && <UserInboxPage />}
-      </section>
+      {active === 7 && (
+        <div className="profile-address">
+          <Address />
+        </div>
+      )}
     </main>
   );
 };

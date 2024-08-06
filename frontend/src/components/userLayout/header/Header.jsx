@@ -11,7 +11,7 @@ import axios from "axios";
 import DropDown from "../dropDown/DropDown";
 import Navbar from "../navbar/Navbar";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserData } from "../../../redux/reducers/userReducer";
+// import { fetchUserData } from "../../../redux/reducers/userReducer";
 import WishList from "../../wishLists/wichList.jsx/WishList";
 import Cart from "../../cart/cart/Cart";
 import Logout from "../../../utils/globalFunction/Logout";
@@ -29,9 +29,9 @@ const Header = () => {
   const dispatch = useDispatch();
   const { signOut } = Logout();
 
-  useEffect(() => {
-    dispatch(fetchUserData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchUserData());
+  // }, [dispatch]);
 
   // Handle logout
   const handleLogout = async () => {

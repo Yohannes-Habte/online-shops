@@ -312,7 +312,7 @@ export const userLogout = async (req, res, next) => {
 export const updateUserProfile = async (req, res, next) => {
   try {
     const { name, email, password, phone, image } = req.body;
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return next(createError(400, "User not found"));

@@ -10,7 +10,7 @@ import { HiOutlineEye } from "react-icons/hi";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchUserData,
+  // fetchUserData,
   loginFailure,
   loginStart,
   loginSuccess,
@@ -28,9 +28,9 @@ const Login = () => {
   const { loading, error, currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchUserData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchUserData());
+  // }, [dispatch]);
 
   // Local State variables
   const [email, setEmail] = useState("");

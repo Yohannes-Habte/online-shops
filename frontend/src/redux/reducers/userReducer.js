@@ -48,7 +48,7 @@ const userReducer = createSlice({
       state.currentUser = action.payload;
       state.loading = false;
     },
-    updateUserFilure: (state, action) => {
+    updateUserFailure: (state, action) => {
       state.error = action.payload;
       state.loading = false;
     },
@@ -143,7 +143,7 @@ export const {
 
   updateUserStart,
   updateUserSuccess,
-  updateUserFilure,
+  updateUserFailure,
 
   changeUserPasswordStart,
   changeUserPasswordSuccess,
@@ -172,23 +172,23 @@ export const {
   clearErrors,
 } = userReducer.actions;
 
-export const fetchUserData = () => async (dispatch) => {
-  dispatch(fetchUserDataStart());
+// export const fetchUserData = () => async (dispatch) => {
+//   dispatch(fetchUserDataStart());
 
-  try {
-    const token = Cookies.get("token");
-    console.log("token from redux =", token)
+//   try {
+//     const token = Cookies.get("token");
+//     console.log("token from redux =", token)
 
-    if (!token) throw new Error("No token found");
-    const res = await axios.get(`${API}/users/user`, {
-      withCredentials: true,
-    });
-    console.log("user data=", res);
-    dispatch(fetchUserDataSuccess(res.data.user));
-  } catch (error) {
-    dispatch(fetchUserDataFailure(error.message));
-  }
-};
+//     if (!token) throw new Error("No token found");
+//     const res = await axios.get(`${API}/users/user`, {
+//       withCredentials: true,
+//     });
+
+//     dispatch(fetchUserDataSuccess(res.data.user));
+//   } catch (error) {
+//     dispatch(fetchUserDataFailure(error.message));
+//   }
+// };
 
 // export userSlice
 export default userReducer.reducer;

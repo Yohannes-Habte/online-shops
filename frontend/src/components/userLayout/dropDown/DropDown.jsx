@@ -1,11 +1,10 @@
-import React from 'react';
 import './DrpDown.scss';
 import { NavLink } from 'react-router-dom';
 
 const DropDown = ({ products, setDropDown }) => {
 
   // Handle submit
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
     setDropDown(false);
     window.location.reload();
   };

@@ -52,16 +52,16 @@ import AdminDashboardWithdraws from './views/adminPages/adminDashboardWithdraws/
 import ShopForgotpassword from './views/shopPages/shopPasswordPage/ShopForgotpassword';
 import ShopResetPassword from './views/shopPages/shopPasswordPage/ShopResetPassword';
 import { useDispatch } from 'react-redux';
-import { fetchUserData } from './redux/reducers/userReducer';
+// import { fetchUserData } from './redux/reducers/userReducer';
 import { API } from './utils/security/secreteKey';
 
 
 const App = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchUserData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchUserData());
+  // }, [dispatch]);
 
   const [stripeApikey, setStripeApiKey] = useState('');
 

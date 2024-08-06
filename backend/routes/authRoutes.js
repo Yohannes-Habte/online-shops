@@ -31,7 +31,7 @@ authRouter.post('/login', loginUser);
 authRouter.get('/logout', userLogout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.patch('/reset-password/:token', resetForgotPassword);
-authRouter.put('/update-user-profile', updateUserProfile);
+authRouter.put('/update/profile', authUser, updateUserProfile);
 authRouter.put('/:id/change-user-password', changeUserPassword);
 authRouter.delete('/delete-account/:account', authUser, deleteAccount);
 
