@@ -15,6 +15,7 @@ import { fetchUserData } from "../../../redux/reducers/userReducer";
 import WishList from "../../wishLists/wichList.jsx/WishList";
 import Cart from "../../cart/cart/Cart";
 import Logout from "../../../utils/globalFunction/Logout";
+import { API } from "../../../utils/security/secreteKey";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Header = () => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/products`);
+        const { data } = await axios.get(`${API}/products`);
 
         setAllProducts(data);
       } catch (error) {

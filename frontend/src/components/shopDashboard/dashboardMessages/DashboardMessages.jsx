@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './DashboardMessages.scss';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
@@ -10,7 +10,7 @@ import ShopInbox from '../shopInbox/ShopInbox';
 import socketIO from 'socket.io-client';
 import { format } from 'timeago.js';
 import { API } from '../../../utils/security/secreteKey';
-const ENDPOINT = 'http://localhost:4000/';
+const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
 const socketId = socketIO(ENDPOINT, { transports: ['websocket'] });
 
 const DashboardMessages = () => {

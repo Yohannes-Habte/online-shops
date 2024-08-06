@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API } from '../../utils/security/secreteKey';
 
 // get all sellers
 export const getAllSellers = () => async (dispatch) => {
@@ -7,7 +8,7 @@ export const getAllSellers = () => async (dispatch) => {
       type: 'getAllSellersRequest',
     });
 
-    const { data } = await axios.get(`http://localhost:5000/api/shops`, {
+    const { data } = await axios.get(`${API}/shops`, {
       withCredentials: true,
     });
 

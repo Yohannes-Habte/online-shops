@@ -53,6 +53,7 @@ import ShopForgotpassword from './views/shopPages/shopPasswordPage/ShopForgotpas
 import ShopResetPassword from './views/shopPages/shopPasswordPage/ShopResetPassword';
 import { useDispatch } from 'react-redux';
 import { fetchUserData } from './redux/reducers/userReducer';
+import { API } from './utils/security/secreteKey';
 
 
 const App = () => {
@@ -67,7 +68,7 @@ const App = () => {
   const getStripeApikey = async () => {
     try {
       const { data } = await axios.get(
-        `http://localhost:5000/api/payment/stripeapikey`
+        `${API}/payment/stripeapikey`
       );
       setStripeApiKey(data.stripeApikey);
     } catch (error) {

@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './UserInboxPage.scss';
-import Header from '../../../components/userLayout/header/Header';
-import UserInbox from '../../../components/user/userInbox/UserInbox';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useEffect, useRef, useState } from "react";
+import "./UserInboxPage.scss";
+import Header from "../../../components/userLayout/header/Header";
+import UserInbox from "../../../components/user/userInbox/UserInbox";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 // Import and connect socket.io-client
-import socketIO from 'socket.io-client';
-import { format } from 'timeago.js';
-import MessageList from '../../../components/user/userMessageList/MessageList';
-const ENDPOINT = 'http://localhost:4000/';
-const socketId = socketIO(ENDPOINT, { transports: ['websocket'] });
+import socketIO from "socket.io-client";
+import { format } from "timeago.js";
+import MessageList from "../../../components/user/userMessageList/MessageList";
+import { API } from "../../../utils/security/secreteKey";
+const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const UserInboxPage = () => {
   // Global state variables
@@ -24,7 +25,7 @@ const UserInboxPage = () => {
 
   // Local state variables for sending new message using Message Model
   const [images, setImages] = useState();
-  const [textMessage, setTextMessage] = useState('');
+  const [textMessage, setTextMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -33,7 +34,7 @@ const UserInboxPage = () => {
   const [activeStatus, setActiveStatus] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
-  console.log('Data of user:', userData);
+  console.log("Data of user:", userData);
 
   // use ref
   const scrollRef = useRef(null);
@@ -43,7 +44,7 @@ const UserInboxPage = () => {
   // ===============================================================
 
   useEffect(() => {
-    socketId.on('getMessage', (data) => {
+    socketId.on("getMessage", (data) => {
       setArrivalMessage({
         sender: data.senderId,
         textMessage: data.textMessage,
@@ -69,7 +70,7 @@ const UserInboxPage = () => {
     const getConversations = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/conversations/user-conversations/${currentUser?._id}`
+          `${API}/conversations/user-conversations/${currentUser?._id}`
         );
 
         setConversations(data.conversations);
@@ -86,8 +87,8 @@ const UserInboxPage = () => {
   useEffect(() => {
     if (currentUser) {
       const userId = currentUser?._id;
-      socketId.emit('addUser', userId);
-      socketId.on('getUsers', (data) => {
+      socketId.emit("addUser", userId);
+      socketId.on("getUsers", (data) => {
         setOnlineUsers(data);
       });
     }
@@ -112,7 +113,7 @@ const UserInboxPage = () => {
     const getMessages = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/messages/sender-messages/${currentChat?._id}`
+          `${API}/messages/sender-messages/${currentChat?._id}`
         );
 
         setMessages(data.messages);
@@ -142,24 +143,24 @@ const UserInboxPage = () => {
     );
 
     // Send message from the socket
-    socketId.emit('sendMessage', {
+    socketId.emit("sendMessage", {
       senderId: currentUser._id,
       receiverId,
       text: textMessage,
     });
 
     try {
-      if (newTextMessage !== '') {
+      if (newTextMessage !== "") {
         const { data } = await axios.post(
-          `http://localhost:5000/api/messages/create-message`,
+          `${API}/messages/create-message`,
           newTextMessage
         );
 
         setMessages([...messages, data.message]);
         updateLastMessage();
-        setTextMessage('');
+        setTextMessage("");
       } else {
-        toast.error('Please enter text message');
+        toast.error("Please enter text message");
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -170,7 +171,7 @@ const UserInboxPage = () => {
   // Update the latest message
   // ===============================================================
   const updateLastMessage = async () => {
-    socketId.emit('updateLastMessage', {
+    socketId.emit("updateLastMessage", {
       lastMessage: textMessage,
       sellerId: currentUser._id,
     });
@@ -183,10 +184,10 @@ const UserInboxPage = () => {
       };
 
       const { data } = await axios.put(
-        `http://localhost:5000/api/conversations/update-lastMessage/${currentChat._id}`,
+        `${API}/conversations/update-lastMessage/${currentChat._id}`,
         updateMessage
       );
-      setTextMessage('');
+      setTextMessage("");
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -217,7 +218,7 @@ const UserInboxPage = () => {
               );
             })}
         </section>
-        <div className='chat-messages-container'>
+        <div className="chat-messages-container">
           {/* If open is true, then show us Chatting Shop inbox */}
           {open && (
             <UserInbox

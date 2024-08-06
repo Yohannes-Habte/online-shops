@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import './BestSellings.scss';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import ProductCard from '../../components/products/productCard/ProductCard';
-import Header from '../../components/userLayout/header/Header';
-import Footer from '../../components/userLayout/footer/Footer';
+import React, { useEffect, useState } from "react";
+import "./BestSellings.scss";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import ProductCard from "../../components/products/productCard/ProductCard";
+import Header from "../../components/userLayout/header/Header";
+import Footer from "../../components/userLayout/footer/Footer";
+import { API } from "../../utils/security/secreteKey";
 
 const BestSellings = () => {
   // Global state variables
@@ -12,12 +13,12 @@ const BestSellings = () => {
 
   // Local state variables
   const [data, setData] = useState([]);
-  console.log('Sorted data are', data);
+  console.log("Sorted data are", data);
 
   useEffect(() => {
     const fetchBestSellingProducts = async () => {
       try {
-        const { data } = await axios(`http://localhost:5000/api/products`);
+        const { data } = await axios(`${API}/products`);
 
         const allProductsData = data ? [...data] : [];
 
@@ -43,7 +44,7 @@ const BestSellings = () => {
           {data &&
             data.map((product) => (
               <ProductCard product={product} key={product._id} />
-            ))}{' '}
+            ))}{" "}
         </div>
       </section>
 

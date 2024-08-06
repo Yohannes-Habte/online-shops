@@ -6,6 +6,7 @@ import axios from 'axios';
 import Header from '../../../components/userLayout/header/Header';
 import Footer from '../../../components/userLayout/footer/Footer';
 import ProductCard from '../../../components/products/productCard/ProductCard';
+import { API } from '../../../utils/security/secreteKey';
 
 const Products = () => {
   // Global state variables
@@ -22,7 +23,7 @@ const Products = () => {
   useEffect(() => {
     const fetachAllProducts = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/products`);
+        const { data } = await axios.get(`${API}/products`);
 
         if (categoryData === null) {
           setAllProducts(data);
