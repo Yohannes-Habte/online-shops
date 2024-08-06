@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/', express.static('uploads')); // image upload using multer
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://shopping-app.onrender.com'],
+    origin: ['http://localhost:3000', 'https://yohannes-shops.netlify.app'],
     credentials: true, // to send token from the backend to the frontend
   })
 );
