@@ -6,19 +6,21 @@ import Header from "../../../components/userLayout/header/Header";
 import Footer from "../../../components/userLayout/footer/Footer";
 import { fetchProduct } from "../../../redux/actions/product";
 import { clearProductErrors } from "../../../redux/reducers/productReducer";
+import RelatedProductCard from "../../../components/products/relatedProductCard/RelatedProductCard";
 
 const SingleProduct = () => {
   const { productID } = useParams();
-
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-
   // Global state variables
   const { loading, error, currentProduct, products } = useSelector(
     (state) => state.product
   );
 
   const dispatch = useDispatch();
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  console.log("Related Products", relatedProducts);
 
   useEffect(() => {
     if (productID) {
@@ -33,14 +35,14 @@ const SingleProduct = () => {
   useEffect(() => {
     if (
       currentProduct &&
-      currentProduct.category &&
+      currentProduct.subcategory &&
       products &&
       products.length > 0
     ) {
       // Filter products by the same category and exclude the current product
       const related = products?.filter(
         (product) =>
-          product.category?._id === currentProduct.category?._id &&
+          product.subcategory?._id === currentProduct.subcategory?._id &&
           product._id !== currentProduct._id
       );
       setRelatedProducts(related);
@@ -87,13 +89,13 @@ const SingleProduct = () => {
 
       <section className="single-product-container">
         <div className="product-image-section">
-          <div className="large-image-container">
+          <figure className="large-image-container">
             <img
               src={selectedImage || "/placeholder-image.jpg"} // Fallback image
               alt="Large product"
               className="large-image"
             />
-          </div>
+          </figure>
           <div className="thumbnail-images">
             {variants.map((variant, index) => (
               <img
@@ -101,6 +103,7 @@ const SingleProduct = () => {
                 src={variant.productImage || "/placeholder-image.jpg"}
                 alt={`${variant.productColor} - ${variant.productSize}`}
                 onClick={() => setSelectedImage(variant.productImage)}
+                className="thumbnail-image"
               />
             ))}
           </div>
@@ -112,7 +115,7 @@ const SingleProduct = () => {
 
           <div className="product-details">
             <p>
-              <strong>Discounted Price:</strong> ${discountPrice} {" "} $
+              <strong>Discounted Price:</strong> ${discountPrice} $
               {originalPrice}
             </p>
             <p>
@@ -198,17 +201,8 @@ const SingleProduct = () => {
         <h4>Related Products</h4>
         <div className="related-products-list">
           {relatedProducts.length > 0 ? (
-            relatedProducts.map((product, index) => (
-              <div className="related-product-item" key={index}>
-                <img
-                  src={
-                    product.variants[0]?.productImage ||
-                    "/placeholder-image.jpg"
-                  }
-                  alt="Product"
-                />
-                <h5 className="product-title">{product.title}</h5>
-              </div>
+            relatedProducts.map((product) => (
+              <RelatedProductCard key={product._id} product={product} />
             ))
           ) : (
             <p>No related products found.</p>

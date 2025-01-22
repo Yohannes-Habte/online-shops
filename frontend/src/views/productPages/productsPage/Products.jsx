@@ -9,7 +9,6 @@ import { clearProductErrors } from "../../../redux/reducers/productReducer";
 import Loader from "../../../components/loader/Loader";
 
 const Products = () => {
-  // Access global state for products, error, and loading status
   const {
     loading,
     error,

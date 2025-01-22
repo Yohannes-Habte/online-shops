@@ -1,14 +1,14 @@
-import "./ProductCard.scss";
-import { AiOutlineShoppingCart } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import "./RelatedProductCard.scss";
 import { useState } from "react";
-import { toast } from "react-toastify";
-import Ratings from "../ratings/Ratings";
-import { addToCart } from "../../../redux/reducers/cartReducer";
 import { ShortenText } from "../../../utils/textHandler/text";
+import Ratings from "../ratings/Ratings";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { addToCart } from "../../../redux/reducers/cartReducer";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
-const ProductCard = ({ product }) => {
+const RelatedProductCard = ({ product }) => {
   const {
     title,
     description,
@@ -17,34 +17,35 @@ const ProductCard = ({ product }) => {
     soldOut,
     variants,
   } = product;
+
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
-  const [selectedVariant, setSelectedVariant] = useState(variants[0]); // Default variant
+  const [selectedVariant, setSelectedVariant] = useState(variants[0]);
 
-  // Add to cart handler
-  const addToCartHandler = () => {
-    const isItemExists =
-      cart &&
-      cart.find(
-        (item) =>
-          item._id === product._id &&
-          item.variant.productColor === selectedVariant.productColor
-      );
-
-    if (isItemExists) {
-      toast.error("Item already in cart!");
-    } else if (product.stock < 1) {
-      toast.error("Product is out of stock!");
-    } else {
-      const cartData = { ...product, qty: 1, variant: selectedVariant };
-      dispatch(addToCart(cartData));
-      toast.success("Item added to cart successfully!");
-    }
-  };
+    // Add to cart handler
+    const addToCartHandler = () => {
+      const isItemExists =
+        cart &&
+        cart.find(
+          (item) =>
+            item._id === product._id &&
+            item.variant.productColor === selectedVariant.productColor
+        );
+  
+      if (isItemExists) {
+        toast.error("Item already in cart!");
+      } else if (product.stock < 1) {
+        toast.error("Product is out of stock!");
+      } else {
+        const cartData = { ...product, qty: 1, variant: selectedVariant };
+        dispatch(addToCart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
+    };
 
   return (
-    <section className={"product-card"}>
+    <section className="related-product-card">
       <figure className="image-container">
         <Link to={`/products/${product._id}`}>
           <img
@@ -107,4 +108,4 @@ const ProductCard = ({ product }) => {
   );
 };
 
-export default ProductCard;
+export default RelatedProductCard;
