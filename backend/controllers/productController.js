@@ -1,126 +1,289 @@
-import Product from '../models/productModel.js';
-import createError from 'http-errors';
-import Shop from '../models/shopModel.js';
-import Order from '../models/orderModel.js';
+import Product from "../models/productModel.js";
+import createError from "http-errors";
+import Shop from "../models/shopModel.js";
+import Order from "../models/orderModel.js";
+import Brand from "../models/brandModel.js";
+import Category from "../models/categoryModel.js";
+import mongoose from "mongoose";
 
 //==============================================================================
 // Create Product
 //==============================================================================
+
 export const createProduct = async (req, res, next) => {
+  console.log("Product data:", req.body);
+  const {
+    title,
+    description,
+    originalPrice,
+    discountPrice,
+    shopId,
+    supplier,
+    category,
+    subcategory,
+    brand,
+    customerCategory,
+    tags,
+    status,
+    variants,
+    stock,
+  } = req.body;
+
+  // Validate the shop ID
+  if (!mongoose.isValidObjectId(shopId)) {
+    return next(createError(400, "Invalid shop ID provided."));
+  }
+
+  // Start a session for the transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    // Find shop ID
-    const shopId = req.body.shopId;
-    const shop = await Shop.findById(shopId);
-
+    // Check if the shop exists
+    const shop = await Shop.findById(shopId).session(session);
     if (!shop) {
-      return createError(401, 'Shop not found! Please login!');
-    } else {
-      const product = new Product({
-        ...req.body,
-        shop: shop,
-      });
-
-      try {
-        await product.save();
-      } catch (error) {
-        return createError(500, 'Shop is not saved! Please login!');
-      }
-
-      res.status(201).json({ success: true, product: product });
+      await session.abortTransaction();
+      session.endSession();
+      return next(createError(400, "Shop not found!"));
     }
+
+    // Check for duplicate product title in the shop
+    const isProductTitleExist = await Product.findOne({
+      shop: shopId,
+      title,
+    }).session(session);
+
+    if (isProductTitleExist) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(
+        createError(400, "Product title already exists in this shop.")
+      );
+    }
+
+    // Step 1: Create a new product
+    const newProduct = new Product({
+      title,
+      description,
+      originalPrice,
+      discountPrice,
+      shop: shopId,
+      supplier,
+      category,
+      subcategory,
+      brand,
+      customerCategory,
+      tags,
+      status,
+      variants,
+      stock,
+    });
+
+    // Save the new product
+    const savedProduct = await newProduct.save({ session });
+
+    // Step 2: Add the product to the shop's shopProducts array
+    if (!shop.shopProducts.includes(savedProduct._id)) {
+      shop.shopProducts.push(savedProduct._id);
+      await shop.save({ session });
+    } else {
+      throw new Error("Product ID already exists in the shop.");
+    }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Step 3: Respond to the client
+    res.status(201).json({
+      success: true,
+      product: savedProduct,
+      message: "Product created successfully and added to the shop.",
+    });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Product could not be created! Please try again!'));
+    // Abort the transaction in case of an error
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error("Error creating product:", error.message);
+    return next(
+      createError(
+        500,
+        error.message || "Something went wrong while creating the product."
+      )
+    );
   }
 };
 
 //==============================================================================
 // Get Single Product
 //==============================================================================
-export const getSingleProduct = async (req, res, next) => {
-  try {
-    const productID = req.params.productID;
 
-    // product id
-    const product = await Product.findById(productID);
+export const getProduct = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findById(id).populate(
+      "shop supplier category brand"
+    );
+
     if (!product) {
-      return next(createError(400, `Product not found!`));
+      return next(createError(404, "Product not found"));
     }
 
-    return res.status(200).json(product);
+    res.status(200).json({ success: true, product });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Product could not be accessed! Please try again!'));
+    return next(createError(500, "Something went wrong"));
   }
 };
 
 //==============================================================================
-// Get All Products
+// Update Single Product
 //==============================================================================
-export const getAllShopProducts = async (req, res, next) => {
+
+export const updateProduct = async (req, res, next) => {
+  const { id } = req.params;
+  const {
+    title,
+    description,
+    shop,
+    supplier,
+    category,
+    brand,
+    tags,
+    status,
+    stock,
+    soldOut,
+    variants,
+  } = req.body;
+
   try {
-    // Get the shop by its id
-    const shopID = req.params.shopID;
+    const product = await Product.findById(id);
 
-    // find the shop id (seller id) and then find all its products
-    const shop = await Shop.findById(shopID);
-
-    if (!shop) {
-      return next(createError(400, 'Shop not found!'));
-    }
-
-    // If the shop found, find all its products using the shopId in the database
-    const products = await Product.find({ shopId: shopID });
-    if (!products) {
-      return next(createError(400, 'Products not found!'));
-    }
-
-    // if shop and products exist, get the products for that particular shop
-
-    return res.status(200).json({ success: true, products: products });
-  } catch (error) {
-    console.log(error);
-    next(createError(500, 'Products could not query! Please try again!'));
-  }
-};
-
-//==============================================================================
-// Get All Products
-//==============================================================================
-export const getAllShopsProducts = async (req, res, next) => {
-  try {
-    const products = await Product.find();
-    if (!products) {
-      return next(createError(400, 'Products not found!'));
-    } else {
-      return res.status(200).json(products);
-    }
-  } catch (error) {
-    console.log(error);
-    next(createError(500, 'Products could not query! Please try again!'));
-  }
-};
-
-//==============================================================================
-// Delete Single Products
-//==============================================================================
-export const deleteSingleProduct = async (req, res, next) => {
-  try {
-    // Find product id
-    const productID = req.params.productID;
-
-    // product id
-    const product = await Product.findById(productID);
     if (!product) {
-      return next(createError(400, `Product not found!`));
+      return next(createError(404, "Product not found"));
     }
 
-    // If product exist, then you can get the product
-    await Product.findByIdAndDelete(productID);
-    return res.status(200).json(`The product has been successfully deleted!`);
+    // Update the product fields
+    product.title = title || product.title;
+    product.description = description || product.description;
+    product.shop = shop || product.shop;
+    product.supplier = supplier || product.supplier;
+    product.category = category || product.category;
+    product.brand = brand || product.brand;
+    product.tags = tags || product.tags;
+    product.status = status || product.status;
+    product.stock = stock || product.stock;
+    product.soldOut = soldOut || product.soldOut;
+    product.variants = variants || product.variants;
+
+    // Save the updated product
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      product,
+      message: "Product updated successfully",
+    });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Product could not be deleted! Please try again!'));
+    console.error("Error updating product:", error);
+    return next(createError(500, "Something went wrong"));
+  }
+};
+
+//==============================================================================
+// Delete Single Product
+//==============================================================================
+
+export const deleteProduct = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      return next(createError(404, "Product not found"));
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return next(createError(500, "Something went wrong"));
+  }
+};
+
+//==============================================================================
+// Get All Products for All Shops
+//==============================================================================
+
+export const getAllProducts = async (req, res, next) => {
+  try {
+    // Pagination options
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find()
+      .skip(skip)
+      .limit(limit)
+      .populate("shop supplier category brand");
+
+    if (!products || products.length === 0) {
+      return next(createError(404, "No products found"));
+    }
+
+    const totalCount = await Product.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      products,
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    return next(createError(500, "Something went wrong"));
+  }
+};
+
+//==============================================================================
+// Get All Products for a specific category
+//==============================================================================
+export const getAllCategoryProducts = async (req, res, next) => {
+  try {
+    const { categoryId } = req.params;
+
+    const products = await Category.findById(categoryId).populate("products");
+
+    if (!products || products.length === 0) {
+      return next(createError(404, "No products found"));
+    }
+
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    console.error("Error getting products:", error);
+    return next(createError(500, "Something went wrong"));
+  }
+};
+
+//==============================================================================
+// Get All Products for a specific brand
+//==============================================================================
+export const getAllBrandProducts = async (req, res, next) => {
+  try {
+    const { brandId } = req.params;
+    const products = await Brand.findById(brandId).populate(products);
+
+    if (!products || products.length === 0) {
+      return next(createError(404, "No products found"));
+    }
+
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    return next(createError(500, "Something went wrong"));
   }
 };
 
@@ -179,40 +342,16 @@ export const productReview = async (req, res, next) => {
     // Update order after the product is reviewed. If the product is reviewed, isReviewed will be true in the orders collection under the cart
     await Order.findByIdAndUpdate(
       orderId,
-      { $set: { 'cart.$[element].isReviewed': true } },
-      { arrayFilters: [{ 'element._id': productId }], new: true }
+      { $set: { "cart.$[element].isReviewed": true } },
+      { arrayFilters: [{ "element._id": productId }], new: true }
     );
 
     res.status(201).json({
       success: true,
-      message: 'Reviwed succesfully!',
+      message: "Reviwed succesfully!",
     });
   } catch (error) {
     console.log(error);
-    next(createError(500, 'Product review did not succeed! Please try again!'));
-  }
-};
-
-//==============================================================================
-// Products that could be seen only by admin
-//==============================================================================
-export const shopsProducts = async (req, res, next) => {
-  try {
-    const products = await Product.find().sort({
-      createdAt: -1,
-    });
-
-    res.status(201).json({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    console.log(error);
-    next(
-      createError(
-        500,
-        'All shops products could not be accessed! Please try again!'
-      )
-    );
+    next(createError(500, "Product review did not succeed! Please try again!"));
   }
 };

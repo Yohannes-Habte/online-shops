@@ -1,137 +1,215 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
-
-// Mobile screen size
-.create-product-wrapper {
-  @include mobileDashboardScreen;
-  .subTitle {
-    @include title;
-    font-size: $one;
+// CreateProduct.scss
+.create-product {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  
+  h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
   }
 
-  .error {
-    @include paragraph;
-    color: $red;
-    padding: 0 1rem;
-  }
-
-  .form {
-    width: $mobile;
-    margin: auto;
-    @include shadow3;
-    padding: 1rem 2rem;
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 
     .input-container {
-      position: relative;
-      @include inputContainer;
-
-      .input-field {
-        @include inputField;
-        font-size: $one;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      
+      label {
+        font-weight: bold;
+        color: #555;
       }
 
-      .input-label {
-        position: absolute;
-        top: 0;
-        left: 2rem;
-        color: rgba(204, 204, 204, 0);
+      .input-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: white;
+        transition: border 0.3s ease;
+
+        input,
+        textarea,
+        select {
+          width: 100%;
+          border: none;
+          outline: none;
+          padding: 5px;
+          font-size: 1rem;
+          color: #333;
+          background-color: transparent;
+        }
+
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .input-icon {
+          margin-right: 10px;
+          color: #888;
+        }
+        
+        &:focus-within {
+          border-color: #0056b3;
+        }
       }
 
-      .input-highlight {
-        position: absolute;
-        bottom: 0.5rem;
-        left: 0;
-        height: 2px;
-        width: 0;
-        background-color: $green;
-        transition: all 0.3s ease;
-      }
-
-      .input-field:focus + .input-label {
-        top: 0;
-        font-size: 12px;
-        color: #81a3e6;
-      }
-
-      .input-field:focus + .input-label + .input-highlight {
-        width: 100%;
-      }
-
-      .icon {
-        position: absolute;
-        top: 1rem;
-        left: 0.5rem;
-        font-size: $afs;
-        color: $green;
-      }
-
-      // displaying password
-      .password-display {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translatey(-50%);
-        font-size: 1.3rem;
-        cursor: pointer;
+      small.error {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 5px;
       }
     }
 
-    .file-container {
-      .input-field {
-        display: none;
+    .variant-group {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      background-color: #f7f7f7;
+
+      .variant-input-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+
+        label {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+
+        .variant-input {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          padding: 10px;
+          background-color: white;
+          transition: border 0.3s ease;
+
+          input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 1rem;
+            color: #333;
+            background-color: transparent;
+          }
+
+          .variant-icon {
+            margin-right: 10px;
+            color: #888;
+          }
+
+          &:focus-within {
+            border-color: #0056b3;
+          }
+        }
+
+        input[type="file"] {
+          margin-top: 5px;
+          padding: 5px;
+          border: 1px solid #ccc;
+        }
       }
 
-      .image-label {
-        @include inputField;
-        font-size: $one;
-        display: flex;
-        gap: 1rem;
-        padding-left: 1rem;
+      button {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
 
-        .icon {
-          color: $green;
+        &:hover {
+          background-color: #c0392b;
+        }
+
+        &:disabled {
+          background-color: #ddd;
+          cursor: not-allowed;
         }
       }
     }
 
-    .image-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
 
-      .image {
-        width: 3rem;
-        height: 3rem;
-        border-radius: $radius;
+      &:hover {
+        background-color: #45a049;
+      }
+
+      &:disabled {
+        background-color: #ddd;
+        cursor: not-allowed;
       }
     }
 
-    .create-product-btn {
-      @include button1;
-      font-size: $one;
+    button[type="button"] {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #2980b9;
+      }
+
+      &:disabled {
+        background-color: #ddd;
+        cursor: not-allowed;
+      }
     }
   }
-}
 
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .create-product-wrapper {
-    @include tabletDashboardScreen;
+  fieldset {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
 
-    .subTitle {
-      @include title;
-      font-size: $one;
+    legend {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #333;
     }
   }
-}
 
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {
-  .create-product-wrapper {
-    @include desktopDashboardScreen;
+  .input-wrapper select {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    color: #333;
+  }
 
-    .subTitle {
-      @include title;
-    }
+  .input-wrapper select:focus {
+    border-color: #0056b3;
   }
 }

@@ -31,13 +31,13 @@
     }
 
     .edit-shop {
-      @include edit;
+    @include editButton; 
       margin-bottom: 1rem;
       font-size: $one;
     }
 
     .logout {
-      @include edit;
+     @include editButton;
       font-size: $one;
     }
   }
@@ -75,13 +75,13 @@
       }
 
       .edit-shop {
-        @include edit;
+       @include editButton;
         margin-bottom: 1rem;
         font-size: $one;
       }
 
       .logout {
-        @include edit;
+       @include editButton;
         font-size: $one;
       }
     }
@@ -119,12 +119,12 @@
       }
 
       .edit-shop {
-        @include edit;
+       @include editButton;
         margin-bottom: 1rem;
       }
 
       .logout {
-        @include edit;
+       @include editButton;
       }
     }
   }

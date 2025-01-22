@@ -14,6 +14,7 @@ $red: #f82a05;
 $tomato: #ff6347;
 $pink: #9a9af7f1;
 $star: #f6ba00;
+$iconColor: #6c757d;
 
 // Border
 $border-bottom: #80808040;
@@ -31,6 +32,7 @@ $sidebar-hover: #d2f6f6d8;
 // Fonts Size
 $sfs: 0.7rem;
 $one: 1rem;
+$nfs: 1.1rem;
 $afs: 1.2rem;
 $mfs: 1.4rem;
 $aafs: 1.8rem;
@@ -61,6 +63,8 @@ $chat-bg: #fff5ee;
 $chatHeader-bg: #b4f5f2;
 $sender: #f5fffa;
 $me: #dedeff;
+$userSidebar-bg: #e9ecef;
+$mobile-header-bg: #c77dff;
 
 // Fomr background
 $form-bg: #f5f5f5;
@@ -83,11 +87,13 @@ $radius: 0.3rem;
 $radius-color: #c6a8ed;
 $border: #9b98f3;
 
+
 // Width View
-$desktop: 85%;
-$laptop: 90%;
-$tablet: 95%;
-$mobile: 98%;
+$mobile: 90%;
+$mobileLandscape: 90%;
+$tablet: 85%;
+$laptop: 80%;
+$desktop: 70%;
 
 // Shop dashboar width
 $desktopDashbaord: 80%;

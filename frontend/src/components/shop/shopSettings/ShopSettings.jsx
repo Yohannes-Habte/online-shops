@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ShopSettings.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { MdEmojiEvents } from 'react-icons/md';
 import { FaAddressCard, FaPhoneVolume, FaUpload } from 'react-icons/fa';
 import { FaAudioDescription } from 'react-icons/fa';
 import {
-  updateSellerFilure,
+  updateSellerFailure,
   updateSellerStart,
   updateSellerSuccess,
 } from '../../../redux/reducers/sellerReducer';
@@ -78,10 +78,10 @@ const ShopSettings = () => {
         }
       );
 
-      toast.success('Shop info updated succesfully!');
+      toast.success('Shop info updated successfully!');
       dispatch(updateSellerSuccess(data.shop));
     } catch (error) {
-      dispatch(updateSellerFilure(error.response.data.shop.message));
+      dispatch(updateSellerFailure(error.response.data.shop.message));
     }
   };
 

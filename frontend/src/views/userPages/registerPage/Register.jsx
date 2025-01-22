@@ -1,329 +1,269 @@
 import { useEffect, useState } from "react";
 import "./Register.scss";
 import axios from "axios";
-import { FaUser, FaUserAlt } from "react-icons/fa";
+import { FaUserAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AiFillEyeInvisible } from "react-icons/ai";
-import { IoClose } from "react-icons/io5";
 import { HiOutlineEye } from "react-icons/hi";
 import { toast } from "react-toastify";
 import { Helmet } from "react-helmet-async";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   validEmail,
   validPassword,
 } from "../../../utils/validators/Validate.js";
-import {
-  API,
-  cloud_URL,
-  cloud_name,
-  upload_preset,
-} from "../../../utils/security/secreteKey.js";
+import { API } from "../../../utils/security/secreteKey.js";
 import GoogleSignupLogin from "../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin.jsx";
 import Cookies from "js-cookie";
+import {
+  userSignUpFailure,
+  userSignUpStart,
+  userSignUpSuccess,
+} from "../../../redux/reducers/userReducer.js";
+import { handleError } from "../../../utils/errorHandler/ErrorMessage.jsx";
+
+const initialState = {
+  name: "",
+  email: "",
+  password: "",
+  showPassword: false,
+  agree: false,
+};
 
 const Register = () => {
   const navigate = useNavigate();
-  // Global state variables
-  const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
-  // If user is logged in, uer will not access the sign up page
+  // Global state variables
+  const { currentUser, loading, error } = useSelector((state) => state.user);
+
+  // Local state variables
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+
+  const { name, email, password, showPassword, agree } = formData;
+
+  // Redirect user if already logged in
   useEffect(() => {
     if (currentUser) {
       navigate("/");
     }
-  }, [navigate, currentUser]);
+  }, [currentUser, navigate]);
 
-  // Local State variables
-  const [image, setImage] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [agree, setAgree] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
 
-  console.log("Image=", image);
-
-  // Update image
-  const updateImage = (e) => {
-    setImage(e.target.files[0]);
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
-  // Deleting uploading image
-  const deleteUploadingImage = () => {
-    setImage(image.name === "");
-  };
+  // Validate inputs// Validate inputs
+  const validateInputs = () => {
+    const newErrors = {};
 
-  // Update input data
-  const updateChange = (e) => {
-    switch (e.target.name) {
-      case "name":
-        setName(e.target.value);
-        break;
-      case "email":
-        setEmail(e.target.value);
-        break;
-      case "password":
-        setPassword(e.target.value);
-        break;
-      case "phone":
-        setPhone(e.target.value);
-        break;
-      case "agree":
-        setAgree(e.target.checked);
-        break;
-      default:
-        break;
+    // Validate name
+    if (!name.trim()) {
+      newErrors.name = "Name is required.";
     }
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!validEmail(email)) {
+      newErrors.email = "Invalid email address.";
+    }
+
+    // Validate password
+    if (!password.trim()) {
+      newErrors.password = "Password is required.";
+    } else if (!validPassword(password)) {
+      newErrors.password =
+        "Password must be at least 8 characters, include an uppercase letter, a number, and a special character.";
+    }
+
+    // Validate agreement
+    if (!agree) {
+      newErrors.agree = "You must agree to the terms of use.";
+    }
+
+    // Set errors in state
+    setErrors(newErrors);
+
+    // Return validation status
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Reset input values
-  const reset = () => {
-    setName("");
-    setEmail("");
-    setPassword("");
-    setPhone("");
-    setAgree(false);
-    setError(false);
+  // Reset form variables
+  const resetVariables = () => {
+    setFormData(initialState);
+    setErrors({});
   };
 
-  // Function to show/hide password
-  const displayPassword = () => {
-    setShowPassword((prevState) => !prevState);
-  };
-
-  // Submit logged in user Function
-  const submitregisterUser = async (event) => {
+  // Submit user registration
+  const submitRegisterUser = async (event) => {
     event.preventDefault();
 
-    if (!validEmail(email)) {
-      return toast.error("Please enter a valid email");
-    }
-
-    if (!validPassword(password)) {
-      return toast.error(
-        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
-      );
+    if (!validateInputs()) {
+      return;
     }
 
     try {
-      setLoading(true);
-      // Image validation
-      const userPhoto = new FormData();
-      userPhoto.append("file", image);
-      userPhoto.append("cloud_name", cloud_name);
-      userPhoto.append("upload_preset", upload_preset);
+      dispatch(userSignUpStart());
 
-      // Save image to cloudinary
-      const response = await axios.post(cloud_URL, userPhoto);
-      const { url } = response.data;
-      // The body
-      const newUser = {
-        name: name,
-        email: email,
-        password: password,
-        phone: phone,
-        image: url,
-        agree: agree,
-      };
+      const newUser = { name, email, password, agree };
 
-      const { data } = await axios.post(`${API}/auths/register`, newUser, {
+      const { data } = await axios.post(`${API}/auth/register`, newUser, {
         withCredentials: true,
       });
 
-      // Set token in cookies
-      const token = data.token;
-      Cookies.set("token", token, {
+      dispatch(userSignUpSuccess(data.user));
+
+      // Store token in cookies
+      Cookies.set("token", data.token, {
         expires: 1,
         secure: true,
         sameSite: "strict",
       });
 
-      reset();
+      toast.success("Account created successfully!");
+      resetVariables();
       navigate("/login");
-      setLoading(false);
     } catch (err) {
-      console.log(err);
-      setLoading(false);
-      toast.error(err.response.data.message);
+      const { message } = handleError(err);
+      dispatch(userSignUpFailure(message));
+      toast.error(message);
     }
   };
 
   return (
     <main className="register-page">
       <Helmet>
-        <title> Sign Up</title>
+        <title>Sign Up</title>
       </Helmet>
 
       <section className="register-container">
-        {error ? <p className="error-message"> {error} </p> : null}
-        <h1 className="register-title"> Create Free Account </h1>
+        {error && <p className="error-message">{error}</p>}
+        <h1 className="register-title">Create Free Account</h1>
 
-        <figure className="image-container">
-          {image ? (
-            <img
-              className="image"
-              src={URL.createObjectURL(image)}
-              alt={image}
+        <form
+          onSubmit={submitRegisterUser}
+          encType="multipart/form-data"
+          className="register-form"
+        >
+          <div className="input-container">
+            <FaUserAlt className="icon" />
+            <input
+              type="text"
+              name="name"
+              id="name"
+              autoComplete="name"
+              value={name}
+              onChange={handleChange}
+              placeholder="Enter your full name"
+              className="input-field"
             />
-          ) : (
-            <FaUser className="image" />
+            <label htmlFor="name" className="input-label">
+              Full Name
+            </label>
+          </div>
+          {errors.name && <small className="error-text">{errors.name}</small>}
+
+          <div className="input-container">
+            <MdEmail className="icon" />
+            <input
+              type="email"
+              name="email"
+              id="email"
+              autoComplete="email"
+              value={email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              className="input-field"
+            />
+            <label htmlFor="email" className="input-label">
+              Email Address
+            </label>
+          </div>
+          {errors.email && <small className="error-text">{errors.email}</small>}
+
+          <div className="input-container">
+            <RiLockPasswordFill className="icon" />
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              className="input-field"
+            />
+            <label htmlFor="password" className="input-label">
+              Password
+            </label>
+            <span
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  showPassword: !prev.showPassword,
+                }))
+              }
+              className="password-display"
+            >
+              {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
+            </span>
+          </div>
+          {errors.password && (
+            <small className="error-text">{errors.password}</small>
           )}
-        </figure>
 
-        <fieldset className="register-fieldset">
-          <legend className="register-legend">Sign Up </legend>
-          <form
-            onSubmit={submitregisterUser}
-            encType="multipart/form-data"
-            className="register-form"
-          >
-            <div className="input-container">
-              <FaUserAlt className="icon" />
-              <input
-                type="text"
-                name={"name"}
-                id={"name"}
-                autoComplete="name"
-                required
-                value={name}
-                onChange={updateChange}
-                placeholder="Enter First Name and Last Name"
-                className="input-field"
-              />
-
-              <label htmlFor={"firstName"} className="input-label">
-                First Name
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            <div className="input-container">
-              <MdEmail className="icon" />
-              <input
-                type="email"
-                name="email"
-                id="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={updateChange}
-                placeholder="Enter Email"
-                className="input-field"
-              />
-              <label htmlFor="email" className="input-label">
-                Email Address
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            <div className="input-container">
-              <RiLockPasswordFill className="icon" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={updateChange}
-                //onBlur={checkPasswordFormat}
-                placeholder="Enter Password"
-                className="input-field"
-              />
-              <label htmlFor="password" className="input-label">
-                Password
-              </label>
-              <span className="input-highlight"></span>
-              <span onClick={displayPassword} className="password-display">
-                {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
-              </span>
-            </div>
-
-            {/* Phone number */}
-            <div className="input-container">
-              <MdEmail className="icon" />
-              <input
-                type="number"
-                name="phone"
-                id="phone"
-                autoComplete="phone"
-                required
-                value={phone}
-                onChange={updateChange}
-                placeholder="Enter Phone Number"
-                className="input-field"
-              />
-              <label htmlFor="phone" className="input-label">
-                Phone Number
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            <div className="file-container">
-              <RiLockPasswordFill className="icon" />
-              <input
-                type="file"
-                name="image"
-                id="image"
-                onChange={updateImage}
-                className="input-field"
-              />
-              <label htmlFor="image" className="file-label">
-                {image ? (
-                  <span className="uploading-image">
-                    {image.name}{" "}
-                    <IoClose
-                      onClick={deleteUploadingImage}
-                      className="image-close-icon"
-                    />
-                  </span>
-                ) : (
-                  "Upload Photo"
-                )}
-              </label>
-            </div>
-
+          <div className="register-consent-container">
             <div className="register-consent">
               <input
                 type="checkbox"
                 name="agree"
                 id="agree"
                 checked={agree}
-                onChange={updateChange}
+                onChange={handleChange}
                 className="register-consent-checkbox"
               />
               <span className="accept">I accept</span>
-              <NavLink className={"terms-of-user"}> Terms of Use</NavLink>
+              <NavLink to="/terms" className="terms-of-use">
+                Terms of Use
+              </NavLink>
             </div>
 
+            {errors.agree && (
+              <small className="error-text">{errors.agree}</small>
+            )}
+          </div>
+
+          <div className="register-button-container">
             <button
-              // onClick={handleClick}
               type="submit"
               disabled={loading}
               className="register-button"
             >
-              {loading && <ButtonLoader />}
-              {loading && <span> Loading...</span>}
-              {!loading && <span>Sign Up</span>}
+              {loading ? <ButtonLoader /> : "Sign Up"}
             </button>
+          </div>
 
-            <GoogleSignupLogin signup={"signup"} />
+          <GoogleSignupLogin signup="signup" />
 
-            <p className="haveAccount">
-              Already have an account?
-              <NavLink to="/login" className={"link-to"}>
-                Log In
-              </NavLink>
-            </p>
-          </form>
-        </fieldset>
+          <p className="have-account">
+            Already have an account?{" "}
+            <NavLink to="/login" className="link-to-login">
+              Log In
+            </NavLink>
+          </p>
+        </form>
       </section>
     </main>
   );

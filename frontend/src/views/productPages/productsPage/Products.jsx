@@ -1,61 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import './Products.scss';
-import { useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
-import axios from 'axios';
-import Header from '../../../components/userLayout/header/Header';
-import Footer from '../../../components/userLayout/footer/Footer';
-import ProductCard from '../../../components/products/productCard/ProductCard';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect } from "react";
+import "./Products.scss";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "../../../components/userLayout/header/Header";
+import Footer from "../../../components/userLayout/footer/Footer";
+import ProductCard from "../../../components/products/productCard/ProductCard";
+import { fetchAllProductsForAllShops } from "../../../redux/actions/product";
+import { clearProductErrors } from "../../../redux/reducers/productReducer";
+import Loader from "../../../components/loader/Loader";
 
 const Products = () => {
-  // Global state variables
-  const { products } = useSelector((state) => state.product);
-  const { currentSeller } = useSelector((state) => state.seller);
+  // Access global state for products, error, and loading status
+  const {
+    loading,
+    error,
+    products = [],
+  } = useSelector((state) => state.product);
+  const dispatch = useDispatch();
 
-  // Local state variables
-  const [searchParams] = useSearchParams();
-  const categoryData = searchParams.get('category');
-  const [allProducts, setAllProducts] = useState([]);
-
-  console.log('useSearchParams', categoryData);
-  // Displaying data
   useEffect(() => {
-    const fetachAllProducts = async () => {
-      try {
-        const { data } = await axios.get(`${API}/products`);
+    dispatch(fetchAllProductsForAllShops());
 
-        if (categoryData === null) {
-          setAllProducts(data);
-        } else {
-          const categories =
-            allProducts &&
-            allProducts.filter((item) => item.category === categoryData);
-          setAllProducts(categories);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    return () => {
+      dispatch(clearProductErrors());
     };
-    fetachAllProducts();
-  }, []);
+  }, [dispatch]);
+
+  console.log("Rendering Products Component. Products:", products);
 
   return (
     <main className="products-page">
       <Header />
 
       <section className="products-container">
-        <h1 className="products-title"> Products Title </h1>
+        {error && (
+          <p className="error-message" role="alert">
+            {`Error: ${error}`}
+          </p>
+        )}
+
+        <h1 className="products-title">Our Products</h1>
+
+        {loading && (
+          <Loader isLoading={loading} message="Loading products..." size={80} />
+        )}
 
         <div className="products-wrapper">
-          {allProducts &&
-            allProducts.map((product) => (
+          {!loading &&
+            Array.isArray(products) &&
+            products.map((product) => (
               <ProductCard product={product} key={product._id} />
-            ))}{' '}
+            ))}
         </div>
 
-        {allProducts && allProducts.length === 0 && (
-          <h1 className="subTitle">No products Found!</h1>
+        {!loading && Array.isArray(products) && products.length === 0 && (
+          <h2 className="no-products-message">No products found!</h2>
+        )}
+
+        {!loading && !Array.isArray(products) && (
+          <h2 className="error-message">
+            Unexpected data format for products!
+          </h2>
         )}
       </section>
 

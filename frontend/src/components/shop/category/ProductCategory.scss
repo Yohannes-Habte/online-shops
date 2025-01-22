@@ -1,0 +1,151 @@
+$primary-color: #4CAF50;
+$secondary-color: #f44336;
+$background-color: #f9f9f9;
+$table-header-color: #f1f1f1;
+$text-color: #333;
+$font-family: 'Arial', sans-serif;
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: $background-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: $font-family;
+  color: $text-color;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: $primary-color;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+
+  .input-group {
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 0.5rem;
+      background-color: $background-color;
+
+      .icon {
+        margin-right: 0.5rem;
+        color: $primary-color;
+        font-size: 1.2rem;
+      }
+
+      input {
+        border: none;
+        flex: 1;
+        outline: none;
+        padding: 0.5rem;
+        background: transparent;
+        font-size: 1rem;
+      }
+
+      input:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 5px rgba($primary-color, 0.5);
+      }
+    }
+  }
+
+  button {
+    padding: 10px 15px;
+    background-color: $primary-color;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  thead {
+    background-color: $table-header-color;
+
+    tr {
+      th {
+        text-align: left;
+        padding: 15px;
+        font-weight: bold;
+        border-bottom: 2px solid #ccc;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background-color: #f7f7f7;
+      }
+
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+          display: flex;
+          gap: 10px;
+
+          button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+
+            &.edit {
+              background-color: #ffa726;
+              color: #fff;
+
+              &:hover {
+                background-color: darken(#ffa726, 10%);
+              }
+            }
+
+            &.delete {
+              background-color: $secondary-color;
+              color: #fff;
+
+              &:hover {
+                background-color: darken($secondary-color, 10%);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

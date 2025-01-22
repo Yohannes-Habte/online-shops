@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBars, FaSearch } from "react-icons/fa";
-import { RiArrowRightSLine } from "react-icons/ri";
 import { AiOutlineHeart } from "react-icons/ai";
 import { BiUserCircle } from "react-icons/bi";
 import { MdKeyboardArrowDown } from "react-icons/md";
@@ -14,8 +13,9 @@ import { useDispatch, useSelector } from "react-redux";
 // import { fetchUserData } from "../../../redux/reducers/userReducer";
 import WishList from "../../wishLists/wichList.jsx/WishList";
 import Cart from "../../cart/cart/Cart";
-import Logout from "../../../utils/globalFunction/Logout";
+import Logout from "../../../utils/globalFunctions/Logout";
 import { API } from "../../../utils/security/secreteKey";
+import { fetchUser } from "../../../redux/actions/user";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -25,18 +25,8 @@ const Header = () => {
   const { currentSeller } = useSelector((state) => state.seller);
   const { cart } = useSelector((state) => state.cart);
   const { wishList } = useSelector((state) => state.wishList);
-
   const dispatch = useDispatch();
   const { signOut } = Logout();
-
-  // useEffect(() => {
-  //   dispatch(fetchUserData());
-  // }, [dispatch]);
-
-  // Handle logout
-  const handleLogout = async () => {
-    await signOut(); // This will trigger the logout process
-  };
 
   // Local state variables
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +36,15 @@ const Header = () => {
   const [openCart, setOpenCart] = useState(false);
   const [openWishList, setOpenWishList] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchUser());
+  }, [dispatch]);
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   // Displaying product data
   useEffect(() => {
@@ -152,14 +151,13 @@ const Header = () => {
         {/* Become Seller */}
         <article className="become-seller">
           <Link
-            to={currentSeller ? "/dashboard" : "/login-shop"}
+            to={currentSeller ? "/shop/dashboard" : "/shop/login"}
             className="link"
           >
             <h3 className="sub-title">
-              {currentSeller ? "Shop Dashboard" : "Create Online Shop"}
+              {currentSeller ? "Shop Dashboard" : "Login Seller"}
             </h3>
           </Link>
-          <RiArrowRightSLine className="icon" />
         </article>
       </section>
 
@@ -210,22 +208,33 @@ const Header = () => {
           <div className="logged-in-user">
             {currentUser ? (
               <React.Fragment>
-                <img
-                  className="image"
-                  src={currentUser.image}
-                  alt="Profile"
-                  onClick={() => setOpenUser(!openUser)}
-                />
+                <figure className="user-image-container">
+                  <img
+                    className="image"
+                    src={currentUser.image}
+                    alt="Profile"
+                    onClick={() => setOpenUser(!openUser)}
+                  />
+                  <figcaption>{currentUser.name.split(" ")[0]}</figcaption>
+                </figure>
 
                 {openUser && (
                   <ul className="user-history">
                     <li className="list-item">
                       <NavLink to={`/profile`} className={"link"}>
-                        User Profile
+                        Profile
                       </NavLink>
                     </li>
 
-                    {currentSeller && (
+                    {currentUser && currentUser.role === "admin" && (
+                      <li className="list-item">
+                        <NavLink to={`/dashboard`} className={"link"}>
+                          Admin Dashboard
+                        </NavLink>
+                      </li>
+                    )}
+
+                    {currentUser && currentUser.role === "seller" && (
                       <li className="list-item">
                         <NavLink to={`/dashboard`} className={"link"}>
                           Shop Dashboard
@@ -234,7 +243,7 @@ const Header = () => {
                     )}
 
                     <li onClick={handleLogout} className="list-item">
-                      User Log Out
+                      Log Out
                     </li>
                   </ul>
                 )}

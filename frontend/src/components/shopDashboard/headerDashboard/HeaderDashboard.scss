@@ -15,6 +15,10 @@
     @include subTitle;
   }
 
+  .item shop-logout {
+    cursor: pointer;
+  }
+
   .dashboard-header-icons {
     display: flex;
     flex-direction: row;

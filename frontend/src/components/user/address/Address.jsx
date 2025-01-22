@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './Address.scss';
 import axios from 'axios';
 import { FaAddressCard } from 'react-icons/fa';
@@ -9,10 +9,10 @@ import { toast } from 'react-toastify';
 import { RiFileZipFill } from 'react-icons/ri';
 import { MdLocationPin } from 'react-icons/md';
 import {
-  deleteUserAddressFilure,
+  deleteUserAddressFailure,
   deleteUserAddressStart,
   deleteUserAddressSuccess,
-  updateUserAddressFilure,
+  updateUserAddressFailure,
   updateUserAddressStart,
   updateUserAddressSuccess,
 } from '../../../redux/reducers/userReducer';
@@ -115,7 +115,7 @@ const Address = () => {
         reset();
       }
     } catch (error) {
-      dispatch(updateUserAddressFilure(error.response.data.message));
+      dispatch(updateUserAddressFailure(error.response.data.message));
     }
   };
 
@@ -130,7 +130,7 @@ const Address = () => {
       );
       dispatch(deleteUserAddressSuccess(data));
     } catch (error) {
-      dispatch(deleteUserAddressFilure(error.response.data.message));
+      dispatch(deleteUserAddressFailure(error.response.data.message));
     }
   };
 

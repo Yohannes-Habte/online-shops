@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './PaymentInfo.scss';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import {
@@ -11,8 +11,8 @@ import { FaCreditCard } from 'react-icons/fa';
 
 const PaymentInfo = ({
   user,
-  open,
-  setOpen,
+  isProcessing,
+  setIsProcessing,
   onApprove,
   createOrder,
   stripePaymentHandler,
@@ -88,14 +88,14 @@ const PaymentInfo = ({
         {/* pay with paypal payement */}
         {select === 2 ? (
           <article className="pay-using-paypal-wrapper">
-            <h4 className={`pay-now-btn`} onClick={() => setOpen(true)}>
+            <h4 className={`pay-now-btn`} onClick={() => setIsProcessing(true)}>
               Pay Now
             </h4>
-            {open && (
+            {isProcessing && (
               <div className="paypal-btn">
                 <span
                   className="paypal-close-btn-icon"
-                  onClick={() => setOpen(false)}
+                  onClick={() => setIsProcessing(false)}
                 >
                   X
                 </span>

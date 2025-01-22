@@ -5,7 +5,6 @@ import {
   getAllCouponCodes,
   getCouponCodePercent,
 } from '../controllers/couponController.js';
-import { authSeller } from '../middleware/auth.js';
 import requiredValues from '../validators/requiredValues.js';
 import couponValidator from '../validators/couponValidator.js';
 import checkValidation from '../validators/checkValidation.js';

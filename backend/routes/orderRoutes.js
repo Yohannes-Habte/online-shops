@@ -11,13 +11,13 @@ import {
   refundUserOrder,
   updateShopOrders,
 } from '../controllers/orderController.js';
-import { authAdmin, authSeller } from '../middleware/auth.js';
+import { isAuthenticated } from '../middleware/auth.js';
 
 // order Router
 const orderRouter = express.Router();
 
 // order routes
-orderRouter.post('/new-order', createOrder);
+orderRouter.post('/create', isAuthenticated, createOrder);
 orderRouter.put('/update-order-status/:id/:shopId', updateShopOrders);
 orderRouter.put('/:id/refund-order', refundUserOrder);
 orderRouter.put('/refund-order-successful/:id', orderRefundByShop);

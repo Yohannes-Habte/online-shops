@@ -1,0 +1,89 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.shop-dashboard-page {
+  .shop-dashboard-page-container {
+    width: 100%;
+    min-height: 100vh;
+
+    .shop-dashboard-page-title {
+      @include title;
+      background-color: $sidebar-bg;
+    }
+
+    .shop-dashboard-sections-wrapper {
+      @include flexColumn;
+    }
+  }
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .shop-dashboard-page {
+    .shop-dashboard-page-container {
+      width: 100vw;
+
+      .shop-dashboard-page-title {
+        font-size: $nfs;
+        background-color: $mobile-header-bg;
+      }
+    }
+  }
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .shop-dashboard-page {
+    .shop-dashboard-page-container {
+      width: 100vw;
+
+      .shop-dashboard-page-title {
+        font-size: $nfs;
+        background-color: $mobile-header-bg;
+      }
+    }
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .shop-dashboard-page {
+    .shop-dashboard-page-container {
+      width: 100%;
+
+      .shop-dashboard-page-title {
+        font-size: $aafs;
+        background-color: $mobile-header-bg;
+      }
+    }
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .shop-dashboard-page {
+    .shop-dashboard-page-container {
+      min-height: 100vh;
+      .shop-dashboard-page-title {
+        @include title;
+        background-color: $sidebar-bg;
+      }
+    }
+  }
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+  .shop-dashboard-page {
+    .shop-dashboard-page-container {
+      min-height: 100vh;
+      .shop-dashboard-page-title {
+        @include title;
+      }
+
+      .shop-dashboard-sections-wrapper {
+        @include flexRow;
+      }
+    }
+  }
+}

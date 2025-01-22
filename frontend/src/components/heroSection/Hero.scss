@@ -1,0 +1,93 @@
+// Variables for consistent styling
+$primary-color: #4fa94d;
+$secondary-color: #f5f5f5;
+$text-color: #333;
+$button-hover-color: darken($primary-color, 10%);
+$loader-bg: rgba(0, 0, 0, 0.1);
+$font-family: "Arial, sans-serif";
+
+// Global styles for hero section
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: justify;
+  margin: 3rem 1rem;
+  background-color: $secondary-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: $font-family;
+}
+
+// Title styling
+.hero-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: $text-color;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+// Paragraph styling
+.hero-paragraph {
+  font-size: 1rem;
+  color: $text-color;
+  line-height: 1.6;
+  max-width: 100%;
+  margin-bottom: 2rem;
+
+  @media (min-width: 768px) {
+    font-size: 1.1rem;
+  }
+}
+
+// Button styling
+.hero-btn {
+  background-color: $primary-color;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: $button-hover-color;
+  }
+
+  &:disabled {
+    background-color: lighten($primary-color, 20%);
+    cursor: not-allowed;
+  }
+
+  .loader {
+    margin-right: 0.5rem;
+  }
+}
+
+// Link styling
+.link {
+  text-decoration: none;
+}
+
+// Responsive design adjustments
+@media (min-width: 1024px) {
+  .hero-container {
+    padding: 8rem 6rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-paragraph {
+    font-size: 1.2rem;
+    max-width: 65%;
+  }
+}

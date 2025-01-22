@@ -1,16 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
-import Cookies from "js-cookie";
-import axios from "axios";
-import { API } from '../../utils/security/secreteKey';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentUser: null,
   error: null,
   loading: false,
-  addressLoading: false,
-  successMessage: null,
 };
 
+// Helper functions for setting state
 const setLoading = (state) => {
   state.loading = true;
   state.error = null;
@@ -21,125 +17,123 @@ const setError = (state, action) => {
   state.loading = false;
 };
 
-const userReducer = createSlice({
-  name: 'user',
+const userSlice = createSlice({
+  name: "user",
   initialState,
   reducers: {
-    // User Login
-    loginStart: (state) => {
-      state.loading = true;
+    // User Sign-Up
+    userSignUpStart: setLoading,
+    userSignUpSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = null;
     },
+    userSignUpFailure: setError,
+
+    // User Login
+    loginStart: setLoading,
     loginSuccess: (state, action) => {
       state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
     },
-    loginFailure: (state, action) => {
-      state.error = action.payload;
-      state.currentUser = null;
+    loginFailure: setError,
+
+    // Fetch Single User
+    fetchUserRequest: setLoading,
+    fetchUserSuccess: (state, action) => {
+      state.currentUser = action.payload;
       state.loading = false;
     },
+    fetchUserFailure: setError,
 
-    // Update user profile
-    updateUserStart: (state) => {
-      state.loading = true;
-    },
+    // Update User Profile
+    updateUserStart: setLoading,
     updateUserSuccess: (state, action) => {
       state.currentUser = action.payload;
       state.loading = false;
+      state.error = null;
     },
-    updateUserFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    updateUserFailure: setError,
 
-    // Change user password
-    changeUserPasswordStart: (state) => {
-      state.loading = true;
-    },
+    // Change User Password
+    changeUserPasswordStart: setLoading,
     changeUserPasswordSuccess: (state, action) => {
       state.currentUser = action.payload;
       state.loading = false;
+      state.error = null;
     },
-    changeUserPasswordFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    changeUserPasswordFailure: setError,
 
-    // User log out
-    userLogoutStart: (state) => {
-      state.loading = true;
-    },
+    // User Logout
+    userLogoutStart: setLoading,
     userLogoutSuccess: (state) => {
       state.currentUser = null;
       state.loading = false;
       state.error = null;
     },
-    userLogoutFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    userLogoutFailure: setError,
 
-    // Delete user
-    deleteUserStart: (state) => {
-      state.loading = true;
-    },
+    // Delete User
+    deleteUserStart: setLoading,
     deleteUserSuccess: (state) => {
       state.currentUser = null;
       state.loading = false;
       state.error = null;
     },
-    deleteUserFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    deleteUserFailure: setError,
 
-    // Update user address
-    updateUserAddressStart: (state) => {
-      state.loading = true;
-    },
+    // Update User Address
+    updateUserAddressStart: setLoading,
     updateUserAddressSuccess: (state, action) => {
       state.currentUser = action.payload;
       state.loading = false;
     },
-    updateUserAddressFilure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    updateUserAddressFailure: setError,
 
-    // delete user address
+    // Delete User Address
     deleteUserAddressStart: (state) => {
-      state.addressLoading = true;
+      state.loading = true;
+      state.error = null;
     },
     deleteUserAddressSuccess: (state, action) => {
-      state.addressLoading = false;
+      state.loading = false;
       state.currentUser = action.payload;
     },
-    deleteUserAddressFilure: (state, action) => {
-      state.addressLoading = false;
+    deleteUserAddressFailure: (state, action) => {
+      state.loading = false;
       state.error = action.payload;
     },
 
-     // Fetch User Data 
-     fetchUserDataStart: setLoading,
-     fetchUserDataSuccess: (state, action) => {
-       state.currentUser = action.payload;
-       state.loading = false;
-     },
-     fetchUserDataFailure: setError,
+    // Fetch User Data
+    fetchUserDataStart: setLoading,
+    fetchUserDataSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    fetchUserDataFailure: setError,
 
-    // Clear errors
+    // Clear Errors
     clearErrors: (state) => {
       state.error = null;
     },
   },
 });
 
-// Destructure user reducer methods
+// Destructure actions
 export const {
+  userSignUpStart,
+  userSignUpSuccess,
+  userSignUpFailure,
+
   loginStart,
   loginSuccess,
   loginFailure,
+
+  fetchUserRequest,
+  fetchUserSuccess,
+  fetchUserFailure,
 
   updateUserStart,
   updateUserSuccess,
@@ -147,7 +141,7 @@ export const {
 
   changeUserPasswordStart,
   changeUserPasswordSuccess,
-  changeUserPasswordFilure,
+  changeUserPasswordFailure,
 
   userLogoutStart,
   userLogoutSuccess,
@@ -159,36 +153,18 @@ export const {
 
   updateUserAddressStart,
   updateUserAddressSuccess,
-  updateUserAddressFilure,
+  updateUserAddressFailure,
 
   deleteUserAddressStart,
   deleteUserAddressSuccess,
-  deleteUserAddressFilure,
+  deleteUserAddressFailure,
 
   fetchUserDataStart,
   fetchUserDataSuccess,
   fetchUserDataFailure,
 
   clearErrors,
-} = userReducer.actions;
+} = userSlice.actions;
 
-// export const fetchUserData = () => async (dispatch) => {
-//   dispatch(fetchUserDataStart());
-
-//   try {
-//     const token = Cookies.get("token");
-//     console.log("token from redux =", token)
-
-//     if (!token) throw new Error("No token found");
-//     const res = await axios.get(`${API}/users/user`, {
-//       withCredentials: true,
-//     });
-
-//     dispatch(fetchUserDataSuccess(res.data.user));
-//   } catch (error) {
-//     dispatch(fetchUserDataFailure(error.message));
-//   }
-// };
-
-// export userSlice
-export default userReducer.reducer;
+// Export the reducer
+export default userSlice.reducer;

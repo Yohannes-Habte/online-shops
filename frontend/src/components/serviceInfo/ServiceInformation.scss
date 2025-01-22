@@ -1,0 +1,79 @@
+// Variables for better consistency
+$primary-color: #4fa94d;
+$icon-bg: #f0f8f0;
+$text-color: #333;
+$background-color: #fff;
+$border-radius: 8px;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+// Main Categories Container
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  background-color: $background-color;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  text-align: center;
+}
+
+// Individual Category Wrapper
+.category-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border-radius: $border-radius;
+  background-color: $icon-bg;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Icon Styling
+.icon-container {
+  background: $primary-color;
+  color: #fff;
+  border-radius: 50%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .icon {
+    font-size: 2rem;
+  }
+}
+
+// Text Content
+.text-content {
+  .category-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: $text-color;
+    margin-bottom: 0.5rem;
+  }
+
+  .category-description {
+    font-size: 0.9rem;
+    color: darken($text-color, 20%);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .categories {
+    grid-template-columns: 1fr;
+  }
+
+  .category-wrapper {
+    padding: 1.2rem;
+  }
+}

@@ -1,114 +1,142 @@
-import { React, useState } from 'react';
-import './ShopLogin.scss';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { MdEmail } from 'react-icons/md';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { HiOutlineEye } from 'react-icons/hi';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import "./ShopLogin.scss";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { useDispatch, useSelector } from "react-redux";
+import { validEmail, validPassword } from "../../../utils/validators/Validate";
+import ButtonLoader from "../../../utils/loader/ButtonLoader";
 import {
-  loginSellerFailure,
-  loginSellerStart,
-  loginSellerSuccess,
-} from '../../../redux/reducers/sellerReducer';
-import { validEmail, validPassword } from '../../../utils/validators/Validate';
-import { toast } from 'react-toastify';
-import { API } from '../../../utils/security/secreteKey';
-import ButtonLoader from '../../../utils/loader/ButtonLoader';
+  clearSellerErrors,
+  loginShopOwner,
+} from "../../../redux/actions/seller";
+
+// Initial form state
+const initialState = {
+  email: "",
+  password: "",
+};
 
 const ShopLogin = () => {
   const navigate = useNavigate();
 
-  // Global state variales
+  // Global state variables
   const { loading, error, currentSeller } = useSelector(
     (state) => state.seller
   );
   const dispatch = useDispatch();
 
-  // Local state variables
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  // Form data state
+  const [formData, setFormData] = useState(initialState);
+  const { email, password } = formData;
 
-  // Function to show/hide password
-  const displayPassword = () => {
-    setShowPassword((prevState) => !prevState);
-  };
+  // Error state
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
-  // Update input data
-  const updateChange = (e) => {
-    switch (e.target.name) {
-      case 'email':
-        setEmail(e.target.value);
-        break;
-      case 'password':
-        setPassword(e.target.value);
-        break;
-      default:
-        break;
+  // Redirect user if already logged in
+  useEffect(() => {
+    if (currentSeller) {
+      navigate(`/shop/${currentSeller._id}`);
     }
+  }, [currentSeller, navigate]);
+
+  // Update input fields
+  const updateChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Clear error for the specific field when user starts typing
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
-  // Reset all state variables for the login form
-  const reset = () => {
-    setEmail('');
-    setPassword('');
+  // Reset form
+  const resetForm = () => {
+    setFormData(initialState);
+    setErrors({ email: "", password: "" });
   };
 
-  // Hanlde submit
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors before new login attempt
+    dispatch(clearSellerErrors());
+
+    // Validate fields and set errors
+    let formIsValid = true;
+    let newErrors = { email: "", password: "" };
+
     if (!validEmail(email)) {
-      return toast.error('Please enter a valid email');
+      formIsValid = false;
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!validPassword(password)) {
-      return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
-      );
+      formIsValid = false;
+      newErrors.password =
+        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number, and one special character";
     }
 
-    try {
-      dispatch(loginSellerStart());
-      // The body
-      const loginUser = {
-        email: email,
-        password: password,
-      };
-      const { data } = await axios.post(`${API}/shops/login-shop`, loginUser);
-
-      dispatch(loginSellerSuccess(data.shop));
-      // Reset
-      reset();
-    } catch (error) {
-      dispatch(loginSellerFailure(error.response.data.message));
+    // If there are validation errors, set them and return
+    if (!formIsValid) {
+      setErrors(newErrors);
+      return;
     }
+
+    // Prepare credentials
+    const credentials = { email, password };
+
+    // Dispatch login action
+    dispatch(loginShopOwner(credentials));
+
+    // Reset form after submission
+    resetForm();
+
+    // Redirect to user shop
+    navigate(`/shop/${currentSeller._id}`);
   };
+
+  useEffect(() => {
+    dispatch(clearSellerErrors());
+    return () => {
+      dispatch(clearSellerErrors());
+    };
+  }, [dispatch]);
 
   return (
     <section className="shop-login-wrapper">
       <h2 className="title">Log in to your shop</h2>
 
-      {error ? <p className="error-message"> {error} </p> : null}
+      {/* Display error message if exists */}
+      {error && <p className="error-message">{error}</p>}
 
       <form className="seller-login-form" onSubmit={handleSubmit}>
+        {/* Profile Image */}
         <figure className="image-container">
           <img
             className="image"
             src={
               currentSeller
                 ? currentSeller.image
-                : 'https://i.ibb.co/4pDNDk1/avatar.png'
+                : "https://i.ibb.co/4pDNDk1/avatar.png"
             }
             alt="Profile"
           />
         </figure>
         <p className="seller-name">
-          {currentSeller ? currentSeller.name : 'Shop Profile'}{' '}
+          {currentSeller ? currentSeller.name : "Shop Profile"}
         </p>
-        {/* email */}
+
+        {/* Email Input */}
         <div className="input-container">
           <MdEmail className="icon" />
           <input
@@ -121,18 +149,21 @@ const ShopLogin = () => {
             onChange={updateChange}
             placeholder="Enter Email"
             className="input-field"
+            aria-label="Email"
+            autoFocus
           />
           <label htmlFor="email" className="input-label">
             Email address
           </label>
           <span className="input-highlight"></span>
+          {errors.email && <p className="error-text">{errors.email}</p>}
         </div>
 
-        {/* password */}
+        {/* Password Input */}
         <div className="input-container">
           <RiLockPasswordFill className="icon" />
           <input
-            type={showPassword ? 'text' : 'password'}
+            type="password" // Always 'password' type for security
             name="password"
             id="password"
             autoComplete="current-password"
@@ -141,39 +172,41 @@ const ShopLogin = () => {
             onChange={updateChange}
             placeholder="Enter Password"
             className="input-field"
+            aria-label="Password"
           />
           <label htmlFor="password" className="input-label">
             Password
           </label>
           <span className="input-highlight"></span>
-          <span onClick={displayPassword} className="password-display">
-            {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
-          </span>
+          {errors.password && <p className="error-text">{errors.password}</p>}
         </div>
 
+        {/* "Keep me logged in" and Forgot Password */}
         <div className="keep-me-login--and-forgot-password-wrapper">
           <div className="keep-me-login-wrapper">
             <input type="checkbox" name="login" className="login-checkbox" />
-            <span className="keep-me-login">Keep me login</span>
+            <span className="keep-me-login">Keep me logged in</span>
           </div>
 
           <div className="forgot-password-wrapper">
-            <Link className="link" to={'/shop-forgot-password'}>
+            <Link className="link" to="/shop-forgot-password">
               Forgot your password?
             </Link>
           </div>
         </div>
 
+        {/* Submit Button */}
         <button type="submit" disabled={loading} className="shop-login-button">
           {loading && <ButtonLoader />}
-          {loading && <span>Loading...</span>}
+          {loading && <span>Logging in...</span>}
           {!loading && <span>Log In</span>}
         </button>
 
+        {/* Sign Up Redirect */}
         <p className="haveNoAccount">
-          Don't have an account?
-          <NavLink to="/create-shop" className={'link'}>
-            Sign Up
+          Do not have an account?{" "}
+          <NavLink to="/shop/create" className="link">
+            Create Shop
           </NavLink>
         </p>
       </form>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShopCreate from '../../../components/shop/createShop/CreateShop';
@@ -10,7 +10,7 @@ const CreateNewShop = () => {
   // If seller is logged in, seller will not see the shop login page
   useEffect(() => {
     if (currentSeller) {
-      navigate(`/shop/${currentSeller._id}`);
+      navigate(`/shops/create/${currentSeller._id}`);
     }
   }, [navigate, currentSeller]);
 

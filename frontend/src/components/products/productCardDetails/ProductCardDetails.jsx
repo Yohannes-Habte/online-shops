@@ -17,6 +17,21 @@ import {
 } from '../../../redux/reducers/wishListReducer';
 
 const ProductCartDetails = ({ setOpen, data }) => {
+  const {
+    title,
+    description,
+    shop: { name },
+    supplier: { supplierName },
+    category: { categoryName },
+    brand: { brandName },
+    tags,
+    status,
+    stock,
+    soldOut,
+    ratings,
+    reviews,
+    variants,
+  } = data;
   // Global state variables
   const { cart } = useSelector((state) => state.cart);
   const { wishList } = useSelector((state) => state.wishList);
@@ -39,7 +54,7 @@ const ProductCartDetails = ({ setOpen, data }) => {
 
   // increasing count
   const incrementCount = () => {
-    if (data.stock > count) {
+    if (stock > count) {
       setCount(count + 1);
     } else {
       toast.error(
@@ -93,12 +108,12 @@ const ProductCartDetails = ({ setOpen, data }) => {
           <article className="left-box">
             <figure className="image-container">
               <Link to={`/shop/preview/${data._id}`} className="flex">
-                <img src={data.images} alt={data.name} className="image" />
+                <img src={variants[0].image} alt={title} className="image" />
               </Link>
             </figure>
 
             <article className="info-wrapper">
-              <h3 className={`product-name`}>{data.name}</h3>
+              <h3 className={`product-name`}>{title}</h3>
               <p className="rating">{data?.ratings} Ratings</p>
               <h3 onClick={handleMessageSubmit} className="send-message-btn">
                 Send Message <AiOutlineMessage className="message-icon" />{' '}
@@ -109,16 +124,16 @@ const ProductCartDetails = ({ setOpen, data }) => {
 
           {/* Right box */}
           <article className="right-box">
-            <h2 className={`product-title`}>{data.name}</h2>
-            <p className="description">{data.description}</p>
+            <h2 className={`product-title`}>{title}</h2>
+            <p className="description">{description}</p>
 
             <section className="price-wrapper">
               <p className={`old-price`}>
-                ${data.originalPrice ? data.originalPrice : null}
+                ${variants[0].originalPrice ? variants[0].originalPrice : null}
               </p>
 
               <h3 className={`new-price`}>
-                ${data.originalPrice - data.discountPrice}
+                ${variants[0].originalPrice  - variants[0].originalPrice}
               </h3>
 
               <article className="quantity-management">
@@ -127,7 +142,7 @@ const ProductCartDetails = ({ setOpen, data }) => {
                 </button>
                 <h3 className="quantity">{count}</h3>
                 <button
-                  disabled={data.stock < count}
+                  disabled={data?.stock < count}
                   className="quantity-btn"
                   onClick={incrementCount}
                 >

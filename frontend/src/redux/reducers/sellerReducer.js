@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentSeller: null,
@@ -7,124 +7,110 @@ const initialState = {
   loading: false,
 };
 
+// Helper functions for setting state
+const setLoading = (state) => {
+  state.loading = true;
+  state.error = null;
+};
+
+const setError = (state, action) => {
+  state.error = action.payload;
+  state.loading = false;
+};
+
+const setSuccess = (state) => {
+  state.loading = false;
+  state.error = null;
+};
+
 const sellerReducer = createSlice({
-  name: 'seller',
+  name: "seller",
   initialState,
   reducers: {
-    // Seller Login
-    loginSellerStart: (state) => {
-      state.loading = true;
+    // Seller Sign-Up
+    sellerSignUpStart: setLoading,
+    sellerSignUpSuccess: (state, action) => {
+      state.currentSeller = action.payload;
+      setSuccess(state);
     },
+    sellerSignUpFailure: setError,
+
+    // Seller Login
+    loginSellerStart: setLoading,
     loginSellerSuccess: (state, action) => {
       state.currentSeller = action.payload;
-      state.loading = false;
-      state.error = null;
+      setSuccess(state);
     },
-    loginSellerFailure: (state, action) => {
-      state.error = action.payload;
-      state.currentSeller = null;
-      state.loading = false;
-    },
+    loginSellerFailure: setError,
 
-    // Update Seller
-    updateSellerStart: (state) => {
-      state.loading = true;
-    },
-    updateSellerSuccess: (state, action) => {
-      state.currentSeller = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    updateSellerFilure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
-
-    // seller log out
-    logoutSellerStart: (state) => {
-      state.loading = true;
-    },
-    logoutSellerSuccess: (state) => {
-      state.currentSeller = null;
-      state.loading = false;
-      state.error = null;
-    },
-    logoutSellerFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
-
-    // delete shop
-    deleteSellerStart: (state) => {
-      state.loading = true;
-    },
-    deleteSellerSuccess: (state) => {
-      state.currentSeller = null;
-      state.loading = false;
-      state.error = null;
-    },
-    deleteSellerFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
-
-    // delete shop payment method
-    deletePaymentMethodRequest: (state) => {
-      state.loading = true;
-    },
-    deletePaymentMethodSuccess: (state, action) => {
-      state.currentSeller = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    deletePaymentMethodFailed: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
-
-    // Get seller
-    getSellerStart: (state) => {
-      state.error = true;
-    },
+    // Get Seller
+    getSellerStart: setLoading,
     getSellerSuccess: (state, action) => {
       state.currentSeller = action.payload;
-      state.loading = false;
-      state.error = null;
+      setSuccess(state);
     },
-    getSellerFailer: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    getSellerFailure: setError,
 
-    // get all sellers ---admin
-    getAllSellersRequest: (state) => {
-      state.loading = true;
+    // Update Seller
+    updateSellerStart: setLoading,
+    updateSellerSuccess: (state, action) => {
+      state.currentSeller = action.payload;
+      setSuccess(state);
     },
+    updateSellerFailure: setError,
+
+    // Seller Logout
+    logoutSellerStart: setLoading,
+    logoutSellerSuccess: (state) => {
+      state.currentSeller = null;
+      setSuccess(state);
+    },
+    logoutSellerFailure: setError,
+
+    // Delete Seller
+    deleteSellerStart: setLoading,
+    deleteSellerSuccess: (state) => {
+      state.currentSeller = null;
+      setSuccess(state);
+    },
+    deleteSellerFailure: setError,
+
+    // Delete Payment Method
+    deletePaymentMethodRequest: setLoading,
+    deletePaymentMethodSuccess: (state, action) => {
+      state.currentSeller = action.payload;
+      setSuccess(state);
+    },
+    deletePaymentMethodFailed: setError,
+
+    // Get All Sellers (Admin)
+    getAllSellersRequest: setLoading,
     getAllSellersSuccess: (state, action) => {
-      state.loading = false;
       state.sellers = action.payload;
+      setSuccess(state);
     },
-    getAllSellerFailed: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
+    getAllSellersFailed: setError,
 
-    // Clear error
+    // Clear Errors
     clearErrors: (state) => {
       state.error = null;
     },
   },
 });
 
-// Destructure user reducer methods
+// Destructure seller reducer methods
 export const {
+  sellerSignUpStart,
+  sellerSignUpSuccess,
+  sellerSignUpFailure,
+
   loginSellerStart,
   loginSellerSuccess,
   loginSellerFailure,
 
   updateSellerStart,
   updateSellerSuccess,
-  updateSellerFilure,
+  updateSellerFailure,
 
   logoutSellerStart,
   logoutSellerSuccess,
@@ -134,19 +120,19 @@ export const {
   deleteSellerSuccess,
   deleteSellerFailure,
 
-  getSellerStart,
-  getSellerSuccess,
-  getSellerFailer,
-
   deletePaymentMethodRequest,
   deletePaymentMethodSuccess,
   deletePaymentMethodFailed,
 
-  // Get all sellers
+  getSellerStart,
+  getSellerSuccess,
+  getSellerFailure,
+
   getAllSellersRequest,
   getAllSellersSuccess,
-  getAllSellerFailed,
+  getAllSellersFailed,
+
+  clearErrors,
 } = sellerReducer.actions;
 
-// exoirt userSlice
 export default sellerReducer.reducer;

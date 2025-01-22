@@ -1,49 +1,45 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import './ChangePassword.scss';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { HiOutlineEye } from 'react-icons/hi';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import {
-  changeUserPasswordFilure,
-  changeUserPasswordStart,
-  changeUserPasswordSuccess,
-} from '../../../redux/reducers/userReducer';
-import { validEmail, validPassword } from '../../../utils/validators/Validate';
-import { API } from '../../../utils/security/secreteKey';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import "./ChangePassword.scss";
+import { AiFillEyeInvisible } from "react-icons/ai";
+import { HiOutlineEye } from "react-icons/hi";
+import { RiLockPasswordFill } from "react-icons/ri";
+import {  useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { validPassword } from "../../../utils/validators/Validate";
+import { API } from "../../../utils/security/secreteKey";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
   // Global state variables
   const { currentUser } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+
 
   // Local state variables
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   // If user is logged in, uer will not see the login page
   useEffect(() => {
     if (currentUser) {
-      navigate('/profile');
+      navigate("/profile");
     }
   }, [navigate, currentUser]);
 
   // Update input data
   const updateChange = (e) => {
     switch (e.target.name) {
-      case 'oldPassword':
+      case "oldPassword":
         setOldPassword(e.target.value);
         break;
-      case 'newPassword':
+      case "newPassword":
         setNewPassword(e.target.value);
         break;
-      case 'confirmPassword':
+      case "confirmPassword":
         setConfirmPassword(e.target.value);
         break;
       default:
@@ -58,9 +54,9 @@ const ChangePassword = () => {
 
   // Reset all state variables for the login form
   const resetVariables = () => {
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   // Submit logged in user Function
@@ -68,12 +64,12 @@ const ChangePassword = () => {
     e.preventDefault();
 
     if (!validPassword(oldPassword)) {
-      return toast.error('Old password is invalid!');
+      return toast.error("Old password is invalid!");
     }
 
     if (!validPassword(newPassword)) {
       return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
+        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
       );
     }
 
@@ -104,7 +100,7 @@ const ChangePassword = () => {
         <div className="input-container">
           <RiLockPasswordFill className="icon" />
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             name="oldPassword"
             id="oldPassword"
             autoComplete="current-password"
@@ -126,7 +122,7 @@ const ChangePassword = () => {
         <div className="input-container">
           <RiLockPasswordFill className="icon" />
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             name="newPassword"
             id="newPassword"
             autoComplete="current-password"
@@ -148,7 +144,7 @@ const ChangePassword = () => {
         <div className="input-container">
           <RiLockPasswordFill className="icon" />
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             name="confirmPassword"
             id="confirmPassword"
             autoComplete="current-password"

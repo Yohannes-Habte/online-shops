@@ -16,7 +16,7 @@
     .active {
       position: relative;
       @include subTitle;
-      @include button4;
+      @include button3;
       font-size: $sfs;
       color: $tomato;
       cursor: pointer;
@@ -36,7 +36,7 @@
       @include subTitle;
       color: $black;
       cursor: pointer;
-      @include button4;
+      @include button3;
       font-size: $sfs;
     }
   }
@@ -162,7 +162,7 @@
       .active {
         position: relative;
         @include subTitle;
-        @include button4;
+        @include button3;
         color: $tomato;
         cursor: pointer;
 
@@ -181,7 +181,7 @@
         @include subTitle;
         color: $black;
         cursor: pointer;
-        @include button4;
+        @include button3;
       }
     }
 
@@ -307,7 +307,7 @@
       .active {
         position: relative;
         @include subTitle;
-        @include button4;
+        @include button3;
         color: $tomato;
         cursor: pointer;
 
@@ -326,7 +326,7 @@
         @include subTitle;
         color: $black;
         cursor: pointer;
-        @include button4;
+        @include button3;
       }
     }
 

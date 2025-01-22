@@ -1,81 +1,116 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  products: null,
+  currentProduct: null,
+  products: [],
+  lastFetched: null, // Track the last fetch time
   error: null,
   loading: false,
 };
 
+// Helper functions
+const startLoading = (state) => {
+  state.loading = true;
+  state.error = null;
+};
+
+const setError = (state, action) => {
+  state.error = action.payload;
+  state.loading = false;
+};
+
+const setSuccess = (state, action) => {
+  state.products = action.payload;
+  state.lastFetched = Date.now(); // Update the timestamp
+  state.loading = false;
+  state.error = null;
+};
+
+const setSingleProductSuccess = (state, action) => {
+  state.currentProduct = action.payload;
+  state.loading = false;
+  state.error = null;
+};
+
+// Create slice
 const productReducer = createSlice({
-  name: 'product',
+  name: "product",
   initialState,
   reducers: {
     // Post product
-    productPostStart: (state) => {
-      state.loading = true;
-      state.error = null;
-      state.products = null;
-    },
-    productPostSuccess: (state, action) => {
-      state.products = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    productPostFailure: (state, action) => {
-      state.error = action.payload;
-      state.products = null;
-      state.loading = false;
-    },
+    productPostStart: startLoading,
+    productPostSuccess: setSingleProductSuccess,
+    productPostFailure: setError,
 
-    // Get all products for a shop
-    productsShopFetchStart: (state) => {
-      state.loading = true;
-      state.error = null;
-      state.products = null;
-    },
-    productsShopFetchSuccess: (state, action) => {
-      state.products = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    productShopFetchFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-      state.products = null;
-    },
+    // Get single product
+    productFetchStart: startLoading,
+    productFetchSuccess: setSingleProductSuccess,
+    productFetchFailure: setError,
+
+    // Update single product
+    productUpdateStart: startLoading,
+    productUpdateSuccess: setSingleProductSuccess,
+    productUpdateFailure: setError,
 
     // Delete single product from a specific shop
-    productShopDeleteStart: (state) => {
-      state.loading = true;
-    },
-    productShopDeleteSuccess: (state, action) => {
-      state.products = action.payload;
-      state.loading = false;
+    productShopDeleteStart: startLoading,
+    productShopDeleteSuccess: setSingleProductSuccess,
+    productShopDeleteFailure: setError,
+
+    // Get all products for a shop
+    productsShopFetchStart: startLoading,
+    productsShopFetchSuccess: setSuccess,
+    productsShopFetchFailure: setError,
+
+    // Get all products for all shops
+    allProductsFetchStart: startLoading,
+    allProductsFetchSuccess: setSuccess,
+    allProductsFetchFailure: setError,
+
+    // Get all products for a category
+    productsCategoryFetchStart: startLoading,
+    productsCategoryFetchSuccess: setSuccess,
+    productsCategoryFetchFailure: setError,
+
+    // Clear Error
+    clearProductErrors: (state) => {
       state.error = null;
-    },
-    productShopDeleteFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
     },
   },
 });
 
-// Destructure product reducer methods under the reducers key
+// Export actions
 export const {
-  // Create shop product
   productPostStart,
   productPostSuccess,
   productPostFailure,
 
-  // Get all shop products
+  productFetchStart,
+  productFetchSuccess,
+  productFetchFailure,
+
+  productUpdateStart,
+  productUpdateSuccess,
+  productUpdateFailure,
+
+  productShopDeleteStart,
+  productShopDeleteSuccess,
+  productShopDeleteFailure,
+
   productsShopFetchStart,
   productsShopFetchSuccess,
   productsShopFetchFailure,
 
-  // Delete specific shop product
-  productShopDeleteStart,
-  productShopDeleteSuccess,
-  productShopDeleteFailure,
+  productsCategoryFetchStart,
+  productsCategoryFetchSuccess,
+  productsCategoryFetchFailure,
+
+  allProductsFetchStart,
+  allProductsFetchSuccess,
+  allProductsFetchFailure,
+
+  clearProductErrors,
 } = productReducer.actions;
 
+// Export reducer
 export default productReducer.reducer;

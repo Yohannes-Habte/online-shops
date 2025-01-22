@@ -1,224 +1,220 @@
 import { useEffect, useState } from "react";
 import "./Login.scss";
 import axios from "axios";
-import { FaUserAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { AiFillEyeInvisible } from "react-icons/ai";
-import { HiOutlineEye } from "react-icons/hi";
-import { Helmet } from "react-helmet-async";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  // fetchUserData,
-  loginFailure,
-  loginStart,
-  loginSuccess,
-} from "../../../redux/reducers/userReducer";
 import { validEmail, validPassword } from "../../../utils/validators/Validate";
 import { toast } from "react-toastify";
 import ButtonLoader from "../../../utils/loader/ButtonLoader";
 import { API } from "../../../utils/security/secreteKey";
 import GoogleSignupLogin from "../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin";
 import Cookies from "js-cookie";
+import {
+  clearErrors,
+  loginFailure,
+  loginStart,
+  loginSuccess,
+} from "../../../redux/reducers/userReducer";
+
+const initialState = {
+  email: "",
+  password: "",
+  showPassword: false,
+  rememberMe: false,
+};
 
 const Login = () => {
   const navigate = useNavigate();
-  // Global state variables using redux
-  const { loading, error, currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const { currentUser, loading, error } = useSelector((state) => state.user);
 
-  // useEffect(() => {
-  //   dispatch(fetchUserData());
-  // }, [dispatch]);
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const { email, password, showPassword, rememberMe } = formData;
 
-  // Local State variables
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // If user is logged in, uer will not see the login page
   useEffect(() => {
     if (currentUser) {
       navigate("/");
     }
-  }, [navigate, currentUser]);
+  }, [currentUser]);
 
-  // Update input data
-  const updateChange = (e) => {
-    switch (e.target.name) {
-      case "email":
-        setEmail(e.target.value);
-        break;
-      case "password":
-        setPassword(e.target.value);
-        break;
-      default:
-        break;
-    }
+  useEffect(() => {
+    dispatch(clearErrors());
+  }, [dispatch]);
+
+  const resetHandler = () => {
+    setFormData(initialState);
+    setErrors({});
   };
 
-  // Function to show/hide password
-  const displayPassword = () => {
-    setShowPassword((prevState) => !prevState);
+  // Handle input changes
+  const changeHandler = (event) => {
+    const { name, value, type, checked } = event.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+
+    // Clear the associated error message, if any
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
-  // Reset all state variables for the login form
-  const resetVariables = () => {
-    setEmail("");
-    setPassword("");
+  const validateForm = () => {
+    const formErrors = {};
+
+    // Email validation
+    if (!email) {
+      formErrors.email = "Email is required.";
+    } else if (!validEmail(email)) {
+      formErrors.email = "Please enter a valid email address.";
+    }
+
+    // Password validation
+    if (!password) {
+      formErrors.password = "Password is required.";
+    } else if (password.length < 8) {
+      formErrors.password = "Password must be at least 8 characters long.";
+    } else if (!validPassword(password)) {
+      formErrors.password = "Please enter a valid password.";
+    }
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0; // Return true if there are no errors
   };
 
-  // Submit logged in user Function
-  const submitLoginUser = async (event) => {
-    event.preventDefault();
-
-    if (!validEmail(email)) {
-      return toast.error("Please enter a valid email");
-    }
-
-    if (!validPassword(password)) {
-      return toast.error(
-        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
-      );
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     try {
       dispatch(loginStart());
-      // The body
-      const loginUser = {
-        email: email,
-        password: password,
-        rememberMe: rememberMe,
-      };
-      const { data } = await axios.post(`${API}/auths/login`, loginUser, {
+      const loginUser = { email, password, rememberMe };
+      const res = await axios.post(`${API}/auth/login`, loginUser, {
         withCredentials: true,
       });
 
-      if (data.success === false) {
-        dispatch(loginFailure(data.user.message));
-        return;
-      }
+      dispatch(loginSuccess(res.data.user));
+      toast.success(res.data.message);
 
-      dispatch(loginSuccess(data.user));
-
-      // Set token in cookies
-      const token = data?.token;
-      console.log("login token=", token);
-
+      const token = res.data?.token;
       Cookies.set("token", token, {
         expires: rememberMe ? 30 : 1,
-        secure: true,
+        secure: true, // This should be true if served over HTTPS
         sameSite: "strict",
       });
 
-      resetVariables();
+      resetHandler();
       navigate("/");
     } catch (err) {
-      dispatch(loginFailure(err.response.data.message));
+      console.error(err);
+      const errorMessage =
+        err.response?.data?.message || "An error occurred. Please try again.";
+      dispatch(loginFailure(errorMessage));
+      toast.error(errorMessage);
     }
   };
 
   return (
-    <main className="lagin-page">
-      <Helmet>
-        <title> Log In </title>
-      </Helmet>
+    <section className="login-container">
+      <h3 className="login-title">Login</h3>
+      <form onSubmit={handleSubmit} className="login-form">
+        {/* Email input container */}
+        <div className="input-container">
+          <MdEmail className="icon" />
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={changeHandler}
+            placeholder="Enter Email"
+            className="input-field"
+            aria-label="Email Address"
+          />
+          <label htmlFor="email" className="input-label">
+            Email Address
+          </label>
+          <span className="input-highlight"></span>
+          {errors.email && (
+            <p className="input-error-message">{errors.email}</p>
+          )}
+        </div>
 
-      <section className="login-container">
-        {error ? <p className="error-message"> {error} </p> : null}
-        <h1 className="login-title"> Login To Your Account </h1>
-        <figure className="login-icon-container">
-          <FaUserAlt className="login-icon" />
-        </figure>
-        <fieldset className="login-fieldset">
-          <legend className="login-legend">User Login </legend>
-          <form onSubmit={submitLoginUser} className="login-form">
-            <div className="input-container">
-              <MdEmail className="icon" />
-              <input
-                type="email"
-                name="email"
-                id="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={updateChange}
-                placeholder="Enter Email"
-                className="input-field"
-              />
-              <label htmlFor="email" className="input-label">
-                Email Address
-              </label>
-              <span className="input-highlight"></span>
-            </div>
+        {/* Password input container */}
+        <div className="input-container">
+          <RiLockPasswordFill className="icon" />
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={password}
+            onChange={changeHandler}
+            placeholder="Enter Password"
+            className="input-field"
+            aria-label="Password"
+          />
+          <label htmlFor="password" className="input-label">
+            Password
+          </label>
+          <span className="input-highlight"></span>
+          {errors.password && (
+            <p className="input-error-message">{errors.password}</p>
+          )}
+        </div>
 
-            <div className="input-container">
-              <RiLockPasswordFill className="icon" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={updateChange}
-                //onBlur={checkPasswordFormat}
-                placeholder="Enter Password"
-                className="input-field"
-              />
-              <label htmlFor="password" className="input-label">
-                Password
-              </label>
-              <span className="input-highlight"></span>
-              <span onClick={displayPassword} className="password-display">
-                {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
-              </span>
-            </div>
+        {/* Show or hide Password input container */}
+        <div className="show-password-container">
+          <input
+            type="checkbox"
+            id="showPassword"
+            name="showPassword"
+            checked={showPassword}
+            onChange={changeHandler}
+            className="show-password-checkbox"
+          />
+          <label htmlFor="showPassword" className="show-password-label">
+            Show Password
+          </label>
+        </div>
 
-            <div className="login-checkbox-forget-password">
-              <div className="login-checkbox-keep-signed-in">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="login-checkbox"
-                />
-                <span className="keep-me-login">Keep me signed in</span>
-              </div>
-              <div className="forget-password">
-                <Link className="link" to={"/forgot-password"}>
-                  Forgot your password?
-                </Link>
-              </div>
-            </div>
+        {/* Log in remember me and forgot password */}
+        <div className="login-checkbox-forgot-password-container">
+          <div className="login-checkbox-keep-signed-in-wrapper">
+            <input
+              type="checkbox"
+              name="rememberMe"
+              checked={rememberMe}
+              onChange={changeHandler}
+              className="login-checkbox"
+            />
+            <span className="keep-me-sign-in">Keep me signed in</span>
+          </div>
+          <Link className="forgot-password" to={"/forgot-password"}>
+            Forgot your password?
+          </Link>
+        </div>
 
-            <button
-              // onClick={handleClick}
-              type="submit"
-              disabled={loading}
-              className="login-button"
-            >
-              {loading && <ButtonLoader />}
-              {loading && <span> Loading...</span>}
-              {!loading && <span>Log In</span>}
-            </button>
+        {/* Button for log in form */}
+        <button className="login-button" disabled={loading}>
+          {loading ? <ButtonLoader isLoading={loading} message="" /> : "Log In"}
+        </button>
 
-            <GoogleSignupLogin login={"login"} />
+        <GoogleSignupLogin signup="login" />
 
-            <p className="haveNoAccount">
-              {" Don't have an account? "}
-              <NavLink to="/register" className={"link-to"}>
-                Sign Up
-              </NavLink>
-            </p>
-          </form>
-        </fieldset>
-      </section>
-    </main>
+        {/* Do not have an account, Sign Up */}
+        <p className="have-no-account">
+          {"Don't have an account?"}
+          <Link className="sign-up" to="/signup">
+            Sign Up
+          </Link>
+        </p>
+        {error && <p className="error-message">{error}</p>}
+      </form>
+    </section>
   );
 };
-
 export default Login;

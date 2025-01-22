@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
-import './DashboardMessages.scss';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import ShopMessageList from '../shopMessageList/ShopMessageList';
-import ShopInbox from '../shopInbox/ShopInbox';
+import { useEffect, useRef, useState } from "react";
+import "./DashboardMessages.scss";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "react-toastify";
+import ShopMessageList from "../shopMessageList/ShopMessageList";
+import ShopInbox from "../shopInbox/ShopInbox";
 
 // Import and connect socket.io-client
-import socketIO from 'socket.io-client';
-import { format } from 'timeago.js';
-import { API } from '../../../utils/security/secreteKey';
+import socketIO from "socket.io-client";
+import { API } from "../../../utils/security/secreteKey";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
-const socketId = socketIO(ENDPOINT, { transports: ['websocket'] });
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const DashboardMessages = () => {
   // Global state variables
@@ -22,9 +21,8 @@ const DashboardMessages = () => {
   const [currentChat, setCurrentChat] = useState(); // conversation Model
   const [conversations, setConversations] = useState([]);
 
-  // Local state variables for sending new message using Message Model
-  const [images, setImages] = useState();
-  const [textMessage, setTextMessage] = useState('');
+  // Local state variables for text message
+  const [textMessage, setTextMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -41,7 +39,7 @@ const DashboardMessages = () => {
   // ===============================================================
 
   useEffect(() => {
-    socketId.on('getMessage', (data) => {
+    socketId.on("getMessage", (data) => {
       setArrivalMessage({
         sender: data.senderId,
         textMessage: data.textMessage,
@@ -84,8 +82,8 @@ const DashboardMessages = () => {
   useEffect(() => {
     if (currentSeller) {
       const sellerId = currentSeller?._id;
-      socketId.emit('addUser', sellerId);
-      socketId.on('getUsers', (data) => {
+      socketId.emit("addUser", sellerId);
+      socketId.on("getUsers", (data) => {
         setOnlineUsers(data);
       });
     }
@@ -140,14 +138,14 @@ const DashboardMessages = () => {
     );
 
     // Send message from the socket
-    socketId.emit('sendMessage', {
+    socketId.emit("sendMessage", {
       senderId: currentSeller._id,
       receiverId,
       text: textMessage,
     });
 
     try {
-      if (newTextMessage !== '') {
+      if (newTextMessage !== "") {
         const { data } = await axios.post(
           `${API}/messages/create-message`,
           newTextMessage
@@ -155,9 +153,9 @@ const DashboardMessages = () => {
 
         setMessages([...messages, data.message]);
         updateLastMessage();
-        setTextMessage('');
+        setTextMessage("");
       } else {
-        toast.error('Please enter text message');
+        toast.error("Please enter text message");
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -168,7 +166,7 @@ const DashboardMessages = () => {
   // Update the latest message
   // ===============================================================
   const updateLastMessage = async () => {
-    socketId.emit('updateLastMessage', {
+    socketId.emit("updateLastMessage", {
       lastMessage: textMessage,
       sellerId: currentSeller._id,
     });
@@ -180,11 +178,11 @@ const DashboardMessages = () => {
         messageSenderId: currentSeller._id,
       };
 
-      const { data } = await axios.put(
+      await axios.put(
         `${API}/conversations/update-lastMessage/${currentChat._id}`,
         updateMessage
       );
-      setTextMessage('');
+      setTextMessage("");
     } catch (error) {
       toast.error(error.response.data.message);
     }

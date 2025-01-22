@@ -1,309 +1,299 @@
 @import '../../../styles/Variables.scss';
 @import '../../../styles/Mixins.scss';
 
-.lagin-page {
-  @include page;
+.login-container {
+  width: 50%;
+  margin: 2rem auto;
 
-  .login-container {
-    width: $mobile;
-    margin: auto;
-    @include shadow3;
+  .login-title {
+    @include title;
+  }
 
-    .login-title {
-      @include title;
-      font-size: $afs;
-    }
+.login-form {
+  @include flexColumn;
+  background-color: $form-bg;
+  @include shadow1;
+  padding: 2rem;
 
-    .login-icon-container {
-      width: 24%;
-      margin: auto;
-      .login-icon {
-        align-items: center;
-        font-size: 4rem;
-        padding-top: 1rem;
+  .input-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .input-field {
+      @include inputField;
+
+      &::placeholder {
+        color: $gray;
       }
     }
 
-    .login-fieldset {
-      @include fieldset;
+    .input-label {
+      @include inputLabel;
+    }
 
-      .login-legend {
-        @include legend;
+    .input-highlight {
+      @include inputHighlight;
+    }
+
+    .input-field:focus + .input-label {
+      @include focusInputFieldAndInputLabel;
+    }
+
+    .input-field:focus + .input-label + .input-highlight {
+      width: 100%;
+    }
+
+    .icon {
+      @include inputIcon;
+    }
+
+    .input-error-message {
+      color: $red;
+      font-size: $sfs;
+      margin: 0.5rem 0 0 0.4rem;
+    }
+  }
+
+  .show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .show-password-checkbox {
+      width: $sfs;
+      height: $sfs;
+    }
+
+    .show-password-label {
+      font-size: $nfs;
+    }
+  }
+
+  .login-checkbox-forgot-password-container {
+    @include flexSpaceBetween;
+
+    .login-checkbox-keep-signed-in-wrapper {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 0.5rem;
+
+      .login-checkbox {
+        width: $sfs;
+        height: $sfs;
       }
 
-      .login-form {
-        .input-container {
-          position: relative;
-          @include inputContainer;
+      .keep-me-sign-in {
+        font-size: $nfs;
+      }
+    }
 
-          .input-field {
-            @include inputField;
-          }
+    .forgot-password {
+      margin-top: 1rem;
+      font-size: $nfs;
+      color: $blue;
+    }
+  }
 
-          .input-label {
-            position: absolute;
-            top: 0;
-            left: 2rem;
-            color: rgba(204, 204, 204, 0);
-          }
+  .login-button {
+    @include button3;
+  }
 
-          .input-highlight {
-            position: absolute;
-            bottom: 0.5rem;
-            left: 0;
-            height: 2px;
-            width: 0;
-            background-color: $green;
-            transition: all 0.3s ease;
-          }
+  .have-no-account {
+    font-size: $nfs;
+    margin-top: 1rem;
 
-          .input-field:focus + .input-label {
-            top: -5px;
-            font-size: 12px;
-            color: #81a3e6;
-          }
+    .sign-up {
+      font-weight: bold;
+      color: $blue;
+      padding-left: 0.5rem;
+    }
+  }
+}
+}
 
-          .input-field:focus + .input-label + .input-highlight {
-            width: 100%;
-          }
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .login-form {
+    .input-container {
+      .input-field {
+        font-size: $sfs;
+      }
 
-          .icon {
-            position: absolute;
-            top: 0.1;
-            left: 0.5rem;
-            font-size: 1rem;
-          }
+      .input-label {
+        font-size: $sfs;
+      }
 
-          // displaying password
-          .password-display {
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translatey(-50%);
-            font-size: 1.3rem;
-            cursor: pointer;
-          }
+      .input-highlight {
+        font-size: $sfs;
+      }
+
+      .input-field:focus + .input-label {
+        font-size: $sfs;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        font-size: $sfs;
+      }
+
+      .input-error-message {
+        font-size: $sfs;
+      }
+    }
+
+    .show-password-container {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      .show-password-checkbox {
+        width: $sfs;
+        height: $sfs;
+      }
+
+      .show-password-label {
+        font-size: $sfs;
+      }
+    }
+
+    .login-checkbox-forgot-password-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
+
+      .login-checkbox-keep-signed-in-wrapper {
+        .login-checkbox {
+          width: $sfs;
+          height: $sfs;
         }
 
-        .login-checkbox-forget-password {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 2rem;
-
-          .login-checkbox-keep-signed-in {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.3rem;
-
-            .login-checkbox {
-              height: 1.2rem;
-              width: 1.6rem;
-              display: flex;
-              align-items: center;
-            }
-
-            .keep-me-login {
-              font-size: 1.2rem;
-            }
-          }
-
-          .forget-password {
-            width: $laptop;
-            display: flex;
-            align-items: center;
-
-            .link {
-              margin-top: 1rem;
-              font-size: $afs;
-              color: $blue;
-
-              &:hover {
-                color: $tomato;
-              }
-            }
-          }
+        .keep-me-sign-in {
+          font-size: $sfs;
         }
+      }
 
-        .login-button {
-          @include button3;
-        }
+      .forgot-password {
+        font-size: $sfs;
+      }
+    }
 
-        .haveNoAccount {
-          font-size: $afs;
-          margin-top: 1rem;
+    .login-button {
+      font-size: $sfs;
+    }
 
-          .link-to {
-            font-weight: $afw;
-            color: $blue;
+    .have-no-account {
+      font-size: $sfs;
 
-            &:hover {
-              color: $tomato;
-            }
-          }
-        }
+      .sign-up {
+        font-size: $sfs;
       }
     }
   }
 }
 
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-  .lagin-page {
-    .login-title {
-      @include title;
-    }
-
-    .login-container {
-      width: 80%;
-      margin: auto;
-      @include shadow3;
-
-      .login-icon-container {
-        width: 12%;
-        margin: 2rem auto;
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .login-form {
+    .input-container {
+      .input-field {
+        font-size: $sfs;
       }
 
-      .login-fieldset {
-        width: $laptop;
-        margin: auto;
+      .input-label {
+        font-size: $sfs;
+      }
 
-        .login-form {
-          .login-checkbox-forget-password {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin-bottom: 1rem;
+      .input-highlight {
+        font-size: $sfs;
+      }
 
-            .login-checkbox-keep-signed-in {
-              margin-top: 1rem;
-            }
-          }
-        }
+      .input-field:focus + .input-label {
+        font-size: $sfs;
+      }
+
+      .input-field:focus + .input-label + .input-highlight {
+        width: 100%;
+      }
+
+      .icon {
+        font-size: $sfs;
+      }
+
+      .input-error-message {
+        font-size: $sfs;
       }
     }
-  }
-}
 
-/* Laptop screen size */
-@media screen and (min-width: 1024px) {
-  .lagin-page {
-    @include page;
+    .show-password-container {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
 
-    .login-container {
-      width: 50%;
-      margin: auto;
-      @include shadow3;
-
-      .error-message {
-        @include paragraph;
-        color: $red;
-        background-color: #f1b7ad;
+      .show-password-checkbox {
+        width: $sfs;
+        height: $sfs;
       }
 
-      .login-title {
-        @include title;
-        color: $green;
+      .show-password-label {
+        font-size: $sfs;
       }
+    }
 
-      .login-icon-container {
-        width: 12%;
-        margin: auto;
-      }
+    .login-checkbox-forgot-password-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
 
-      .login-fieldset {
-        width: 90%;
-        margin: auto;
-
-        .login-legend {
-          @include legend;
+      .login-checkbox-keep-signed-in-wrapper {
+        .login-checkbox {
+          width: $sfs;
+          height: $sfs;
         }
 
-        .login-form {
-          .input-container {
-            position: relative;
-            @include inputContainer;
-
-            .input-field {
-              @include inputField;
-              margin-bottom: $radius;
-              padding-left: 2rem;
-
-              &::placeholder {
-                color: gray;
-              }
-            }
-
-            .input-label {
-              position: absolute;
-              top: 0;
-              left: 2rem;
-              color: rgba(204, 204, 204, 0);
-            }
-
-            .input-highlight {
-              position: absolute;
-              bottom: 0.2rem;
-              left: 0;
-              height: 2px;
-              width: 0;
-              background-color: $green;
-              transition: all 0.3s ease;
-            }
-
-            .input-field:focus + .input-label {
-              top: -5px;
-              font-size: 12px;
-            }
-
-            .input-field:focus + .input-label + .input-highlight {
-              width: 100%;
-            }
-
-            .icon {
-              position: absolute;
-              top: 1.1rem;
-              left: 0.5rem;
-              font-size: 1rem;
-              color: $green;
-            }
-
-            // displaying password
-            .password-display {
-              position: absolute;
-              top: 50%;
-              right: 1rem;
-              transform: translatey(-50%);
-              font-size: 1.3rem;
-              cursor: pointer;
-            }
-          }
-          .login-checkbox-forget-password {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-
-            .login-checkbox-keep-signed-in {
-              margin-top: 1rem;
-            }
-          }
-
-          .login-button {
-            @include button3;
-          }
+        .keep-me-sign-in {
+          font-size: $sfs;
         }
+      }
+
+      .forgot-password {
+        font-size: $sfs;
+      }
+    }
+
+    .login-button {
+      font-size: $sfs;
+    }
+
+    .have-no-account {
+      font-size: $sfs;
+
+      .sign-up {
+        font-size: $sfs;
       }
     }
   }
 }
 
-// Styling email and password validation
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+}
+
 
 .errorInvisible {
   display: none;

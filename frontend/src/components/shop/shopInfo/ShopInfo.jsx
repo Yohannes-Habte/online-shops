@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./ShopInfo.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Ratings from "../../products/ratings/Ratings";
 import { eventsShopFetchSuccess } from "../../../redux/reducers/eventReducer";
 import { productsShopFetchSuccess } from "../../../redux/reducers/productReducer";
@@ -10,29 +10,28 @@ import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 
 // The isOwner comes from ShopHome.jsx page
-const ShopInfo = ({ isOwner }) => {
+const ShopInfo = () => {
   const { id } = useParams();
   // Global state variables
   const { currentSeller } = useSelector((state) => state.seller);
-  const { products } = useSelector((state) => state.product);
+  // const { products } = useSelector((state) => state.product);
   const { events } = useSelector((state) => state.event);
   const dispatch = useDispatch();
-
-  console.log("Shop is", currentSeller);
 
   // Local state variables
   const [active, setActive] = useState(1);
   const [shopProducts, setShopProducts] = useState([]);
   const [shopEvents, setShopEvents] = useState([]);
+  console.log("Shop products:", shopProducts);
 
   // Display products for a single shop
   useEffect(() => {
     const shopProducts = async () => {
       try {
         // dispatch(productsShopFetchStart());
-        const { data } = await axios.get(
-          `${API}/products/${currentSeller._id}/shop-products`
-        );
+        const { data } = await axios.get(`${API}/shops/shop/products`, {
+          withCredentials: true,
+        });
         // dispatch(productsShopFetchSuccess(data));
         setShopProducts(data.products);
       } catch (error) {
@@ -77,7 +76,7 @@ const ShopInfo = ({ isOwner }) => {
 
   return (
     <section className="shop-info-contianer">
-      <h1 className="shop-title"> {currentSeller.name} </h1>
+      <h1 className="shop-title"> {currentSeller?.name} </h1>
 
       <article className="tabs-wrapper">
         <h3
@@ -146,9 +145,9 @@ const ShopInfo = ({ isOwner }) => {
                   />
                 </figure>
                 <section className="user-rating">
-                  <h3 className="reviewer-name">{reviewer.user.name}</h3>
+                  <h3 className="reviewer-name">{reviewer.user?.name}</h3>
                   <div className="rating-wrapper">
-                    <Ratings averageRating={reviewer.rating} />
+                    <Ratings averageRating={reviewer?.rating} />
                   </div>
 
                   <p className="comment">{reviewer?.comment}</p>

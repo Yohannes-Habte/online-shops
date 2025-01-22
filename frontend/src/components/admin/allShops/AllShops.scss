@@ -39,11 +39,11 @@
       margin: 0 1rem;
 
       .cancel-delete {
-        @include button5;
+        @include button3;
       }
 
       .confirm-delete {
-        @include button5;
+        @include button3;
       }
     }
   }
@@ -87,11 +87,11 @@
         margin: 0 1rem;
 
         .cancel-delete {
-          @include button5;
+          @include button3;
         }
 
         .confirm-delete {
-          @include button5;
+          @include button3;
         }
       }
     }
@@ -137,11 +137,11 @@
         margin: 0 1rem;
 
         .cancel-delete {
-          @include button5;
+          @include button3;
         }
 
         .confirm-delete {
-          @include button5;
+          @include button3;
         }
       }
     }

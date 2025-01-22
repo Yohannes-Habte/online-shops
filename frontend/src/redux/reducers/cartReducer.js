@@ -1,21 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   cart: [],
 };
 
 const cartReducer = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState,
   reducers: {
     // Add to cart
+
     addToCart: (state, action) => {
       const item = action.payload;
-      const isItemExist = state.cart.find((i) => i._id === item._id);
+
+      const isItemExist = state.cart.find(
+        (i) =>
+          i._id === item._id &&
+          i.variant?.productColor === item.variant?.productColor
+      );
+
       if (isItemExist) {
         return {
           ...state,
-          cart: state.cart.map((i) => (i._id === isItemExist._id ? item : i)),
+          cart: state.cart.map((i) =>
+            i._id === isItemExist._id &&
+            i.variant.productColor === isItemExist.variant.productColor
+              ? item
+              : i
+          ),
         };
       } else {
         return {
@@ -34,7 +46,7 @@ const cartReducer = createSlice({
     },
 
     // Clear cart after placing an order
-    clearFromCart: (state, action) => {
+    clearFromCart: (state) => {
       return { ...state, cart: [] };
     },
   },

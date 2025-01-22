@@ -1,37 +1,89 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
+// Variant schema for product options
+const variantSchema = new Schema({
+  productColor: { type: String, required: true },
+  productSize: { type: String, required: true },
+  productImage: { type: String, required: true },
+});
+
+// Product review schema
+const reviewSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  rating: { type: Number, required: true, min: 0, max: 5 },
+  comment: { type: String, trim: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+// Product schema
 const productSchema = new Schema(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     description: { type: String, required: true },
-    category: { type: String, required: true },
-    tags: { type: String },
-    shop: { type: Object },
-    shopId: { type: String, required: true },
-    originalPrice: { type: Number },
+    originalPrice: { type: Number, required: true },
     discountPrice: { type: Number, required: true },
-    stock: { type: Number, required: true },
-    images: { type: String, required: true },
-    // images: [],
-    sold_out: { type: Number, default: 0 },
-    // Average rating of a product
-    ratings: { type: Number },
-    // Individual user product review for rating a product
-    reviews: [
-      {
-        user: { type: Object },
-        rating: { type: Number },
-        comment: { type: String },
-        productId: { type: String },
-        createdAt: { type: Date, default: Date.now() },
-      },
-    ],
+    shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
+    supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      required: true,
+    },
+    brand: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
+
+    customerCategory: {
+      type: String,
+      enum: ["Ladies", "Gents", "Kids"],
+      required: true,
+    },
+
+    tags: {
+      type: [String], // Tags for filtering or categorization, such as "New", "Sale", etc.
+      default: [],
+      validate: [arrayLimit, "Exceeds the limit of tags"], // Limit tags to 10
+    },
+
+    status: {
+      type: String,
+      required: true,
+      enum: ["active", "inactive", "out_of_stock"], 
+      default: "active",
+    },
+
+    stock: { type: Number }, // Total stock available
+
+    soldOut: { type: Number, default: 0, min: 0 },
+
+    ratings: {
+      average: { type: Number, min: 0, max: 5, default: 0 }, // Average rating
+      count: { type: Number, default: 0, min: 0 }, // Total number of ratings
+    },
+
+    reviews: [reviewSchema],
+
+    variants: [variantSchema], 
   },
   { timestamps: true }
 );
 
-// Product Model
-const Product = mongoose.model('Product', productSchema);
+function arrayLimit(val) {
+  return val.length <= 10; // Helper function to limit array size
+}
+
+// Pre-save hook to ensure discountPrice is valid
+productSchema.pre("save", function (next) {
+  if (this.discountPrice > this.originalPrice) {
+    next(new Error("Discount price cannot be greater than the original price"));
+  } else {
+    next();
+  }
+});
+
+// Add a text index for search optimization
+productSchema.index({ title: "text", description: "text" });
+
+const Product = mongoose.model("Product", productSchema);
 export default Product;

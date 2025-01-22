@@ -1,278 +1,258 @@
-import { React, useState } from 'react';
-import './ShopCreate.scss';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { RxAvatar } from 'react-icons/rx';
-import { HiOutlineEye } from 'react-icons/hi';
-import { FaAddressCard, FaPhoneVolume, FaUserTie } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { RiLockPasswordFill } from 'react-icons/ri';
-import { MdDescription } from 'react-icons/md';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "./ShopCreate.scss";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { FaCloudUploadAlt } from "react-icons/fa";
+import { FaAddressCard, FaPhoneVolume, FaUserTie } from "react-icons/fa";
+import { MdEmail, MdDescription } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   validEmail,
   validPassword,
-} from '../../../utils/validators/Validate.js';
+} from "../../../utils/validators/Validate.js";
 import {
-  API,
   cloud_URL,
   cloud_name,
   upload_preset,
-} from '../../../utils/security/secreteKey.js';
-import ButtonLoader from '../../../utils/loader/ButtonLoader.jsx';
+} from "../../../utils/security/secreteKey.js";
+import {
+  clearSellerErrors,
+  createNewShop,
+} from "../../../redux/actions/seller.js";
+
+const initialState = {
+  name: "",
+  email: "",
+  password: "",
+  phoneNumber: "",
+  description: "",
+  shopAddress: "",
+  LogoImage: null,
+  agree: false,
+};
 
 const ShopCreate = () => {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.seller);
 
-  // Local state variables
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [shopAddress, setShopAddress] = useState('');
-  const [image, setImage] = useState();
-  const [description, setDescription] = useState('');
-  const [agree, setAgree] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // Handle input change and image file upload
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
 
-  // Function to show/hide password
-  const displayPassword = () => {
-    setShowPassword((prevState) => !prevState);
-  };
-
-  // Update image
-  const updateImage = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  // Update input data
-  const updateChange = (e) => {
-    switch (e.target.name) {
-      case 'name':
-        setName(e.target.value);
-        break;
-
-      case 'email':
-        setEmail(e.target.value);
-        break;
-
-      case 'password':
-        setPassword(e.target.value);
-        break;
-
-      case 'phoneNumber':
-        setPhoneNumber(e.target.value);
-        break;
-
-      case 'shopAddress':
-        setShopAddress(e.target.value);
-        break;
-
-      case 'description':
-        setDescription(e.target.value);
-        break;
-
-      case 'agree':
-        setAgree(e.target.checked);
-        break;
-
-      default:
-        break;
+    if (files) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: files[0],
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
     }
+
+    // Clear any existing error for the field being changed
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
-  // Reset input data
-  const reset = () => {
-    setName('');
-    setEmail('');
-    setPassword('');
-    setPhoneNumber('');
-    setShopAddress('');
-    setDescription('');
-    setAgree(false);
+  // Validate form inputs
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Shop name is required.";
+
+    if (!validEmail(formData.email)) newErrors.email = "Invalid email.";
+
+    if (!validPassword(formData.password))
+      newErrors.password = "Invalid password";
+
+    if (!formData.phoneNumber)
+      newErrors.phoneNumber = "Phone number is required.";
+
+    if (!formData.description)
+      newErrors.description = "Description is required.";
+
+    if (!formData.shopAddress.trim())
+      newErrors.shopAddress = "Shop address is required.";
+
+    if (!formData.LogoImage) newErrors.LogoImage = "Shop logo is required.";
+
+    if (!formData.agree) newErrors.agree = "You must accept the Terms of Use.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Submit created shop
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (!validEmail(email)) {
-      return toast.error('Please enter a valid email');
-    }
-
-    if (!validPassword(password)) {
-      return toast.error(
-        'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'
-      );
-    }
-    setLoading(true);
     try {
-      // Image validation
-      const userPhoto = new FormData();
-      userPhoto.append('file', image);
-      userPhoto.append('cloud_name', cloud_name);
-      userPhoto.append('upload_preset', upload_preset);
+      let imageUrl = "";
+      if (formData.LogoImage) {
+        const formDataImage = new FormData();
+        formDataImage.append("file", formData.LogoImage);
+        formDataImage.append("upload_preset", upload_preset);
+        formDataImage.append("cloud_name", cloud_name);
 
-      // Save image to cloudinary
-      const response = await axios.post(cloud_URL, userPhoto);
-      const { url } = response.data;
-      // The body
-      const newUser = {
-        name: name,
-        email: email,
-        password: password,
-        phoneNumber: phoneNumber,
-        shopAddress: shopAddress,
-        description: description,
-        agree: agree,
-        image: url,
+        const response = await fetch(cloud_URL, {
+          method: "POST",
+          body: formDataImage,
+        });
+        const data = await response.json();
+        imageUrl = data.url;
+      }
+
+      const newShop = {
+        ...formData,
+        LogoImage: imageUrl,
       };
 
-      const { data } = await axios.post(`${API}/shops/create-shop`, newUser);
-      reset();
-      navigate('/login-shop');
-      setLoading(false);
+      // Dispatch the Redux action to create the shop
+      dispatch(createNewShop(newShop));
+
+      // Redirect to the shop login page on successful shop creation
+      navigate("/shop/login");
     } catch (error) {
-      toast.error(error.response.data.message);
-      setLoading(false);
+      toast.error("Failed to upload image or create shop.");
     }
   };
+
+  // Clear errors on successful form submission or when the component unmounts
+  useEffect(() => {
+    // Clear errors when the form component is mounted
+    dispatch(clearSellerErrors());
+
+    return () => {
+      // Optionally clear errors when the component unmounts (important for state resets)
+      dispatch(clearSellerErrors());
+    };
+  }, [dispatch]);
+
+  const {
+    name,
+    email,
+    password,
+    phoneNumber,
+    shopAddress,
+    description,
+    LogoImage,
+    agree,
+  } = formData;
 
   return (
     <section className="create-shop-wrapper">
       <h1 className="title">Create Your Own Shop</h1>
+
+      {/* Display error message from Redux state */}
+      {error && <p className="error-message">{error}</p>}
 
       <form className="seller-signup-form" onSubmit={handleSubmit}>
         <figure className="image-container">
           <img
             className="image"
             src={
-              image
-                ? URL.createObjectURL(image)
-                : 'https://i.ibb.co/4pDNDk1/avatar.png'
+              LogoImage
+                ? URL.createObjectURL(LogoImage)
+                : "https://i.ibb.co/4pDNDk1/avatar.png"
             }
             alt="Profile"
           />
         </figure>
-        <p className="seller-profile"> Shop Profile </p>
-        {/* name */}
-        <div className="wrapper">
+        <p className="seller-profile">Shop Profile</p>
+        <div className="inputs-wrapper">
           <div className="input-container">
             <FaUserTie className="icon" />
             <input
-              type="name"
+              type="text"
               name="name"
-              id="name"
-              required
               value={name}
-              onChange={updateChange}
-              placeholder="Enter Shop name"
+              onChange={handleChange}
+              placeholder="Shop Name"
               className="input-field"
+              aria-label="Shop Name"
             />
-            <label htmlFor="name" className="input-label">
-              Shop Name
-            </label>
-            <span className="input-highlight"></span>
+            {errors.name && <p className="error">{errors.name}</p>}
           </div>
 
-          {/* email */}
           <div className="input-container">
             <MdEmail className="icon" />
             <input
               type="email"
               name="email"
-              id="email"
-              autoComplete="email"
-              required
               value={email}
-              onChange={updateChange}
-              placeholder="Enter Email"
+              onChange={handleChange}
+              placeholder="Email"
               className="input-field"
+              aria-label="Email"
             />
-            <label htmlFor="email" className="input-label">
-              Email address
-            </label>
-            <span className="input-highlight"></span>
+            {errors.email && <span className="error">{errors.email}</span>}
           </div>
 
-          {/* password */}
           <div className="input-container">
             <RiLockPasswordFill className="icon" />
             <input
-              type={showPassword ? 'text' : 'password'}
+              type="password"
               name="password"
-              id="password"
-              autoComplete="current-password"
-              required
               value={password}
-              onChange={updateChange}
-              placeholder="Enter Password"
+              onChange={handleChange}
+              placeholder="Password"
               className="input-field"
+              aria-label="Password"
             />
-            <label htmlFor="password" className="input-label">
-              Password
-            </label>
-            <span className="input-highlight"></span>
-            <span onClick={displayPassword} className="password-display">
-              {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
-            </span>
+            {errors.password && <p className="error">{errors.password}</p>}
           </div>
 
-          {/* phone */}
           <div className="input-container">
             <FaPhoneVolume className="icon" />
             <input
-              type="number"
+              type="text"
               name="phoneNumber"
-              id="phoneNumber"
-              required
               value={phoneNumber}
-              onChange={updateChange}
-              placeholder="Enter Phone Number"
+              onChange={handleChange}
+              placeholder="Phone Number"
               className="input-field"
+              aria-label="Phone Number"
             />
-            <label htmlFor="phoneNumber" className="input-label">
-              Phone Number
-            </label>
-            <span className="input-highlight"></span>
+            {errors.phoneNumber && (
+              <p className="error">{errors.phoneNumber}</p>
+            )}
           </div>
 
-          {/* Shop address */}
           <div className="input-container">
             <FaAddressCard className="icon" />
             <input
               type="text"
               name="shopAddress"
-              id="shopAddress"
-              required
               value={shopAddress}
-              onChange={updateChange}
-              placeholder="Enter Address"
+              onChange={handleChange}
+              placeholder="Shop Address"
               className="input-field"
+              aria-label="Shop Address"
             />
-            <label htmlFor="shopAddress" className="input-label">
-              Shop Address
-            </label>
-            <span className="input-highlight"></span>
+            {errors.shopAddress && (
+              <p className="error">{errors.shopAddress}</p>
+            )}
           </div>
 
-          {/* image */}
           <div className="file-container">
-            <label htmlFor="file-input" className="input-label">
-              <label htmlFor="image" className="image-label">
-                <RxAvatar className="icon" />
-                Upload Photo
-              </label>
-              <input
-                type="file"
-                name="image"
-                id="image"
-                onChange={updateImage}
-                className="input-field"
-              />
+            <label htmlFor="LogoImage" className="image-label">
+              <FaCloudUploadAlt className="icon" /> Upload Logo
             </label>
+            <input
+              className="file-input"
+              type="file"
+              name="LogoImage"
+              id="LogoImage"
+              onChange={handleChange}
+            />
+            {errors.LogoImage && <p className="error">{errors.LogoImage}</p>}
           </div>
         </div>
 
@@ -280,49 +260,42 @@ const ShopCreate = () => {
           <MdDescription className="icon" />
           <textarea
             name="description"
-            id="description"
-            cols="20"
-            rows="6"
+            rows={5}
+            cols={30}
             value={description}
-            onChange={updateChange}
+            onChange={handleChange}
+            placeholder="Shop Description"
             className="input-field"
+            aria-label="Shop Description"
           ></textarea>
-
-          <label htmlFor="description" className="input-label">
-            Shop Description
-          </label>
-          <span className="input-highlight"></span>
+          {errors.description && <p className="error">{errors.description}</p>}
         </div>
 
         <div className="shop-register-consent">
           <input
             type="checkbox"
             name="agree"
-            id="agree"
             checked={agree}
-            onChange={updateChange}
-            className="register-consent-input"
+            onChange={handleChange}
           />
-          <span className="accept">I accept</span>
-          <Link to={'/'} className={'terms-of-user'}>
-            Terms of Use
-          </Link>
+          <span>
+            I accept <Link to={"/"}>Terms of Use</Link>
+          </span>
+        </div>
+        {errors.agree && <span className="error">{errors.agree}</span>}
+
+        <div className="shop-button-wrapper">
+          <button type="submit" disabled={loading} className="create-shop-btn">
+            {loading ? <ButtonLoader /> : "Submit"}
+          </button>
         </div>
 
-        <button type="submit" disabled={loading} className="create-shop-btn">
-          {loading && <ButtonLoader />}
-          {loading && <span>Loading...</span>}
-          {!loading && <span>Submit</span>}
-        </button>
-
-        <article className={`already-have-account-wrapper`}>
-          <p className="already-have-account">Already have an account?</p>
-          <h3 className="sign-in">
-            <Link to="/login-shop" className="link">
-              Sign in
-            </Link>
-          </h3>
-        </article>
+        <p className="already-have-shop">
+          Already have a shop?{" "}
+          <Link to={"/shop/login"} className="redirect-login">
+            Login
+          </Link>
+        </p>
       </form>
     </section>
   );

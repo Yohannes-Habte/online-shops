@@ -1,15 +1,15 @@
 import User from "../models/userModel.js";
 import createError from "http-errors";
 import bcrypt from "bcryptjs";
-import userToken from "../middleware/userToken.js";
 import crypto from "crypto";
 import sendEmail from "../utils/sendMail.js";
+import generateUserToken from "../middleware/userToken.js";
 
 //=========================================================================
 // Create an account
 //=========================================================================
 export const createAccount = async (req, res, next) => {
-  const { name, email, password, phone, image, role, agree } = req.body;
+  const { name, email, password, agree } = req.body;
   try {
     const user = await User.findOne({ email: email });
 
@@ -25,9 +25,6 @@ export const createAccount = async (req, res, next) => {
       name: name,
       email: email,
       password: password,
-      phone: phone,
-      image: image,
-      role: role,
       agree: agree,
     });
 
@@ -38,14 +35,14 @@ export const createAccount = async (req, res, next) => {
       return next(createError(500, "User could not be saved"));
     }
 
-    // generate user token
-    const userRegisterToken = userToken(newUser._id);
+    // Generate token for a user
+    const token = generateUserToken(newUser);
 
     return res
-      .cookie("user_token", userRegisterToken, {
+      .cookie("user_token", token, {
         path: "/",
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000),
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         sameSite: "none",
         secure: true,
       })
@@ -72,7 +69,7 @@ export const googleRegisterLogin = async (req, res, next) => {
         .cookie("user_token", googleLoginToken, {
           path: "/",
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 3600),
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "none",
           secure: true,
         })
@@ -92,7 +89,6 @@ export const googleRegisterLogin = async (req, res, next) => {
           Math.random().toString(36).slice(-4),
         email: req.body.email,
         password: hashedPassword,
-        image: req.body.image,
         agree: req.body.agree,
       });
       console.log("new User", newUser);
@@ -110,7 +106,7 @@ export const googleRegisterLogin = async (req, res, next) => {
         .cookie("user_token", googleLoginSignup, {
           path: "/",
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 3600),
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "none",
           secure: true,
         })
@@ -128,43 +124,50 @@ export const googleRegisterLogin = async (req, res, next) => {
 //=========================================================================
 
 export const loginUser = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
+
   try {
     const user = await User.findOne({ email: email });
 
-    // If user does not exist in the database, then ....
     if (!user) {
-      return next(
-        createError(400, "This email does not exist! Please sign up!")
-      );
+      console.error("User not found:", email);
+      return next(createError(400, "Wrong credentials"));
     }
 
-    // If user exist in the database, then check password validity
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return next(createError(400, "Invalid password! Please sign up!"));
+      return next(createError(400, "Incorrect password!"));
     }
 
     if (user && isPasswordValid) {
-      const { token, password, ...rest } = user._doc;
+      const { password, admin, seller, ...userDetails } = user._doc;
 
-      // generate user token
-      const loginToken = userToken(user._id);
+      const token = generateUserToken(user);
 
-      return res
-        .cookie("user_token", loginToken, {
+      const tokenExpiry = rememberMe
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        : new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      res
+
+        .cookie("token", token, {
           path: "/",
-          httpOnly: true,
-          expires: new Date(Date.now() + 60 * 60 * 1000),
-          sameSite: "none",
+          httpOnly: false,
           secure: true,
+          expires: tokenExpiry,
+          sameSite: "strict",
         })
         .status(200)
-        .json({ success: true, user });
+        .json({
+          success: true,
+          user: { ...userDetails },
+          token,
+          message: "User successfully logged in!",
+        });
     }
   } catch (error) {
-    console.log(error);
-    next(createError(500, "User could not login. Please try again!"));
+    console.error("Login error:", error.message, error.stack);
+    return next(createError(400, "You are unable to login! Please try again!"));
   }
 };
 
@@ -295,13 +298,13 @@ export const resetForgotPassword = async (req, res, next) => {
 
 export const userLogout = async (req, res, next) => {
   try {
-    res.clearCookie('user_token');
+    res.clearCookie("user_token");
     res.status(200).json({
       success: true,
-      message: 'You have successfully logged out.',
+      message: "You have successfully logged out.",
     });
   } catch (error) {
-    next(createError(500, 'User could not logout. Please try again!'));
+    next(createError(500, "User could not logout. Please try again!"));
   }
 };
 

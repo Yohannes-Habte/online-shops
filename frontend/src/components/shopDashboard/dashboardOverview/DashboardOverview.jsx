@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './DashboardOverview.scss';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -66,7 +66,7 @@ const DashboardOverview = () => {
       try {
         dispatch(sellerOrdersRequest());
         const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
+          `${API}/orders/shop/${currentSeller?._id}`
         );
         const orderData = data.orders.filter(
           (shopOrderData) => shopOrderData.status === 'Delivered'
@@ -160,7 +160,7 @@ const DashboardOverview = () => {
           <aside className=" aside-box account-balance">
             <MdPriceChange className="icon" />
             <h3 className={`subTitle`}>
-              Account Balance of {currentSeller.name}
+              Account Balance of {currentSeller?.name}
             </h3>
           </aside>
 
@@ -175,11 +175,11 @@ const DashboardOverview = () => {
           <aside className="aside-box all-orders">
             <FaFirstOrderAlt className="icon" />
             <h3 className={`subTitle`}>
-              All Orders from {currentSeller.name}{' '}
+              All Orders from {currentSeller?.name}{' '}
             </h3>
           </aside>
           <h3 className="subTitle">
-            {allShopOrders ? allShopOrders.length : '0'}
+            {allShopOrders ? allShopOrders?.length : '0'}
           </h3>
           <Link to="/dashboard-orders" className="link">
             View Orders
@@ -190,7 +190,7 @@ const DashboardOverview = () => {
         <article className="article-box all-products-wrapper">
           <aside className="aside-box all-products">
             <FaProductHunt className="icon" />
-            <h3 className={`subTitle`}>All Products of {currentSeller.name}</h3>
+            <h3 className={`subTitle`}>All Products of {currentSeller?.name}</h3>
           </aside>
           <h3 className="subTitle">
             {shopProducts ? shopProducts.length : '0'}
@@ -201,7 +201,7 @@ const DashboardOverview = () => {
 
       {/* Latest orders */}
       <h3 className="latest-orders">
-        Delivered Orders of {currentSeller.name}
+        Delivered Orders of {currentSeller?.name}
       </h3>
 
       {/* Data Grid */}

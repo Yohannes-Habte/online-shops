@@ -44,7 +44,7 @@ const shopRegisterValidator = () => {
       .isLength({ min: 2, max: 50 })
       .withMessage('Name must be between 2 and 50 characters'),
 
-    check('image').notEmpty(),
+    check('LogoImage').notEmpty(),
     check('agree').custom((input) => {
       if (input === false) {
         throw new Error(

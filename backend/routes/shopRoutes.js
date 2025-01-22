@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import {
   createShop,
   deleteAllShops,
@@ -6,49 +6,54 @@ import {
   deleteWithdrawMethod,
   getAllShops,
   getShop,
+  getShopProducts,
   loginSeller,
   resetForgotShopPassword,
   sellerLogout,
   shopForgotPassword,
   updatePaymentMethods,
   updateShopProfile,
-} from '../controllers/shopController.js';
-import { authAdmin, authSeller } from '../middleware/auth.js';
-import requiredValues from '../validators/requiredValues.js';
-import shopRegisterValidator from '../validators/shopRegisterValidator.js';
-import checkValidation from '../validators/checkValidation.js';
+} from "../controllers/shopController.js";
+import requiredValues from "../validators/requiredValues.js";
+import shopRegisterValidator from "../validators/shopRegisterValidator.js";
+import checkValidation from "../validators/checkValidation.js";
+import { isSellerAuthenticated } from "../middleware/shopAuth.js";
 
 // shop Router
 const shopRouter = express.Router();
 
 // shop routes
 shopRouter.post(
-  '/create-shop',
+  "/create",
   requiredValues([
-    'name',
-    'email',
-    'password',
-    'phoneNumber',
-    'description',
-    'shopAddress',
-    'image',
-    'agree',
+    "name",
+    "email",
+    "password",
+    "phoneNumber",
+    "description",
+    "shopAddress",
+    "LogoImage",
+    "agree",
   ]),
   shopRegisterValidator(),
   checkValidation,
   createShop
 );
-shopRouter.post('/login-shop', loginSeller);
-shopRouter.get('/logout-shop', sellerLogout);
-shopRouter.post('/shop-forgot-password', shopForgotPassword);
-shopRouter.patch('/shop-reset-password/:token', resetForgotShopPassword);
-shopRouter.put('/update-shop-profile', authSeller, updateShopProfile);
-shopRouter.put('/update-payment-methods', authSeller, updatePaymentMethods);
-shopRouter.delete('/delete-payment-method', authSeller, deleteWithdrawMethod);
-shopRouter.get('/shop/:id', getShop);
-shopRouter.get('/', getAllShops);
-shopRouter.delete('/delete-shop/:id', deleteSingleShop);
-shopRouter.delete('/delete-all-shops', authAdmin, deleteAllShops);
+shopRouter.post("/login",  loginSeller);
+shopRouter.get("/shop", isSellerAuthenticated, getShop);
+shopRouter.put("/update", updateShopProfile);
+shopRouter.get("/logout", sellerLogout);
+shopRouter.delete("/delete", deleteSingleShop);
+shopRouter.delete("/payment-method/:id", deleteWithdrawMethod);
+shopRouter.get("/", getAllShops);
+shopRouter.get("/shop/products", isSellerAuthenticated, getShopProducts);
+
+shopRouter.post("/forgotPassword", shopForgotPassword);
+shopRouter.patch("/shop-reset-password/:token", resetForgotShopPassword);
+shopRouter.put("/update-payment-methods", updatePaymentMethods);
+
+
+shopRouter.delete("/delete-all-shops", deleteAllShops);
 
 // Export shop Router
 export default shopRouter;

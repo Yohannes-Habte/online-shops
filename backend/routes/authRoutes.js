@@ -10,7 +10,6 @@ import {
   updateUserProfile,
   userLogout,
 } from '../controllers/authController.js';
-import { authUser } from '../middleware/auth.js';
 import requiredValues from '../validators/requiredValues.js';
 import userRegisterValidator from '../validators/userRegisterValidator.js';
 import checkValidation from '../validators/checkValidation.js';
@@ -21,7 +20,7 @@ const authRouter = express.Router();
 // Auth routes
 authRouter.post(
   '/register',
-  requiredValues(['name', 'email', 'password', 'phone', 'image', 'agree']),
+  requiredValues(['name', 'email', 'password', 'agree']),
   userRegisterValidator(),
   checkValidation,
   createAccount
@@ -31,9 +30,9 @@ authRouter.post('/login', loginUser);
 authRouter.get('/logout', userLogout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.patch('/reset-password/:token', resetForgotPassword);
-authRouter.put('/update/profile', authUser, updateUserProfile);
+authRouter.put('/update/profile', updateUserProfile);
 authRouter.put('/:id/change-user-password', changeUserPassword);
-authRouter.delete('/delete-account/:account', authUser, deleteAccount);
+authRouter.delete('/delete-account/:account', deleteAccount);
 
 // Export auth Router
 export default authRouter;

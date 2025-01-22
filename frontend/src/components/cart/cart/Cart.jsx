@@ -1,4 +1,3 @@
-import React from 'react';
 import './Cart.scss';
 import { RxCross1 } from 'react-icons/rx';
 import { IoBagHandleOutline } from 'react-icons/io5';
@@ -12,13 +11,16 @@ const Cart = ({ setOpenCart }) => {
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
+
+  console.log("Cart Items:",cart);
+
   // Remove from cart handler
   const removeFromCartHandler = (id) => {
     dispatch(removeFromCart(id));
   };
 
   // Total price
-  const totalPrice = cart.reduce(
+  const totalPrice = cart?.reduce(
     (acc, item) => acc + item.qty * item.discountPrice,
     0
   );
@@ -72,7 +74,7 @@ const Cart = ({ setOpenCart }) => {
             </section>
             <hr />
             <h2 className="total-price">
-              Total Pirce: <span className="amount">${totalPrice}</span>
+              Total Price: <span className="amount">${totalPrice}</span>
             </h2>
             <hr />
 

@@ -1,325 +1,504 @@
-import React, { useState } from 'react';
-import './CreateProduct.scss';
-import { AiFillTags } from 'react-icons/ai';
-import { BiSolidCategoryAlt } from 'react-icons/bi';
-import { FaAudioDescription, FaProductHunt, FaUpload } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { MdMedicalServices, MdPriceChange } from 'react-icons/md';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import {
-  productPostFailure,
-  productPostStart,
-  productPostSuccess,
-} from '../../../redux/reducers/productReducer';
+  FiTag,
+  FiAlignLeft,
+  FiPackage,
+  FiGrid,
+  FiShoppingBag,
+} from "react-icons/fi";
+import { FaMoneyCheckAlt } from "react-icons/fa";
+import { MdOutlineCategory, MdOutlineImage } from "react-icons/md";
+import "./CreateProduct.scss";
+
 import {
   API,
-  cloud_URL,
   cloud_name,
+  cloud_URL,
   upload_preset,
-} from '../../../utils/security/secreteKey';
+} from "../../../utils/security/secreteKey";
+import { useSelector } from "react-redux";
+
+const initialState = {
+  title: "",
+  description: "",
+  originalPrice: "",
+  discountPrice: "",
+  supplier: "",
+  category: "",
+  subcategory: "",
+  brand: "",
+  customerCategory: "",
+  tags: [],
+  status: "active",
+  stock: 0,
+  variants: [
+    {
+      productColor: "",
+      productSize: "",
+      productImage: null,
+    },
+  ],
+};
 
 const CreateProduct = () => {
-  const navigate = useNavigate();
-  // Global state variables
   const { currentSeller } = useSelector((state) => state.seller);
-  const { loading, error } = useSelector((state) => state.product);
-  const dispatch = useDispatch();
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const [images, setImages] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [tags, setTags] = useState('');
-  const [originalPrice, setOriginalPrice] = useState();
-  const [discountPrice, setDiscountPrice] = useState();
-  const [stock, setStock] = useState();
+  useEffect(() => {
+    const fetchData = async (endpoint, setter) => {
+      try {
+        const response = await axios.get(`${API}/${endpoint}`, {
+          withCredentials: true,
+        });
+        setter(response.data[endpoint]);
+      } catch (error) {
+        console.error(`Error fetching ${endpoint}:`, error);
+        toast.error(`Failed to load ${endpoint}`);
+      }
+    };
 
-  // Update input data
-  const updateChange = (e) => {
-    switch (e.target.name) {
-      case 'name':
-        setName(e.target.value);
-        break;
-      case 'description':
-        setDescription(e.target.value);
-        break;
-      case 'category':
-        setCategory(e.target.value);
-        break;
-      case 'tags':
-        setTags(e.target.value);
-        break;
+    fetchData("brands", setBrands);
+    fetchData("categories", setCategories);
+    fetchData("subcategories", setSubcategories);
+    fetchData("suppliers", setSuppliers);
+  }, []);
 
-      case 'originalPrice':
-        setOriginalPrice(e.target.value);
-        break;
-      case 'discountPrice':
-        setDiscountPrice(e.target.value);
-        break;
-      case 'stock':
-        setStock(e.target.value);
-        break;
-      default:
-        break;
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const reset = () => {
-    setImages('');
-    setName('');
-    setDescription('');
-    setCategory('');
-    setTags('');
-    setOriginalPrice('');
-    setDiscountPrice('');
-    setStock('');
+  const handleVariantChange = (index, e) => {
+    const { name, value, files } = e.target;
+    const updatedVariants = [...formData.variants];
+    updatedVariants[index][name] = files ? files[0] : value;
+    setFormData({ ...formData, variants: updatedVariants });
   };
 
-  //& Handle multiple image changes
-  // const handleImageChange = (e) => {
-  //   const files = Array.from(e.target.files);
+  const addVariant = () => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: [
+        ...prev.variants,
+        {
+          productColor: "",
+          productSize: "",
+          productImage: null,
+        },
+      ],
+    }));
+  };
 
-  //   setImages([]);
+  const removeVariant = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }));
+  };
 
-  //   files.forEach((file) => {
-  //     const reader = new FileReader();
+  const validateForm = () => {
+    const newErrors = {};
 
-  //     reader.onload = () => {
-  //       if (reader.readyState === 2) {
-  //         setImages((old) => [...old, reader.result]);
-  //       }
-  //     };
-  //     reader.readAsDataURL(file);
-  //   });
-  // };
+    if (!formData.title.trim()) newErrors.title = "Title is required.";
 
-  // Handle submit
+    if (!formData.description.trim())
+      newErrors.description = "Description is required.";
+
+    if (!formData.originalPrice.trim())
+      newErrors.originalPrice = "Original price is required.";
+
+    if (!formData.discountPrice.trim())
+      newErrors.discountPrice = "Discounted price is required.";
+
+    if (!formData.supplier) newErrors.supplier = "Supplier ID is required.";
+
+    if (!formData.category) newErrors.category = "Category ID is required.";
+
+    if (!formData.subcategory)
+      newErrors.subcategory = "Subcategory is required.";
+
+    if (!formData.brand) newErrors.brand = "Brand ID is required.";
+
+    if (!formData.stock.trim() || formData.stock <= 0)
+      newErrors.stock = "Stock must be greater than 0.";
+
+    if (!formData.customerCategory)
+      newErrors.customerCategory = "Customer category is required.";
+
+    return newErrors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setLoading(true);
     try {
-      dispatch(productPostStart());
+      const variantImages = await Promise.all(
+        formData.variants.map(async (variant) => {
+          if (variant.productImage) {
+            const cloudData = new FormData();
+            cloudData.append("file", variant.productImage);
+            cloudData.append("upload_preset", upload_preset);
+            cloudData.append("cloud_name", cloud_name);
 
-      const productImages = new FormData();
-      productImages.append('file', images);
-      productImages.append('cloud_name', cloud_name);
-      productImages.append('upload_preset', upload_preset);
-
-      // Save image to cloudinary
-      const response = await axios.post(cloud_URL, productImages);
-      const { url } = response.data;
-
-      // The body
-      const newProduct = {
-        shopId: currentSeller._id,
-        name: name,
-        description: description,
-        category: category,
-        tags: tags,
-        originalPrice: originalPrice,
-        discountPrice: discountPrice,
-        stock: stock,
-        images: url,
-        //& For more images upload
-        // images: images.forEach((image) => {productImages.append('images', image)}),
-      };
-
-      const { data } = await axios.post(
-        `${API}/products/create-product`,
-        newProduct
+            const res = await axios.post(cloud_URL, cloudData);
+            return { ...variant, productImage: res.data.secure_url };
+          }
+          return variant;
+        })
       );
 
-      dispatch(productPostSuccess(data.product));
-      reset();
+      const newProduct = {
+        ...formData,
+        shopId: currentSeller?._id,
+        variants: variantImages,
+      };
+      const response = await axios.post(`${API}/products/create`, newProduct, {
+        withCredentials: true,
+      });
+      toast.success(response.data.message);
+      setFormData(initialState);
     } catch (error) {
-      console.log(error);
-      dispatch(productPostFailure(error.response.data.message));
-      toast.error(error.response.data.message);
+      console.error("Error creating product:", error);
+      toast.error("Failed to create product.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <section className="create-product-wrapper">
-      <h5 className="subTitle">Create Product</h5>
-
-      <p className="error"> {error} </p>
-
-      {/* create product form */}
-      <form
-        onSubmit={handleSubmit}
-        encType="multipart/form-data"
-        className="form"
-      >
-        {/* Product name */}
+    <div className="create-product">
+      <h2>Create Product</h2>
+      <form onSubmit={handleSubmit}>
+        {/* Title Field */}
         <div className="input-container">
-          <FaProductHunt className="icon" />
-          <input
-            type="text"
-            name="name"
-            id="name"
-            autoComplete="name"
-            required
-            value={name}
-            onChange={updateChange}
-            placeholder="Enter Product Name"
-            className="input-field"
-          />
-          <label htmlFor="name" className="input-label">
-            Product Name
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="title">Title</label>
+          <div className="input-wrapper">
+            <FiTag className="input-icon" />
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Enter product title"
+              disabled={loading}
+            />
+          </div>
+          {errors.title && <small className="error">{errors.title}</small>}
         </div>
 
-        {/* Product category */}
+        {/* Description Field */}
         <div className="input-container">
-          <BiSolidCategoryAlt className="icon" />
-          <label htmlFor="category" className="input-label">
-            Product Category <span className="mark">*</span>
-          </label>
-          <select
-            name="category"
-            id="category"
-            value={category}
-            onChange={updateChange}
-            className="input-field"
-          >
-            <option value="default">Choose Product Category</option>
-            <option value="phone"> Phone </option>
-            <option value="laptop"> Laptop </option>
-            <option value="shoes"> Shoes </option>
-            <option value="clothes"> Clothes </option>
-            <option value="others"> Others </option>
-          </select>
-        </div>
-
-        {/* Product tags */}
-        <div className="input-container">
-          <AiFillTags className="icon" />
-          <input
-            type="text"
-            name="tags"
-            id="tags"
-            autoComplete="tags"
-            required
-            value={tags}
-            onChange={updateChange}
-            placeholder="Enter Product tags"
-            className="input-field"
-          />
-          <label htmlFor="tags" className="input-label">
-            Product tags
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="description">Description</label>
+          <div className="input-wrapper">
+            <FiAlignLeft className="input-icon" />
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Enter product description"
+              disabled={loading}
+            ></textarea>
+          </div>
+          {errors.description && (
+            <small className="error">{errors.description}</small>
+          )}
         </div>
 
         {/* Product Original Price */}
         <div className="input-container">
-          <MdPriceChange className="icon" />
-          <input
-            type="number"
-            name="originalPrice"
-            id="originalPrice"
-            autoComplete="originalPrice"
-            required
-            value={originalPrice}
-            onChange={updateChange}
-            placeholder="Enter Product Original Price"
-            className="input-field"
-          />
-          <label htmlFor="originalPrice" className="input-label">
-            Product Original Price
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="stock">Original Price</label>
+          <div className="input-wrapper">
+            <FaMoneyCheckAlt className="input-icon" />
+            <input
+              type="number"
+              id="originalPrice"
+              name="originalPrice"
+              value={formData.originalPrice}
+              onChange={handleInputChange}
+              placeholder="Enter product original price"
+              disabled={loading}
+            />
+          </div>
+          {errors.originalPrice && (
+            <small className="error">{errors.originalPrice}</small>
+          )}
         </div>
 
-        {/* Product discount Price */}
+        {/* Product Discounted Price */}
         <div className="input-container">
-          <MdPriceChange className="icon" />
-          <input
-            type="number"
-            name="discountPrice"
-            id="discountPrice"
-            autoComplete="discountPrice"
-            required
-            value={discountPrice}
-            onChange={updateChange}
-            placeholder="Enter Product Discount Price"
-            className="input-field"
-          />
-          <label htmlFor="discountPrice" className="input-label">
-            Product Discount Price
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="stock">Discount Price</label>
+          <div className="input-wrapper">
+            <FaMoneyCheckAlt className="input-icon" />
+            <input
+              type="number"
+              id="discountPrice"
+              name="discountPrice"
+              value={formData.discountPrice}
+              onChange={handleInputChange}
+              placeholder="Enter product discounted price"
+              disabled={loading}
+            />
+          </div>
+          {errors.discountPrice && (
+            <small className="error">{errors.discountPrice}</small>
+          )}
         </div>
 
-        {/* Product stock */}
+        {/* Tags Field */}
         <div className="input-container">
-          <MdMedicalServices className="icon" />
-          <input
-            type="number"
-            name="stock"
-            id="stock"
-            autoComplete="stock"
-            required
-            value={stock}
-            onChange={updateChange}
-            placeholder="Enter Product Stock"
-            className="input-field"
-          />
-          <label htmlFor="stock" className="input-label">
-            Product Stock
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="tags">Tags</label>
+          <div className="input-wrapper">
+            <FiPackage className="input-icon" />
+            <input
+              type="text"
+              id="tags"
+              name="tags"
+              value={formData.tags.join(",")}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  tags: e.target.value.split(",").map((tag) => tag.trim()),
+                })
+              }
+              placeholder="Enter tags separated by commas"
+              disabled={loading}
+            />
+          </div>
         </div>
 
-        {/* Images of products */}
-        <div className="file-container">
-          <label htmlFor="images" className="image-label">
-            <FaUpload className="icon" />
-            Upload Images <span className="mark">*</span>
-          </label>
-          <input
-            type="file"
-            name="images"
-            id="images"
-            // multiple
-            onChange={(e) => setImages(e.target.files[0])}
-            className="input-field"
-          />
-        </div>
-
-        {/* display products upload images on the browser */}
-        {/* <figure className="image-container">
-          {images && <img src={images} alt="Product" className="image" />}
-        </figure> */}
-
-        {/* Product Description */}
+        {/* Supplier Dropdown */}
         <div className="input-container">
-          <FaAudioDescription className="icon" />
-          <textarea
-            type="text"
-            name="description"
-            id="description"
-            cols="30"
-            rows="7"
-            autoComplete="description"
-            required
-            value={description}
-            onChange={updateChange}
-            placeholder="Enter Product Description"
-            className="input-field"
-          ></textarea>
-          <label htmlFor="description" className="input-label">
-            Product Description
-          </label>
-          <span className="input-highlight"></span>
+          <label htmlFor="supplier">Supplier</label>
+          <div className="input-wrapper">
+            <FiGrid className="input-icon" />
+            <select
+              id="supplier"
+              name="supplier"
+              value={formData.supplier}
+              onChange={handleInputChange}
+              className="input-field"
+              disabled={loading}
+            >
+              <option value="">Select Supplier</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.supplierName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.supplier && (
+            <small className="error">{errors.supplier}</small>
+          )}
         </div>
 
-        <button className="create-product-btn">Submit</button>
+        {/* Category Dropdown */}
+        <div className="input-container">
+          <label htmlFor="category">Category</label>
+          <div className="input-wrapper">
+            <MdOutlineCategory className="input-icon" />
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              className="input-field"
+              disabled={loading}
+            >
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.categoryName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.category && (
+            <small className="error">{errors.category}</small>
+          )}
+        </div>
+
+        {/* Subcategory Dropdown */}
+        <div className="input-container">
+          <label htmlFor="subcategory">Subcategory</label>
+          <div className="input-wrapper">
+            <FiShoppingBag className="input-icon" />
+            <select
+              id="subcategory"
+              name="subcategory"
+              value={formData.subcategory}
+              onChange={handleInputChange}
+              className="input-field"
+              disabled={loading}
+            >
+              <option value="">Select Subcategory</option>
+              {subcategories.map((subcategory) => (
+                <option key={subcategory._id} value={subcategory._id}>
+                  {subcategory.subcategoryName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.subcategory && (
+            <small className="error">{errors.subcategory}</small>
+          )}
+        </div>
+
+        {/* Brand Dropdown */}
+        <div className="input-container">
+          <label htmlFor="brand">Brand</label>
+          <div className="input-wrapper">
+            <FiPackage className="input-icon" />
+            <select
+              id="brand"
+              name="brand"
+              value={formData.brand}
+              onChange={handleInputChange}
+              className="input-field"
+              disabled={loading}
+            >
+              <option value="">Select Brand</option>
+              {brands.map((brand) => (
+                <option key={brand._id} value={brand._id}>
+                  {brand.brandName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.brand && <small className="error">{errors.brand}</small>}
+        </div>
+
+        {/* customer category Dropdown */}
+        <div className="input-container">
+          <label htmlFor="customerCategory">Customer Category</label>
+          <div className="input-wrapper">
+            <FiPackage className="input-icon" />
+            <select
+              id="customerCategory"
+              name="customerCategory"
+              value={formData.customerCategory}
+              onChange={handleInputChange}
+              className="input-field"
+              disabled={loading}
+            >
+              <option value="">Select Customer Category </option>
+              <option value="Ladies">Ladies </option>
+              <option value="Gents">Gents </option>
+              <option value="Kids">Kids </option>
+            </select>
+          </div>
+          {errors.customerCategory && (
+            <small className="error">{errors.customerCategory}</small>
+          )}
+        </div>
+
+        {/* Variants */}
+        <fieldset>
+          <legend>Variants</legend>
+          {formData.variants.map((variant, index) => (
+            <div className="variant-group" key={index}>
+              {[
+                {
+                  name: "productColor",
+                  placeholder: "Color",
+                  icon: FiTag,
+                },
+                {
+                  name: "productSize",
+                  placeholder: "Size",
+                  icon: FiAlignLeft,
+                },
+              ].map(({ name, placeholder, icon: Icon }) => (
+                <div className="variant-input-container" key={name}>
+                  <label>{placeholder}</label>
+                  <div className="variant-input">
+                    <Icon className="variant-icon" />
+                    <input
+                      type="text"
+                      placeholder={placeholder}
+                      name={name}
+                      value={variant[name]}
+                      onChange={(e) => handleVariantChange(index, e)}
+                      disabled={loading}
+                    />
+                  </div>
+                  {errors[`variant_${index}`] && (
+                    <small className="error">
+                      {errors[`variant_${index}`]}
+                    </small>
+                  )}
+                </div>
+              ))}
+
+              <div className="variant-input-container">
+                <label>Variant Image</label>
+                <div className="variant-input">
+                  <MdOutlineImage className="variant-icon" />
+                  <input
+                    type="file"
+                    name="productImage"
+                    onChange={(e) => handleVariantChange(index, e)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => removeVariant(index)}
+                disabled={loading}
+              >
+                Remove Variant
+              </button>
+            </div>
+          ))}
+        </fieldset>
+
+        <button type="button" onClick={addVariant} disabled={loading}>
+          Add Variant
+        </button>
+
+        {/* Product quantity */}
+        <div className="input-container">
+          <label htmlFor="stock">Stock</label>
+          <div className="input-wrapper">
+            <FiTag className="input-icon" />
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              value={formData.stock}
+              onChange={handleInputChange}
+              placeholder="Enter product quantity"
+              disabled={loading}
+            />
+          </div>
+          {errors.stock && <small className="error">{errors.stock}</small>}
+        </div>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Submitting..." : "Create Product"}
+        </button>
       </form>
-    </section>
+    </div>
   );
 };
 

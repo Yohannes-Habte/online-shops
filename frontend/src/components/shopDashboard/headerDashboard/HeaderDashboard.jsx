@@ -1,22 +1,17 @@
-import React, { useState } from 'react';
-import './HeaderDashboard.scss';
-import { AiOutlineGift } from 'react-icons/ai';
-import { MdOutlineLocalOffer } from 'react-icons/md';
-import { FiPackage, FiShoppingBag } from 'react-icons/fi';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { BiMessageSquareDetail } from 'react-icons/bi';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import {
-  logoutSellerFailure,
-  logoutSellerStart,
-  logoutSellerSuccess,
-} from '../../../redux/reducers/sellerReducer';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import "./HeaderDashboard.scss";
+import { AiOutlineGift } from "react-icons/ai";
+import { MdOutlineLocalOffer } from "react-icons/md";
+import { FiPackage, FiShoppingBag } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, NavLink } from "react-router-dom";
+import { BiMessageSquareDetail } from "react-icons/bi";
 
-const HeaderDashboard = ({ isOwner }) => {
-  const navigate = useNavigate();
+import { fetchSingleSeller } from "../../../redux/actions/seller";
+import LogoutShowOwner from "../../../utils/globalFunctions/LogoutShopOwner";
+
+const HeaderDashboard = () => {
+  const { sellerSignOut } = LogoutShowOwner();
 
   // Global state variables
   const { currentSeller } = useSelector((state) => state.seller);
@@ -25,32 +20,25 @@ const HeaderDashboard = ({ isOwner }) => {
   // Local state variables
   const [open, setOpen] = useState(false);
 
-  // Logout seller
-  const logoutSeller = async () => {
-    try {
-      dispatch(logoutSellerStart());
-      const { data } = await axios.get(`${API}/shops/logout-shop`);
+  // Shop owner Details
+  useEffect(() => {
+    dispatch(fetchSingleSeller());
+  }, [dispatch]);
 
-      dispatch(logoutSellerSuccess());
-
-      toast.success(data.message);
-      window.location.reload(true);
-      navigate('/login-shop');
-    } catch (error) {
-      dispatch(logoutSellerFailure(error.response.data.message));
-      console.log(error);
-    }
+  // Handle Seller logout
+  const handleSellerLogout = async () => {
+    await sellerSignOut();
   };
 
   // Style active and none active link
   const active = ({ isActive }) =>
-    isActive ? 'active-header-dashboard-icon' : 'passive-header-dashboard-icon';
+    isActive ? "active-header-dashboard-icon" : "passive-header-dashboard-icon";
 
   return (
     <header className="header-shop-dashboard">
       {/* Logo */}
       <h1 className="shop-logo">
-        <Link to="/dashboard"> {currentSeller.name} </Link>
+        <Link to={`/shop/${currentSeller?._id}`}> {currentSeller?.name} </Link>
       </h1>
 
       {/* Links to various pages */}
@@ -85,10 +73,10 @@ const HeaderDashboard = ({ isOwner }) => {
           <img
             src={
               currentSeller
-                ? currentSeller.image
-                : 'https://i.ibb.co/4pDNDk1/avatar.png'
+                ? currentSeller?.LogoImage
+                : "https://i.ibb.co/4pDNDk1/avatar.png"
             }
-            alt={currentSeller.name}
+            alt={currentSeller?.name}
             className="image"
           />
         </figure>
@@ -106,7 +94,7 @@ const HeaderDashboard = ({ isOwner }) => {
             </li>
 
             <li className="item user-profile">
-              <NavLink to={`/profile`} className={'link'}>
+              <NavLink to={`/profile`} className={"link"}>
                 User Profile
               </NavLink>
             </li>
@@ -121,10 +109,8 @@ const HeaderDashboard = ({ isOwner }) => {
               </Link>
             </li>
 
-            <li onClick={logoutSeller} className="item shop-logout">
-              <Link to={'/login-shop'} className="link">
-                Shop Log Out
-              </Link>
+            <li onClick={handleSellerLogout} className="item shop-logout">
+              <button>Log Out</button>
             </li>
           </ul>
         )}

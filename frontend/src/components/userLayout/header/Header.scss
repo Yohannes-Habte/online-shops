@@ -1,5 +1,5 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 // Mobile Screen Size
 .header {
   display: flex;
@@ -107,7 +107,7 @@
     // Become seller
     .become-seller {
       @include flexCenter;
-      @include button5;
+      @include button3;
       font-size: $sfs;
 
       .icon {
@@ -189,12 +189,18 @@
       .logged-in-user {
         position: relative;
 
-        .image {
-          width: 2rem;
-          height: 2rem;
-          border-radius: 50%;
-          object-fit: cover;
-          cursor: pointer;
+        .user-image-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .image {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+          }
         }
 
         .user-history {
@@ -340,7 +346,7 @@
       // Become seller
       .become-seller {
         @include flexCenter;
-        @include button5;
+        @include button3;
 
         .icon {
           font-size: $aafs;
@@ -573,7 +579,7 @@
       // Become seller
       .become-seller {
         @include flexCenter;
-        @include button5;
+        @include button3;
 
         .icon {
           font-size: $aafs;

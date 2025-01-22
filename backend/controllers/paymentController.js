@@ -10,7 +10,7 @@ export const postStripe = async (req, res, next) => {
 
     const myPayment = await stripe.paymentIntents.create({
       amount: req.body.amount,
-      currency: 'EUR',
+      currency: 'USD',
       metadata: {
         company: 'LisaConsult',
       },

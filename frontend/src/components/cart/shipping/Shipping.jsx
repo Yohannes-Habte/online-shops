@@ -1,217 +1,137 @@
-import React from 'react';
-import './Shipping.scss';
-import { Country, State, City } from 'country-state-city';
-import { FaAddressCard, FaPhoneSquareAlt, FaUserTie } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { RiFileZipFill } from 'react-icons/ri';
-import { toast } from 'react-toastify';
+import "./Shipping.scss";
+import { Country, State, City } from "country-state-city";
+import { FaAddressCard, FaPhoneSquareAlt, FaUserTie } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { RiFileZipFill } from "react-icons/ri";
 
-const Shipping = ({
-  user,
-  country,
-  setCountry,
-  state,
-  setState,
-  city,
-  setCity,
-  userInfo,
-  setUserInfo,
-  address,
-  setAddress,
-  zipCode,
-  setZipCode,
-  updateChange,
-}) => {
+const Shipping = ({ user, formData, handleInputChange, errors }) => {
+  const { address, zipCode, country, state, city, phoneNumber } = formData;
+
   return (
     <section className="shipping-wrapper">
       <h3 className="subTitle">Shipping Address</h3>
 
       <form className="shipping-form">
-        {/*  name */}
+        {/* Name */}
         <div className="input-container">
           <FaUserTie className="icon" />
           <input
             type="text"
             value={user && user.name}
-            required
+            readOnly
             className="input-field"
           />
-          <label htmlFor="name" className="input-label">
-            Full Name
-          </label>
-          <span className="input-highlight"></span>
+          <label className="input-label">Full Name</label>
         </div>
 
-        {/*  email */}
+        {/* Email */}
         <div className="input-container">
           <MdEmail className="icon" />
           <input
             type="email"
             value={user && user.email}
-            required
+            readOnly
             className="input-field"
           />
-          <label htmlFor="email" className="input-label">
-            Email Address
-          </label>
-          <span className="input-highlight"></span>
+          <label className="input-label">Email Address</label>
         </div>
 
-        {/*  phone */}
-        <div className="input-container">
+        {/* Phone */}
+        <div className={`input-container ${errors.phoneNumber && "error"}`}>
           <FaPhoneSquareAlt className="icon" />
           <input
             type="number"
-            required
-            value={user && user.phone}
+            name="phoneNumber"
+            value={phoneNumber}
+            onChange={handleInputChange}
+            placeholder="Enter Phone Number"
             className="input-field"
           />
-          <label htmlFor="phone" className="input-label">
-            Phone Number
-          </label>
-          <span className="input-highlight"></span>
+          {errors.phoneNumber && <small>{errors.phoneNumber}</small>}
         </div>
 
         {/* Zip Code */}
-        <div className="input-container">
+        <div className={`input-container ${errors.zipCode && "error"}`}>
           <RiFileZipFill className="icon" />
           <input
             type="number"
-            name={zipCode}
-            id={zipCode}
-            autoComplete="zipCode"
-            required
+            name="zipCode"
             value={zipCode}
-            onChange={updateChange}
+            onChange={handleInputChange}
             placeholder="Enter Zip Code"
             className="input-field"
           />
-
-          <label htmlFor={zipCode} className="input-label">
-            Zip Code
-          </label>
-          <span className="input-highlight"></span>
+          {errors.zipCode && <small>{errors.zipCode}</small>}
         </div>
 
         {/* Address */}
-        <div className="input-container">
+        <div className={`input-container ${errors.address && "error"}`}>
           <FaAddressCard className="icon" />
           <input
             type="text"
-            name={'address'}
-            id={'address'}
-            autoComplete="address1"
-            required
+            name="address"
             value={address}
-            onChange={updateChange}
-            placeholder="Address 1"
+            onChange={handleInputChange}
+            placeholder="Address"
             className="input-field"
           />
-
-          <label htmlFor={'address'} className="input-label">
-            Address
-          </label>
-          <span className="input-highlight"></span>
+          {errors.address && <small>{errors.address}</small>}
         </div>
 
-        {/* Choose Country using select */}
+        {/* Country */}
         <div className="select-container">
           <select
             name="country"
-            id="country"
             value={country}
-            onChange={updateChange}
+            onChange={handleInputChange}
             className="select-options"
           >
-            <option value=""> Choose your country </option>
-            {Country &&
-              Country.getAllCountries().map((country) => (
-                <option
-                  className="option"
-                  key={country.isoCode}
-                  value={country.isoCode}
-                >
-                  {country.name}
-                </option>
-              ))}
+            <option value="">Choose your country</option>
+            {Country.getAllCountries().map((c) => (
+              <option key={c.isoCode} value={c.isoCode}>
+                {c.name}
+              </option>
+            ))}
           </select>
+          {errors.country && <small>{errors.country}</small>}
         </div>
 
-        {/* Choose State using select */}
+        {/* State */}
         <div className="select-container">
           <select
             name="state"
-            id="state"
             value={state}
-            onChange={updateChange}
+            onChange={handleInputChange}
             className="select-options"
           >
-            <option value=""> Choose your state </option>
-            {State &&
-              State.getStatesOfCountry(country).map((item) => (
-                <option
-                  className="option"
-                  key={item.isoCode}
-                  value={item.isoCode}
-                >
-                  {item.name}
-                </option>
-              ))}
+            <option value="">Choose your state</option>
+            {State.getStatesOfCountry(country).map((s) => (
+              <option key={s.isoCode} value={s.isoCode}>
+                {s.name}
+              </option>
+            ))}
           </select>
+          {errors.state && <small>{errors.state}</small>}
         </div>
 
-        {/* Choose City using select */}
+        {/* City */}
         <div className="select-container">
           <select
             name="city"
-            id="city"
             value={city}
-            onChange={updateChange}
+            onChange={handleInputChange}
             className="select-options"
           >
-            <option value=""> Choose your city </option>
-            {City &&
-              City.getCitiesOfCountry(country).map((item) => (
-                <option
-                  className="option"
-                  key={item.isoCode}
-                  value={item.isoCode}
-                >
-                  {item.name}
-                </option>
-              ))}
+            <option value="">Choose your city</option>
+            {City.getCitiesOfCountry(country).map((ci) => (
+              <option key={ci.isoCode} value={ci.name}>
+                {ci.name}
+              </option>
+            ))}
           </select>
+          {errors.city && <small>{errors.city}</small>}
         </div>
       </form>
-
-      <h3 className="saved-address" onClick={() => setUserInfo(!userInfo)}>
-        Choose From saved address{' '}
-      </h3>
-
-      {userInfo && (
-        <div className="user-infos-wrapper">
-          {user &&
-            user.addresses.map((item) => (
-              <article className="address-info">
-                <input
-                  type="checkbox"
-                  className="input-checkbox"
-                  value={item.addressType}
-                  onClick={() =>
-                    setAddress(item.address) ||
-                    setZipCode(item.zipCode) ||
-                    setCountry(item.country) ||
-                    setState(item.state) ||
-                    setCity(item.city) ||
-                    setZipCode(item.zipCode)
-                  }
-                />
-
-                <h3 className="address-type">{item.addressType}</h3>
-              </article>
-            ))}
-        </div>
-      )}
     </section>
   );
 };
