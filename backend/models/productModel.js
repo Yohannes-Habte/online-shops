@@ -5,7 +5,15 @@ const { Schema } = mongoose;
 // Variant schema for product options
 const variantSchema = new Schema({
   productColor: { type: String, required: true },
-  productSize: { type: String, required: true },
+  productSizes: [
+    {
+      size: {
+        type: Schema.Types.Mixed, // Can be either String or Number
+        required: true,
+      },
+      stock: { type: Number, required: true, min: 0 }, // Stock for this specific size
+    },
+  ],
   productImage: { type: String, required: true },
 });
 
@@ -49,11 +57,9 @@ const productSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["active", "inactive", "out_of_stock"], 
+      enum: ["active", "inactive", "out_of_stock"],
       default: "active",
     },
-
-    stock: { type: Number }, // Total stock available
 
     soldOut: { type: Number, default: 0, min: 0 },
 
@@ -64,7 +70,7 @@ const productSchema = new Schema(
 
     reviews: [reviewSchema],
 
-    variants: [variantSchema], 
+    variants: [variantSchema],
   },
   { timestamps: true }
 );

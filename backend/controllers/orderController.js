@@ -9,6 +9,7 @@ import Shop from "../models/shopModel.js";
 //=========================================================================
 export const createOrder = async (req, res, next) => {
   let { orderedItems, shippingAddress, customer, payment } = req.body;
+  console.log(req.body);
 
   // Validate customer ID using mongoose
   if (!mongoose.Types.ObjectId.isValid(customer)) {
@@ -69,29 +70,38 @@ export const createOrder = async (req, res, next) => {
       const selectedVariant = product.variants.find(
         (variant) =>
           variant.productColor === item.variant.productColor &&
-          variant.productSize === item.variant.productSize
+          variant.productSizes.some(
+            (sizeObj) =>
+              sizeObj.size === item.variant.size && sizeObj.stock >= item.qty
+          )
       );
 
       if (!selectedVariant) {
-        console.warn(`Variant not found for product ID ${item._id}`);
-        continue; // Skip items with invalid variant
+        console.warn(
+          `Variant not found for product ID ${item._id}, Size: ${item.variant.size}, Color: ${item.variant.productColor}`
+        );
+        continue; // Skip items with invalid variant or insufficient stock
       }
 
-      // Check stock availability
-      if (product.stock < item.qty) {
+      // Update stock and soldOut count
+      const sizeObj = selectedVariant.productSizes.find(
+        (size) => size.size === item.variant.size
+      );
+      if (sizeObj && sizeObj.stock < item.qty) {
         console.warn(`Not enough stock for product ${item._id}`);
         continue; // Skip items with insufficient stock
       }
 
-      // Update stock and soldOut count
-      product.stock -= item.qty;
-      product.soldOut += item.qty;
+      // Deduct the stock
+      sizeObj.stock -= item.qty;
 
       const total = item.qty * product.discountPrice;
       subtotalPrice += total;
 
+      // Populate item with correct size
       populatedItems.push({
         ...item,
+        size: item.variant.size,  // Ensure size is set correctly
         product: product._id,
         title: product.title,
         category: product.category,
@@ -100,7 +110,7 @@ export const createOrder = async (req, res, next) => {
         supplier: product.supplier,
         shop: product.shop,
         productColor: selectedVariant.productColor,
-        productSize: selectedVariant.productSize,
+        productSize: item.variant.size,
         quantity: item.qty,
         price: product.discountPrice,
         total,
@@ -145,7 +155,7 @@ export const createOrder = async (req, res, next) => {
       serviceFee: serviceFeeAmount,
       grandTotal: calculatedGrandTotal,
       orderStatus: "Pending",
-      statusHistory: [{ status: "Pending", changedAt: new Date() }],
+      statusHistory: [{ status: "Pending", changedAt: new Date() }], // History
     });
 
     const savedOrder = await order.save({ session });
@@ -185,6 +195,8 @@ export const createOrder = async (req, res, next) => {
     session.endSession();
   }
 };
+
+
 
 //=========================================================================
 // Update order status for a shop

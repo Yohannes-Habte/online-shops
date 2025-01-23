@@ -444,6 +444,23 @@ const clearAllShopProducts = async () => {
   }
 };
 
-// clearAllShopProducts();
+//clearAllShopProducts();
 
+// ====================================================================
+// If You Need to Clear the soldProducts Field for All Shops:
+// ====================================================================
+const clearShopProductsField = async () => {
+  try {
+    const result = await Shop.updateMany(
+      {}, // No filter: Applies to all documents
+      { $unset: { soldProducts: "" } } // Removes the soldProducts field entirely
+    );
+    console.log(result);
+  } catch (err) {
+    console.error("Error clearing ShopProducts for all shops:", err);
+  }
+};
+
+// clearShopProductsField();
 */
+

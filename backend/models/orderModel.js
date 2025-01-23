@@ -12,7 +12,7 @@ const orderItemSchema = new Schema({
   supplier: { type: String, required: true },
   shop: { type: String, required: true },
   productColor: { type: String, required: true },
-  productSize: { type: String, required: true },
+  size: { type: String, required: true },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true },
   total: { type: Number, required: true }, // Total price for this item (quantity * price)

@@ -16,7 +16,8 @@ const cartReducer = createSlice({
       const isItemExist = state.cart.find(
         (i) =>
           i._id === item._id &&
-          i.variant?.productColor === item.variant?.productColor
+          i.variant?.productColor === item.variant?.productColor &&
+          i.variant?.size === item.variant?.size // Match size as well
       );
 
       if (isItemExist) {
@@ -24,7 +25,8 @@ const cartReducer = createSlice({
           ...state,
           cart: state.cart.map((i) =>
             i._id === isItemExist._id &&
-            i.variant.productColor === isItemExist.variant.productColor
+            i.variant.productColor === isItemExist.variant.productColor &&
+            i.variant.size === isItemExist.variant.size
               ? item
               : i
           ),

@@ -1,215 +1,225 @@
-// CreateProduct.scss
 .create-product {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  
-  h2 {
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Helvetica Neue", sans-serif;
+
+  .create-product-title {
     text-align: center;
     font-size: 2rem;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
     color: #333;
   }
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  .input-container {
+    margin-bottom: 1.5rem;
 
-    .input-container {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      
-      label {
-        font-weight: bold;
-        color: #555;
+    label {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+
+      .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        color: #aaa;
       }
 
-      .input-wrapper {
-        display: flex;
-        align-items: center;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 10px;
-        background-color: white;
-        transition: border 0.3s ease;
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 15px 10px 35px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        background-color: #f9f9f9;
+        transition: border 0.3s ease-in-out;
 
-        input,
-        textarea,
-        select {
-          width: 100%;
-          border: none;
-          outline: none;
-          padding: 5px;
-          font-size: 1rem;
-          color: #333;
-          background-color: transparent;
+        &:focus {
+          border: 1px solid #007bff;
+          background-color: #fff;
         }
 
-        textarea {
-          resize: vertical;
-          min-height: 100px;
-        }
-
-        .input-icon {
-          margin-right: 10px;
-          color: #888;
-        }
-        
-        &:focus-within {
-          border-color: #0056b3;
+        &::placeholder {
+          color: #aaa;
         }
       }
 
-      small.error {
-        color: #e74c3c;
-        font-size: 0.875rem;
-        margin-top: 5px;
+      textarea {
+        height: 150px;
+        resize: vertical;
+      }
+
+      .input-field {
+        height: 40px;
       }
     }
 
+    small.error {
+      color: #e74c3c;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .variants-fieldset {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+
+    .variants-legend {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
     .variant-group {
-      margin-top: 20px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 5px;
-      background-color: #f7f7f7;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
 
-      .variant-input-container {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
+      .color-input-container {
+        width: 100%;
 
-        label {
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-
-        .variant-input {
-          display: flex;
-          align-items: center;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          padding: 10px;
-          background-color: white;
-          transition: border 0.3s ease;
-
-          input {
-            width: 100%;
-            border: none;
-            outline: none;
-            padding: 5px;
-            font-size: 1rem;
-            color: #333;
-            background-color: transparent;
-          }
-
-          .variant-icon {
-            margin-right: 10px;
-            color: #888;
-          }
-
-          &:focus-within {
-            border-color: #0056b3;
-          }
-        }
-
-        input[type="file"] {
-          margin-top: 5px;
-          padding: 5px;
-          border: 1px solid #ccc;
+        .color-input {
+          width: 100%;
         }
       }
 
-      button {
+      .image-input-container {
+        width: 100%;
+        background-color: #ffffff;
+
+        .image-input {
+          width: 100%;
+        }
+      }
+
+      .size-group {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .remove-size,
+      .remove-variant {
         background-color: #e74c3c;
         color: white;
         border: none;
-        padding: 8px 15px;
-        border-radius: 5px;
-        font-size: 1rem;
+        padding: 5px 10px;
+        font-size: 0.875rem;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        border-radius: 4px;
+        transition: background-color 0.3s;
 
         &:hover {
           background-color: #c0392b;
         }
+      }
 
-        &:disabled {
-          background-color: #ddd;
-          cursor: not-allowed;
+      .add-size {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #27ae60;
         }
       }
-    }
 
-    button[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #45a049;
-      }
-
-      &:disabled {
-        background-color: #ddd;
-        cursor: not-allowed;
-      }
-    }
-
-    button[type="button"] {
-      background-color: #3498db;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #2980b9;
-      }
-
-      &:disabled {
-        background-color: #ddd;
-        cursor: not-allowed;
+      .image-input {
+        margin-top: 0.5rem;
       }
     }
   }
 
-  fieldset {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 5px;
-    background-color: #f7f7f7;
-
-    legend {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #333;
-    }
-  }
-
-  .input-wrapper select {
-    padding: 8px;
+  .add-variant {
+    display: block;
+    width: 25%;
+    padding: 10px;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: white;
-    color: #333;
+    background-color: #65abf7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    text-align: center;
+
+    &:hover {
+      background-color: #0056b3;
+    }
   }
 
-  .input-wrapper select:focus {
-    border-color: #0056b3;
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1.125rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background-color: #218838;
+    }
+
+    &:disabled {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+  }
+
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #007bff;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-product {
+    padding: 1rem;
+  }
+
+  .input-container {
+    margin-bottom: 1rem;
+  }
+
+  .input-wrapper {
+    input,
+    select,
+    textarea {
+      font-size: 0.9rem;
+    }
+  }
+
+  button[type="submit"],
+  .add-variant {
+    font-size: 1rem;
   }
 }

@@ -10,7 +10,6 @@ import RelatedProductCard from "../../../components/products/relatedProductCard/
 
 const SingleProduct = () => {
   const { productID } = useParams();
-  // Global state variables
   const { loading, error, currentProduct, products } = useSelector(
     (state) => state.product
   );
@@ -19,8 +18,9 @@ const SingleProduct = () => {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [variantToggles, setVariantToggles] = useState([]);
 
-  console.log("Related Products", relatedProducts);
+  console.log(currentProduct);
 
   useEffect(() => {
     if (productID) {
@@ -39,24 +39,32 @@ const SingleProduct = () => {
       products &&
       products.length > 0
     ) {
-      // Filter products by the same category and exclude the current product
       const related = products?.filter(
         (product) =>
+          product.category?._id === currentProduct.category?._id &&
           product.subcategory?._id === currentProduct.subcategory?._id &&
+          product.customerCategory._id ===
+            currentProduct.customerCategory._id &&
           product._id !== currentProduct._id
       );
       setRelatedProducts(related);
     }
 
-    // Set the default image to the first variant's image if available
     if (
       currentProduct &&
       currentProduct.variants &&
       currentProduct.variants.length > 0
     ) {
-      setSelectedImage(currentProduct.variants[0].productImage); // Use productImage from variants
+      setSelectedImage(currentProduct.variants[0].productImage);
+      setVariantToggles(new Array(currentProduct.variants.length).fill(false)); // Initialize toggle states
     }
   }, [currentProduct, products]);
+
+  const handleToggle = (index) => {
+    setVariantToggles((prev) =>
+      prev.map((toggle, i) => (i === index ? !toggle : toggle))
+    );
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -76,7 +84,6 @@ const SingleProduct = () => {
     brand,
     tags,
     status,
-    stock,
     soldOut,
     ratings,
     reviews,
@@ -91,12 +98,12 @@ const SingleProduct = () => {
         <div className="product-image-section">
           <figure className="large-image-container">
             <img
-              src={selectedImage || "/placeholder-image.jpg"} // Fallback image
+              src={selectedImage || "/placeholder-image.jpg"}
               alt="Large product"
               className="large-image"
             />
           </figure>
-          <div className="thumbnail-images">
+          <figure className="thumbnail-images">
             {variants.map((variant, index) => (
               <img
                 key={index}
@@ -106,16 +113,16 @@ const SingleProduct = () => {
                 className="thumbnail-image"
               />
             ))}
-          </div>
+          </figure>
         </div>
 
         <div className="product-details">
           <h1 className="product-title">{title}</h1>
           <p className="product-description">{description}</p>
 
-          <div className="product-details">
+          <div className="product-info">
             <p>
-              <strong>Discounted Price:</strong> ${discountPrice} $
+              <strong>Discounted Price:</strong> ${discountPrice} ${" "}
               {originalPrice}
             </p>
             <p>
@@ -132,9 +139,6 @@ const SingleProduct = () => {
             </p>
             <p>
               <strong>Status:</strong> {status}
-            </p>
-            <p>
-              <strong>Stock Available:</strong> {stock}
             </p>
             <p>
               <strong>Sold Out:</strong> {soldOut}
@@ -155,11 +159,26 @@ const SingleProduct = () => {
                 {variants.map((variant, index) => (
                   <li key={index} className="variant-item">
                     <p>
-                      <strong>Color:</strong> {variant.productColor}
+                      <strong>Color:</strong> {variant.productColor}{" "}
+                      <button
+                        className="toggle-button"
+                        onClick={() => handleToggle(index)}
+                      >
+                        {variantToggles[index]
+                          ? "Hide Details"
+                          : "Show Details"}
+                      </button>
                     </p>
-                    <p>
-                      <strong>Size:</strong> {variant.productSize}
-                    </p>
+                    {variantToggles[index] && (
+                      <ul className="variant-details">
+                        {variant.productSizes.map((size, idx) => (
+                          <li key={idx}>
+                            <strong>Size:</strong> {size.size} - {size.stock} in
+                            stock
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>

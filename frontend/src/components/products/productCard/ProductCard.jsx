@@ -20,7 +20,11 @@ const ProductCard = ({ product }) => {
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
-  const [selectedVariant, setSelectedVariant] = useState(variants[0]); // Default variant
+  // State to manage selected color and size
+  const [selectedVariant, setSelectedVariant] = useState(variants[0]); // Default color variant
+  const [selectedSize, setSelectedSize] = useState(
+    variants[0]?.productSizes[0]?.size // Default size for the first variant
+  );
 
   // Add to cart handler
   const addToCartHandler = () => {
@@ -29,15 +33,23 @@ const ProductCard = ({ product }) => {
       cart.find(
         (item) =>
           item._id === product._id &&
-          item.variant.productColor === selectedVariant.productColor
+          item.variant.productColor === selectedVariant.productColor &&
+          item.variant.size === selectedSize
       );
 
     if (isItemExists) {
       toast.error("Item already in cart!");
-    } else if (product.stock < 1) {
-      toast.error("Product is out of stock!");
+    } else if (
+      selectedVariant.productSizes.find((size) => size.size === selectedSize)
+        ?.stock < 1
+    ) {
+      toast.error("Selected size is out of stock!");
     } else {
-      const cartData = { ...product, qty: 1, variant: selectedVariant };
+      const cartData = {
+        ...product,
+        qty: 1,
+        variant: { ...selectedVariant, size: selectedSize },
+      };
       dispatch(addToCart(cartData));
       toast.success("Item added to cart successfully!");
     }
@@ -62,9 +74,10 @@ const ProductCard = ({ product }) => {
         </Link>
         <p className="product-description">{ShortenText(description, 100)}</p>
         <div className="display-rating-flex-row">
+          Rating:
           <Ratings averageRating={product?.ratings} />
           <span className="reviewers-number">
-            25 people reviewed this product
+            {product?.ratings?.count || 0} people reviewed this product
           </span>
         </div>
 
@@ -80,24 +93,46 @@ const ProductCard = ({ product }) => {
           <div className="sold-out-wrapper">Sold: {soldOut}</div>
         </div>
 
+        {/* Color Selector */}
         <div className="variant-selector">
+          <label htmlFor="color-selector">Choose Color:</label>
           <select
-            onChange={(e) =>
-              setSelectedVariant(
-                variants.find((v) => v.productColor === e.target.value)
-              )
-            }
+            id="color-selector"
+            onChange={(e) => {
+              const selected = variants.find(
+                (variant) => variant.productColor === e.target.value
+              );
+              setSelectedVariant(selected);
+              setSelectedSize(selected?.productSizes[0]?.size); // Reset size on color change
+            }}
           >
             {variants.map((variant, index) => (
               <option key={index} value={variant.productColor}>
-                {variant.productColor} - {variant.productSize}
+                {variant.productColor}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Size Selector */}
+        <div className="variant-selector">
+          <label htmlFor="size-selector">Choose Size:</label>
+          <select
+            id="size-selector"
+            onChange={(e) => setSelectedSize(e.target.value)}
+          >
+            {selectedVariant.productSizes.map((sizeObj, index) => (
+              <option key={index} value={sizeObj.size}>
+                {sizeObj.size} {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
               </option>
             ))}
           </select>
         </div>
 
         <button
-          className={`add-to-cart-btn ${soldOut ? "disabled" : ""}`}
+          className={`add-to-cart-btn ${
+            soldOut || !selectedSize ? "disabled" : ""
+          }`}
           onClick={addToCartHandler}
         >
           <AiOutlineShoppingCart /> Add to Cart

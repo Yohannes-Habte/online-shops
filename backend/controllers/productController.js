@@ -11,7 +11,6 @@ import mongoose from "mongoose";
 //==============================================================================
 
 export const createProduct = async (req, res, next) => {
-  console.log("Product data:", req.body);
   const {
     title,
     description,
@@ -26,7 +25,6 @@ export const createProduct = async (req, res, next) => {
     tags,
     status,
     variants,
-    stock,
   } = req.body;
 
   // Validate the shop ID
@@ -76,7 +74,6 @@ export const createProduct = async (req, res, next) => {
       tags,
       status,
       variants,
-      stock,
     });
 
     // Save the new product
@@ -355,3 +352,4 @@ export const productReview = async (req, res, next) => {
     next(createError(500, "Product review did not succeed! Please try again!"));
   }
 };
+
