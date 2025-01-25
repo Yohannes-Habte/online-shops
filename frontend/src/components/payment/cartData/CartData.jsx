@@ -5,30 +5,40 @@ const CartData = ({ orderData }) => {
     <section className="cart-data-wrapper">
       <article className="box subtotal-price">
         <h3 className="cart-data-subTitle">Total Items Price:</h3>
-        <p className="cart-data-paragraph">${orderData?.subTotal}</p>
+        <p className="cart-data-paragraph">
+          ${orderData?.subTotal?.toFixed(2)}
+        </p>
       </article>
 
       <article className="box shipping-price">
         <h3 className="cart-data-subTitle">Tax Charge:</h3>
-        <p className="cart-data-paragraph">${orderData?.tax}</p>
+        <p className="cart-data-paragraph">${orderData?.tax?.toFixed(2)}</p>
       </article>
 
       <article className="box shipping-price">
         <h3 className="cart-data-subTitle">Shipping Charge:</h3>
-        <p className="cart-data-paragraph">${orderData?.shippingFee}</p>
+        <p className="cart-data-paragraph">
+          ${orderData?.shippingFee?.toFixed(2)}
+        </p>
       </article>
 
       <article className="box shipping-price">
         <h3 className="cart-data-subTitle">Service Charge:</h3>
-        <p className="cart-data-paragraph">${orderData?.serviceCharge}</p>
+        <p className="cart-data-paragraph">
+          ${orderData?.serviceCharge?.toFixed(2)}
+        </p>
       </article>
 
       <article className="box discount-price">
         <h3 className="cart-data-subTitle">Discount:</h3>
-        <p className="cart-data-paragraph">${orderData?.discount}</p>
+        <p className="cart-data-paragraph">
+          ${orderData ? orderData?.discount?.toFixed(2) : 1}
+        </p>
       </article>
       <hr />
-      <h2 className="cart-data-total-price">${orderData?.grandTotal}</h2>
+      <h2 className="cart-data-total-price">
+        ${orderData?.grandTotal?.toFixed(2)}
+      </h2>
     </section>
   );
 };

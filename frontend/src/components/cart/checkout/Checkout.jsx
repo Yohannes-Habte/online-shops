@@ -123,6 +123,7 @@ const Checkout = () => {
           subTotal={subTotal}
           shippingFee={shippingFee}
           discount={discount}
+          serviceCharge={serviceCharge}
           totalPrice={totalPrice}
         />
 

@@ -43,7 +43,7 @@ const PaymentMethod = () => {
   };
 
   // ==========================================================================================
-  // Clear Cart and Redirect
+  // Clear Cart and Redirect to Order Success Page
   // ==========================================================================================
 
   const clearCartAndRedirect = () => {
@@ -70,7 +70,6 @@ const PaymentMethod = () => {
     try {
       const { data } = await axios.post(`${API}/payment/stripe`, paymentData, {
         withCredentials: true,
-        // headers: { "Content-Type": "application/json" },
       });
 
       const clientSecret = data.client_secret;
@@ -102,33 +101,40 @@ const PaymentMethod = () => {
   // PayPal Payment Handler: Create Order and On Approve
   // ==========================================================================================
 
-  const createOrder = (data, actions) => {
-    return actions.order.create({
-      purchase_units: [
-        {
-          description: "Lisa Online Shopping Products",
-          amount: {
-            currency_code: "USD",
-            value: orderData?.grandTotal,
+  const createOrder = async (data, actions) => {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            description: "Lisa Online Shopping Products",
+            amount: {
+              currency_code: "USD",
+              value: orderData?.grandTotal.toFixed(2), // Ensure proper decimal format
+            },
           },
-        },
-      ],
-      application_context: { shipping_preference: "NO_SHIPPING" },
-    });
+        ],
+        application_context: { shipping_preference: "NO_SHIPPING" },
+      })
+      .catch((error) => {
+        console.error("PayPal Order Creation Error:", error);
+        handleAPIError(error, "Failed to create PayPal order.");
+      });
   };
 
   const onApprove = async (data, actions) => {
     try {
-      const details = await actions.order.capture();
-      const paymentInfo = details.payer;
+      const details = await actions.order.capture(); // Capture payment
+      const paymentInfo = details?.purchase_units[0]?.payments?.captures[0];
 
       if (paymentInfo) {
         const order = createOrderObject(
-          paymentInfo.payer_id,
+          paymentInfo.id, // Use PayPal capture ID
           "PayPal",
           "completed"
         );
-        await submitOrder(order);
+        await submitOrder(order); // Submit order
+      } else {
+        throw new Error("Payment details not available.");
       }
     } catch (error) {
       handleAPIError(error, "PayPal payment failed. Please try again.");
@@ -202,7 +208,6 @@ const PaymentMethod = () => {
 
   return (
     <section className="payment-methods-wrapper">
-      <h1 className="add-payment-methods-title">Add Payment Method</h1>
       <div className="paymentInfo-cardData-wrapper">
         <PaymentInfo
           user={currentUser}
@@ -212,6 +217,7 @@ const PaymentMethod = () => {
           cashOnDeliveryHandler={cashOnDeliveryHandler}
           isProcessing={isProcessing}
           setIsProcessing={setIsProcessing}
+          handleAPIError={handleAPIError}
         />
         <CartData orderData={orderData} />
       </div>

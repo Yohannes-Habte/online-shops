@@ -16,3 +16,8 @@ export const apiKey = import.meta.env.VITE_GEOCODIO_API_KEY;
 // The URL portion
 //=================================================================
 export const API = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+
+//=================================================================
+// Payment Gateway
+//=================================================================
+export const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
