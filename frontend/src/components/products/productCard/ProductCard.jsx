@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
     originalPrice,
     discountPrice,
     soldOut,
-    variants,
+    variants= [], // Ensure variants is at least an empty array
   } = product;
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -60,7 +60,7 @@ const ProductCard = ({ product }) => {
       <figure className="image-container">
         <Link to={`/products/${product._id}`}>
           <img
-            src={selectedVariant.productImage}
+            src={selectedVariant?.productImage}
             alt={title}
             className="product-image"
           />
@@ -68,7 +68,7 @@ const ProductCard = ({ product }) => {
       </figure>
 
       <div className="product-details">
-        <h3 className="shop-name">{product.shop.name}</h3>
+        <h3 className="shop-name">{product?.shop?.name}</h3>
         <Link to={`/products/${product._id}`}>
           <h4 className="product-title">{ShortenText(title, 40)}</h4>
         </Link>
@@ -121,7 +121,7 @@ const ProductCard = ({ product }) => {
             id="size-selector"
             onChange={(e) => setSelectedSize(e.target.value)}
           >
-            {selectedVariant.productSizes.map((sizeObj, index) => (
+            {selectedVariant?.productSizes?.map((sizeObj, index) => (
               <option key={index} value={sizeObj.size}>
                 {sizeObj.size} {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
               </option>

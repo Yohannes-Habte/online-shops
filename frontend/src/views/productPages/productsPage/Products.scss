@@ -1,5 +1,5 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
 .products-page {
   .products-container {
@@ -10,15 +10,46 @@
     .products-title {
       @include title;
     }
+
     .products-wrapper {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+
+      .no-products-message {
+        color: red;
+        background-color: orange;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 20px;
+      }
     }
 
     .subTitle {
       @include subTitle;
     }
+
+    .see-more-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    .see-more-btn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    
+    .see-more-btn:hover {
+      background-color: #0056b3;
+    }
+    
   }
 }
 
@@ -33,6 +64,7 @@
       .products-title {
         @include title;
       }
+
       .products-wrapper {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -47,7 +79,7 @@
   }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
   .products-page {
     .products-container {
@@ -58,12 +90,89 @@
       .products-title {
         @include title;
       }
+
       .products-wrapper {
         @include productsGrid;
       }
 
       .subTitle {
         @include subTitle;
+      }
+
+      .no-products-message {
+        color: red;
+        background-color: orange;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
+      .search-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+
+        input,
+        select {
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 1rem;
+          background-color: #fafafa;
+          transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+          outline: none;
+          border-color: #007bff;
+          background-color: #fff;
+        }
+
+        input::placeholder,
+        select {
+          color: #777;
+        }
+
+        button {
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 600;
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          margin-top: 1rem;
+        }
+
+        button:hover {
+          background-color: #0056b3;
+        }
+
+        .reset-btn {
+          background-color: #f44336;
+          margin-left: 1rem;
+        }
+
+        .reset-btn:hover {
+          background-color: #e53935;
+        }
+
+        .button-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
       }
     }
   }

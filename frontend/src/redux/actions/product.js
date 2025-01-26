@@ -129,20 +129,30 @@ export const fetchProductsByShop = () => async (dispatch) => {
 //==============================================================================
 // Action to fetch all products for all shops
 //==============================================================================
-export const fetchAllProductsForAllShops = () => async (dispatch) => {
-  try {
-    dispatch(allProductsFetchStart());
+export const fetchAllProductsForAllShops =
+  (queryParams) => async (dispatch) => {
+    try {
+      dispatch(allProductsFetchStart());
 
-    const res = await axios.get(`${API}/products`);
+      // Build the query string
+      const queryString = new URLSearchParams(queryParams).toString();
+      const res = await axios.get(`${API}/products?${queryString}`);
 
-    const products = res.data.products;
+      const { products, totalCount, currentPage, totalPages } = res.data;
 
-    dispatch(allProductsFetchSuccess(products));
-  } catch (error) {
-    const { message } = handleError(error);
-    dispatch(allProductsFetchFailure(message));
-  }
-};
+      dispatch(
+        allProductsFetchSuccess({
+          products,
+          totalCount,
+          currentPage,
+          totalPages,
+        })
+      );
+    } catch (error) {
+      const { message } = handleError(error);
+      dispatch(allProductsFetchFailure(message));
+    }
+  };
 
 //==============================================================================
 // Action to fetch all products for a category

@@ -5,6 +5,8 @@ import Order from "../models/orderModel.js";
 import Brand from "../models/brandModel.js";
 import Category from "../models/categoryModel.js";
 import mongoose from "mongoose";
+import Joi from "joi";
+import Subcategory from "../models/subcategory.js";
 
 //==============================================================================
 // Create Product
@@ -113,6 +115,123 @@ export const createProduct = async (req, res, next) => {
 };
 
 //==============================================================================
+// Get All Products for All Shops
+//==============================================================================
+export const getAllProducts = async (req, res, next) => {
+  try {
+    // Validate and sanitize query parameters
+    const schema = Joi.object({
+      title: Joi.string().allow(""),
+      shopName: Joi.string().allow(""), // Query by shop name
+      categoryName: Joi.string().allow(""), // Query by category name
+      subcategoryName: Joi.string().allow(""), // Query by subcategory name
+      brandName: Joi.string().allow(""), // Query by brand name
+      customerCategory: Joi.string().valid("Ladies", "Gents", "Kids").allow(""), // Allow empty string,
+      page: Joi.number().integer().min(1).default(1),
+      limit: Joi.number().integer().min(1).default(6),
+      populate: Joi.boolean().default(false),
+    });
+
+    const {
+      title,
+      shopName,
+      categoryName,
+      subcategoryName,
+      brandName,
+      customerCategory,
+      page,
+      limit,
+      populate,
+    } = await schema.validateAsync(req.query);
+
+    // Initialize the query object
+    let query = {};
+
+    // Search by product title (case-insensitive, partial match)
+    if (title)
+      query.title = new RegExp(
+        title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "i"
+      );
+
+    // Resolve shop name to shop ID
+    if (shopName) {
+      const shop = await Shop.findOne({ name: shopName }).select("_id");
+      if (shop) query.shop = shop._id;
+      else
+        return res
+          .status(404)
+          .json({ success: false, message: "Shop not found" });
+    }
+
+    // Resolve category name to category ID
+    if (categoryName) {
+      const category = await Category.findOne({
+        categoryName: categoryName,
+      }).select("_id");
+      if (category) query.category = category._id;
+      else
+        return res
+          .status(404)
+          .json({ success: false, message: "Category not found" });
+    }
+
+    // Resolve subcategory name to subcategory ID
+    if (subcategoryName) {
+      const subcategory = await Subcategory.findOne({
+        subcategoryName: subcategoryName,
+      }).select("_id");
+      if (subcategory) query.subcategory = subcategory._id;
+      else
+        return res
+          .status(404)
+          .json({ success: false, message: "Subcategory not found" });
+    }
+
+    // Resolve brand name to brand ID
+    if (brandName) {
+      const brand = await Brand.findOne({ brandName: brandName }).select("_id");
+      if (brand) query.brand = brand._id;
+      else
+        return res
+          .status(404)
+          .json({ success: false, message: "Brand not found" });
+    }
+
+    // Add customer category filter
+    if (customerCategory) query.customerCategory = customerCategory;
+
+    const skip = (page - 1) * limit;
+
+    // Fetch products
+    const products = await Product.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(skip)
+      .populate(populate ? "shop supplier category brand" : "");
+
+    if (!products || products.length === 0) {
+      return next(createError(404, "No products found"));
+    }
+
+    // Get total product count for pagination
+    const totalCount = await Product.countDocuments(query);
+
+    // Respond with the results
+    res.status(200).json({
+      success: true,
+      products,
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    });
+  } catch (error) {
+    console.error(error);
+    return next(createError(500, error.message || "Internal Server Error"));
+  }
+};
+
+//==============================================================================
 // Get Single Product
 //==============================================================================
 
@@ -207,41 +326,6 @@ export const deleteProduct = async (req, res, next) => {
       .json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
     console.error("Error deleting product:", error);
-    return next(createError(500, "Something went wrong"));
-  }
-};
-
-//==============================================================================
-// Get All Products for All Shops
-//==============================================================================
-
-export const getAllProducts = async (req, res, next) => {
-  try {
-    // Pagination options
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 15;
-    const skip = (page - 1) * limit;
-
-    const products = await Product.find()
-      .skip(skip)
-      .limit(limit)
-      .populate("shop supplier category brand");
-
-    if (!products || products.length === 0) {
-      return next(createError(404, "No products found"));
-    }
-
-    const totalCount = await Product.countDocuments();
-
-    res.status(200).json({
-      success: true,
-      products,
-      totalCount,
-      currentPage: page,
-      totalPages: Math.ceil(totalCount / limit),
-    });
-  } catch (error) {
-    console.error(error); // Log the error for debugging
     return next(createError(500, "Something went wrong"));
   }
 };
@@ -352,4 +436,3 @@ export const productReview = async (req, res, next) => {
     next(createError(500, "Product review did not succeed! Please try again!"));
   }
 };
-
