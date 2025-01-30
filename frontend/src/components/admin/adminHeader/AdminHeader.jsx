@@ -19,7 +19,7 @@ const AdminHeader = () => {
   const navigate = useNavigate();
 
   // Global state variables
-  const { currentSeller } = useSelector((state) => state.seller);
+  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   // Local state variables
@@ -99,20 +99,20 @@ const AdminHeader = () => {
         <figure onClick={() => setOpen(!open)} className="image-container">
           <img
             src={
-              currentSeller
-                ? currentSeller.image
+              currentUser
+                ? currentUser.image
                 : "https://i.ibb.co/4pDNDk1/avatar.png"
             }
-            alt={currentSeller.name}
+            alt={currentUser.name}
             className="image"
           />
         </figure>
 
-        {currentSeller && open && (
+        {currentUser && open && (
           <ul className="shop-profile-logout-wrapper">
             <li className="item shop-profile">
               <Link
-                to={`/shop/${currentSeller._id}`}
+                to={`/admin/${currentUser._id}`}
                 onClick={() => setOpen(false)}
                 className="link"
               >

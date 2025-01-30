@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './AllShopsEvents.scss';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';

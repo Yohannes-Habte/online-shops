@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import './ShopRefunds.scss';
 import { DataGrid } from '@mui/x-data-grid';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
-import {
-  sellerOrdersFail,
-  sellerOrdersRequest,
-  sellerOrdersSuccess,
-} from '../../../redux/reducers/orderReducer';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey';
+import { clearOrderErrors, fetchSellerOrders } from '../../../redux/actions/order';
 
 const ShopRefunds = () => {
   // Global variables
@@ -18,23 +12,32 @@ const ShopRefunds = () => {
   const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
-  // Display all of a seller
-  useEffect(() => {
-    const sellerOrders = async () => {
-      try {
-        dispatch(sellerOrdersRequest());
+    // Get all orders of the admin
+    useEffect(() => {
+      dispatch(fetchSellerOrders());
+  
+      return () => {
+        dispatch(clearOrderErrors());
+      };
+    }, [dispatch]);
 
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
-        );
+  // // Display all of a seller
+  // useEffect(() => {
+  //   const sellerOrders = async () => {
+  //     try {
+  //       dispatch(sellerOrdersRequest());
 
-        dispatch(sellerOrdersSuccess(data.orders));
-      } catch (error) {
-        dispatch(sellerOrdersFail(error.response.data.message));
-      }
-    };
-    sellerOrders();
-  }, []);
+  //       const { data } = await axios.get(
+  //         `${API}/orders/shop/${currentSeller._id}`
+  //       );
+
+  //       dispatch(sellerOrdersSuccess(data.orders));
+  //     } catch (error) {
+  //       dispatch(sellerOrdersFail(error.response.data.message));
+  //     }
+  //   };
+  //   sellerOrders();
+  // }, []);
 
   // Filter all 'Processing refund' or 'Successfully refunded'
   const refundOrders =

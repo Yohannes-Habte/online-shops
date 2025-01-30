@@ -1,85 +1,120 @@
-import React, { useEffect, useState } from 'react';
-import './AdminDashboardOrders.scss';
-import { DataGrid } from '@mui/x-data-grid';
-import { useDispatch, useSelector } from 'react-redux';
-import AdminSidebar from '../../../components/admin/adminSidebar/AdminSidebar';
-import AdminHeader from '../../../components/admin/adminHeader/AdminHeader';
-import { getAllOrdersOfAdmin } from '../../../redux/actions/order';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey';
-import { toast } from 'react-toastify';
+import { useEffect } from "react";
+import "./AdminDashboardOrders.scss";
+import { DataGrid } from "@mui/x-data-grid";
+import { useDispatch, useSelector } from "react-redux";
+import AdminSidebar from "../../../components/admin/adminSidebar/AdminSidebar";
+import AdminHeader from "../../../components/admin/adminHeader/AdminHeader";
+
+import moment from "moment";
+import { fetchAllOrders } from "../../../redux/actions/order";
+import { clearErrors } from "../../../redux/reducers/orderReducer";
 
 const AdminDashboardOrders = () => {
   const dispatch = useDispatch();
+ 
+   const { allOrders } = useSelector((state) => state.order);
+   const { data: orders = [], loading, error } = allOrders || {};
+ 
+ 
+   useEffect(() => {
+     dispatch(clearErrors("allOrders")); // Ensure errors are cleared before fetching
+ 
+     dispatch(fetchAllOrders());
+ 
+     return () => {
+       dispatch(clearErrors("allOrders")); // Cleanup errors when unmounting
+     };
+   }, [dispatch]);
 
-  const { adminOrders, adminOrderLoading } = useSelector(
-    (state) => state.order
-  );
+   const handleDelete = async () => {}
+ 
+   // **Process orders into rows for DataGrid**const rows = orders.map((order) => ({
+   const rows = orders.map((order) => ({
+     id: order._id,
+     createdAt: order.createdAt,
+     quantity:
+       order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
+       0,
+     method: order.payment?.method || "Unknown",
+     grandTotal: order.grandTotal ?? 0, // Ensure it's always a number
+     orderStatus: order.orderStatus || "Unknown",
+   }));
 
-  const [orders, setOrders] = useState([]);
-
-  // Get all orders
-  useEffect(() => {
-    const allOrders = async () => {
-      try {
-        const { data } = await axios.get(`${API}/orders`);
-        setOrders(data.orders);
-      } catch (error) {
-        toast.error(error.response.data.message);
-      }
-    };
-    allOrders();
-  }, []);
-
-  const columns = [
-    { field: 'id', headerName: 'Order ID', minWidth: 200, flex: 0.7 },
-
-    {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 130,
-      flex: 0.7,
-      // cellClassName: (params) => {
-      //   return params.getValue(params.id, 'status') === 'Delivered'
-      //     ? 'greenColor'
-      //     : 'redColor';
-      // },
-    },
-    {
-      field: 'itemsQty',
-      headerName: 'Order Quantity',
-      type: 'number',
-      minWidth: 130,
-      flex: 0.7,
-    },
-
-    {
-      field: 'total',
-      headerName: 'Total',
-      type: 'number',
-      minWidth: 130,
-      flex: 0.8,
-    },
-    {
-      field: 'createdAt',
-      headerName: 'Order Date',
-      type: 'number',
-      minWidth: 130,
-      flex: 0.8,
-    },
-  ];
-
-  const row = [];
-  orders &&
-    orders.forEach((order) => {
-      row.push({
-        id: order._id,
-        itemsQty: order?.cart?.reduce((acc, item) => acc + item.qty, 0),
-        total: order?.totalPrice + ' $',
-        status: order?.status,
-        createdAt: order?.createdAt.slice(0, 10),
-      });
-    });
+ 
+   // **Columns for DataGrid**
+   const columns = [
+     {
+       field: "createdAt",
+       headerName: "Order Date",
+       minWidth: 180,
+       flex: 0.8,
+       valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"), // Format date
+     },
+     {
+       field: "quantity",
+       headerName: "Total Items",
+       type: "number",
+       minWidth: 130,
+       flex: 0.6,
+     },
+     {
+       field: "method",
+       headerName: "Payment Method",
+       minWidth: 150,
+       flex: 0.8,
+     },
+ 
+     {
+       field: "grandTotal",
+       headerName: "Total Amount",
+       type: "number",
+       minWidth: 150,
+       flex: 0.8,
+       renderCell: (params) => {
+         return `$${(params.row.grandTotal ?? 0).toFixed(2)}`;
+       },
+     },
+ 
+     {
+       field: "orderStatus",
+       headerName: "Order Status",
+       minWidth: 140,
+       flex: 0.7,
+       renderCell: (params) => (
+         <span
+           style={{
+             color: params.value === "Pending" ? "orange" : "green",
+             fontWeight: "bold",
+           }}
+         >
+           {params.value}
+         </span>
+       ),
+     },
+     {
+       field: "action",
+       headerName: "Details",
+       minWidth: 150,
+       flex: 0.7,
+       sortable: false,
+       renderCell: (params) => (
+          <div className="action-btns">
+            <button
+              className="btn btn-view"
+              onClick={() => history.push(`/admin/orders/${params.id}`)}
+            >
+              View
+            </button>
+            <button
+              className="btn btn-delete"
+              onClick={() => handleDelete(params.id)}
+            >
+              Delete
+            </button>
+          </div>
+       ),
+     },
+   ];
   return (
     <main className="admin-dashboard-orders-page">
       <AdminHeader />
@@ -88,13 +123,21 @@ const AdminDashboardOrders = () => {
         <div className="wrapper">
           <AdminSidebar />
           <div className="orders-table">
-            <DataGrid
-              rows={row}
-              columns={columns}
-              pageSize={4}
-              disableSelectionOnClick
-              autoHeight
-            />
+          {loading ? (
+        <div>Loading orders...</div>
+      ) : error ? (
+        <div style={{ color: "red" }}>Error: {error}</div>
+      ) : orders.length === 0 ? (
+        <div>No orders found.</div>
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={10}
+          disableSelectionOnClick
+          autoHeight
+        />
+      )}
           </div>
         </div>
       </section>

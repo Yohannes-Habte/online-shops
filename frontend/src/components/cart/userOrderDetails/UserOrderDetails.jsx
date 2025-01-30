@@ -1,22 +1,21 @@
-import { useEffect, useState } from 'react';
-import './UserOrderDetails.scss';
-import { Link, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RxCross1 } from 'react-icons/rx';
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "./UserOrderDetails.scss";
+import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RxCross1 } from "react-icons/rx";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {
-  userOrdersFail,
-  userOrdersRequest,
-  userOrdersSuccess,
-} from '../../../redux/reducers/orderReducer';
-import { API } from '../../../utils/security/secreteKey';
+  clearOrderErrors,
+  fetchCustomerOrders,
+} from "../../../redux/actions/order";
+import { API } from "../../../utils/security/secreteKey";
 
 const UserOrderDetails = () => {
   // The orderId is ...
   const { id } = useParams();
-  console.log('param id = ', id);
+  console.log("param id = ", id);
   // Global state variables
   const { orders } = useSelector((state) => state.order);
   const { currentUser } = useSelector((state) => state.user);
@@ -25,32 +24,41 @@ const UserOrderDetails = () => {
   // Local state variables for reviewing a product
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Display all orders of a user
   useEffect(() => {
-    const userOrders = async () => {
-      try {
-        dispatch(userOrdersRequest());
+    dispatch(fetchCustomerOrders());
 
-        const { data } = await axios.get(
-          `${API}/orders/user/${currentUser._id}`
-        );
-
-        dispatch(userOrdersSuccess(data.orders));
-      } catch (error) {
-        dispatch(userOrdersFail(error.response.data.message));
-      }
+    return () => {
+      dispatch(clearOrderErrors());
     };
-    userOrders();
-  }, []);
+  }, [dispatch]);
+
+  // Display all orders of a user
+  // useEffect(() => {
+  //   const userOrders = async () => {
+  //     try {
+  //       dispatch(userOrdersRequest());
+
+  //       const { data } = await axios.get(
+  //         `${API}/orders/user/${currentUser._id}`
+  //       );
+
+  //       dispatch(userOrdersSuccess(data.orders));
+  //     } catch (error) {
+  //       dispatch(userOrdersFail(error.response.data.message));
+  //     }
+  //   };
+  //   userOrders();
+  // }, []);
 
   // Find a specific order
   const order = orders && orders.find((item) => item._id === id);
 
   const rest = () => {
-    setComment('');
+    setComment("");
     setRating(0);
     setOpen(false);
   };
@@ -85,7 +93,7 @@ const UserOrderDetails = () => {
   const refundHandler = async () => {
     try {
       const refundStatus = {
-        status: 'Processing refund',
+        status: "Processing refund",
       };
       const { data } = await axios.put(
         `${API}/orders/${id}/refund-order`,
@@ -132,7 +140,7 @@ const UserOrderDetails = () => {
                     PQ: ${product.discountPrice} x {product.qty}
                   </p>
                 </article>
-                {!product.isReviewed && order?.status === 'Delivered' ? (
+                {!product.isReviewed && order?.status === "Delivered" ? (
                   <h4
                     className={`review-btn`}
                     onClick={() => setOpen(true) || setSelectedProduct(product)}
@@ -172,7 +180,7 @@ const UserOrderDetails = () => {
 
                 {/* ratings */}
                 <h3 className="rating">
-                  Rating <span style={{ color: 'red' }}>*</span>
+                  Rating <span style={{ color: "red" }}>*</span>
                 </h3>
 
                 {/* Rating usring Starts of 1 to 5 scale for ordered products*/}
@@ -248,10 +256,10 @@ const UserOrderDetails = () => {
             Status:
             {order?.paymentInfo?.status
               ? order?.paymentInfo?.status
-              : 'Not Paid'}
+              : "Not Paid"}
           </p>
 
-          {order?.status === 'Delivered' && (
+          {order?.status === "Delivered" && (
             <button className={`give-refund-btn`} onClick={refundHandler}>
               Refund Me
             </button>
@@ -261,7 +269,7 @@ const UserOrderDetails = () => {
       {/* Send Message button */}
       <Link to="/contact">
         <button className={`send-message-btn`}>Send Message</button>
-      </Link>{' '}
+      </Link>{" "}
     </section>
   );
 };

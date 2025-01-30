@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import './AdminDashboardOverview.scss';
-import { DataGrid } from '@mui/x-data-grid';
-import { useDispatch, useSelector } from 'react-redux';
-import { GiProfit } from 'react-icons/gi';
-import { FaShopSlash } from 'react-icons/fa6';
-import { Link } from 'react-router-dom';
-import { FaCartShopping } from 'react-icons/fa6';
-import { getAllOrdersOfAdmin } from '../../../redux/actions/order';
-import { getAllSellers } from '../../../redux/actions/seller';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import "./AdminDashboardOverview.scss";
+import { DataGrid } from "@mui/x-data-grid";
+import { useDispatch, useSelector } from "react-redux";
+import { GiProfit } from "react-icons/gi";
+import { FaShopSlash } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import { FaCartShopping } from "react-icons/fa6";
+import { clearOrderErrors, fetchAllOrders } from "../../../redux/actions/order";
+import { getAllSellers } from "../../../redux/actions/seller";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
 
 const AdminDashboardOverview = () => {
   // Global state variables
@@ -21,20 +21,28 @@ const AdminDashboardOverview = () => {
   const [orders, setOrders] = useState([]);
   const [shops, setShops] = useState([]);
 
+  // Get all orders of the admin
   useEffect(() => {
-    dispatch(getAllOrdersOfAdmin());
-    dispatch(getAllSellers());
-  }, []);
+    dispatch(fetchAllOrders());
 
-  useEffect(() => {
-    const allShopsOrders = async () => {
-      try {
-        const { data } = await axios.get(`${API}/orders`);
-        setOrders(data.orders);
-      } catch (error) {}
+    dispatch(getAllSellers());
+
+    return () => {
+      dispatch(clearOrderErrors());
     };
-    allShopsOrders();
-  }, []);
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   const allShopsOrders = async () => {
+  //     try {
+  //       const { data } = await axios.get(`${API}/orders`);
+  //       setOrders(data.orders);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   allShopsOrders();
+  // }, []);
 
   useEffect(() => {
     const allShops = async () => {
@@ -53,11 +61,11 @@ const AdminDashboardOverview = () => {
   const adminBalance = adminEarning?.toFixed(2);
 
   const columns = [
-    { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
     {
-      field: 'status',
-      headerName: 'Status',
+      field: "status",
+      headerName: "Status",
       minWidth: 70,
       flex: 0.7,
       cellClassName: (params) => {
@@ -67,24 +75,24 @@ const AdminDashboardOverview = () => {
       },
     },
     {
-      field: 'quantity',
-      headerName: 'Quantity',
-      type: 'number',
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
       minWidth: 70,
       flex: 0.7,
     },
 
     {
-      field: 'total',
-      headerName: 'Total',
-      type: 'number',
+      field: "total",
+      headerName: "Total",
+      type: "number",
       minWidth: 130,
       flex: 0.8,
     },
     {
-      field: 'createdAt',
-      headerName: 'Order Date',
-      type: 'number',
+      field: "createdAt",
+      headerName: "Order Date",
+      type: "number",
       minWidth: 130,
       flex: 0.8,
     },

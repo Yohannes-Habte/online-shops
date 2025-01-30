@@ -1,205 +1,184 @@
-import { useEffect, useState } from 'react';
-import './DashboardOverview.scss';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { DataGrid } from '@mui/x-data-grid';
-import axios from 'axios';
-import { RxArrowRight } from 'react-icons/rx';
-import { MdPriceChange } from 'react-icons/md';
-import { FaFirstOrderAlt } from 'react-icons/fa6';
-import { FaProductHunt } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+import { RxArrowRight } from "react-icons/rx";
+import { MdPriceChange } from "react-icons/md";
+import { FaFirstOrderAlt } from "react-icons/fa6";
+import { FaProductHunt } from "react-icons/fa";
+import { API } from "../../../utils/security/secreteKey";
 import {
-  sellerOrdersFail,
-  sellerOrdersRequest,
-  sellerOrdersSuccess,
-} from '../../../redux/reducers/orderReducer';
-import { API } from '../../../utils/security/secreteKey';
+  fetchSellerOrders,
+  clearOrderErrors,
+} from "../../../redux/actions/order";
+import { fetchSellerOrdersRequest } from "../../../redux/reducers/orderReducer";
+import "./DashboardOverview.scss";
 
 const DashboardOverview = () => {
   // Global state variables
-  const { orders } = useSelector((state) => state.order);
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { products } = useSelector((state) => state.product);
   const dispatch = useDispatch();
+  const { sellerOrders } = useSelector((state) => state.order);
+  const { currentSeller } = useSelector((state) => state.seller);
+
+  // Extract loading, error, and data from sellerOrders
+  const {
+    data: sellerOrdersData,
+    loading: sellerOrdersLoading,
+    error: sellerOrdersError,
+  } = sellerOrders;
 
   // Local state variables
   const [shopProducts, setShopProducts] = useState([]);
   const [deliveredShopOrders, setDeliveredShopOrders] = useState([]);
-  const [allShopOrders, setAllShopOrders] = useState([]);
 
+  // Fetch seller orders on mount
   useEffect(() => {
-    const fetchAllShopOrders = async () => {
-      try {
-        // dispatch(sellerOrdersRequest());
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
-        );
-        // dispatch(sellerOrdersSuccess(data.orders));
-        setAllShopOrders(data.orders);
-      } catch (error) {
-        // dispatch(sellerOrdersFail(error.response.data.message));
-      }
+    dispatch(fetchSellerOrders());
+
+    return () => {
+      dispatch(clearOrderErrors());
     };
-    fetchAllShopOrders();
   }, [dispatch]);
 
-  // Display shop products
+  // Fetch shop products
   useEffect(() => {
     const getShopProducts = async () => {
       try {
-        // dispatch(productsShopFetchStart());
         const { data } = await axios.get(
-          `${API}/products/${currentSeller._id}/shop-products`
+          `${API}/products/${currentSeller?._id}/shop-products`
         );
         setShopProducts(data.products);
       } catch (error) {
-        console.log(error);
-        // dispatch(productsShopFetchFailure(error.response.data.message));
+        console.error("Error fetching shop products:", error);
       }
     };
     getShopProducts();
-  }, []);
+  }, [currentSeller]);
 
-  // Display all delivered shop orders
+  // Fetch delivered orders
   useEffect(() => {
     const getShopOrders = async () => {
       try {
-        dispatch(sellerOrdersRequest());
+        dispatch(fetchSellerOrdersRequest());
         const { data } = await axios.get(
           `${API}/orders/shop/${currentSeller?._id}`
         );
-        const orderData = data.orders.filter(
-          (shopOrderData) => shopOrderData.status === 'Delivered'
+        const deliveredOrders = data.sellerOrders.filter(
+          (order) => order.status === "Delivered"
         );
-        setDeliveredShopOrders(orderData);
+        setDeliveredShopOrders(deliveredOrders);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching delivered orders:", error);
       }
     };
     getShopOrders();
-  }, []);
+  }, [currentSeller, dispatch]);
 
-  // Total earning without tax
-  const totalEaringWithoutTax =
-    deliveredShopOrders &&
-    deliveredShopOrders.reduce((acc, order) => acc + order.totalPrice, 0);
+  // Calculate earnings
+  const totalEarningsWithoutTax = deliveredShopOrders.reduce(
+    (acc, order) => acc + order.totalPrice,
+    0
+  );
+  const serviceCharge = totalEarningsWithoutTax * 0.1;
+  const totalEarnings = totalEarningsWithoutTax - serviceCharge;
+  const shopIncome = totalEarnings.toFixed(2);
 
-  const serviceCharge = totalEaringWithoutTax * 0.1;
-  const totalEarning = totalEaringWithoutTax - serviceCharge;
-  const shopIncome = totalEarning.toFixed(2);
+  const availableBalance = currentSeller?.availableBalance?.toFixed() || "0";
 
-  //! Available Balance will be done in the backend
-  const availableBalance = currentSeller?.availableBalance.toFixed();
-
+  // Data Grid Columns
   const columns = [
-    { field: 'id', headerName: 'Order ID', minWidth: 250, flex: 0.7 },
-
+    { field: "id", headerName: "Order ID", minWidth: 250, flex: 0.7 },
+    { field: "status", headerName: "Status", minWidth: 130, flex: 0.7 },
     {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 130,
-      flex: 0.7,
-      // cellClassName: (params) => {
-      //   return params.getValue(params.id, 'status') === 'Delivered'
-      //     ? 'greenColor'
-      //     : 'redColor';
-      // },
-    },
-    {
-      field: 'quantity',
-      headerName: 'Quantity',
-      type: 'number',
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
       minWidth: 130,
       flex: 0.7,
     },
-
     {
-      field: 'total',
-      headerName: 'Total',
-      type: 'number',
+      field: "total",
+      headerName: "Total",
+      type: "number",
       minWidth: 130,
       flex: 0.8,
     },
-
     {
-      field: ' ',
+      field: " ",
       flex: 1,
       minWidth: 150,
-      headerName: '',
-      type: 'number',
+      headerName: "",
+      type: "number",
       sortable: false,
-      renderCell: (params) => {
-        return (
-          <Link to={`/shop/order/${params.id}`}>
-            <RxArrowRight size={20} />
-          </Link>
-        );
-      },
+      renderCell: (params) => (
+        <Link to={`/shop/order/${params.id}`}>
+          <RxArrowRight size={20} />
+        </Link>
+      ),
     },
   ];
 
-  const row = [];
+  // Data Grid Rows
+  const rows = deliveredShopOrders.map((order) => ({
+    id: order._id,
+    quantity: order.cart.reduce((acc, item) => acc + item.qty, 0),
+    total: `$${order.totalPrice}`,
+    status: order.status,
+  }));
 
-  deliveredShopOrders &&
-    deliveredShopOrders.forEach((order) => {
-      row.push({
-        id: order._id,
-        quantity: order.cart.reduce((acc, item) => acc + item.qty, 0),
-        total: '$' + order.totalPrice,
-        status: order.status,
-      });
-    });
+  // Loading & Error States Handling
+  if (sellerOrdersLoading) return <p>Loading orders...</p>;
+  if (sellerOrdersError)
+    return <p className="error-message">Error: {sellerOrdersError}</p>;
 
   return (
     <section className="overview-dashboard-wrapper">
       <h2 className="overview-dashboard-title">Overview</h2>
 
       <div className="summary-overview">
-        {/* Account balance wrapper */}
+        {/* Account Balance */}
         <article className="article-box account-balance">
-          <aside className=" aside-box account-balance">
+          <aside className="aside-box account-balance">
             <MdPriceChange className="icon" />
-            <h3 className={`subTitle`}>
+            <h3 className="subTitle">
               Account Balance of {currentSeller?.name}
             </h3>
           </aside>
-
           <h3 className="subTitle">${shopIncome}</h3>
           <Link to="/dashboard-withdraw-money" className="link">
             Withdraw Money
           </Link>
         </article>
 
-        {/* Orders wrapper */}
+        {/* Orders */}
         <article className="article-box orders-wrapper">
           <aside className="aside-box all-orders">
             <FaFirstOrderAlt className="icon" />
-            <h3 className={`subTitle`}>
-              All Orders from {currentSeller?.name}{' '}
-            </h3>
+            <h3 className="subTitle">All Orders from {currentSeller?.name}</h3>
           </aside>
           <h3 className="subTitle">
-            {allShopOrders ? allShopOrders?.length : '0'}
+            {sellerOrdersData ? sellerOrdersData.length : "0"}
           </h3>
           <Link to="/dashboard-orders" className="link">
             View Orders
           </Link>
         </article>
 
-        {/* Products wrapper */}
+        {/* Products */}
         <article className="article-box all-products-wrapper">
           <aside className="aside-box all-products">
             <FaProductHunt className="icon" />
-            <h3 className={`subTitle`}>All Products of {currentSeller?.name}</h3>
+            <h3 className="subTitle">All Products of {currentSeller?.name}</h3>
           </aside>
           <h3 className="subTitle">
-            {shopProducts ? shopProducts.length : '0'}
+            {shopProducts ? shopProducts.length : "0"}
           </h3>
           <Link to="/dashboard-products">View Products</Link>
         </article>
       </div>
 
-      {/* Latest orders */}
+      {/* Latest Orders */}
       <h3 className="latest-orders">
         Delivered Orders of {currentSeller?.name}
       </h3>
@@ -207,11 +186,12 @@ const DashboardOverview = () => {
       {/* Data Grid */}
       <div className="data-grid-wrapper">
         <DataGrid
-          rows={row}
+          rows={rows}
           columns={columns}
           pageSize={10}
           disableSelectionOnClick
           autoHeight
+          loading={sellerOrdersLoading} // Shows loading spinner in DataGrid
         />
       </div>
     </section>

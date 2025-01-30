@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import './AllSellerOrders.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { RxArrowRight } from 'react-icons/rx';
-import { DataGrid } from '@mui/x-data-grid';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import "./AllSellerOrders.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { RxArrowRight } from "react-icons/rx";
+import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
 import {
-  sellerOrdersFail,
-  sellerOrdersRequest,
-  sellerOrdersSuccess,
-} from '../../../redux/reducers/orderReducer';
-import { API } from '../../../utils/security/secreteKey';
+  clearOrderErrors,
+  fetchSellerOrders,
+} from "../../../redux/actions/order";
 
 const AllSellerOrders = () => {
   // Global variables
@@ -20,56 +19,65 @@ const AllSellerOrders = () => {
 
   // Local state variable
   const [shopOrders, setShopOrders] = useState([]);
-  console.log('Orders', shopOrders);
+  console.log("Orders", shopOrders);
 
-  // Display all orders of a shop
+  // Get all orders of the admin
   useEffect(() => {
-    const fetchAllShopOrders = async () => {
-      try {
-        // dispatch(sellerOrdersRequest());
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
-        );
-        // dispatch(sellerOrdersSuccess(data.orders));
-        setShopOrders(data.orders);
-      } catch (error) {
-        // dispatch(sellerOrdersFail(error.response.data.message));
-      }
+    dispatch(fetchSellerOrders());
+
+    return () => {
+      dispatch(clearOrderErrors());
     };
-    fetchAllShopOrders();
   }, [dispatch]);
 
+  // // Display all orders of a shop
+  // useEffect(() => {
+  //   const fetchAllShopOrders = async () => {
+  //     try {
+  //       // dispatch(sellerOrdersRequest());
+  //       const { data } = await axios.get(
+  //         `${API}/orders/shop/${currentSeller._id}`
+  //       );
+  //       // dispatch(sellerOrdersSuccess(data.orders));
+  //       setShopOrders(data.orders);
+  //     } catch (error) {
+  //       // dispatch(sellerOrdersFail(error.response.data.message));
+  //     }
+  //   };
+  //   fetchAllShopOrders();
+  // }, [dispatch]);
+
   const columns = [
-    { field: 'id', headerName: 'Order ID', minWidth: 250, flex: 0.7 },
+    { field: "id", headerName: "Order ID", minWidth: 250, flex: 0.7 },
 
     {
-      field: 'status',
-      headerName: 'Status',
+      field: "status",
+      headerName: "Status",
       minWidth: 150,
       flex: 0.7,
     },
     {
-      field: 'quantity',
-      headerName: 'Quantity',
-      type: 'number',
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
       minWidth: 150,
       flex: 0.7,
     },
 
     {
-      field: 'total',
-      headerName: 'Total',
-      type: 'number',
+      field: "total",
+      headerName: "Total",
+      type: "number",
       minWidth: 150,
       flex: 0.8,
     },
 
     {
-      field: ' ',
+      field: " ",
       flex: 1,
       minWidth: 150,
-      headerName: '',
-      type: 'number',
+      headerName: "",
+      type: "number",
       sortable: false,
       renderCell: (params) => {
         return (
@@ -88,7 +96,7 @@ const AllSellerOrders = () => {
       row.push({
         id: item._id,
         quantity: item.cart.length,
-        total: '$ ' + item.totalPrice,
+        total: "$ " + item.totalPrice,
         status: item.status,
       });
     });

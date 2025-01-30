@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import Header from "../../../components/userLayout/header/Header";
 import Footer from "../../../components/userLayout/footer/Footer";
 import ProductCard from "../../../components/products/productCard/ProductCard";
@@ -67,16 +67,11 @@ const Products = () => {
     fetchDropdownData();
   }, []);
 
-  // Handle input changes
-  const handleInputChange = (e) => {
-    setQuery({ ...query, [e.target.name]: e.target.value });
-  };
-
-  // Handle search button click
+  // Fetch products only on Search button click
   const handleSearch = () => {
     const queryString = new URLSearchParams(query).toString();
     navigate(`/products?${queryString}`);
-    dispatch(fetchAllProductsForAllShops(query));
+    dispatch(fetchAllProductsForAllShops(query)); // Fetch products only on search
   };
 
   // Reset the search form
@@ -93,32 +88,35 @@ const Products = () => {
 
     setQuery(resetQuery);
     navigate(`/products`);
-    dispatch(fetchAllProductsForAllShops(resetQuery));
+    dispatch(fetchAllProductsForAllShops(resetQuery)); // Reset the product list
   };
 
-  // Fetch all products on initial load or query change
+  // Handle input changes without fetching products
+  const handleInputChange = (e) => {
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  // Fetch all products on initial load only
   useEffect(() => {
     dispatch(fetchAllProductsForAllShops(query));
 
+    // Cleanup function to clear product errors on component unmount
     return () => {
       dispatch(clearProductErrors());
     };
-  }, [dispatch, query]);
+  }, []); // Runs only once on mount
 
-  // Handle "See More Products" click
+  // Handle "See More Products" click (pagination)
   const handleSeeMore = () => {
-    // Increase the page count by 1 for the next set of products
     const nextPage = query.page + 1;
-    const updatedQuery = {
-      ...query,
-      page: nextPage,
-    };
-  
-    // Update the query state
+    const updatedQuery = { ...query, page: nextPage };
+
     setQuery(updatedQuery);
-    dispatch(fetchAllProductsForAllShops(updatedQuery)); // Fetch the next set of products
+    dispatch(fetchAllProductsForAllShops(updatedQuery));
   };
-  
 
   return (
     <main className="products-page">
@@ -134,78 +132,82 @@ const Products = () => {
         <h1 className="products-title">Search Products</h1>
 
         {/* Search bar */}
-        <div className="search-bar">
-          <select
-            name="shopName"
-            value={query.shopName}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Shop</option>
-            {dropdownOptions.shopNames.map((shop) => (
-              <option key={shop._id} value={shop.name}>
-                {shop.name}
-              </option>
-            ))}
-          </select>
+        <div className="search-bar-container">
+          <div className="select-container">
+            <select
+              name="shopName"
+              value={query.shopName}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Shop</option>
+              {dropdownOptions.shopNames.map((shop) => (
+                <option key={shop._id} value={shop.name}>
+                  {shop.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            name="categoryName"
-            value={query.categoryName}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Category</option>
-            {dropdownOptions.categoryNames.map((category) => (
-              <option key={category._id} value={category.categoryName}>
-                {category.categoryName}
-              </option>
-            ))}
-          </select>
+          <div className="select-container">
+            <select
+              name="categoryName"
+              value={query.categoryName}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Category</option>
+              {dropdownOptions.categoryNames.map((category) => (
+                <option key={category._id} value={category.categoryName}>
+                  {category.categoryName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            name="subcategoryName"
-            value={query.subcategoryName}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Subcategory</option>
-            {dropdownOptions.subcategoryNames.map((subcategory) => (
-              <option key={subcategory._id} value={subcategory.subcategoryName}>
-                {subcategory.subcategoryName}
-              </option>
-            ))}
-          </select>
+          <div className="select-container">
+            <select
+              name="subcategoryName"
+              value={query.subcategoryName}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Subcategory</option>
+              {dropdownOptions.subcategoryNames.map((subcategory) => (
+                <option
+                  key={subcategory._id}
+                  value={subcategory.subcategoryName}
+                >
+                  {subcategory.subcategoryName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            name="brandName"
-            value={query.brandName}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Brand</option>
-            {dropdownOptions.brandNames.map((brand) => (
-              <option key={brand._id} value={brand.brandName}>
-                {brand.brandName}
-              </option>
-            ))}
-          </select>
+          <div className="select-container">
+            <select
+              name="brandName"
+              value={query.brandName}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Brand</option>
+              {dropdownOptions.brandNames.map((brand) => (
+                <option key={brand._id} value={brand.brandName}>
+                  {brand.brandName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            name="customerCategory"
-            value={query.customerCategory}
-            onChange={handleInputChange}
-          >
-            <option value="">All Categories</option>
-            <option value="Ladies">Ladies</option>
-            <option value="Gents">Gents</option>
-            <option value="Kids">Kids</option>
-          </select>
-
-          <select name="title" value={query.title} onChange={handleInputChange}>
-            <option value="">Select Product Title</option>
-            {products.map((product) => (
-              <option key={product._id} value={product.title}>
-                {product.title}
-              </option>
-            ))}
-          </select>
+          <div className="select-container">
+            <select
+              name="customerCategory"
+              value={query.customerCategory}
+              onChange={handleInputChange}
+            >
+              <option value="">All Categories</option>
+              <option value="Ladies">Ladies</option>
+              <option value="Gents">Gents</option>
+              <option value="Kids">Kids</option>
+            </select>
+          </div>
 
           <div className="button-container">
             <button onClick={handleSearch}>Search</button>
@@ -240,7 +242,7 @@ const Products = () => {
             <button
               onClick={handleSeeMore}
               className="see-more-btn"
-              disabled={loading} // Disable button when loading
+              disabled={loading}
             >
               {loading ? "Loading..." : "See More Products"}
             </button>

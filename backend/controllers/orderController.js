@@ -3,6 +3,7 @@ import createError from "http-errors";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
+import User from "../models/userModel.js";
 
 //=========================================================================
 // Create an order
@@ -101,7 +102,7 @@ export const createOrder = async (req, res, next) => {
       // Populate item with correct size
       populatedItems.push({
         ...item,
-        size: item.variant.size,  // Ensure size is set correctly
+        size: item.variant.size, // Ensure size is set correctly
         product: product._id,
         title: product.title,
         category: product.category,
@@ -179,6 +180,11 @@ export const createOrder = async (req, res, next) => {
       })
     );
 
+    // Find the user and update their orders
+    const user = await User.findById(customer).session(session);
+    user.myOrders.push(savedOrder._id);
+    await user.save({ session });
+
     // Commit the transaction
     await session.commitTransaction();
 
@@ -195,8 +201,6 @@ export const createOrder = async (req, res, next) => {
     session.endSession();
   }
 };
-
-
 
 //=========================================================================
 // Update order status for a shop
@@ -353,20 +357,32 @@ export const getOrder = async (req, res, next) => {
 
 export const getAllUserOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ "user._id": req.params.userId }).sort({
-      createdAt: -1,
-    });
-
-    if (!orders) {
-      return next(createError(400, "User orders not found! Please try again!"));
+    if (!req.user?.id) {
+      return next(
+        createError(401, "Unauthorized: Please login to view your orders")
+      );
     }
 
-    res.status(200).json({
-      success: true,
-      orders,
-    });
+    if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
+      return next(createError(400, "Invalid user ID format"));
+    }
+
+    const user = await User.findById(req.user.id).populate("myOrders").lean();
+
+    if (!user) {
+      return next(createError(404, "User not found"));
+    }
+
+    if (!user.myOrders?.length) {
+      return next(createError(404, "No orders found for this user"));
+    }
+
+    res.status(200).json({ success: true, orders: user.myOrders });
   } catch (error) {
-    next(createError(500, "Orders could not be accessed! Please try again!"));
+    console.error("Error fetching user orders:", error);
+    next(
+      createError(500, error.message || "Server error: Unable to fetch orders.")
+    );
   }
 };
 
@@ -422,22 +438,44 @@ export const deleteOrders = async (req, res, next) => {
 };
 
 //=========================================================================
-// Get all orders for all shops by an admin
+// Get all orders for all shops (Admin Only)
 //=========================================================================
-
 export const allShopsOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find().sort({
-      deliveredAt: -1,
-      createdAt: -1,
-    });
-    res.status(201).json({
+    // Ensure only admins can access this route
+    const user = await User.findById(req.user.id);
+    
+    if (!user || user.role !== "admin") {
+      return next(createError(403, "Unauthorized access!"));
+    }
+
+    // Pagination setup
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Fetch orders with sorting and pagination
+    const orders = await Order.find()
+      .sort({ deliveredAt: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select("-sensitiveField"); // Exclude sensitive fields if necessary
+
+    if (!orders) {
+      return next(createError(404, "No orders found!"));
+    }
+
+    // count the total number of orders
+    const totalOrders = await Order.countDocuments();
+
+    res.status(200).json({
       success: true,
+      count: totalOrders,
+      page,
       orders,
     });
   } catch (error) {
-    next(
-      createError(500, "All shops orders could not be accessed! Try again!")
-    );
+    console.error("Error fetching all shop orders:", error);
+    next(createError(500, "Failed to retrieve orders. Please try again."));
   }
 };

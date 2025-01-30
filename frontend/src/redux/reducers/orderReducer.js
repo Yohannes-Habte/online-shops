@@ -1,79 +1,82 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  orders: [],
-  error: '',
-  loading: false,
-  adminOrders: [],
-  adminOrderLoading: false,
+  allOrders: { data: [], loading: false, error: null },
+  sellerOrders: { data: [], loading: false, error: null },
+  customerOrders: { data: [], loading: false, error: null },
+};
+
+const setLoadingState = (state, key) => {
+  console.log(`Setting loading state for ${key}`);
+  state[key] = { ...state[key], loading: true, error: null };
+};
+
+const setSuccessState = (state, action, key) => {
+  console.log(`Setting success state for ${key}`, action.payload); // Debugging
+  state[key] = {
+    ...state[key],
+    data: action.payload ?? [], // Ensures `data` is always an array
+    loading: false,
+    error: null,
+  };
+};
+
+const setFailureState = (state, action, key) => {
+  console.log(`Setting failure state for ${key}`, action.payload); // Debugging
+  state[key] = {
+    ...state[key],
+    loading: false,
+    error: action.payload ?? "An error occurred",
+  };
 };
 
 const orderReducer = createSlice({
-  name: 'order',
+  name: "order",
   initialState,
   reducers: {
-    // Get all orders of a user
-    userOrdersRequest: (state) => {
-      state.loading = true;
-    },
-    userOrdersSuccess: (state, action) => {
-      state.orders = action.payload;
-      state.loading = false;
-    },
-    userOrdersFail: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    // Fetch all orders (Admin)
+    fetchOrdersRequest: (state) => setLoadingState(state, "allOrders"),
+    fetchOrdersSuccess: (state, action) =>
+      setSuccessState(state, action, "allOrders"),
+    fetchOrdersFailure: (state, action) =>
+      setFailureState(state, action, "allOrders"),
 
-    // Get all orders of a seller/shop
-    sellerOrdersRequest: (state) => {
-      state.loading = true;
-    },
-    sellerOrdersSuccess: (state, action) => {
-      state.orders = action.payload;
-      state.loading = false;
-    },
-    sellerOrdersFail: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+    // Fetch orders for a specific seller
+    fetchSellerOrdersRequest: (state) => setLoadingState(state, "sellerOrders"),
+    fetchSellerOrdersSuccess: (state, action) =>
+      setSuccessState(state, action, "sellerOrders"),
+    fetchSellerOrdersFailure: (state, action) =>
+      setFailureState(state, action, "sellerOrders"),
 
-    // Get all orders for an admin
-    adminOrdersRequest: (state) => {
-      state.adminOrderLoading = true;
-    },
-    adminOrdersSuccess: (state, action) => {
-      state.adminOrders = action.payload;
-      state.adminOrderLoading = false;
-    },
-    adminOrdersFail: (state, action) => {
-      state.error = action.payload;
-      state.adminOrderLoading = false;
-    },
+    // Fetch orders for a specific customer
+    fetchCustomerOrdersRequest: (state) =>
+      setLoadingState(state, "customerOrders"),
+    fetchCustomerOrdersSuccess: (state, action) =>
+      setSuccessState(state, action, "customerOrders"),
+    fetchCustomerOrdersFailure: (state, action) =>
+      setFailureState(state, action, "customerOrders"),
 
-    // Clear error
+    // Clear errors
     clearErrors: (state) => {
-      state.error = null;
+      console.log("Clearing errors...");
+      state.allOrders.error = null;
+      state.sellerOrders.error = null;
+      state.customerOrders.error = null;
     },
   },
 });
 
-// Destructure order reducer methods under the reducers key
 export const {
-  // User orders
-  userOrdersRequest,
-  userOrdersSuccess,
-  userOrdersFail,
-
-  // Seller orders
-  sellerOrdersRequest,
-  sellerOrdersSuccess,
-  sellerOrdersFail,
-
-  // Admin orders
-  adminOrdersRequest,
-  adminOrdersSuccess,
-  adminOrdersFail,
+  fetchOrdersRequest,
+  fetchOrdersSuccess,
+  fetchOrdersFailure,
+  fetchSellerOrdersRequest,
+  fetchSellerOrdersSuccess,
+  fetchSellerOrdersFailure,
+  fetchCustomerOrdersRequest,
+  fetchCustomerOrdersSuccess,
+  fetchCustomerOrdersFailure,
+  clearErrors,
 } = orderReducer.actions;
 
 export default orderReducer.reducer;

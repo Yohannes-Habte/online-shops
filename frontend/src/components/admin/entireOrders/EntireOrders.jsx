@@ -3,24 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
 import { DataGrid } from "@mui/x-data-grid";
-import { fetchCustomerOrders } from "../../../redux/actions/order";
+import { fetchAllOrders } from "../../../redux/actions/order";
 import { clearErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 
-const UserOrders = () => {
+const EntireOrders = () => {
   const dispatch = useDispatch();
 
-  const { customerOrders } = useSelector((state) => state.order);
-  const { data: orders = [], loading, error } = customerOrders || {};
+  const { allOrders } = useSelector((state) => state.order);
+  const { data: orders = [], loading, error } = allOrders || {};
 
 
   useEffect(() => {
-    dispatch(clearErrors("customerOrders")); // Ensure errors are cleared before fetching
+    dispatch(clearErrors("allOrders")); // Ensure errors are cleared before fetching
 
-    dispatch(fetchCustomerOrders());
+    dispatch(fetchAllOrders());
 
     return () => {
-      dispatch(clearErrors("customerOrders")); // Cleanup errors when unmounting
+      dispatch(clearErrors("allOrders")); // Cleanup errors when unmounting
     };
   }, [dispatch]);
 
@@ -107,7 +107,7 @@ const UserOrders = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Your Orders</h2>
+      <h2>Entire Orders</h2>
 
       {loading ? (
         <div>Loading orders...</div>
@@ -128,4 +128,6 @@ const UserOrders = () => {
   );
 };
 
-export default UserOrders;
+
+
+export default EntireOrders
