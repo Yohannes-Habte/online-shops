@@ -1,115 +1,123 @@
-import { useEffect, useState } from "react";
-import "./AllSellerOrders.scss";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
 import { DataGrid } from "@mui/x-data-grid";
-import axios from "axios";
-import { API } from "../../../utils/security/secreteKey";
-import {
-  clearOrderErrors,
-  fetchSellerOrders,
-} from "../../../redux/actions/order";
+import { fetchSellerOrders } from "../../../redux/actions/order";
+import { clearErrors } from "../../../redux/reducers/orderReducer";
+import moment from "moment";
 
 const AllSellerOrders = () => {
-  // Global variables
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
-  // Local state variable
-  const [shopOrders, setShopOrders] = useState([]);
-  console.log("Orders", shopOrders);
+  const { sellerOrders } = useSelector((state) => state.order);
+  const { data: orders = [], loading, error } = sellerOrders || {};
+  console.log("Orders", sellerOrders);
 
   // Get all orders of the admin
   useEffect(() => {
     dispatch(fetchSellerOrders());
 
     return () => {
-      dispatch(clearOrderErrors());
+      dispatch(clearErrors());
     };
   }, [dispatch]);
 
-  // // Display all orders of a shop
-  // useEffect(() => {
-  //   const fetchAllShopOrders = async () => {
-  //     try {
-  //       // dispatch(sellerOrdersRequest());
-  //       const { data } = await axios.get(
-  //         `${API}/orders/shop/${currentSeller._id}`
-  //       );
-  //       // dispatch(sellerOrdersSuccess(data.orders));
-  //       setShopOrders(data.orders);
-  //     } catch (error) {
-  //       // dispatch(sellerOrdersFail(error.response.data.message));
-  //     }
-  //   };
-  //   fetchAllShopOrders();
-  // }, [dispatch]);
+  // **Process orders into rows for DataGrid**
+  const rows = orders.map((order) => ({
+    id: order._id,
+    createdAt: order.createdAt,
+    quantity:
+      order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
+      0,
+    method: order.payment?.method || "Unknown",
+    grandTotal: order.grandTotal ?? 0,
+    orderStatus: order.orderStatus || "Unknown",
+  }));
 
+  // **Columns for DataGrid**
   const columns = [
-    { field: "id", headerName: "Order ID", minWidth: 250, flex: 0.7 },
-
     {
-      field: "status",
-      headerName: "Status",
-      minWidth: 150,
-      flex: 0.7,
+      field: "createdAt",
+      headerName: "Order Date",
+      minWidth: 180,
+      flex: 0.8,
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"), // Format date
     },
     {
       field: "quantity",
-      headerName: "Quantity",
+      headerName: "Total Items",
       type: "number",
-      minWidth: 150,
-      flex: 0.7,
+      minWidth: 130,
+      flex: 0.6,
     },
-
     {
-      field: "total",
-      headerName: "Total",
-      type: "number",
+      field: "method",
+      headerName: "Payment Method",
       minWidth: 150,
       flex: 0.8,
     },
 
     {
-      field: " ",
-      flex: 1,
-      minWidth: 150,
-      headerName: "",
+      field: "grandTotal",
+      headerName: "Total Amount",
       type: "number",
-      sortable: false,
+      minWidth: 150,
+      flex: 0.8,
       renderCell: (params) => {
-        return (
-          <Link to={`/shop/order/${params.id}`}>
-            <RxArrowRight size={20} />
-          </Link>
-        );
+        return `$${(params.row.grandTotal ?? 0).toFixed(2)}`;
       },
+    },
+
+    {
+      field: "orderStatus",
+      headerName: "Order Status",
+      minWidth: 140,
+      flex: 0.7,
+      renderCell: (params) => (
+        <span
+          style={{
+            color: params.value === "Pending" ? "orange" : "green",
+            fontWeight: "bold",
+          }}
+        >
+          {params.value}
+        </span>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Details",
+      minWidth: 150,
+      flex: 0.7,
+      sortable: false,
+      renderCell: (params) => (
+        <Link to={`/shop/order/${params.id}`}>
+          <RxArrowRight size={20} />
+        </Link>
+      ),
     },
   ];
 
-  const row = [];
-
-  shopOrders &&
-    shopOrders.forEach((item) => {
-      row.push({
-        id: item._id,
-        quantity: item.cart.length,
-        total: "$ " + item.totalPrice,
-        status: item.status,
-      });
-    });
-
   return (
-    <div className="shop-orders-wrapper">
-      <DataGrid
-        rows={row}
-        columns={columns}
-        pageSize={10}
-        disableSelectionOnClick
-        autoHeight
-      />
+    <div style={{ padding: "20px" }}>
+      <h2>Your Orders</h2>
+
+      {loading ? (
+        <div>Loading orders...</div>
+      ) : error ? (
+        <div style={{ color: "red" }}>Error: {error}</div>
+      ) : orders.length === 0 ? (
+        <div>No orders found.</div>
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={10}
+          disableSelectionOnClick
+          autoHeight
+        />
+      )}
     </div>
   );
 };

@@ -19,7 +19,7 @@ const Events = () => {
       try {
         // dispatch(eventsShopFetchStart());
         const { data } = await axios.get(
-          `${API}/events/${currentSeller._id}/shop-events`
+          `${API}/events/${currentSeller?._id}/shop-events`
         );
         setEventsData(data.events);
         // dispatch(eventsShopFetchSuccess(data));
@@ -37,7 +37,7 @@ const Events = () => {
 
       <article className="event-cards-wrapper">
         {eventsData.length !== 0 &&
-          eventsData.map((event) => <EventCard data={event} key={event._id} />)}
+          eventsData.map((event) => <EventCard data={event} key={event?._id} />)}
         <h4>{eventsData?.length === 0 && 'New Events are coming soon!'}</h4>
       </article>
     </section>

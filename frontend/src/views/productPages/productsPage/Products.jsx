@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import Header from "../../../components/userLayout/header/Header";
-import Footer from "../../../components/userLayout/footer/Footer";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ProductCard from "../../../components/products/productCard/ProductCard";
 import { fetchAllProductsForAllShops } from "../../../redux/actions/product";
 import { clearProductErrors } from "../../../redux/reducers/productReducer";
@@ -10,8 +8,37 @@ import Loader from "../../../components/loader/Loader";
 import axios from "axios";
 import "./Products.scss";
 import { API } from "../../../utils/security/secreteKey";
+import SearchForm from "../../../components/search/SearchForm";
+import Header from "../../../components/layouts/header/Header";
+import Footer from "../../../components/layouts/footer/Footer";
 
 const Products = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // Get query parameters from URL
+
+  // ===================================================================================================================================================================
+  // This is an object that holds the values extracted directly from the URL when the component first mounts (or when the URL changes).
+  // It's essentially the initial set of values used to set the local state.
+  // ===================================================================================================================================================================
+  const queryParams = {
+    title: searchParams.get("title") || "",
+    shopName: searchParams.get("shopName") || "",
+    categoryName: searchParams.get("categoryName") || "",
+    subcategoryName: searchParams.get("subcategoryName") || "",
+    brandName: searchParams.get("brandName") || "",
+    customerCategory: searchParams.get("customerCategory") || "",
+    page: Number(searchParams.get("page")) || 1,
+  };
+
+  // ===================================================================================================================================================================
+  // This is the local state (useState) that keeps track of the current filter settings and pagination throughout the user’s interaction with the UI.
+  // query is what is used when you want to trigger an action to update the page or submit a search, because it reflects the most recent user choices (which could have changed after the page loaded).
+  // ===================================================================================================================================================================
+
+  const [query, setQuery] = useState(queryParams);
+
+  // Get products from the redux store
   const {
     loading,
     error,
@@ -19,21 +46,24 @@ const Products = () => {
     currentPage,
     totalPages,
   } = useSelector((state) => state.product);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  // State for query parameters
-  const [query, setQuery] = useState({
-    title: "",
-    shopName: "",
-    categoryName: "",
-    subcategoryName: "",
-    brandName: "",
-    customerCategory: "",
-    page: 1, // Start from page 1
-  });
+  console.log("Products:", products);
 
-  // State for dropdown options
+  // ===================================================================================================================================================================
+  // This useEffect is used to set up the initial state (queryParams) when the component loads or when the URL changes (because searchParams changes).
+  // It is also used here to populate the component's local state (query).
+  // ===================================================================================================================================================================
+  useEffect(() => {
+    setQuery(queryParams); // Set state when URL changes
+    dispatch(fetchAllProductsForAllShops(queryParams)); // Fetch products based on URL params
+
+    // Cleanup to clear errors when component unmounts or when query params change
+    return () => {
+      dispatch(clearProductErrors());
+    };
+  }, [searchParams]); // Trigger on URL change (searchParams change)
+
+  // Local state for dropdown options
   const [dropdownOptions, setDropdownOptions] = useState({
     shopNames: [],
     categoryNames: [],
@@ -41,7 +71,9 @@ const Products = () => {
     brandNames: [],
   });
 
-  // Fetch dropdown options from the backend
+  // ===================================================================================================================================================================
+  // Fetch dropdown options on component mount
+  // ===================================================================================================================================================================
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
@@ -67,14 +99,19 @@ const Products = () => {
     fetchDropdownData();
   }, []);
 
-  // Fetch products only on Search button click
+  // ===================================================================================================================================================================
+  // the query is used in handleSearch because it represents the current state of the search (filters and page), which could have been modified by the user.
+  // It ensures that you're submitting the latest state of filters and pagination when the user clicks the "Search" button.
+  // ===================================================================================================================================================================
   const handleSearch = () => {
     const queryString = new URLSearchParams(query).toString();
     navigate(`/products?${queryString}`);
-    dispatch(fetchAllProductsForAllShops(query)); // Fetch products only on search
+    dispatch(fetchAllProductsForAllShops(query));
   };
 
-  // Reset the search form
+  // ===================================================================================================================================================================
+  // Reset search form
+  // ===================================================================================================================================================================
   const handleReset = () => {
     const resetQuery = {
       title: "",
@@ -83,7 +120,7 @@ const Products = () => {
       subcategoryName: "",
       brandName: "",
       customerCategory: "",
-      page: 1, // Reset to page 1
+      page: 1,
     };
 
     setQuery(resetQuery);
@@ -91,7 +128,7 @@ const Products = () => {
     dispatch(fetchAllProductsForAllShops(resetQuery)); // Reset the product list
   };
 
-  // Handle input changes without fetching products
+  // Handle input changes
   const handleInputChange = (e) => {
     setQuery((prevQuery) => ({
       ...prevQuery,
@@ -99,17 +136,10 @@ const Products = () => {
     }));
   };
 
-  // Fetch all products on initial load only
-  useEffect(() => {
-    dispatch(fetchAllProductsForAllShops(query));
-
-    // Cleanup function to clear product errors on component unmount
-    return () => {
-      dispatch(clearProductErrors());
-    };
-  }, []); // Runs only once on mount
-
-  // Handle "See More Products" click (pagination)
+  // ===================================================================================================================================================================
+  // the query is used in handleSeeMore because it represents the current state of the search (filters and page), which could have been modified by the user.
+  // It ensures that you're submitting the latest state of filters and pagination when the user clicks the "See More Products" button.
+  // ===================================================================================================================================================================
   const handleSeeMore = () => {
     const nextPage = query.page + 1;
     const updatedQuery = { ...query, page: nextPage };
@@ -122,121 +152,43 @@ const Products = () => {
     <main className="products-page">
       <Header />
 
-      <section className="products-container">
-        {error && (
-          <p className="error-message" role="alert">
-            {`Error: ${error}`}
-          </p>
-        )}
+      <section className="products-page-container">
+        <h1 className="products-title">All Shops Products</h1>
 
-        <h1 className="products-title">Search Products</h1>
-
-        {/* Search bar */}
-        <div className="search-bar-container">
-          <div className="select-container">
-            <select
-              name="shopName"
-              value={query.shopName}
-              onChange={handleInputChange}
-            >
-              <option value="">Select Shop</option>
-              {dropdownOptions.shopNames.map((shop) => (
-                <option key={shop._id} value={shop.name}>
-                  {shop.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-container">
-            <select
-              name="categoryName"
-              value={query.categoryName}
-              onChange={handleInputChange}
-            >
-              <option value="">Select Category</option>
-              {dropdownOptions.categoryNames.map((category) => (
-                <option key={category._id} value={category.categoryName}>
-                  {category.categoryName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-container">
-            <select
-              name="subcategoryName"
-              value={query.subcategoryName}
-              onChange={handleInputChange}
-            >
-              <option value="">Select Subcategory</option>
-              {dropdownOptions.subcategoryNames.map((subcategory) => (
-                <option
-                  key={subcategory._id}
-                  value={subcategory.subcategoryName}
-                >
-                  {subcategory.subcategoryName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-container">
-            <select
-              name="brandName"
-              value={query.brandName}
-              onChange={handleInputChange}
-            >
-              <option value="">Select Brand</option>
-              {dropdownOptions.brandNames.map((brand) => (
-                <option key={brand._id} value={brand.brandName}>
-                  {brand.brandName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-container">
-            <select
-              name="customerCategory"
-              value={query.customerCategory}
-              onChange={handleInputChange}
-            >
-              <option value="">All Categories</option>
-              <option value="Ladies">Ladies</option>
-              <option value="Gents">Gents</option>
-              <option value="Kids">Kids</option>
-            </select>
-          </div>
-
-          <div className="button-container">
-            <button onClick={handleSearch}>Search</button>
-            <button onClick={handleReset} type="button" className="reset-btn">
-              Reset
-            </button>
-          </div>
-        </div>
+        {/* Search bar form component */}
+        <SearchForm
+          query={query}
+          products={products}
+          dropdownOptions={dropdownOptions}
+          handleInputChange={handleInputChange}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
 
         {loading && (
           <Loader isLoading={loading} message="Loading products..." size={80} />
         )}
 
-        {/* Products list */}
-        <article className="products-wrapper">
-          {!loading && Array.isArray(products) && products.length > 0 ? (
-            products.map((product) => (
-              <ProductCard product={product} key={product._id} />
-            ))
-          ) : (
-            <h2 className="no-products-message">
-              {Object.values(query).some((value) => value)
-                ? "No products found related to your query."
-                : "No products available."}
-            </h2>
-          )}
-        </article>
+        {!loading && error && <p className="error-msg">{error}</p>}
 
-        {/* Show "See More Products" button */}
+        {!loading &&
+          !error &&
+          Array.isArray(products) &&
+          products.length > 0 && (
+            <article className="products-wrapper">
+              {products.map((product) => (
+                <ProductCard product={product} key={product._id} />
+              ))}
+            </article>
+          )}
+
+        {!loading && !error && products.length === 0 && (
+          <p className="no-products-msg">
+            No products found related to your query. Please try again.
+          </p>
+        )}
+
+        {/* "See More Products" Button */}
         {currentPage < totalPages ? (
           <div className="see-more-container">
             <button

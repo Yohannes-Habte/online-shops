@@ -1,8 +1,8 @@
-import React from 'react';
+
 import './AdminDashboardWithdraws.scss';
-import AdminSidebar from '../../../components/admin/adminSidebar/AdminSidebar';
 import AllShopsWithdraws from '../../../components/admin/allShopsWithdraws/AllShopsWithdraws';
 import AdminHeader from '../../../components/admin/adminHeader/AdminHeader';
+import AdminSidebar from '../../../components/layouts/adminSidebar/AdminSidebar';
 
 const AdminDashboardWithdraws = () => {
   return (

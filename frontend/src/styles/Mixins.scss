@@ -90,16 +90,21 @@
 }
 
 @mixin inputField {
-  display: block;
   width: 100%;
-  font-size: 1rem;
-  border: none;
-  border: 1px solid $field-bg;
+  padding: 0.7rem 1.8rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
   outline: none;
-  background-color: transparent;
-  padding: 1rem 1rem 1rem 2rem;
-  margin-bottom: 0.5rem;
-  border-radius: $radius;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #007bff;
+  }
+
+  &.input-field[type="date"] {
+    padding: 8px 40px;
+  }
 }
 
 // Four types of buttons
@@ -514,7 +519,6 @@
   align-items: center;
   gap: 1rem;
 }
-
 
 // ==============================================================================================
 // Form input and label styling

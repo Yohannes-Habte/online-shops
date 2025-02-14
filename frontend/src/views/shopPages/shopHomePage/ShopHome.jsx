@@ -1,13 +1,14 @@
 import "./ShopHome.scss";
-import HeaderDashboard from "../../../components/shopDashboard/headerDashboard/HeaderDashboard";
 import ShopBiodata from "../../../components/shop/shopBiodata/ShopBiodata";
 import ShopInfo from "../../../components/shop/shopInfo/ShopInfo";
-import Footer from "../../../components/userLayout/footer/Footer";
+import Footer from "../../../components/layouts/footer/Footer";
+import ShopHeader from "../../../components/layouts/shopHeader/ShopHeader";
+
 
 const ShopHome = () => {
   return (
     <main className="shop-home-page">
-      <HeaderDashboard isOwner={true} />
+      <ShopHeader isOwner={true} />
       <section className="shop-home-container">
         <ShopBiodata />
         <ShopInfo />

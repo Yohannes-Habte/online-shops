@@ -21,7 +21,7 @@ const verifyToken = (token) => {
 //====================================================================
 
 export const isSellerAuthenticated = (req, res, next) => {
-  const token = req.cookies.shopToken
+  const token = req.cookies.shop_token
 
   if (!token) {
     return next(createError(401, "Seller is not authenticated!"));
@@ -42,7 +42,7 @@ export const isSellerAuthenticated = (req, res, next) => {
 //====================================================================
 
 export const isOwnerOrAdmin = async (req, res, next) => {
-  const token = req.cookies.shopToken;
+  const token = req.cookies.shop_token;
 
   if (!token) {
     return next(createError(401, "Not authenticated!"));
@@ -83,7 +83,7 @@ export const isOwnerOrAdmin = async (req, res, next) => {
 
 const checkRole = (role) => {
   return async (req, res, next) => {
-    const token = req.cookies.shopToken;
+    const token = req.cookies.shop_token;
 
     if (!token) {
       return next(createError(401, "Not authenticated!"));

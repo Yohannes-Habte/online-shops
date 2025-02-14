@@ -63,7 +63,8 @@ const sellerReducer = createSlice({
     logoutSellerStart: setLoading,
     logoutSellerSuccess: (state) => {
       state.currentSeller = null;
-      setSuccess(state);
+      state.loading = false;
+      state.error = null;
     },
     logoutSellerFailure: setError,
 
@@ -91,8 +92,18 @@ const sellerReducer = createSlice({
     },
     getAllSellersFailed: setError,
 
+    // Update Seller Balance (New action to update available balance)
+    updateShopStatusStart: setLoading,
+    updateShopStatusBalance: (state, action) => {
+      if (state.currentSeller) {
+        state.currentSeller.availableBalance = action.payload;
+      }
+      setSuccess(state);
+    },
+    updateShopStatusFailure: setError,
+
     // Clear Errors
-    clearErrors: (state) => {
+    clearShopErrors: (state) => {
       state.error = null;
     },
   },
@@ -132,7 +143,11 @@ export const {
   getAllSellersSuccess,
   getAllSellersFailed,
 
-  clearErrors,
+  updateShopStatusStart,
+  updateShopStatusBalance,
+  updateShopStatusFailure,
+
+  clearShopErrors,
 } = sellerReducer.actions;
 
 export default sellerReducer.reducer;

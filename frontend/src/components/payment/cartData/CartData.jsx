@@ -22,12 +22,6 @@ const CartData = ({ orderData }) => {
         </p>
       </article>
 
-      <article className="box shipping-price">
-        <h3 className="cart-data-subTitle">Service Charge:</h3>
-        <p className="cart-data-paragraph">
-          ${orderData?.serviceCharge?.toFixed(2)}
-        </p>
-      </article>
 
       <article className="box discount-price">
         <h3 className="cart-data-subTitle">Discount:</h3>

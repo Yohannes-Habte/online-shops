@@ -10,9 +10,6 @@ import {
   updateSellerStart,
   updateSellerSuccess,
   updateSellerFailure,
-  logoutSellerStart,
-  logoutSellerSuccess,
-  logoutSellerFailure,
   deleteSellerStart,
   deleteSellerSuccess,
   deleteSellerFailure,
@@ -25,15 +22,15 @@ import {
   getAllSellersRequest,
   getAllSellersSuccess,
   getAllSellersFailed,
-  clearErrors,
+  clearShopErrors,
 } from "../reducers/sellerReducer";
 import { API } from "../../utils/security/secreteKey";
 import { toast } from "react-toastify";
 import { handleError } from "../../utils/errorHandler/ErrorMessage";
 
-//==============================================================================
+//=========================================================================
 // Action to create a new seller
-//==============================================================================
+//=========================================================================
 
 export const createNewShop = (credentials) => async (dispatch) => {
   try {
@@ -46,15 +43,23 @@ export const createNewShop = (credentials) => async (dispatch) => {
     const newShop = res.data.shop;
     dispatch(sellerSignUpSuccess(newShop));
     toast.success("Shop created successfully!");
+
+    const token = res.data?.myToken;
+    console.log("token", token);
+    Cookies.set("token", token, {
+      expires: 1,
+      secure: true, // This should be true if served over HTTPS
+      sameSite: "strict",
+    });
   } catch (error) {
     const { message } = handleError(error);
     dispatch(sellerSignUpFailure(message));
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to log in a seller
-//==============================================================================
+//=========================================================================
 export const loginShopOwner = (credentials) => async (dispatch) => {
   try {
     dispatch(loginSellerStart());
@@ -67,7 +72,8 @@ export const loginShopOwner = (credentials) => async (dispatch) => {
     dispatch(loginSellerSuccess(myShop));
     toast.success("Seller logged in successfully!");
 
-    const token = res.data?.token;
+    const token = res.data?.myToken;
+    console.log("token", token);
     Cookies.set("token", token, {
       expires: 1,
       secure: true, // This should be true if served over HTTPS
@@ -79,9 +85,9 @@ export const loginShopOwner = (credentials) => async (dispatch) => {
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to get seller details
-//==============================================================================
+//=========================================================================
 export const fetchSingleSeller = () => async (dispatch) => {
   try {
     dispatch(getSellerStart());
@@ -94,11 +100,11 @@ export const fetchSingleSeller = () => async (dispatch) => {
 
     const res = await axios.get(`${API}/shops/shop`, { withCredentials: true });
 
-    if (!res.data || !res.data.seller) {
+    if (!res.data || !res.data.shop) {
       throw new Error("Seller data not found");
     }
 
-    const shopDetails = res.data.seller;
+    const shopDetails = res.data.shop;
 
     dispatch(getSellerSuccess(shopDetails));
   } catch (error) {
@@ -127,26 +133,9 @@ export const updateSeller = (sellerData) => async (dispatch) => {
   }
 };
 
-//==============================================================================
-// Action to log out a seller
-//==============================================================================
-export const logoutSeller = () => async (dispatch) => {
-  try {
-    dispatch(logoutSellerStart());
-
-    await axios.post(`${API}/shops/logout`, {}, { withCredentials: true });
-
-    dispatch(logoutSellerSuccess());
-    toast.success("Seller logged out successfully!");
-  } catch (error) {
-    const { message } = handleError(error);
-    dispatch(logoutSellerFailure(message));
-  }
-};
-
-//==============================================================================
+//=========================================================================
 // Action to delete a seller
-//==============================================================================
+//=========================================================================
 export const deleteSeller = () => async (dispatch) => {
   try {
     dispatch(deleteSellerStart());
@@ -161,9 +150,9 @@ export const deleteSeller = () => async (dispatch) => {
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to delete a payment method
-//==============================================================================
+//=========================================================================
 export const deletePaymentMethod = (paymentMethodId) => async (dispatch) => {
   try {
     dispatch(deletePaymentMethodRequest());
@@ -182,9 +171,9 @@ export const deletePaymentMethod = (paymentMethodId) => async (dispatch) => {
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to get all sellers (Admin only)
-//==============================================================================
+//=========================================================================
 export const getAllSellers = () => async (dispatch) => {
   try {
     dispatch(getAllSellersRequest());
@@ -201,9 +190,9 @@ export const getAllSellers = () => async (dispatch) => {
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to clear errors
-//==============================================================================
+//=========================================================================
 export const clearSellerErrors = () => (dispatch) => {
-  dispatch(clearErrors());
+  dispatch(clearShopErrors());
 };

@@ -208,7 +208,7 @@ const Login = () => {
         {/* Do not have an account, Sign Up */}
         <p className="have-no-account">
           {"Don't have an account?"}
-          <Link className="sign-up" to="/signup">
+          <Link className="sign-up" to="/register">
             Sign Up
           </Link>
         </p>

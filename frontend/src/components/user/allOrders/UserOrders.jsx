@@ -13,18 +13,17 @@ const UserOrders = () => {
   const { customerOrders } = useSelector((state) => state.order);
   const { data: orders = [], loading, error } = customerOrders || {};
 
-
   useEffect(() => {
-    dispatch(clearErrors("customerOrders")); // Ensure errors are cleared before fetching
+    dispatch(clearErrors()); // Ensure errors are cleared before fetching
 
     dispatch(fetchCustomerOrders());
 
     return () => {
-      dispatch(clearErrors("customerOrders")); // Cleanup errors when unmounting
+      dispatch(clearErrors()); // Cleanup errors when unmounting
     };
   }, [dispatch]);
 
-  // **Process orders into rows for DataGrid**const rows = orders.map((order) => ({
+  // **Process orders into rows for DataGrid**
   const rows = orders.map((order) => ({
     id: order._id,
     createdAt: order.createdAt,
@@ -32,11 +31,9 @@ const UserOrders = () => {
       order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
       0,
     method: order.payment?.method || "Unknown",
-    grandTotal: order.grandTotal ?? 0, // Ensure it's always a number
+    grandTotal: order.grandTotal ?? 0,
     orderStatus: order.orderStatus || "Unknown",
   }));
-
-  console.log("✅ Final Rows Data:", rows);
 
   // **Columns for DataGrid**
   const columns = [
@@ -96,7 +93,7 @@ const UserOrders = () => {
       sortable: false,
       renderCell: (params) => (
         <Link
-          to={`/user/order/${params.id}`}
+          to={`/orders/${params.id}`}
           style={{ textDecoration: "none" }}
         >
           <RxArrowRight size={20} />

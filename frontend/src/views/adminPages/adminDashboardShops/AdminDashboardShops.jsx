@@ -1,8 +1,9 @@
-import React from 'react';
+
 import './AdminDashboardShops.scss';
-import AdminSidebar from '../../../components/admin/adminSidebar/AdminSidebar';
+
 import AllShops from '../../../components/admin/allShops/AllShops';
 import AdminHeader from '../../../components/admin/adminHeader/AdminHeader';
+import AdminSidebar from '../../../components/layouts/adminSidebar/AdminSidebar';
 
 const AdminDashboardShops = () => {
   return (

@@ -1,8 +1,8 @@
-import React from 'react';
+
 import './PaymentPage.scss';
-import Header from '../../../components/userLayout/header/Header';
-import Footer from '../../../components/userLayout/footer/Footer';
 import PaymentMethod from '../../../components/payment/paymentMethod/PaymentMethod';
+import Header from '../../../components/layouts/header/Header';
+import Footer from '../../../components/layouts/footer/Footer';
 
 const PaymentPage = () => {
   return (

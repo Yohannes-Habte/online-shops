@@ -1,0 +1,152 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.admin-dashboard-sidebar-wrapper {
+  width: 17%;
+  background-color: $sidebar-bg;
+
+  .admin-hamburger-menu {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: $afs;
+    z-index: 9999;
+  }
+
+  // Big screens
+  .admin-dashboard-menu-container {
+    min-height: 100vh;
+    .admin-dashboard-sidebar-title {
+      @include subTitle;
+    }
+
+    .admin-dashboard-sidebar-item {
+      @include flexRow;
+      @include shadow1;
+      align-items: center;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $sidebar-hover;
+      }
+
+      .active-icon {
+        color: $red;
+        font-size: $afs;
+      }
+
+      .passive-icon {
+        color: $iconColor;
+        font-size: $afs;
+
+        &:hover {
+          color: $red;
+        }
+      }
+
+      .active-text {
+        color: $red;
+      }
+
+      .passive-text {
+        color: $black;
+
+        &:hover {
+          color: $red;
+        }
+      }
+    }
+  }
+}
+
+// Small screens
+.admin-dashboard-sidebar-wrapper.admin-hamburger-menu-opened {
+  .admin-dashboard-menu-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 3rem;
+    left: 0rem;
+    background-color: $userSidebar-bg;
+    width: 100%;
+    min-height: 100vh;
+    padding: 1rem 2rem;
+    z-index: 9999;
+  }
+  .admin-dashboard-sidebar-item {
+    display: flex;
+
+    .active-icon {
+      color: $red;
+      font-size: $nfs;
+    }
+
+    .passive-icon {
+      font-size: $nfs;
+    }
+
+    .active-text {
+      color: $red;
+      font-size: $sfs;
+    }
+
+    .passive-text {
+      font-size: $sfs;
+    }
+  }
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .admin-dashboard-sidebar-wrapper {
+    .admin-hamburger-menu {
+      font-size: $afs;
+    }
+    .admin-dashboard-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .admin-dashboard-sidebar-wrapper {
+    .admin-sidebar-hamburger-menu {
+      font-size: $afs;
+    }
+    .admin-dashboard-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-sidebar-wrapper {
+    .admin-sidebar-hamburger-menu {
+      font-size: $afs;
+    }
+    .admin-dashboard-menu-container {
+      display: none;
+    }
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .admin-dashboard-sidebar-wrapper {
+    .admin-sidebar-hamburger-menu {
+      font-size: $lfs;
+    }
+    .admin-dashboard-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+  .admin-hamburger-menu {
+    display: none;
+  }
+}

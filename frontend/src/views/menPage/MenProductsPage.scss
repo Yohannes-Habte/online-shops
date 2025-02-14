@@ -1,0 +1,19 @@
+.men-products-page {
+    .men-products-page-container {
+      width: 80%;
+      margin: 2rem auto;
+  
+      .men-products-page-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+  
+      .men-products-wrapper {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 1rem;
+        row-gap: 1rem;
+      }
+    }
+  }
+  

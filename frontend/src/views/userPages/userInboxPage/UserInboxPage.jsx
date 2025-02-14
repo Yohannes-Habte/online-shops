@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./UserInboxPage.scss";
-import Header from "../../../components/userLayout/header/Header";
 import UserInbox from "../../../components/user/userInbox/UserInbox";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -11,6 +10,8 @@ import socketIO from "socket.io-client";
 import { format } from "timeago.js";
 import MessageList from "../../../components/user/userMessageList/MessageList";
 import { API } from "../../../utils/security/secreteKey";
+import Header from "../../../components/layouts/header/Header";
+import Footer from "../../../components/layouts/footer/Footer";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -236,6 +237,7 @@ const UserInboxPage = () => {
           )}
         </div>
       </section>
+      <Footer />
     </main>
   );
 };

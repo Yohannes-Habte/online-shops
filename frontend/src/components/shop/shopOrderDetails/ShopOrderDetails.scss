@@ -1,456 +1,192 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
 
-.order-detail-wrapper {
-  @include mobileDashboardScreen;
 
-  .order-details-list-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+.shop-order-details {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 
-    .subTitle {
-      @include subTitle;
-      font-size: $one;
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333;
     }
 
-    .order-list {
-      @include button1;
-      font-size: $one;
-
-      .link {
-        color: $white;
-        font-weight: $aafw;
-        font-size: $one;
-      }
-    }
-  }
-  .order-id-and-date {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    .order-id {
-      @include paragraph;
-      color: $gray;
-      font-size: $one;
-    }
-
-    .order-placed-date {
-      color: $blue;
-      font-size: $one;
+    p {
+      font-size: 1rem;
+      color: #666;
+      margin-top: 0.5rem;
     }
   }
 
-  // Order items
-  .order-items-wrapper {
-    @include productsGrid;
+  .ordered-items {
+    margin-bottom: 2rem;
 
-    .order {
-      @include shadow3;
-
-      .image-container {
-        .image {
-          @include image;
-        }
-      }
-
-      .name-and-quantity {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        font-size: $one;
-        padding: 0 0.5rem;
-      }
-    }
-  }
-
-  .hr {
-    @include hr;
-  }
-
-  // Total price
-  .total-price {
-    text-align: right;
-    font-size: $one;
-  }
-
-  // Shipping address and payment status
-  .shipping-address-and-payment-wrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    @include shadow3;
-    margin: 1rem 0;
-
-    // Shipping -address
-    .shipping-address-wrapper {
-      .shipping-address-title {
-        @include subTitle;
-        font-size: $one;
-      }
-      .address {
-        font-size: $one;
-        padding-left: 0.5rem;
-
-        .addrress-span {
-          margin-left: $radius;
-          color: $blue;
-        }
-      }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #444;
     }
 
-    // Payment info status
-    .payment-info-status {
-      @include subTitle;
-      font-size: $one;
-
-      .status-result {
-        font-size: $one;
-        color: $blue;
-        font-weight: $afw;
-      }
-    }
-  }
-
-  // Order Processing and refunding
-  .order-status {
-    @include subTitle;
-    font-size: $one;
-  }
-
-  .form-process-and-refund-order {
-    .section-order-process {
-      @include inputField;
+    .product-card {
+      display: grid;
+      grid-template-columns:repeat(2, 1fr); 
+      align-items: center;
       padding: 1rem;
-      font-size: $one;
-      cursor: pointer;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1rem;
 
-      .option-order-process {
-        color: $blue;
+      img {
+        width: 380px;
+        height: 380px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      div {
+        flex: 1;
+
+        h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #333;
+        }
+
+        p {
+          font-size: 0.9rem;
+          color: #666;
+          margin: 0.3rem 0;
+        }
+      }
+    }
+  }
+
+  .order-summary-and-shipping-address {
+    @include shadow1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    box-shadow: 0px 4px 10px #0000001a;
+    padding: 1rem 1rem 0 1rem;
+  }
+
+  .order-summary,
+  .shipping-address,
+  .order-processing,
+  .reviews {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .order-update-processing {
+    @include shadow1;
+    margin: 1rem 0;
+    .order-status-form {
+      display: flex;
+      flex-direction: column;
+
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      
+      .input-icon {
+        position: absolute;
+        left: 10px;
+        font-size: 1.2rem;
+        color: #555;
+      }
+      
+      .input-container select,
+      .input-container textarea {
+       @include inputField;
+      }
+      
+
+      button {
+        background: #007bff;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
 
         &:hover {
-          color: $red;
-          background-color: $popup-bg;
+          background: #0056b3;
         }
 
-        &::before {
-          content: '>';
-          padding-right: 10px;
-          padding-left: 5px;
+        &:disabled {
+          background: #aaa;
+          cursor: not-allowed;
         }
       }
     }
   }
 
-  .update-status-btn {
-    @include button1;
-    width: fit-content;
-    font-size: $one;
+  .refund-order-processing-container {
+    @include shadow1;
   }
-}
 
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .order-detail-wrapper {
-    @include tabletDashboardScreen;
+  .reviews {
+    .review {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
 
-    .order-details-list-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      .subTitle {
-        @include subTitle;
-        font-size: $one;
+      p {
+        margin: 0.3rem 0;
       }
 
-      .order-list {
-        @include button1;
-        font-size: $one;
-
-        .link {
-          color: $white;
-          font-weight: $aafw;
-          font-size: $one;
-        }
+      strong {
+        color: #222;
       }
-    }
-    .order-id-and-date {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      .order-id {
-        @include paragraph;
-        color: $gray;
-        font-size: $one;
-      }
-
-      .order-placed-date {
-        color: $blue;
-        font-size: $one;
-      }
-    }
-
-    // Order items
-    .order-items-wrapper {
-      @include productsGrid;
-
-      .order {
-        @include shadow3;
-
-        .image-container {
-          .image {
-            @include image;
-          }
-        }
-
-        .name-and-quantity {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
-          font-size: $one;
-          padding: 0 0.5rem;
-        }
-      }
-    }
-
-    .hr {
-      @include hr;
-    }
-
-    // Total price
-    .total-price {
-      text-align: right;
-      font-size: $one;
-    }
-
-    // Shipping address and payment status
-    .shipping-address-and-payment-wrapper {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      @include shadow3;
-      margin: 1rem 0;
-
-      // Shipping -address
-      .shipping-address-wrapper {
-        .shipping-address-title {
-          @include subTitle;
-          font-size: $one;
-        }
-        .address {
-          font-size: $one;
-          padding-left: 0.5rem;
-
-          .addrress-span {
-            margin-left: $radius;
-            color: $blue;
-          }
-        }
-      }
-
-      // Payment info status
-      .payment-info-status {
-        @include subTitle;
-        font-size: $one;
-
-        .status-result {
-          font-size: $one;
-          color: $blue;
-          font-weight: $afw;
-        }
-      }
-    }
-
-    // Order Processing and refunding
-    .order-status {
-      @include subTitle;
-      font-size: $one;
-    }
-
-    .form-process-and-refund-order {
-      .section-order-process {
-        @include inputField;
-        padding: 1rem;
-        font-size: $one;
-        cursor: pointer;
-
-        .option-order-process {
-          color: $blue;
-
-          &:hover {
-            color: $red;
-            background-color: $popup-bg;
-          }
-
-          &::before {
-            content: '>';
-            padding-right: 10px;
-            padding-left: 5px;
-          }
-        }
-      }
-    }
-
-    .update-status-btn {
-      @include button1;
-      width: fit-content;
-      font-size: $one;
     }
   }
 }
 
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {
-  .order-detail-wrapper {
-    @include desktopDashboardScreen;
-    .order-details-list-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .shop-order-details {
+    padding: 1.5rem;
 
-      .subTitle {
-        @include subTitle;
-      }
+    .ordered-items {
+      .product-card {
+        flex-direction: column;
+        align-items: flex-start;
 
-      .order-list {
-        @include button1;
-
-        .link {
-          color: $white;
-          font-weight: $aafw;
-        }
-      }
-    }
-    .order-id-and-date {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      .order-id {
-        @include paragraph;
-        color: $gray;
-      }
-
-      .order-placed-date {
-        color: $blue;
-      }
-    }
-
-    // Order items
-    .order-items-wrapper {
-      @include productsGrid;
-
-      .order {
-        @include shadow3;
-
-        .image-container {
-          .image {
-            @include image;
-          }
-        }
-
-        .name-and-quantity {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
-          font-size: $afs;
-          padding: 0 0.5rem;
+        img {
+          width: 100%;
+          max-width: 200px;
+          height: auto;
         }
       }
     }
 
-    .hr {
-      @include hr;
-    }
-
-    // Total price
-    .total-price {
-      text-align: right;
-    }
-
-    // Shipping address and payment status
-    .shipping-address-and-payment-wrapper {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      @include shadow3;
-      margin: 1rem 0;
-
-      // Shipping -address
-      .shipping-address-wrapper {
-        .shipping-address-title {
-          @include subTitle;
-        }
-        .address {
-          font-size: $afs;
-          padding-left: 0.5rem;
-
-          .addrress-span {
-            margin-left: $radius;
-            color: $blue;
-          }
-        }
+    .order-processing {
+      form {
+        flex-direction: column;
+        align-items: flex-start;
       }
-
-      // Payment info status
-      .payment-info-status {
-        @include subTitle;
-
-        .status-result {
-          font-size: $afs;
-          color: $blue;
-          font-weight: $afw;
-        }
-      }
-    }
-
-    // Order Processing and refunding
-    .order-status {
-      @include subTitle;
-    }
-
-    .form-process-and-refund-order {
-      .section-order-process {
-        @include inputField;
-        padding: 1rem;
-        font-size: $afs;
-        cursor: pointer;
-
-        .option-order-process {
-          color: $blue;
-
-          &:hover {
-            color: $red;
-            background-color: $popup-bg;
-          }
-
-          &::before {
-            content: '>';
-            padding-right: 10px;
-            padding-left: 5px;
-          }
-        }
-      }
-    }
-
-    .update-status-btn {
-      @include button1;
-      width: fit-content;
     }
   }
 }

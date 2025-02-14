@@ -1,9 +1,9 @@
-import React from 'react';
+
 import './OrderSuccess.scss';
-import Header from '../../../components/userLayout/header/Header';
-import Footer from '../../../components/userLayout/footer/Footer';
 import { useSelector } from 'react-redux';
 import PageLoader from '../../../utils/loader/PageLoader';
+import Header from '../../../components/layouts/header/Header';
+import Footer from '../../../components/layouts/footer/Footer';
 
 const OrderSuccess = () => {
   // Global state variables

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleSeller } from "../../../redux/actions/seller";
 import LogoutShowOwner from "../../../utils/globalFunctions/LogoutShopOwner";
+import ShopProducts from "../../../hooks/ShopProducts";
 
 const ShopBiodata = () => {
   // Global state variables
@@ -12,6 +13,10 @@ const ShopBiodata = () => {
 
   const { currentSeller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
+
+  const { shopProducts, error, loading } = ShopProducts();
+
+  console.log("Shop Products", shopProducts);
 
   // Shop owner Details
   useEffect(() => {
@@ -23,24 +28,44 @@ const ShopBiodata = () => {
     await sellerSignOut();
   };
 
-  // Provide a fallback for when `products` is temporarily undefined or null
-  const totalReviewsLength = Array.isArray(products) && products.length > 0
-  ? products.reduce((acc, product) => acc + product.reviews.length, 0)
-  : 0;
+  // Shop Ratings calculation using reduce method
+  /** 
+  const totalReviewsLength =
+    Array.isArray(shopProducts) && shopProducts.length > 0
+      ? shopProducts.reduce((acc, product) => acc + product.reviews.length, 0)
+      : 0;
 
-const totalRatings = Array.isArray(products) && products.length > 0
-  ? products.reduce(
-      (acc, product) =>
-        acc +
-        (Array.isArray(product.reviews) 
-          ? product.reviews.reduce((sum, review) => sum + (review.rating || 0), 0) 
-          : 0),
-      0
-    )
-  : 0;
+  const totalRatings =
+    Array.isArray(shopProducts) && shopProducts.length > 0
+      ? shopProducts.reduce(
+          (acc, product) =>
+            acc +
+            (Array.isArray(product.reviews)
+              ? product.reviews.reduce(
+                  (sum, review) => sum + (review.rating || 0),
+                  0
+                )
+              : 0),
+          0
+        )
+      : 0;
 
-const averageRating = totalReviewsLength > 0 ? totalRatings / totalReviewsLength : 0;
+  const averageRating =
+    totalReviewsLength > 0 ? totalRatings / totalReviewsLength : 0;
+    */
 
+  // Shop Ratings calculation using forEach method
+  let totalRating = 0;
+  let totalReviews = 0;
+
+  shopProducts.forEach((product) => {
+    product.reviews.forEach((review) => {
+      totalRating += review.rating;
+      totalReviews++;
+    });
+  });
+
+  const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
 
   return (
     <div className="shop-biodata-container">
@@ -73,7 +98,13 @@ const averageRating = totalReviewsLength > 0 ? totalRatings / totalReviewsLength
 
       <article className="article-box">
         <h3 className="subTitle">Shop Ratings</h3>
-        <p className="text average"> {averageRating} </p>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          <p className="text average"> {averageRating} </p>
+        )}
       </article>
 
       <article className="article-box">

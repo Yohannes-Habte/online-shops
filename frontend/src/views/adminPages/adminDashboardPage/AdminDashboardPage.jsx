@@ -1,8 +1,8 @@
 
 import './AdminDashboardPage.scss';
-import AdminSidebar from '../../../components/admin/adminSidebar/AdminSidebar';
 import AdminDashboardOverview from '../../../components/admin/adminDashboardOverview/AdminDashboardOverview';
 import AdminHeader from '../../../components/admin/adminHeader/AdminHeader';
+import AdminSidebar from '../../../components/layouts/adminSidebar/AdminSidebar';
 
 const AdminDashboardPage = () => {
   return (

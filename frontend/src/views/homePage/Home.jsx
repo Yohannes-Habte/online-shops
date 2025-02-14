@@ -1,11 +1,12 @@
 import "./Home.scss";
-import FeaturedProducts from "../../components/products/featuredProducts/FeaturedProducts";
-import BestDealProducts from "../../components/products/bestDealProducts/BestDealProducts";
 import Events from "../../components/events/events/Events";
-import Header from "../../components/userLayout/header/Header";
-import Footer from "../../components/userLayout/footer/Footer";
+import Header from "../../components/layouts/header/Header";
 import Hero from "../../components/heroSection/Hero";
 import ServiceInformation from "../../components/serviceInfo/ServiceInformation";
+import WomenProducts from "../../components/products/womenProducts/WomenProducts";
+import MenProducts from "../../components/products/menProducts/MenProducts";
+import KidsProducts from "../../components/products/kidsProducts/KidsProducts";
+import Footer from "../../components/layouts/footer/Footer";
 
 const Home = () => {
   return (
@@ -16,11 +17,14 @@ const Home = () => {
 
         <ServiceInformation />
 
-        <BestDealProducts />
+        <WomenProducts />
+
+        <MenProducts />
+
+        <KidsProducts />
 
         <Events />
 
-        <FeaturedProducts />
       </section>
 
       <Footer />

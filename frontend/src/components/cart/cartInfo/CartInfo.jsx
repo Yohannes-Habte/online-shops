@@ -1,6 +1,6 @@
 import "./CartInfo.scss";
 
-const CartInfo = ({ subTotal, shippingFee, totalPrice, discount, serviceCharge }) => {
+const CartInfo = ({ subTotal, shippingFee, tax, totalPrice, discount }) => {
   return (
     <section className="cart-info-wrapper">
       <h2 className="cart-info-title"> Price Summary</h2>
@@ -16,16 +16,16 @@ const CartInfo = ({ subTotal, shippingFee, totalPrice, discount, serviceCharge }
         <p className="outcome">${shippingFee.toFixed(2)}</p>
       </article>
 
-      {/* Discount */}
+      {/* Shipping Cost */}
       <article className="info-container">
-        <h3 className="subTitle">Discount Price:</h3>
-        <p className="outcome"> ${discount ? discount.toFixed(2) : 1} </p>
+        <h3 className="subTitle">Tax Charge:</h3>
+        <p className="outcome">${tax.toFixed(2)}</p>
       </article>
 
       {/* Discount */}
       <article className="info-container">
-        <h3 className="subTitle">Service Charge:</h3>
-        <p className="outcome"> ${serviceCharge ? serviceCharge.toFixed(2) : 1} </p>
+        <h3 className="subTitle">Discount Price:</h3>
+        <p className="outcome"> ${discount ? discount.toFixed(2) : 1} </p>
       </article>
 
       {/* Total Price */}

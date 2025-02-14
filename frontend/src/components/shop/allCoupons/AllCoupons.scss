@@ -23,20 +23,22 @@
   }
 
   .create-coupon-code-form-wrapper {
+    @include flexCenter;
     position: fixed;
     top: 0;
     left: 0;
     background-color: $popup-display-bg;
     width: 100%;
     height: 100%;
-    @include flexCenter;
+   
 
     .form {
+      @include shadow1;
       position: relative;
       width: 50%;
       margin: auto;
       background-color: $white;
-      @include shadow1;
+    
 
       .close-icon {
         position: absolute;
@@ -51,8 +53,9 @@
       }
 
       .input-container {
-        position: relative;
         @include inputContainer;
+        position: relative;
+       
 
         .input-field {
           @include inputField;
@@ -225,7 +228,7 @@
   }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
   .coupons-wrapper {
     @include desktopDashboardScreen;

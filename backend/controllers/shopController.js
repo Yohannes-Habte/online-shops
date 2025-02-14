@@ -5,6 +5,7 @@ import sellerToken from "../middleware/shopToken.js";
 import shopSendEmail from "../utils/shopSendEmail.js";
 import crypto from "crypto";
 import generateShopToken from "../middleware/shopToken.js";
+import mongoose from "mongoose";
 
 //=========================================================================
 // Create a seller
@@ -46,7 +47,7 @@ export const createShop = async (req, res, next) => {
 
     const token = generateShopToken(newShop);
     return res
-      .cookie("shopToken", token, {
+      .cookie("shop_token", token, {
         path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -88,10 +89,10 @@ export const loginSeller = async (req, res, next) => {
       const { password, ...rest } = seller._doc;
 
       // generate login shop token
-      const token = sellerToken(seller);
+      const token = generateShopToken(seller);
 
       return res
-        .cookie("shopToken", token, {
+        .cookie("shop_token", token, {
           path: "/",
           httpOnly: true,
           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -99,7 +100,7 @@ export const loginSeller = async (req, res, next) => {
           secure: true,
         })
         .status(201)
-        .json({ success: true, shop: rest, token: token });
+        .json({ success: true, shop: rest, myToken: token });
     }
   } catch (error) {
     console.log(error);
@@ -112,18 +113,13 @@ export const loginSeller = async (req, res, next) => {
 //=========================================================================
 export const sellerLogout = async (req, res, next) => {
   try {
-    res.cookie("shopToken", null, {
-      httpOnly: true,
-      expires: new Date(0),
-      sameSite: "none",
-      secure: true,
-    });
-    res.status(201).json({
+    res.clearCookie("shop_token");
+    res.status(200).json({
       success: true,
-      message: "Log out successful!",
+      message: "You have successfully logged out.",
     });
   } catch (error) {
-    next(createError(500, "Seller could not logout. Please try again!"));
+    next(createError(500, "User could not logout. Please try again!"));
   }
 };
 
@@ -219,7 +215,7 @@ export const resetForgotShopPassword = async (req, res, next) => {
     const shopLoginToken = sellerToken(shop._id);
 
     return res
-      .cookie("ushopToken", shopLoginToken, {
+      .cookie("shop_token", shopLoginToken, {
         path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 60 * 60 * 1000),
@@ -266,17 +262,30 @@ export const updateShopProfile = async (req, res, next) => {
 //====================================================================
 export const getShop = async (req, res, next) => {
   try {
-    // const shop = await Shop.findById(req.shop._id);
-    const shop = await Shop.findById(req.shop.id);
+    const shopId = req.shop?.id;
 
-    if (!shop) {
-      return next(createError(404, "Shop does not found! Please try again!"));
+    // Validate shop ID
+    if (!shopId || !mongoose.Types.ObjectId.isValid(shopId)) {
+      return next(createError(400, "Invalid Shop ID provided."));
     }
 
+    // Fetch shop from database
+    const shop = await Shop.findById(shopId).lean(); // lean() returns a plain JS object, improving performance
+
+    // Check if shop exists
+    if (!shop) {
+      return next(createError(404, "Shop not found. Please try again."));
+    }
+
+    // Send success response
     return res.status(200).json({ success: true, shop });
   } catch (error) {
-    next(createError(500, "Database could not query! Please try again!"));
-    console.log(error);
+    return next(
+      createError(
+        500,
+        "An unexpected error occurred while retrieving the shop. Please try again later."
+      )
+    );
   }
 };
 
@@ -303,8 +312,21 @@ export const getAllShops = async (req, res, next) => {
 
 export const getShopProducts = async (req, res, next) => {
   try {
+    const shopId = req.shop.id;
+
+    if (!shopId || !mongoose.Types.ObjectId.isValid(shopId)) {
+      return next(createError(400, "Invalid Shop ID provided."));
+    }
     // Find the shop and populate its shopProducts
-    const shop = await Shop.findById(req.shop.id).populate("shopProducts");
+    const shop = await Shop.findById(shopId).populate({
+      path: "shopProducts",
+      model: "Product",
+      populate: {
+        path: "reviews.user",
+        model: "User",
+        select: "name email image",
+      },
+    });
 
     // Check if the shop exists
     if (!shop) {
@@ -314,7 +336,7 @@ export const getShopProducts = async (req, res, next) => {
     // Return the shop's products
     res.status(200).json({
       success: true,
-      products: shop.shopProducts,
+      shopProducts: shop.shopProducts,
     });
   } catch (error) {
     console.error("Error fetching shop products:", error);
@@ -453,7 +475,7 @@ const clearShopProductsField = async () => {
   try {
     const result = await Shop.updateMany(
       {}, // No filter: Applies to all documents
-      { $unset: { soldProducts: "" } } // Removes the soldProducts field entirely
+      { $unset: { orders: "" } } // Removes the soldProducts field entirely
     );
     console.log(result);
   } catch (err) {
@@ -462,5 +484,5 @@ const clearShopProductsField = async () => {
 };
 
 // clearShopProductsField();
-*/
 
+*/

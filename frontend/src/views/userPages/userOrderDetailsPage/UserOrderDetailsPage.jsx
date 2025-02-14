@@ -1,15 +1,10 @@
-import React from 'react';
-import './UserOrderDetailsPage.scss';
-import { useSelector } from 'react-redux';
+import "./UserOrderDetailsPage.scss";
+import UserOrderDetails from "../../../components/cart/userOrderDetails/UserOrderDetails";
+import Header from "../../../components/layouts/header/Header";
+import Footer from "../../../components/layouts/footer/Footer";
 
-import UserOrderDetails from '../../../components/cart/userOrderDetails/UserOrderDetails';
-import Header from '../../../components/userLayout/header/Header';
-import Footer from '../../../components/userLayout/footer/Footer';
 
 const UserOrderDetailsPage = () => {
-  // Global state variables
-  const { currentUser } = useSelector((state) => state.user);
-
   return (
     <main className="user-order-details-page">
       <Header />

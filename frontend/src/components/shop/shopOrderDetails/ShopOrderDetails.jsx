@@ -1,270 +1,424 @@
-import { useEffect, useState } from 'react';
-import './ShopOrderDetails.scss';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import {
-  sellerOrdersFail,
-  sellerOrdersRequest,
-  sellerOrdersSuccess,
-} from '../../../redux/reducers/orderReducer';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "./ShopOrderDetails.scss";
+import { API } from "../../../utils/security/secreteKey";
+import { MdOutlineAssignmentTurnedIn, MdMessage } from "react-icons/md";
 
 const ShopOrderDetails = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [cancellationReason, setCancellationReason] = useState("");
+  const [returnReason, setReturnReason] = useState("");
+  const [refundAmount, setRefundAmount] = useState("");
+  const [refundReason, setRefundReason] = useState("");
+  const [tracking, setTracking] = useState({
+    carrier: "",
+    trackingNumber: "",
+    estimatedDeliveryDate: null,
+  });
 
-  // Global vairables
-  const { orders, loading } = useSelector((state) => state.order);
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { currentUser } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-
-  // Local variables
-  const [status, setStatus] = useState('');
-  const [shopOrders, setShopOrders] = useState([]);
-
+  // Fetch order details
   useEffect(() => {
-    const fetchAllShopOrders = async () => {
+    const fetchOrderDetails = async () => {
+      setLoading(true);
       try {
-        // dispatch(sellerOrdersRequest());
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
-        );
-        // dispatch(sellerOrdersSuccess(data.orders));
-        setShopOrders(data.orders);
+        const { data } = await axios.get(`${API}/orders/${id}/shop/order`, {
+          withCredentials: true,
+        });
+
+        setOrder(data.order);
+        setStatus(data.order?.orderStatus || "");
+        setReviews(data.order?.reviews || []);
+        setTracking({
+          carrier: data.order?.tracking?.carrier || "",
+          trackingNumber: data.order?.tracking?.trackingNumber || "",
+          estimatedDeliveryDate: data.order?.tracking?.estimatedDeliveryDate
+            ? new Date(data.order.tracking.estimatedDeliveryDate)
+            : null,
+        });
       } catch (error) {
-        // dispatch(sellerOrdersFail(error.response.data.message));
+        setError(
+          error.response?.data?.message || "Failed to fetch order details"
+        );
+      } finally {
+        setLoading(false);
       }
     };
-    fetchAllShopOrders();
-  }, [dispatch]);
 
-  // Order details
-  const data = shopOrders && shopOrders.find((order) => order._id === id);
-  console.log('Order data is:', orders);
+    fetchOrderDetails();
+  }, [id]);
 
-  // Update order
-  const orderUpdateHandler = async (e) => {
+  // Handle tracking input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTracking((prevTracking) => ({
+      ...prevTracking,
+      [name]: value,
+    }));
+  };
+
+  // Generate tracking number only when necessary
+  const generateTrackingNumber = () => {
+    return `TRK-${Date.now().toString(36).toUpperCase()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase()}`;
+  };
+
+  // Update order status
+  const updateOrderStatus = async (e) => {
     e.preventDefault();
+    if (!status) return toast.error("Please select an order status.");
+
+    const updateData = { orderStatus: status, tracking: tracking };
+
+    if (status === "Cancelled")
+      updateData.cancellationReason = cancellationReason;
+    if (status === "Returned") updateData.returnReason = returnReason;
+
+    if (status === "Processing") {
+      updateData.tracking = {
+        carrier: tracking.carrier,
+        estimatedDeliveryDate: tracking.estimatedDeliveryDate,
+        trackingNumber: tracking.trackingNumber || generateTrackingNumber(),
+      };
+    }
+
+    setProcessing(true);
     try {
       const { data } = await axios.put(
-        `${API}/orders/update-order-status/${id}/${currentSeller._id}`,
+        `${API}/orders/${id}/update/status`,
+        updateData,
         {
-          status,
+          withCredentials: true,
         }
       );
 
-      toast.success('Order updated!');
-      navigate('/dashboard-orders');
+      toast.success(data.message);
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        orderStatus: status,
+        cancellationReason:
+          status === "Cancelled"
+            ? cancellationReason
+            : prevOrder.cancellationReason,
+        returnReason:
+          status === "Returned" ? returnReason : prevOrder.returnReason,
+        tracking:
+          status === "Processing" ? updateData.tracking : prevOrder.tracking,
+        statusHistory: [
+          ...(prevOrder.statusHistory || []),
+          { status, changedAt: new Date().toISOString() },
+        ],
+      }));
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message || "Error updating order status"
+      );
+    } finally {
+      setProcessing(false);
     }
   };
 
-  // Refund order
-  const refundOrderUpdateHandler = async (e) => {
+  // Handle refund processing
+  const handleRefund = async (e) => {
     e.preventDefault();
+    if (!refundAmount || !refundReason) {
+      return toast.error("Please enter refund amount and reason.");
+    }
+
     try {
-      const updateStatus = {
-        status: status,
-      };
       const { data } = await axios.put(
-        `${API}/orders/refund-order-successful/${id}`,
-        updateStatus,
+        `${API}/orders/${id}/process-refund`,
+        { refundAmount, refundReason },
         { withCredentials: true }
       );
 
-      toast.success('Order updated!');
+      toast.success(data.message);
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        isRefunded: true,
+        refundAmount,
+        refundReason,
+      }));
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Error processing refund.");
     }
   };
 
+  if (loading) return <p>Loading order details...</p>;
+  if (error) return <p className="error">{error}</p>;
+
   return (
-    <section className={`order-detail-wrapper`}>
-      {/* order details and list*/}
-      <article className="order-details-list-container">
-        <h1 className="subTitle">Order Details</h1>
+    <section className="shop-order-details">
+      <header>
+        <h1>Order Details</h1>
+        <p>Order ID: #{order?._id?.slice(0, 8)}</p>
+        <p>Placed on: {order?.createdAt?.slice(0, 10)}</p>
+      </header>
 
-        <p className="order-list">
-          <Link to="/dashboard-orders" className="link">
-            Order List{' '}
-          </Link>
-        </p>
-      </article>
-
-      {/* order id and date */}
-      <article className="order-id-and-date">
-        <p className="order-id">
-          Order ID: <span>#{data?._id?.slice(0, 8)}</span>
-        </p>
-        <h5 className="order-placed-date">
-          Order placed on: <span>{data?.createdAt?.slice(0, 10)}</span>
-        </h5>
-      </article>
-
-      {/* ordered items */}
-      <div className="order-items-wrapper">
-        {data &&
-          data?.cart.map((item) => (
-            <article key={item._id} className="order">
-              <figure className="image-container">
-                <img src={item.images} alt="" className="image" />
-              </figure>
-              <section className="name-and-quantity">
-                <h5 className="subTitle">{item.name}</h5>
-                <p className="price">
-                  PQ: ${item.discountPrice} x {item.qty}
-                </p>
-              </section>
+      <section className="ordered-items">
+        <h2>Ordered Items</h2>
+        {order?.orderedItems?.map((item) => (
+          <article key={item._id} className="product-card">
+            <figure>
+              <img src={item.productImage} alt={item.title} />
+            </figure>
+            <article>
+              <h3>{item.title}</h3>
+              <p>Brand: {item.brand?.brandName}</p>
+              <p>Category: {item.category?.categoryName}</p>
+              <p>Color: {item.productColor}</p>
+              <p>Size: {item.size}</p>
+              <p>Quantity: {item.quantity}</p>
+              <p>Price: ${item.price}</p>
+              <p>Total: ${item.total}</p>
             </article>
-          ))}
-      </div>
-
-      {/* Total order price */}
-      <hr className="hr" />
-      <h2 className="total-price">
-        Total Price: <strong>US${data?.totalPrice}</strong>
-      </h2>
-      <hr className="hr" />
-
-      {/* Shipping adddress and payment status */}
-      <section className="shipping-address-and-payment-wrapper">
-        <article className="shipping-address-wrapper">
-          <h3 className="shipping-address-title">Shipping Address:</h3>
-          <p className="address">
-            Name:
-            <span className="addrress-span">{currentUser?.name}</span>
-          </p>
-          <p className="address">
-            Street:
-            <span className="addrress-span">
-              {data?.shippingAddress.address}
-            </span>
-          </p>
-          <p className="address">
-            Zip Code:
-            <span className="addrress-span">
-              {data?.shippingAddress?.zipCode}
-            </span>
-          </p>
-          <p className="address">
-            City:
-            <span className="addrress-span">{data?.shippingAddress?.city}</span>
-          </p>
-          <p className="address">
-            State:
-            <span className="addrress-span">
-              {data?.shippingAddress?.state}
-            </span>
-          </p>
-          <p className="address">
-            Country:
-            <span className="addrress-span">
-              {data?.shippingAddress?.country}
-            </span>
-          </p>
-          <p className="address">
-            Phone: <span className="addrress-span"> {data?.user?.phone}</span>
-          </p>
-          <p className="address">
-            Email: <span className="addrress-span">{data?.user?.email}</span>
-          </p>
-        </article>
-
-        <h3 className="payment-info-status">
-          Payment Info Status:
-          {data?.paymentInfo?.status ? (
-            <p className="status-result"> {data?.paymentInfo?.status} </p>
-          ) : (
-            'Not Paid'
-          )}{' '}
-        </h3>
+          </article>
+        ))}
       </section>
 
-      {/* Order Processing */}
-      <h3 className="order-status">Order Status:</h3>
-      {data?.status !== 'Processing refund' &&
-        data?.status !== 'Successfully refunded' && (
-          <form action="" className="form-process-and-refund-order">
+      <div className="order-summary-and-shipping-address">
+        <section className="order-summary">
+          <h2>Order Summary</h2>
+          <p>Subtotal: ${order?.subtotal?.toFixed(2)}</p>
+          <p>Shipping Fee: ${order?.shippingFee?.toFixed(2)}</p>
+          <p>Tax: ${order?.tax?.toFixed(2)}</p>
+          <p>Service Fee: ${order?.serviceFee?.toFixed(2)}</p>
+          <h3>Grand Total: ${order?.grandTotal?.toFixed(2)}</h3>
+        </section>
+
+        <section className="shipping-address">
+          <h2>Shipping Address</h2>
+          <p>{order?.shippingAddress?.address}</p>
+          <p>
+            {order?.shippingAddress?.zipCode}, {order?.shippingAddress?.city}
+          </p>
+          <p>{order?.shippingAddress?.state}</p>
+          <p>{order?.shippingAddress?.country}</p>
+          <p>Phone: {order?.shippingAddress?.phoneNumber}</p>
+        </section>
+      </div>
+
+      <section className="order-update-processing">
+        <h2 className="status-update-title">Update Order Status</h2>
+        <form onSubmit={updateOrderStatus} className="order-status-form">
+          {/* Order Status Dropdown */}
+          <div className="input-container">
+            <MdOutlineAssignmentTurnedIn className="input-icon" />
             <select
+              name="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="section-order-process"
+              className="status-select"
             >
               {[
-                'Processing',
-                'Transferred to delivery partner',
-                'Shipping',
-                'Received',
-                'On the way',
-                'Delivered',
-              ]
-                .slice(
-                  [
-                    'Processing',
-                    'Transferred to delivery partner',
-                    'Shipping',
-                    'Received',
-                    'On the way',
-                    'Delivered',
-                  ].indexOf(data?.status)
-                )
-                .map((option, index) => (
-                  <option
-                    value={option}
-                    key={index}
-                    className="option-order-process"
-                  >
-                    {option}
-                  </option>
-                ))}
-            </select>
-          </form>
-        )}
-
-      {/* Refund Processing */}
-      {data?.status === 'Processing refund' ||
-      data?.status === 'Successfully refunded' ? (
-        <form action="" className="form-process-and-refund-order">
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="section-order-process"
-          >
-            {['Processing refund', 'Successfully refunded']
-              .slice(
-                ['Processing refund', 'Successfully refunded'].indexOf(
-                  data?.status
-                )
-              )
-              .map((option, index) => (
-                <option
-                  value={option}
-                  key={index}
-                  className="option-order-process"
-                >
-                  {option}
+                "Pending",
+                "Processing",
+                "Shipped",
+                "Delivered",
+                "Cancelled",
+                "Returned",
+              ].map((selectStatus) => (
+                <option key={selectStatus} value={selectStatus}>
+                  {selectStatus}
                 </option>
               ))}
-          </select>
-        </form>
-      ) : null}
+            </select>
+          </div>
+          {/* Tracking Information (only for "Processing" status) */}
+          {status === "Processing" && (
+            <div className="tracking-info">
+              <div className="input-container">
+                <select
+                  name="carrier"
+                  value={tracking.carrier}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">Select Carrier</option>
+                  <option value="FedEx">FedEx</option>
+                  <option value="UPS">UPS</option>
+                  <option value="USPS">USPS</option>
+                  <option value="DHL">DHL</option>
+                </select>
+              </div>
 
-      {/* Update status Button*/}
-      <button
-        type="submit"
-        className={`update-status-btn`}
-        onClick={
-          data?.status !== 'Processing refund'
-            ? orderUpdateHandler
-            : refundOrderUpdateHandler
-        }
-      >
-        Update Status
-      </button>
+              <div className="input-container">
+                <input
+                  type="text"
+                  name="trackingNumber"
+                  placeholder="Tracking Number"
+                  value={tracking.trackingNumber}
+                  onChange={handleChange}
+                  readOnly
+                  className="input-field"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTracking((prev) => ({
+                      ...prev,
+                      trackingNumber: generateTrackingNumber(),
+                    }))
+                  }
+                >
+                  Generate Tracking Number
+                </button>
+              </div>
+
+              <div className="input-container">
+                <input
+                  type="date"
+                  name="estimatedDeliveryDate"
+                  value={
+                    tracking.estimatedDeliveryDate
+                      ? new Date(tracking.estimatedDeliveryDate)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Cancellation Reason Input */}
+          {status === "Cancelled" && (
+            <div className="input-container">
+              <MdMessage className="input-icon" />
+              <textarea
+                name="cancellationReason"
+                id="cancellationReason"
+                rows={4}
+                cols={50}
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                placeholder="Enter cancellation reason"
+              />
+            </div>
+          )}
+
+          {/* Return Reason Input */}
+          {status === "Returned" && (
+            <div className="input-container">
+              <MdMessage className="input-icon" />
+              <textarea
+                name="returnReason"
+                id="returnReason"
+                rows={4}
+                cols={50}
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                placeholder="Enter return reason"
+              />
+            </div>
+          )}
+
+          <button type="submit" disabled={order?.orderStatus === "Delivered"}>
+            {processing ? "Updating..." : "Update Status"}
+          </button>
+        </form>
+      </section>
+
+      {order?.orderStatus === "Cancelled" && order?.cancellationReason && (
+        <section className="cancellation-info">
+          <h2>Cancellation Details</h2>
+          <p>
+            <strong>Reason:</strong> {order.cancellationReason}
+          </p>
+        </section>
+      )}
+
+      {order?.orderStatus === "Returned" && order?.returnReason && (
+        <section className="return-info">
+          <h2>Return Details</h2>
+          <p>
+            <strong>Reason:</strong> {order.returnReason}
+          </p>
+        </section>
+      )}
+
+      {/* Refund order processing */}
+      <div className="refund-order-processing-container">
+        {order?.payment?.paymentStatus === "completed" && (
+          <section className="refund">
+            <h2>Refund Order</h2>
+            <form onSubmit={handleRefund}>
+              <input
+                type="number"
+                placeholder="Refund Amount"
+                value={refundAmount}
+                onChange={(e) => setRefundAmount(e.target.value)}
+              />
+              <textarea
+                placeholder="Refund Reason"
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+              />
+              <button
+                type="submit"
+                disabled={
+                  status !== "Delivered" ||
+                  processing ||
+                  order?.payment?.refunds?.length > 0
+                }
+              >
+                {processing ? "Processing..." : "Process Refund"}
+              </button>
+            </form>
+          </section>
+        )}
+
+        {order?.payment?.refunds?.length > 0 && (
+          <section className="refund-history">
+            <h2>Refund History</h2>
+            <ul>
+              {order.payment.refunds.map((refund) => (
+                <li key={refund.refundId}>
+                  <p>
+                    <strong>Refund ID:</strong> {refund.refundId}
+                  </p>
+                  <p>
+                    <strong>Amount:</strong> ${refund.amount.toFixed(2)}
+                  </p>
+                  <p>
+                    <strong>Reason:</strong> {refund.reason}
+                  </p>
+                  <p>
+                    <strong>Refunded On:</strong>{" "}
+                    {new Date(refund.createdAt).toLocaleDateString()}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+
+      <section className="reviews">
+        <h2>Customer Reviews</h2>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="review">
+              <p>
+                <strong>{review.user.name}:</strong> {review.comment}
+              </p>
+              <p>Rating: {review.rating}/5</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews yet.</p>
+        )}
+      </section>
     </section>
   );
 };

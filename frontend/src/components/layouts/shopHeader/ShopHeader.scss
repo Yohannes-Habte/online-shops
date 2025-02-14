@@ -1,0 +1,224 @@
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
+
+// Mobile screen
+.header-shop-dashboard {
+  display: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $header-bg;
+  padding: 0 1rem;
+
+  .go-back-link {
+    margin: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    color: $green;
+    font-size: $afs;
+  }
+
+  .item shop-logout {
+    cursor: pointer;
+  }
+
+  .dashboard-header-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+
+    .active-header-dashboard-icon {
+      .header-dashboard-icon {
+        color: $red;
+        font-size: $afs;
+      }
+    }
+
+    .passive-header-dashboard-icon {
+      .header-dashboard-icon {
+        color: $green;
+        font-size: $afs;
+      }
+    }
+
+    .image-container {
+      .image {
+        width: $afs;
+        height: $afs;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
+      }
+    }
+
+    .shop-profile-logout-wrapper {
+      position: absolute;
+      top: 2.8rem;
+      right: 0;
+      background-color: $header-bg;
+      width: 15rem;
+      height: 100vh;
+      z-index: 999;
+
+      .item {
+        padding: 0.5rem 1rem;
+        border-radius: 0 0 0 $radius;
+
+        .link {
+          font-size: $afs;
+
+          &:hover {
+            color: $tomato;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .header-shop-dashboard {
+    display: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $header-bg;
+    padding: 0 1rem;
+
+    .shop-logo {
+      @include subTitle;
+    }
+
+    .dashboard-header-icons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      .active-header-dashboard-icon {
+        .header-dashboard-icon {
+          color: $red;
+          font-size: $afs;
+        }
+      }
+
+      .passive-header-dashboard-icon {
+        .header-dashboard-icon {
+          color: $green;
+          font-size: $afs;
+        }
+      }
+
+      .image-container {
+        .image {
+          width: $afs;
+          height: $afs;
+          border-radius: 50%;
+          object-fit: cover;
+          cursor: pointer;
+        }
+      }
+
+      .shop-profile-logout-wrapper {
+        position: absolute;
+        top: 2.8rem;
+        right: 0;
+        background-color: $header-bg;
+        width: 15rem;
+        height: 100vh;
+        z-index: 999;
+
+        .item {
+          padding: 0.5rem 1rem;
+          border-radius: 0 0 0 $radius;
+
+          .link {
+            font-size: $afs;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .header-shop-dashboard {
+    display: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $header-bg;
+    padding: 0 1rem;
+
+    .shop-logo {
+      @include subTitle;
+      font-size: $aafs;
+    }
+
+    .dashboard-header-icons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      .active-header-dashboard-icon {
+        .header-dashboard-icon {
+          color: $red;
+          font-size: $aafs;
+        }
+      }
+
+      .passive-header-dashboard-icon {
+        .header-dashboard-icon {
+          color: $green;
+          font-size: $aafs;
+        }
+      }
+
+      .image-container {
+        .image {
+          width: $aafs;
+          height: $aafs;
+          border-radius: 50%;
+          object-fit: cover;
+          cursor: pointer;
+        }
+      }
+
+      .shop-profile-logout-wrapper {
+        position: absolute;
+        top: 2.8rem;
+        right: 0;
+        background-color: $header-bg;
+        width: 15rem;
+        height: 100vh;
+        z-index: 999;
+
+        .item {
+          padding: 0.5rem 1rem;
+          border-radius: 0 0 0 $radius;
+
+          .link {
+            font-size: $afs;
+
+            &:hover {
+              color: $tomato;
+            }
+          }
+        }
+      }
+    }
+  }
+}

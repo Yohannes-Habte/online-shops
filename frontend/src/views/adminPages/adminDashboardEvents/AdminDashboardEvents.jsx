@@ -1,8 +1,8 @@
-import React from 'react';
+
 import './AdminDashboardEvents.scss';
-import AdminSidebar from '../../../components/admin/adminSidebar/AdminSidebar';
 import AllShopsEvents from '../../../components/admin/allShopsEvents/AllShopsEvents';
 import AdminHeader from '../../../components/admin/adminHeader/AdminHeader';
+import AdminSidebar from '../../../components/layouts/adminSidebar/AdminSidebar';
 
 const AdminDashboardEvents = () => {
   return (

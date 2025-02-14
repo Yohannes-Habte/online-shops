@@ -54,6 +54,7 @@ $shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
 // Text Content
 .text-content {
+
   .category-title {
     font-size: 1.2rem;
     font-weight: bold;
@@ -62,6 +63,7 @@ $shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .category-description {
+ 
     font-size: 0.9rem;
     color: darken($text-color, 20%);
   }

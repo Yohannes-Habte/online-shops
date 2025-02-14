@@ -62,8 +62,6 @@ const Checkout = () => {
 
   const calculateTax = (subTotal) => subTotal * 0.02;
 
-  const calculateServiceCharge = (subTotal) => subTotal * 0.01;
-
   const calculateDiscount = (subTotal) => {
     if (subTotal > 500) return subTotal * 0.1; // 10% discount
     if (subTotal > 200) return subTotal * 0.05; // 5% discount
@@ -82,23 +80,26 @@ const Checkout = () => {
       const subTotal = calculateSubTotal();
       const shippingFee = calculateShippingFee(subTotal);
       const tax = calculateTax(subTotal);
-      const serviceCharge = calculateServiceCharge(subTotal);
       const discount = calculateDiscount(subTotal);
-      const grandTotal = subTotal + shippingFee + tax + serviceCharge - discount;
+      const grandTotal = subTotal + shippingFee + tax - discount;
 
       const orderData = {
         currentUser,
         cart,
-        shippingAddress: { address, zipCode, country, state, city, phoneNumber },
+        shippingAddress: {
+          address,
+          zipCode,
+          country,
+          state,
+          city,
+          phoneNumber,
+        },
         subTotal,
         shippingFee,
         tax,
-        serviceCharge,
         discount,
         grandTotal,
       };
-
-   
 
       localStorage.setItem("latestOrder", JSON.stringify(orderData));
       navigate("/payment");
@@ -112,9 +113,8 @@ const Checkout = () => {
   const subTotal = calculateSubTotal();
   const shippingFee = calculateShippingFee(subTotal);
   const tax = calculateTax(subTotal);
-  const serviceCharge = calculateServiceCharge(subTotal);
   const discount = calculateDiscount(subTotal);
-  const totalPrice = subTotal + shippingFee + tax + serviceCharge - discount;
+  const totalPrice = subTotal + shippingFee + tax - discount;
 
   return (
     <section className="cart-checkout-wrapper">
@@ -122,8 +122,8 @@ const Checkout = () => {
         <CartInfo
           subTotal={subTotal}
           shippingFee={shippingFee}
+          tax={tax}
           discount={discount}
-          serviceCharge={serviceCharge}
           totalPrice={totalPrice}
         />
 

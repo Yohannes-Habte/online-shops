@@ -1,0 +1,45 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.admin-dashboard-right-box-wrapper {
+  width: $mobile;
+  margin: 1rem auto;
+  
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .admin-dashboard-right-box-wrapper {
+    width: $mobile;
+    margin: 1rem auto;
+  }
+ 
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .admin-dashboard-right-box-wrapper {
+    width: $mobileLandscape;
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .admin-dashboard-right-box-wrapper {
+    width: $tablet;
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .admin-dashboard-right-box-wrapper {
+    width: $laptop;
+  }
+}
+
+/* 1201px and up (large desktop and TV screens) */
+@media (min-width: 1201px) {
+  .admin-dashboard-right-box-wrapper {
+    width: $desktop;
+  }
+}

@@ -6,12 +6,17 @@ const { Schema } = mongoose;
 const orderItemSchema = new Schema({
   product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
   title: { type: String, required: true },
-  category: { type: String, required: true },
-  subcategory: { type: String, required: true },
-  brand: { type: String, required: true },
-  supplier: { type: String, required: true },
-  shop: { type: String, required: true },
+  category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+  subcategory: {
+    type: Schema.Types.ObjectId,
+    ref: "Subcategory",
+    required: true,
+  },
+  brand: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
+  supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
+  shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
   productColor: { type: String, required: true },
+  productImage: { type: String, required: true },
   size: { type: String, required: true },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true },
@@ -76,7 +81,7 @@ const orderSchema = new Schema(
     subtotal: { type: Number, required: true, min: 0 }, // Total price of ordered items before tax, shipping, and service fees
     shippingFee: { type: Number, default: 0 },
     tax: { type: Number, default: 0 }, // Calculated tax amount
-    serviceFee: { type: Number, default: 0 }, // Additional service charges for the app or platform
+    serviceFee: { type: Number, default: 0 }, // Service charges for the app or platform
     grandTotal: { type: Number, required: true, min: 0 }, // subtotal + tax + shipping + service fees
     orderStatus: {
       type: String, // Status of the order
@@ -105,6 +110,7 @@ const orderSchema = new Schema(
           ],
         },
         changedAt: { type: Date, default: Date.now }, // Date of status change
+        message: { type: String, trim: true }, // Message for status change
       },
     ],
     tracking: {

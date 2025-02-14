@@ -1,78 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./ShopInfo.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Ratings from "../../products/ratings/Ratings";
-import { eventsShopFetchSuccess } from "../../../redux/reducers/eventReducer";
-import { productsShopFetchSuccess } from "../../../redux/reducers/productReducer";
 import ProductCard from "../../products/productCard/ProductCard";
-import axios from "axios";
-import { API } from "../../../utils/security/secreteKey";
+import { formatDistanceToNow } from "date-fns";
+import ShopProducts from "../../../hooks/ShopProducts";
 
 // The isOwner comes from ShopHome.jsx page
 const ShopInfo = () => {
-  const { id } = useParams();
   // Global state variables
   const { currentSeller } = useSelector((state) => state.seller);
-  // const { products } = useSelector((state) => state.product);
+  // const { shopProducts } = useSelector((state) => state.product);
   const { events } = useSelector((state) => state.event);
-  const dispatch = useDispatch();
+
+  const { shopProducts } = ShopProducts();
 
   // Local state variables
   const [active, setActive] = useState(1);
-  const [shopProducts, setShopProducts] = useState([]);
-  const [shopEvents, setShopEvents] = useState([]);
-  console.log("Shop products:", shopProducts);
-
-  // Display products for a single shop
-  useEffect(() => {
-    const shopProducts = async () => {
-      try {
-        // dispatch(productsShopFetchStart());
-        const { data } = await axios.get(`${API}/shops/shop/products`, {
-          withCredentials: true,
-        });
-        // dispatch(productsShopFetchSuccess(data));
-        setShopProducts(data.products);
-      } catch (error) {
-        console.log(error);
-        // dispatch(productsShopFetchFailure(error.response.data.message));
-      }
-    };
-    shopProducts();
-  }, []);
-
-  // Display events for a single shop
-  useEffect(() => {
-    const getShopEvents = async () => {
-      try {
-        const { data } = await axios.get(
-          `${API}/events/${currentSeller._id}/shop-events`
-        );
-        setShopEvents(data.events);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getShopEvents();
-  }, []);
-
-  useEffect(() => {
-    dispatch(eventsShopFetchSuccess(id));
-    dispatch(productsShopFetchSuccess(id));
-  }, [dispatch]);
 
   // All reviews
   const allReviews =
     shopProducts && shopProducts.map((product) => product.reviews).flat();
-
-  // Total millisenconds per day
-  const totalMillisecondsPerDay = 1000 * 60 * 60 * 24;
-  // Date now
-  const now = new Date();
-  const dateNow = now.getTime();
-
-  // Review Created Date
 
   return (
     <section className="shop-info-contianer">
@@ -115,15 +63,14 @@ const ShopInfo = () => {
       {active === 2 && (
         <article className="shop-events-wrapper">
           <div className="shop-events">
-            {shopEvents &&
-              shopEvents.map((event, index) => (
+            {/* {shopEvents.map((event, index) => (
                 <ProductCard
                   product={event}
                   key={index}
                   isShop={true}
                   isEvent={true}
                 />
-              ))}
+              ))} */}
           </div>
           {events && events.length === 0 && (
             <h3 className="no-events">No Events have for this shop!</h3>
@@ -135,28 +82,45 @@ const ShopInfo = () => {
       {active === 3 && (
         <article className="shop-reviews-wrapper">
           {allReviews &&
-            allReviews.map((reviewer) => (
-              <div key={reviewer._id} className="shop-review">
-                <figure className="image-container">
-                  <img
-                    src={`${reviewer.user.image}`}
-                    className="image"
-                    alt=""
-                  />
-                </figure>
-                <section className="user-rating">
-                  <h3 className="reviewer-name">{reviewer.user?.name}</h3>
-                  <div className="rating-wrapper">
-                    <Ratings averageRating={reviewer?.rating} />
-                  </div>
+            allReviews.map((reviewer) => {
+              // Find the product associated with this review
+              const product = shopProducts.find((p) =>
+                p.reviews.some((rev) => rev._id === reviewer._id)
+              );
 
-                  <p className="comment">{reviewer?.comment}</p>
-                  <p className="review-date">2days ago</p>
-                </section>
-              </div>
-            ))}
+              return (
+                <div key={reviewer._id} className="shop-review">
+                  <figure className="image-container">
+                    <img
+                      src={`${reviewer.user.image}`}
+                      className="image"
+                      alt="User Avatar"
+                    />
+                  </figure>
+                  <section className="user-rating">
+                    <h3 className="reviewer-name">{reviewer.user?.name}</h3>
+                    <p>{reviewer.user?.email}</p>
+                    <div className="rating-wrapper">
+                      <Ratings ratings={product?.ratings?.average || 0} />
+                      <span>
+                        {" "}
+                        ({product?.ratings?.average?.toFixed(1) ||
+                          "0.0"}/5){" "}
+                      </span>
+                    </div>
+
+                    <p className="comment">{reviewer?.comment}</p>
+                    <p className="review-date">
+                      {formatDistanceToNow(new Date(reviewer.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </p>
+                  </section>
+                </div>
+              );
+            })}
           {allReviews && allReviews.length === 0 && (
-            <h3 className="no-review">No Reviews have for this shop!</h3>
+            <h3 className="no-review">No Reviews for this shop!</h3>
           )}
         </article>
       )}

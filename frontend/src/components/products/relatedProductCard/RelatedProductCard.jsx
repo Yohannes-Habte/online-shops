@@ -3,7 +3,7 @@ import "./RelatedProductCard.scss";
 import { ShortenText } from "../../../utils/textHandler/text";
 
 const RelatedProductCard = ({ product }) => {
-  const { title, description, variants } = product;
+  const { title, variants } = product;
 
   return (
     <section className="related-product-card">
@@ -17,13 +17,12 @@ const RelatedProductCard = ({ product }) => {
         </Link>
       </figure>
 
-      <div className="product-details">
+      <aide className="product-details">
         <h3 className="shop-name">{product.shop.name}</h3>
         <Link to={`/products/${product._id}`}>
-          <h4 className="product-title">{ShortenText(title, 40)}</h4>
+          <p className="product-title">{ShortenText(title, 40)}</p>
         </Link>
-        <p className="product-description">{ShortenText(description, 100)}</p>
-      </div>
+      </aide>
     </section>
   );
 };

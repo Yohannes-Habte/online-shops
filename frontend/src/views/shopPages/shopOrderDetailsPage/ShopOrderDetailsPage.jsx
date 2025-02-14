@@ -1,15 +1,16 @@
-import React from 'react';
-import './ShopOrderDetailsPage.scss';
-import HeaderDashboard from '../../../components/shopDashboard/headerDashboard/HeaderDashboard';
-import ShopOrderDetails from '../../../components/shop/shopOrderDetails/ShopOrderDetails';
-import Footer from '../../../components/userLayout/footer/Footer';
+import "./ShopOrderDetailsPage.scss";
+import ShopOrderDetails from "../../../components/shop/shopOrderDetails/ShopOrderDetails";
+import { useSelector } from "react-redux";
+import Footer from "../../../components/layouts/footer/Footer";
+import ShopHeader from "../../../components/layouts/shopHeader/ShopHeader";
 
 const ShopOrderDetailsPage = () => {
+  const { currentSeller } = useSelector((state) => state.seller);
   return (
     <main className="shop-order-details-page">
-      <HeaderDashboard />
+      <ShopHeader />
       <section className="shop-order-details-container">
-        <h1 className="title"> Shop Order Details</h1>
+        <h1 className="title"> Single Order Details for {currentSeller.name} </h1>
         <ShopOrderDetails />
       </section>
       <Footer />

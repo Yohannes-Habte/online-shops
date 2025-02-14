@@ -21,6 +21,7 @@
     "@stripe/stripe-js": "^4.1.0",
     "axios": "^1.7.3",
     "country-state-city": "^3.2.1",
+    "date-fns": "^4.1.0",
     "firebase": "^10.12.5",
     "js-cookie": "^3.0.5",
     "moment": "^2.30.1",

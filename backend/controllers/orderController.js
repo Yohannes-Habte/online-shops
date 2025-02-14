@@ -10,7 +10,6 @@ import User from "../models/userModel.js";
 //=========================================================================
 export const createOrder = async (req, res, next) => {
   let { orderedItems, shippingAddress, customer, payment } = req.body;
-  console.log(req.body);
 
   // Validate customer ID using mongoose
   if (!mongoose.Types.ObjectId.isValid(customer)) {
@@ -24,13 +23,11 @@ export const createOrder = async (req, res, next) => {
   try {
     // Validate required fields
     if (!customer || !orderedItems || !shippingAddress) {
-      return res.status(400).json({ message: "Missing required fields." });
+      return next(createError(400, "Missing required fields!"));
     }
 
     if (!Array.isArray(orderedItems) || orderedItems.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Ordered items cannot be empty." });
+      return next(createError(400, "Invalid order items format!"));
     }
 
     // Validate each ordered item
@@ -58,10 +55,13 @@ export const createOrder = async (req, res, next) => {
     const products = await Product.find({ _id: { $in: productIds } }).session(
       session
     );
+
+    // Ensure all products are valid and populate items
     const populatedItems = [];
 
     for (const item of orderedItems) {
       const product = products.find((p) => p._id.toString() === item._id);
+
       if (!product) {
         console.warn(`Product not found: ${item._id}`);
         continue; // Skip invalid products
@@ -71,6 +71,7 @@ export const createOrder = async (req, res, next) => {
       const selectedVariant = product.variants.find(
         (variant) =>
           variant.productColor === item.variant.productColor &&
+          variant.productImage === item.variant.productImage &&
           variant.productSizes.some(
             (sizeObj) =>
               sizeObj.size === item.variant.size && sizeObj.stock >= item.qty
@@ -79,7 +80,7 @@ export const createOrder = async (req, res, next) => {
 
       if (!selectedVariant) {
         console.warn(
-          `Variant not found for product ID ${item._id}, Size: ${item.variant.size}, Color: ${item.variant.productColor}`
+          `Variant not found for product ID ${item._id}, Size: ${item.variant.size}, Color: ${item.variant.productColor}, Image: ${item.variant.productImage}`
         );
         continue; // Skip items with invalid variant or insufficient stock
       }
@@ -111,6 +112,7 @@ export const createOrder = async (req, res, next) => {
         supplier: product.supplier,
         shop: product.shop,
         productColor: selectedVariant.productColor,
+        productImage: selectedVariant.productImage,
         productSize: item.variant.size,
         quantity: item.qty,
         price: product.discountPrice,
@@ -134,15 +136,10 @@ export const createOrder = async (req, res, next) => {
 
     const taxAmount = calculateTax(subtotalPrice);
     const shippingFeeAmount = calculateShippingFee(subtotalPrice);
-    const serviceFeeAmount = calculateServiceCharge(subtotalPrice);
     const discountAmount = calculateDiscount(subtotalPrice);
 
     const calculatedGrandTotal =
-      subtotalPrice +
-      taxAmount +
-      shippingFeeAmount +
-      serviceFeeAmount -
-      discountAmount;
+      subtotalPrice + taxAmount + shippingFeeAmount - discountAmount;
 
     // Create the order
     const order = new Order({
@@ -153,7 +150,6 @@ export const createOrder = async (req, res, next) => {
       subtotal: subtotalPrice,
       shippingFee: shippingFeeAmount,
       tax: taxAmount,
-      serviceFee: serviceFeeAmount,
       grandTotal: calculatedGrandTotal,
       orderStatus: "Pending",
       statusHistory: [{ status: "Pending", changedAt: new Date() }], // History
@@ -203,70 +199,508 @@ export const createOrder = async (req, res, next) => {
 };
 
 //=========================================================================
-// Update order status for a shop
+// Get an order
 //=========================================================================
 
-export const updateShopOrders = async (req, res, next) => {
+export const getOrder = async (req, res, next) => {
   try {
-    // Find order by id
-    const order = await Order.findById(req.params.id);
+    const { id } = req.params;
+
+    // Validate ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(createError(400, "Invalid order ID format!"));
+    }
+
+    const order = await Order.findById(id)
+      .populate({
+        path: "customer",
+        select: "name email image",
+      })
+      .populate({
+        path: "orderedItems.product",
+        select: "title description discountPrice",
+      })
+      .populate({
+        path: "orderedItems.category",
+        select: "categoryName",
+      })
+      .populate({
+        path: "orderedItems.subcategory",
+        select: "subcategoryName",
+      })
+      .populate({
+        path: "orderedItems.brand",
+        select: "brandName brandDescription",
+      })
+      .populate({
+        path: "orderedItems.supplier",
+        select: "supplierName supplierEmail, supplierPhone",
+      })
+      .populate({
+        path: "orderedItems.shop",
+        select: "name email,phoneNumber, shopAddress",
+      });
 
     if (!order) {
-      return next(createError(400, "Order not found!"));
+      return next(createError(404, "Order not found!"));
     }
 
-    // Update each ordered product using forEach method and updateOrder function
-    if (req.body.status === "Transferred to delivery partner") {
-      order.cart.forEach(async (product) => {
-        await updateOrder(product._id, product.qty);
-      });
-    }
-
-    // The order status in the database will be ...
-    order.status = req.body.status;
-
-    // Update shop info using updateShopInfo function
-    if (req.body.status === "Delivered") {
-      order.deliveredAt = Date.now();
-      order.paymentInfo.status = "Succeeded";
-      const serviceCharge = order.totalPrice * 0.1;
-      const ammount = order.totalPrice - serviceCharge;
-      await updateShopInfo(ammount);
-    }
-
-    // Save the order
-    await order.save({ validateBeforeSave: false });
-
-    // Response is ...
     res.status(200).json({
       success: true,
       order,
     });
-
-    // update product after an order has been transferred to delivery partner
-    async function updateOrder(id, qty) {
-      const product = await Product.findById(id);
-
-      product.stock = product.stock - qty;
-      product.soldOut = product.soldOut + qty;
-
-      await product.save({ validateBeforeSave: false });
-    }
-
-    // update shop info after an order has been delivered to a user
-    async function updateShopInfo(amount) {
-      const shop = await Shop.findById(req.params.shopId);
-
-      shop.availableBalance = amount;
-
-      await shop.save();
-    }
   } catch (error) {
-    console.log(error);
-    next(createError(500, "Order is not updated! Please try again!"));
+    console.error(`Error fetching order: ${error.message}`);
+    next(
+      createError(500, "An unexpected error occurred. Please try again later.")
+    );
   }
 };
 
+//=========================================================================
+// Get an order
+//=========================================================================
+
+export const shopOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(createError(400, "Invalid order ID format!"));
+    }
+
+    const order = await Order.findById(id)
+      .populate({
+        path: "customer",
+        select: "name email image",
+      })
+      .populate({
+        path: "orderedItems.product",
+        select: "title description discountPrice",
+      })
+      .populate({
+        path: "orderedItems.category",
+        select: "categoryName",
+      })
+      .populate({
+        path: "orderedItems.subcategory",
+        select: "subcategoryName",
+      })
+      .populate({
+        path: "orderedItems.brand",
+        select: "brandName brandDescription",
+      })
+      .populate({
+        path: "orderedItems.supplier",
+        select: "supplierName supplierEmail, supplierPhone",
+      })
+      .populate({
+        path: "orderedItems.shop",
+        select: "name email,phoneNumber, shopAddress",
+      });
+
+    if (!order) {
+      return next(createError(404, "Order not found!"));
+    }
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error(`Error fetching order: ${error.message}`);
+    next(
+      createError(500, "An unexpected error occurred. Please try again later.")
+    );
+  }
+};
+
+//=========================================================================
+// Helper function to push status history for update shop orders
+//=========================================================================
+const addToStatusHistory = (order, status) => {
+  order.statusHistory.push({
+    status,
+    changedAt: new Date(),
+    message: `Your order is ${status} at ${new Date().toLocaleString()}`,
+  });
+};
+
+//=========================================================================
+// Update order status for a shop
+//=========================================================================
+export const updateShopOrders = async (req, res, next) => {
+  const { orderStatus, tracking, cancellationReason, returnReason } = req.body;
+  const { id } = req.params;
+  const shopId = req.shop.id;
+
+  // 1. Validate the order ID and shop ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(createError(400, "Invalid order ID format!"));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID format!"));
+  }
+
+  // 2. Start a transaction for atomicity
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 3. Fetch the shop by ID to ensure it's the correct shop
+    const seller = await Shop.findById(shopId).session(session);
+    if (!seller) {
+      await session.abortTransaction();
+      return next(createError(404, "No permission to update order status!"));
+    }
+
+    // 4. Fetch the order by ID and check its current status
+    const order = await Order.findById(id).session(session);
+    if (!order) {
+      await session.abortTransaction();
+      return next(createError(404, "Order not found!"));
+    }
+
+    // 5. Ensure that the status transition is valid
+    if (
+      ![
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Returned",
+      ].includes(orderStatus)
+    ) {
+      await session.abortTransaction();
+      return next(createError(400, "Invalid order status provided!"));
+    }
+
+    // 6. Prevent modification if already "Delivered" or "Returned"
+    if (["Delivered", "Returned"].includes(order.orderStatus)) {
+      await session.abortTransaction();
+      return next(
+        createError(
+          400,
+          "Cannot modify the order status once it is delivered or returned!"
+        )
+      );
+    }
+
+    // 7. If the order status is "Processing", update orderStatus, statusHistory, and tracking
+    if (orderStatus === "Processing") {
+      order.orderStatus = orderStatus;
+      addToStatusHistory(order, orderStatus);
+      if (tracking) {
+        order.tracking = tracking;
+      } else {
+        return next(
+          createError(
+            400,
+            "Tracking details must be provided when status is 'Processing'"
+          )
+        );
+      }
+    }
+
+    // 8. If the order status is "Shipped", update  orderStatus, and statusHistory
+    if (orderStatus === "Shipped") {
+      order.orderStatus = orderStatus;
+      addToStatusHistory(order, orderStatus);
+    }
+
+    // 9. If the order status is "Delivered", update orderStatus, statusHistory, payment status, service fee, stock, soldOut, availableBalance, and deliverAt
+    if (orderStatus === "Delivered") {
+      order.orderStatus = orderStatus;
+      order.deliveredAt = Date.now();
+      order.payment.paymentStatus = "completed";
+
+      // Calculate service fee, soldOut, availableBalance
+      const grandTotal = order.grandTotal;
+      const shopCommission = grandTotal * 0.01;
+      const shopBalance = grandTotal - shopCommission;
+      const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2));
+
+      // Update service fee, deliveredAt, soldOut, and availableBalance
+      order.serviceFee = shopCommission;
+      order.availableBalance = shopNetOrderAmount;
+
+      // Loop through the ordered items to update stock and soldOut in the product schema
+      await Promise.all(
+        order.orderedItems.map(async (item) => {
+          const product = await Product.findById(item.product).session(session);
+          if (product) {
+            // Find the variant based on the productColor
+            const variant = product.variants.find(
+              (v) => v.productColor === item.productColor
+            );
+            if (variant) {
+              // Find the product size based on the size
+              const productSize = variant.productSizes.find(
+                (size) => size.size === item.size
+              );
+              if (productSize) {
+                // Check if stock is sufficient before decrementing
+                if (productSize.stock < item.quantity) {
+                  return next(
+                    createError(
+                      400,
+                      `Insufficient stock for product ${product.name}, size ${item.size}.`
+                    )
+                  );
+                }
+
+                // Reduce stock and update soldOut in the product schema
+                productSize.stock -= item.quantity;
+                product.soldOut += item.quantity; // Increase soldOut quantity
+
+                await product.save({ session });
+              } else {
+                throw new Error(
+                  `Size ${item.size} not found in product variant.`
+                );
+              }
+            } else {
+              throw new Error(
+                `Variant with color ${item.productColor} not found.`
+              );
+            }
+          }
+        })
+      );
+
+      // Add to status history
+      addToStatusHistory(order, orderStatus);
+
+      // Update shop balance
+      if (seller) {
+        seller.availableBalance += shopNetOrderAmount;
+        await seller.save({ session });
+      }
+    }
+
+    // 10. Handle the "Cancelled" status logic
+    if (orderStatus === "Cancelled") {
+      if (cancellationReason) {
+        order.cancellationReason = cancellationReason;
+      }
+      order.orderStatus = orderStatus;
+      addToStatusHistory(order, orderStatus);
+    }
+
+    // 11. Handle the "Returned" status logic
+    if (orderStatus === "Returned") {
+      if (returnReason) {
+        order.returnReason = returnReason;
+      }
+      order.orderStatus = orderStatus;
+      addToStatusHistory(order, orderStatus);
+    }
+
+    // 12. Save the updated order and commit the transaction
+    await order.save({ validateBeforeSave: false, session });
+    await session.commitTransaction();
+
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      order,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    console.error(error);
+    return next(
+      createError(500, "Order status update failed. Please try again.")
+    );
+  } finally {
+    session.endSession();
+  }
+};
+
+/**
+
+export const updateShopOrders = async (req, res, next) => {
+  const { orderStatus, cancellationReason, returnReason } = req.body;
+  const { id } = req.params;
+  const shopId = req.shop.id;
+
+  // 1. Validate the order ID and shop ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(createError(400, "Invalid order ID format!"));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID format!"));
+  }
+
+  // 2. Start a transaction for atomicity
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 3. Fetch the shop by ID to ensure it's the correct shop
+    const seller = await Shop.findById(shopId).session(session);
+    if (!seller) {
+      session.abortTransaction();
+      return next(createError(404, "No permission to update order status!"));
+    }
+
+    // 4. Fetch the order by ID and check its current status
+    const order = await Order.findById(id).session(session);
+    if (!order) {
+      session.abortTransaction();
+      return next(createError(404, "Order not found!"));
+    }
+
+    console.log("Order status:", order);
+
+    // 5. Ensure that the status transition is valid
+    if (
+      orderStatus &&
+      ![
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Returned",
+      ].includes(orderStatus)
+    ) {
+      session.abortTransaction();
+      return next(createError(400, "Invalid order status provided!"));
+    }
+
+    // 6. Handle specific order status updates
+    if (orderStatus) {
+      // Prevent transition from Delivered back to other statuses
+      if (order.orderStatus === "Delivered" && orderStatus !== "Returned") {
+        session.abortTransaction();
+        return next(
+          createError(
+            400,
+            "Cannot modify the order status once it is delivered!"
+          )
+        );
+      }
+
+      order.orderStatus = orderStatus;
+
+      // Handle cancellation reason
+      if (orderStatus === "Cancelled" && cancellationReason) {
+        order.cancellationReason = cancellationReason;
+      }
+
+      // Handle return reason
+      if (orderStatus === "Returned" && returnReason) {
+        order.returnReason = returnReason;
+      }
+
+      // Add to the status history using the helper function
+      addToStatusHistory(order, orderStatus);
+    }
+
+    // 7. Handle the "Delivered" status logic
+    if (orderStatus === "Delivered") {
+      order.deliveredAt = Date.now();
+      order.payment.paymentStatus = "completed";
+
+      
+      // Calculate shop commission and net order amount
+      const grandTotal = order.grandTotal;
+      const shopCommission = grandTotal * 0.1;
+      const serviceFee = grandTotal * 0.01;
+      const shopBalance = grandTotal - shopCommission;
+      const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2)); // Convert string to number
+
+      // Add to status history
+      addToStatusHistory(order, orderStatus);
+
+      // Update shop balance
+      if (seller) {
+        seller.availableBalance += shopNetOrderAmount; // Now adding number to number
+        await seller.save({ session });
+      }
+    }
+
+    // 8. Handle other statuses like "Shipped", "Processing"
+    if (["Shipped", "Processing"].includes(orderStatus)) {
+      await Promise.all(
+        order.orderedItems.map(async (item) => {
+          const product = await Product.findById(item.product).session(session);
+          if (product) {
+            const variant = product.variants.find(
+              (v) => v.productColor === item.productColor
+            );
+            if (variant) {
+              const productSize = variant.productSizes.find(
+                (size) => size.size === item.size
+              );
+              if (productSize) {
+                if (orderStatus === "Shipped") {
+                  // Check if stock is sufficient before decrementing
+                  if (productSize.stock < item.quantity) {
+                    session.abortTransaction();
+                    return next(
+                      createError(
+                        400,
+                        `Insufficient stock for product ${product.name}, size ${item.size}.`
+                      )
+                    );
+                  }
+
+                  productSize.stock -= item.quantity;
+                  product.soldOut += item.quantity;
+
+                  // Add to status history
+                  addToStatusHistory(order, orderStatus);
+                } else if (orderStatus === "Processing") {
+                  addToStatusHistory(order, orderStatus);
+                }
+
+                await product.save({ session });
+              } else {
+                throw new Error(
+                  `Size ${item.size} not found in product variant.`
+                );
+              }
+            } else {
+              throw new Error(
+                `Variant with color ${item.productColor} not found.`
+              );
+            }
+          }
+        })
+      );
+    }
+
+    // 9. Handle "Returned" status: No stock update, just handling returnReason
+    if (orderStatus === "Returned") {
+      order.returnReason = returnReason || "No reason provided";
+      addToStatusHistory(order, orderStatus); // Add to status history for return
+    }
+
+    // 10. Save the updated order and commit the transaction
+    await order.save({ validateBeforeSave: false, session });
+    await session.commitTransaction();
+
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      order,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    console.error(error);
+    return next(
+      createError(500, "Order status update failed. Please try again.")
+    );
+  } finally {
+    session.endSession();
+  }
+};
+ */
 //=========================================================================
 // Order Refund for a user
 //=========================================================================
@@ -340,18 +774,6 @@ export const orderRefundByShop = async (req, res, next) => {
 };
 
 //=========================================================================
-// Get an order
-//=========================================================================
-
-export const getOrder = async (req, res, next) => {
-  try {
-    res.send("New order");
-  } catch (error) {
-    next(createError(500, "Order could not be accessed! Please try again!"));
-  }
-};
-
-//=========================================================================
 // Get all orders for a user
 //=========================================================================
 
@@ -387,26 +809,39 @@ export const getAllUserOrders = async (req, res, next) => {
 };
 
 //=========================================================================
-// Get all orders for a seller
+// Get all orders for a seller with populated fields
 //=========================================================================
-
 export const allShopOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({
-      "cart.shopId": req.params.shopId,
-    }).sort({
-      createdAt: -1,
-    });
+    const sellerId = req.shop.id;
 
-    if (!orders) {
-      return next(
-        createError(400, "Seller orders not found! Please try again!")
-      );
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      return next(createError(400, "Invalid seller ID format"));
     }
+
+    const shop = await Shop.findById(sellerId).select("_id");
+
+    if (!shop) {
+      return next(createError(404, "Seller not found"));
+    }
+
+    // Fetch orders for the shop and populate necessary fields
+    const orders = await Order.find({ "orderedItems.shop": shop._id })
+      .populate("orderedItems.product", "title price productImage")
+      .populate("orderedItems.category", "categoryName")
+      .populate("orderedItems.subcategory", "subcategoryName")
+      .populate("orderedItems.brand", "brandName")
+      .populate("orderedItems.supplier", "supplierName")
+      .populate("payment.createdBy", "username email")
+      .populate("payment.updatedBy", "username email")
+      .populate("customer", "username email")
+      .select(
+        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory"
+      );
 
     res.status(200).json({
       success: true,
-      orders,
+      orders: orders,
     });
   } catch (error) {
     next(createError(500, "Orders could not be accessed! Please try again!"));
@@ -444,7 +879,7 @@ export const allShopsOrders = async (req, res, next) => {
   try {
     // Ensure only admins can access this route
     const user = await User.findById(req.user.id);
-    
+
     if (!user || user.role !== "admin") {
       return next(createError(403, "Unauthorized access!"));
     }

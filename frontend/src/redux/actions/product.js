@@ -15,15 +15,15 @@ import {
   productShopDeleteStart,
   productShopDeleteSuccess,
   productShopDeleteFailure,
-  productsShopFetchStart,
-  productsShopFetchSuccess,
-  productsShopFetchFailure,
-  productsCategoryFetchStart,
-  productsCategoryFetchSuccess,
-  productsCategoryFetchFailure,
   allProductsFetchStart,
   allProductsFetchSuccess,
   allProductsFetchFailure,
+  customerCategoryProductsFetchStart,
+  customerCategoryProductsFetchSuccess,
+  customerCategoryProductsFetchFailure,
+  shopProductFetchStart,
+  shopProductFetchSuccess,
+  shopProductFetchFailure,
 } from "../reducers/productReducer";
 
 //==============================================================================
@@ -106,29 +106,33 @@ export const deleteProductFromAll = (productId) => async (dispatch) => {
   }
 };
 
-//==============================================================================
+//=========================================================================
 // Action to fetch all products for a shop
-//==============================================================================
+//=========================================================================
 
 export const fetchProductsByShop = () => async (dispatch) => {
   try {
-    dispatch(productsShopFetchStart());
-
+    dispatch(shopProductFetchStart());
+    
     const res = await axios.get(`${API}/shops/shop/products`, {
       withCredentials: true,
     });
 
-    const products = res.data.products;
-    dispatch(productsShopFetchSuccess(products));
+    console.log('API response:', res.data);  // Check API response structure
+
+    const products = res.data.shopProducts;
+    dispatch(shopProductFetchSuccess({ shopProducts: products }));  
   } catch (error) {
-    const { message } = handleError(error);
-    dispatch(productsShopFetchFailure(message));
+    const { message } = handleError(error); 
+    dispatch(shopProductFetchFailure(message));
   }
 };
 
-//==============================================================================
+
+
+//=========================================================================
 // Action to fetch all products for all shops
-//==============================================================================
+//=========================================================================
 export const fetchAllProductsForAllShops =
   (queryParams) => async (dispatch) => {
     try {
@@ -155,19 +159,26 @@ export const fetchAllProductsForAllShops =
   };
 
 //==============================================================================
-// Action to fetch all products for a category
-//==============================================================================
+// Action to fetch all products for a specific customer category
+//==============================================================================export const fetchCustomerCategoryProducts = (customerCategory) => async (dispatch) => {
+export const fetchCustomerCategoryProducts =
+  (customerCategory) => async (dispatch) => {
+    try {
+      dispatch(customerCategoryProductsFetchStart());
 
-export const fetchProductsByCategory = (categoryId) => async (dispatch) => {
-  try {
-    dispatch(productsCategoryFetchStart());
+      const res = await axios.get(
+        `${API}/products/category/customer/${customerCategory}`
+      );
 
-    const res = await axios.get(`${API}/categories/${categoryId}/products`);
-
-    const products = res.data.products;
-    dispatch(productsCategoryFetchSuccess(products));
-  } catch (error) {
-    const { message } = handleError(error);
-    dispatch(productsCategoryFetchFailure(message));
-  }
-};
+      const products = res.data.customerProducts;
+      dispatch(
+        customerCategoryProductsFetchSuccess({
+          customerCategory,
+          customerProducts: products,
+        })
+      );
+    } catch (error) {
+      const { message } = handleError(error);
+      dispatch(customerCategoryProductsFetchFailure(message));
+    }
+  };

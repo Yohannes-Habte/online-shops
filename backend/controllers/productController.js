@@ -7,6 +7,7 @@ import Category from "../models/categoryModel.js";
 import mongoose from "mongoose";
 import Joi from "joi";
 import Subcategory from "../models/subcategory.js";
+import User from "../models/userModel.js";
 
 //==============================================================================
 // Create Product
@@ -128,7 +129,7 @@ export const getAllProducts = async (req, res, next) => {
       brandName: Joi.string().allow(""), // Query by brand name
       customerCategory: Joi.string().valid("Ladies", "Gents", "Kids").allow(""), // Allow empty string,
       page: Joi.number().integer().min(1).default(1),
-      limit: Joi.number().integer().min(1).default(6),
+      limit: Joi.number().integer().min(1).default(12),
       populate: Joi.boolean().default(false),
     });
 
@@ -205,13 +206,24 @@ export const getAllProducts = async (req, res, next) => {
 
     // Fetch products
     const products = await Product.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .limit(limit)
       .skip(skip)
-      .populate(populate ? "shop supplier category brand" : "");
+      .populate([
+        { path: "shop", model: "Shop" },
+        { path: "supplier", model: "Supplier" },
+        { path: "category", model: "Category" },
+        { path: "subcategory", model: "Subcategory" },
+        { path: "brand", model: "Brand" },
+      ]);
 
     if (!products || products.length === 0) {
-      return next(createError(404, "No products found"));
+      return next(
+        createError(
+          404,
+          "No products found related to your query. Please try again."
+        )
+      );
     }
 
     // Get total product count for pagination
@@ -232,6 +244,29 @@ export const getAllProducts = async (req, res, next) => {
 };
 
 //==============================================================================
+// Get All Products based on customer category (Ladies, Gents, Kids)
+//==============================================================================
+
+export const getProductsByCustomerCategory = async (req, res, next) => {
+  try {
+    const { customerCategory } = req.params; // Get category from params
+
+    const customerProducts = await Product.find({
+      customerCategory: { $regex: new RegExp(customerCategory, "i") },
+    }).sort({ soldOut: -1 });
+    if (!customerProducts || customerProducts.length === 0) {
+      return res.status(200).json({ success: true, products: [] });
+    }
+
+    // Return the products
+    res.status(200).json({ success: true, customerProducts });
+  } catch (error) {
+    console.error("Error getting products:", error);
+    return next(createError(500, "Something went wrong. Please try again."));
+  }
+};
+
+//==============================================================================
 // Get Single Product
 //==============================================================================
 
@@ -239,9 +274,13 @@ export const getProduct = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const product = await Product.findById(id).populate(
-      "shop supplier category brand"
-    );
+    const product = await Product.findById(id).populate([
+      { path: "shop", model: "Shop" },
+      { path: "supplier", model: "Supplier" },
+      { path: "category", model: "Category" },
+      { path: "subcategory", model: "Subcategory" },
+      { path: "brand", model: "Brand" },
+    ]);
 
     if (!product) {
       return next(createError(404, "Product not found"));
@@ -374,65 +413,86 @@ export const getAllBrandProducts = async (req, res, next) => {
 
 export const productReview = async (req, res, next) => {
   try {
-    const { user, rating, comment, productId, orderId } = req.body;
+    const { ratings, productId, orderId } = req.body;
+    const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(productId)) {
+      return next(createError(400, "Invalid product ID provided."));
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return next(createError(400, "Invalid user ID provided."));
+    }
+
+    if (!mongoose.isValidObjectId(orderId)) {
+      return next(createError(400, "Invalid order ID provided."));
+    }
+
+    // Fetch product and user
     const product = await Product.findById(productId);
+    if (!product) return next(createError(404, "Product not found."));
 
-    if (!product) {
-      return next(createError(400, `Product not found!`));
-    }
+    const user = await User.findById(userId);
+    if (!user) return next(createError(404, "User not found."));
 
-    // New Review for a product
-    const newReview = {
-      user,
-      rating,
-      comment,
-      productId,
-    };
-
-    // Is product reviewed?
-    const isReviewed = product.reviews.find(
-      (review) => review.user._id === req.user._id
-    );
-
-    // If product is reviewed, ..., otherwise, push the new review of a product to a product model
-    if (isReviewed) {
-      product.reviews.forEach((accessed) => {
-        if (accessed.user._id === req.user._id) {
-          (accessed.rating = rating),
-            (accessed.comment = comment),
-            (accessed.user = user);
-        }
-      });
-    } else {
-      product.reviews.push(newReview);
-    }
-
-    // Ratings sum for a product
-    let totalSum = 0;
-
-    product.reviews.forEach((review) => {
-      totalSum = totalSum + review.rating;
+    // Ensure the user has purchased the product before reviewing
+    const order = await Order.findOne({
+      _id: orderId,
+      customer: userId,
+      "orderedItems.product": productId,
     });
 
-    // Average rating for a product is
-    product.ratings = totalSum / product.reviews.length;
+    if (!order) {
+      return next(
+        createError(403, "You can only review products you have purchased.")
+      );
+    }
 
-    await product.save({ validateBeforeSave: false });
+    const newProductReview = {
+      user: userId,
+      rating: ratings.rating,
+      comment: ratings.comment,
+    };
 
-    // Update order after the product is reviewed. If the product is reviewed, isReviewed will be true in the orders collection under the cart
-    await Order.findByIdAndUpdate(
-      orderId,
-      { $set: { "cart.$[element].isReviewed": true } },
-      { arrayFilters: [{ "element._id": productId }], new: true }
+    // Check if the user has already reviewed this product
+    const existingReview = product.reviews.find(
+      (review) => review.user.toString() === userId.toString()
     );
+
+    if (existingReview) {
+      // Update existing review
+      existingReview.rating = ratings.rating;
+      existingReview.comment = ratings.comment;
+    } else {
+      // Add new review
+      product.reviews.push(newProductReview);
+    }
+
+    // Recalculate the average rating
+    const totalRatings = product.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    const averageRating = totalRatings / product.reviews.length;
+    const averageRatingFixed = averageRating.toFixed(1);
+    const totalReviews = product.reviews.length;
+
+    const updateRatings = {
+      average: averageRatingFixed,
+      count: totalReviews,
+    };
+
+    product.ratings = updateRatings;
+
+    // Save the updated product
+    await product.save({ validateBeforeSave: false });
 
     res.status(201).json({
       success: true,
-      message: "Reviwed succesfully!",
+      message: "Review submitted successfully!",
     });
   } catch (error) {
-    console.log(error);
-    next(createError(500, "Product review did not succeed! Please try again!"));
+    console.error("Product Review Error:", error);
+    next(createError(500, error.message || "Product review failed."));
   }
 };

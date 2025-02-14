@@ -15,7 +15,8 @@ const ProductCard = ({ product }) => {
     originalPrice,
     discountPrice,
     soldOut,
-    variants= [], // Ensure variants is at least an empty array
+    ratings,
+    variants = [], // Ensure variants is at least an empty array
   } = product;
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -75,9 +76,10 @@ const ProductCard = ({ product }) => {
         <p className="product-description">{ShortenText(description, 100)}</p>
         <div className="display-rating-flex-row">
           Rating:
-          <Ratings averageRating={product?.ratings} />
-          <span className="reviewers-number">
-            {product?.ratings?.count || 0} people reviewed this product
+          <Ratings ratings={ratings?.average} /> <span> ({ratings.average.toFixed(1)}/5) </span>
+          <span className="reviewers-count">
+            <strong className="reviewers-number">{ratings?.count || 0}</strong>{" "}
+            people reviewed this product
           </span>
         </div>
 

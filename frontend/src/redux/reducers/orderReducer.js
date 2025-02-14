@@ -7,12 +7,10 @@ const initialState = {
 };
 
 const setLoadingState = (state, key) => {
-  console.log(`Setting loading state for ${key}`);
   state[key] = { ...state[key], loading: true, error: null };
 };
 
 const setSuccessState = (state, action, key) => {
-  console.log(`Setting success state for ${key}`, action.payload); // Debugging
   state[key] = {
     ...state[key],
     data: action.payload ?? [], // Ensures `data` is always an array
@@ -22,7 +20,6 @@ const setSuccessState = (state, action, key) => {
 };
 
 const setFailureState = (state, action, key) => {
-  console.log(`Setting failure state for ${key}`, action.payload); // Debugging
   state[key] = {
     ...state[key],
     loading: false,
@@ -58,7 +55,6 @@ const orderReducer = createSlice({
 
     // Clear errors
     clearErrors: (state) => {
-      console.log("Clearing errors...");
       state.allOrders.error = null;
       state.sellerOrders.error = null;
       state.customerOrders.error = null;

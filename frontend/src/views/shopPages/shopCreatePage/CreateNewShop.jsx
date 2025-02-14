@@ -10,7 +10,7 @@ const CreateNewShop = () => {
   // If seller is logged in, seller will not see the shop login page
   useEffect(() => {
     if (currentSeller) {
-      navigate(`/shops/create/${currentSeller._id}`);
+      navigate(`/shops/${currentSeller._id}`);
     }
   }, [navigate, currentSeller]);
 

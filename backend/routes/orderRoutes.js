@@ -9,9 +9,11 @@ import {
   getOrder,
   orderRefundByShop,
   refundUserOrder,
+  shopOrder,
   updateShopOrders,
 } from "../controllers/orderController.js";
 import { isAdmin, isAuthenticated } from "../middleware/auth.js";
+import { isSellerAuthenticated } from "../middleware/shopAuth.js";
 
 // order Router
 const orderRouter = express.Router();
@@ -19,14 +21,15 @@ const orderRouter = express.Router();
 // order routes
 orderRouter.post("/create", isAuthenticated, createOrder);
 orderRouter.get("/customer", isAuthenticated, getAllUserOrders);
-orderRouter.get("/seller", allShopOrders);
+orderRouter.get("/seller", isSellerAuthenticated, allShopOrders);
 orderRouter.get("/admin", isAuthenticated, isAdmin, allShopsOrders);
-orderRouter.put("/update-order-status/:id/:shopId", updateShopOrders);
-orderRouter.put("/:id/refund-order", refundUserOrder);
-orderRouter.put("/refund-order-successful/:id", orderRefundByShop);
-orderRouter.delete("/order/id", deleteOrder);
-orderRouter.delete("/", deleteOrders);
-orderRouter.get("/:id", getOrder);
+orderRouter.put("/:id/update/status", isSellerAuthenticated, updateShopOrders);
+orderRouter.put("/:id/refund/request", isAuthenticated, refundUserOrder);
+orderRouter.put("/:id/refund/successful", isAuthenticated, orderRefundByShop);
+orderRouter.get("/:id/shop/order", isSellerAuthenticated, shopOrder);
+orderRouter.get("/:id", isAuthenticated, getOrder);
+orderRouter.delete("/:id", isAuthenticated, deleteOrder);
+orderRouter.delete("/", isAuthenticated, isAdmin, deleteOrders);
 
 // Export order Router
 export default orderRouter;

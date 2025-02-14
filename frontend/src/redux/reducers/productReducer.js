@@ -4,6 +4,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   currentProduct: null,
   products: [],
+  shopProducts: [],
+  womenProducts: [],
+  menProducts: [],
+  kidsProducts: [],
   totalCount: 0,
   currentPage: 1,
   totalPages: 1,
@@ -20,15 +24,6 @@ const startLoading = (state) => {
 const setError = (state, action) => {
   state.error = action.payload;
   state.loading = false;
-};
-
-const setSuccess = (state, action) => {
-  state.totalCount = action.payload.totalCount;
-  state.currentPage = action.payload.currentPage;
-  state.totalPages = action.payload.totalPages;
-  state.lastFetched = Date.now(); // Update last fetch timestamp
-  state.loading = false;
-  state.error = null;
 };
 
 const setSingleProductSuccess = (state, action) => {
@@ -62,9 +57,14 @@ const productReducer = createSlice({
     productShopDeleteFailure: setError,
 
     // Get all products for a shop
-    productsShopFetchStart: startLoading,
-    productsShopFetchSuccess: setSuccess,
-    productsShopFetchFailure: setError,
+    shopProductFetchStart: startLoading,
+    shopProductFetchSuccess: (state, action) => {
+      const { shopProducts } = action.payload;
+      state.shopProducts = shopProducts;
+      state.loading = false;
+      state.error = null;
+    },
+    shopProductFetchFailure: setError,
 
     // Get all products for all shops
     allProductsFetchStart: startLoading,
@@ -92,10 +92,27 @@ const productReducer = createSlice({
 
     allProductsFetchFailure: setError,
 
-    // Get all products for a category
-    productsCategoryFetchStart: startLoading,
-    productsCategoryFetchSuccess: setSuccess,
-    productsCategoryFetchFailure: setError,
+    // Get all products for a specific customer category
+    customerCategoryProductsFetchStart: setError,
+    customerCategoryProductsFetchSuccess: (state, action) => {
+      const { customerCategory, customerProducts } = action.payload;
+
+      if (customerCategory === "Ladies") {
+        state.womenProducts = customerProducts;
+      } else if (customerCategory === "Gents") {
+        state.menProducts = customerProducts;
+      } else if (customerCategory === "Kids") {
+        state.kidsProducts = customerProducts;
+      }
+
+      state.loading = false;
+      state.error = null;
+    },
+
+    customerCategoryProductsFetchFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload; // Set error message from payload
+    },
 
     // Clear Error
     clearProductErrors: (state) => {
@@ -117,15 +134,19 @@ export const {
   productShopDeleteStart,
   productShopDeleteSuccess,
   productShopDeleteFailure,
-  productsShopFetchStart,
-  productsShopFetchSuccess,
-  productsShopFetchFailure,
-  productsCategoryFetchStart,
-  productsCategoryFetchSuccess,
-  productsCategoryFetchFailure,
+
   allProductsFetchStart,
   allProductsFetchSuccess,
   allProductsFetchFailure,
+
+  shopProductFetchStart,
+  shopProductFetchSuccess,
+  shopProductFetchFailure,
+
+  customerCategoryProductsFetchStart,
+  customerCategoryProductsFetchSuccess,
+  customerCategoryProductsFetchFailure,
+
   clearProductErrors,
 } = productReducer.actions;
 

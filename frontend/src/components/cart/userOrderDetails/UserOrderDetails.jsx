@@ -1,275 +1,280 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "./UserOrderDetails.scss";
-import { Link, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RxCross1 } from "react-icons/rx";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import {
-  clearOrderErrors,
-  fetchCustomerOrders,
-} from "../../../redux/actions/order";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { API } from "../../../utils/security/secreteKey";
+import "./UserOrderDetails.scss";
 
+const initialState = {
+  comment: "",
+  rating: 1,
+};
 const UserOrderDetails = () => {
-  // The orderId is ...
   const { id } = useParams();
-  console.log("param id = ", id);
-  // Global state variables
-  const { orders } = useSelector((state) => state.order);
   const { currentUser } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
 
-  // Local state variables for reviewing a product
+  const [orderInfos, setOrderInfos] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [ratings, setRatings] = useState(initialState);
   const [open, setOpen] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [refundReason, setRefundReason] = useState("");
 
-  // Display all orders of a user
   useEffect(() => {
-    dispatch(fetchCustomerOrders());
-
-    return () => {
-      dispatch(clearOrderErrors());
+    const fetchSingleOrder = async () => {
+      try {
+        const { data } = await axios.get(`${API}/orders/${id}`, {
+          withCredentials: true,
+        });
+        setOrderInfos(data.order);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to fetch order details");
+        setLoading(false);
+      }
     };
-  }, [dispatch]);
+    fetchSingleOrder();
+  }, [id]);
 
-  // Display all orders of a user
-  // useEffect(() => {
-  //   const userOrders = async () => {
-  //     try {
-  //       dispatch(userOrdersRequest());
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRatings((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  //       const { data } = await axios.get(
-  //         `${API}/orders/user/${currentUser._id}`
-  //       );
-
-  //       dispatch(userOrdersSuccess(data.orders));
-  //     } catch (error) {
-  //       dispatch(userOrdersFail(error.response.data.message));
-  //     }
-  //   };
-  //   userOrders();
-  // }, []);
-
-  // Find a specific order
-  const order = orders && orders.find((item) => item._id === id);
-
-  const rest = () => {
-    setComment("");
-    setRating(0);
+  const resetForm = () => {
+    setRatings(initialState);
     setOpen(false);
   };
 
-  // Product Review handler
+  // Review product handler
   const reviewHandler = async (e) => {
     e.preventDefault();
     try {
       const newProductReview = {
-        user: currentUser,
-        rating: rating,
-        comment: comment,
+        userId: currentUser._id,
+        ratings,
         productId: selectedProduct?._id,
         orderId: id,
       };
 
       const { data } = await axios.put(
         `${API}/products/product/review`,
-        newProductReview
+        newProductReview,
+        { withCredentials: true }
       );
 
       toast.success(data.message);
-      rest();
+      resetForm();
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Review submission failed");
     }
   };
 
-  // ==============================================================================
-  // Refund handler function for a user request to a seller
-  // ==============================================================================
+  // Request refund handler
   const refundHandler = async () => {
+    if (!window.confirm("Are you sure you want to request a refund?")) return;
+
     try {
-      const refundStatus = {
+      const refundRequest = {
         status: "Processing refund",
+        reason: refundReason,
       };
       const { data } = await axios.put(
-        `${API}/orders/${id}/refund-order`,
-        refundStatus
+        `${API}/orders/${id}/refund`,
+        refundRequest
       );
       toast.success(data.message);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Refund request failed");
     }
   };
 
+  if (loading) return <p>Loading order details...</p>;
+  if (error) return <p className="error">{error}</p>;
+
   return (
-    <section className={`user-order-details-container`}>
-      <h1 className="title"> Single Order Details</h1>
-      {/* order id and date */}
-      <article className="order-id-and-date">
+    <section className="user-order-details">
+      <header className="order-header">
+        <h1>Order Details</h1>
         <p className="order-id">
-          Order ID: <span>#{order?._id?.slice(0, 8)}</span>
+          Order ID: <span>#{orderInfos?._id?.slice(0, 8)}</span>
         </p>
-        <h5 className="order-placed-date">
-          Order placed on: <span>{order?.createdAt?.slice(0, 10)}</span>
-        </h5>
-      </article>
-      {/* ordered products */}
-      <div className="ordered-items-wrapper">
-        {order &&
-          order?.cart.map((product) => {
-            return (
-              <section
-                key={product._id}
-                className="image-name-quantity-wrapper"
-              >
-                <figure className="image-container">
-                  <img
-                    src={product.images}
-                    alt={product.name}
-                    className="image"
-                  />
-                </figure>
+        <p className="order-date">
+          Placed on: <strong>{orderInfos?.createdAt?.slice(0, 10)}</strong>
+        </p>
+      </header>
 
-                <article className="name-price-wrapper">
-                  <h4 className="subTitle">{product.name}</h4>
-                  <p className="price">
-                    PQ: ${product.discountPrice} x {product.qty}
-                  </p>
-                </article>
-                {!product.isReviewed && order?.status === "Delivered" ? (
-                  <h4
-                    className={`review-btn`}
-                    onClick={() => setOpen(true) || setSelectedProduct(product)}
-                  >
-                    Write a review
-                  </h4>
-                ) : null}
-              </section>
-            );
-          })}
-      </div>
-      {/* Ordered product review popup */}
-      {open && (
-        <div className="modal-container">
-          <article className="review-order-wrapper">
-            <RxCross1 onClick={() => setOpen(false)} className="close-icon" />
+      {/* Ordered Products Section */}
+      <section className="ordered-items">
+        <h2>Ordered Items</h2>
+        {orderInfos?.orderedItems?.map((product) => (
+          <article key={product._id} className="product-card">
+            <figure className="product-image">
+              <img
+                src={product?.productImage || "https://via.placeholder.com/150"}
+                alt={product?.title}
+              />
+            </figure>
+            <div className="product-info">
+              <h3>{product?.title}</h3>
+              <p>
+                Brand: <strong>{product?.brand?.brandName}</strong>
+              </p>
+              <p>Category: {product?.category?.categoryName}</p>
+              <p>Subcategory: {product?.subcategory?.subcategoryName}</p>
+              <p>Color: {product?.productColor}</p>
+              <p>Size: {product?.size}</p>
+              <p>Quantity: {product?.quantity}</p>
+              <p>
+                Price: <strong>${product?.price}</strong>
+              </p>
+              <p>
+                Total: <strong>${product?.total}</strong>
+              </p>
 
-            <h2 className="review-title">Give a Review</h2>
-
-            {/* Order product image */}
-            <div className="selected-item-wrapper">
-              <figure className="image-container">
-                <img
-                  src={selectedProduct?.images}
-                  alt={selectedProduct.name}
-                  className="image"
-                />
-              </figure>
-
-              {/* Order product name and ratings */}
-
-              <article className="name-quantity-rating">
-                <h3 className="name">{selectedProduct?.name}</h3>
-                <p className="quanity">
-                  ${selectedProduct?.discountPrice} x {selectedProduct?.qty}
-                </p>
-
-                {/* ratings */}
-                <h3 className="rating">
-                  Rating <span style={{ color: "red" }}>*</span>
-                </h3>
-
-                {/* Rating usring Starts of 1 to 5 scale for ordered products*/}
-                <div className="star-rating-wrapper">
-                  {[1, 2, 3, 4, 5].map((i) =>
-                    rating >= i ? (
-                      <AiFillStar
-                        key={i}
-                        className="rated-icon"
-                        onClick={() => setRating(i)}
-                      />
-                    ) : (
-                      <AiOutlineStar
-                        key={i}
-                        className="unratedicon"
-                        onClick={() => setRating(i)}
-                      />
-                    )
-                  )}
-                </div>
-              </article>
-            </div>
-
-            {/* Form for user to write comment for the order placed */}
-            <form className="form">
-              <div className="input-container">
-                <textarea
-                  name="comment"
-                  id="comment"
-                  cols="20"
-                  rows="5"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="How was your product? Write your feeling about it! (Optional)"
-                  className="text-area"
-                ></textarea>
-                <label htmlFor="comment" className="input-label">
-                  Write a comment
-                </label>
-                <span className="input-highlight"></span>
-              </div>
               <button
-                onClick={rating > 0 ? reviewHandler : null}
-                className="comment-btn"
-                type="submit"
+                onClick={() => {
+                  setOpen(true);
+                  setSelectedProduct(product);
+                }}
               >
-                Submit
+                Leave a Review
               </button>
-            </form>
+            </div>
           </article>
+        ))}
+      </section>
+
+      {/* Review Modal */}
+      {open && (
+        <div className="review-modal">
+          <h2>Write a Review</h2>
+          <form onSubmit={reviewHandler}>
+            <label>Rating:</label>
+            <select
+              name="rating"
+              id="rating"
+              value={ratings.rating}
+              onChange={handleChange}
+            >
+              <option value="default">Select Rating</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+
+            <label>Comment:</label>
+            <textarea
+              name="comment"
+              id="comment"
+              value={ratings.comment}
+              onChange={handleChange}
+            />
+
+            <button type="submit">Submit Review</button>
+            <button type="button" onClick={resetForm}>
+              Cancel
+            </button>
+          </form>
         </div>
       )}
-      <hr className="hr" />
-      {/* Total Price */}
-      <h2 className="total-price">
-        Total Price: <strong>${order?.totalPrice}</strong>
-      </h2>
-      <hr className="hr" />
-      {/* Shopping address */}
-      <div className="shipping-paymentinfo-refund-container">
-        <article className="shipping-address">
-          <h4 className="subTitle">Shipping Address:</h4>
-          <p className="address">{`${order?.shippingAddress?.address}`}</p>
-          <p className="address">{order?.shippingAddress?.country}</p>
-          <p className="address">{order?.shippingAddress?.state}</p>
-          <p className="address">{order?.shippingAddress?.city}</p>
-          <p className="address">{order?.user?.phoneNumber}</p>
-        </article>
 
-        <article className="status-wrapper">
-          <h4 className="subTitle">Payment Info:</h4>
+      {/* Refund Request Section */}
+      <section className="refund-section">
+        <h2>Request Refund</h2>
+        <textarea
+          name="refundReason"
+          id="refundReason"
+          rows={5}
+          cols={30}
+          placeholder="Enter refund reason..."
+          value={refundReason}
+          onChange={(e) => setRefundReason(e.target.value)}
+        />
+        <button onClick={refundHandler} className="refund-request-btn">
+          Submit Refund Request
+        </button>
+      </section>
+
+      {/* Refund Details Section */}
+      {orderInfos?.payment?.refunds?.length > 0 && (
+        <section className="refund-details">
+          <h2>Refund Details</h2>
+          {orderInfos.payment.refunds.map((refund, index) => (
+            <div key={index} className="refund-item">
+              <p>
+                <strong>Refund ID:</strong> {refund.refundId}
+              </p>
+              <p>
+                <strong>Amount:</strong> ${refund.amount.toFixed(2)}
+              </p>
+              <p>
+                <strong>Reason:</strong> {refund.reason || "No reason provided"}
+              </p>
+              <p>
+                <strong>Refund Date:</strong>{" "}
+                {new Date(refund.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* Order Summary with Shipping Address */}
+      <footer className="order-summary">
+        <div className="summary-details">
+          <h2>Order Summary</h2>
           <p>
-            Status:
-            {order?.paymentInfo?.status
-              ? order?.paymentInfo?.status
-              : "Not Paid"}
+            Subtotal: <strong>${orderInfos?.subtotal.toFixed(2)}</strong>
           </p>
+          <p>
+            Shipping Fee: <strong>${orderInfos?.shippingFee.toFixed(2)}</strong>
+          </p>
+          <p>
+            Tax: <strong>${orderInfos?.tax.toFixed(2)}</strong>
+          </p>
+          <p>
+            Service Fee: <strong>${orderInfos?.serviceFee.toFixed(2)}</strong>
+          </p>
+          <h3>
+            Grand Total: <strong>${orderInfos?.grandTotal.toFixed(2)}</strong>
+          </h3>
+        </div>
 
-          {order?.status === "Delivered" && (
-            <button className={`give-refund-btn`} onClick={refundHandler}>
-              Refund Me
-            </button>
-          )}
-        </article>
-      </div>
-      {/* Send Message button */}
-      <Link to="/contact">
-        <button className={`send-message-btn`}>Send Message</button>
-      </Link>{" "}
+        {/* Shipping Address */}
+        <div className="shipping-address">
+          <h2>Shipping Address</h2>
+          <p>
+            <strong>Name:</strong> {currentUser?.name}
+          </p>
+          <p>
+            <strong>Address:</strong> {orderInfos?.shippingAddress?.address}
+          </p>
+          <p>
+            <strong>City:</strong> {orderInfos?.shippingAddress?.city}
+          </p>
+          <p>
+            <strong>State:</strong> {orderInfos?.shippingAddress?.state}
+          </p>
+          <p>
+            <strong>Zip Code:</strong> {orderInfos?.shippingAddress?.zipCode}
+          </p>
+          <p>
+            <strong>Country:</strong> {orderInfos?.shippingAddress?.country}
+          </p>
+          <p>
+            <strong>Phone:</strong> {orderInfos?.shippingAddress?.phoneNumber}
+          </p>
+        </div>
+      </footer>
     </section>
   );
 };

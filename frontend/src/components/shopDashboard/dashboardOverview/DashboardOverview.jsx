@@ -1,115 +1,126 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
-import axios from "axios";
 import { RxArrowRight } from "react-icons/rx";
 import { MdPriceChange } from "react-icons/md";
 import { FaFirstOrderAlt } from "react-icons/fa6";
 import { FaProductHunt } from "react-icons/fa";
-import { API } from "../../../utils/security/secreteKey";
-import {
-  fetchSellerOrders,
-  clearOrderErrors,
-} from "../../../redux/actions/order";
-import { fetchSellerOrdersRequest } from "../../../redux/reducers/orderReducer";
+import { fetchSellerOrders } from "../../../redux/actions/order";
 import "./DashboardOverview.scss";
+import { clearErrors } from "../../../redux/reducers/orderReducer";
+import moment from "moment";
+
+import {
+  clearSellerErrors,
+  fetchSingleSeller,
+} from "../../../redux/actions/seller";
 
 const DashboardOverview = () => {
-  // Global state variables
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
-  const { currentSeller } = useSelector((state) => state.seller);
-
-  // Extract loading, error, and data from sellerOrders
   const {
-    data: sellerOrdersData,
-    loading: sellerOrdersLoading,
-    error: sellerOrdersError,
-  } = sellerOrders;
+    currentSeller: shopDetails,
+    loading: shopLoading,
+    error: shopError,
+  } = useSelector((state) => state.seller);
 
-  // Local state variables
-  const [shopProducts, setShopProducts] = useState([]);
-  const [deliveredShopOrders, setDeliveredShopOrders] = useState([]);
+  const { data: orders = [], loading, error } = sellerOrders || {};
 
-  // Fetch seller orders on mount
   useEffect(() => {
+    dispatch(clearErrors());
     dispatch(fetchSellerOrders());
 
     return () => {
-      dispatch(clearOrderErrors());
+      dispatch(clearErrors());
     };
   }, [dispatch]);
 
-  // Fetch shop products
   useEffect(() => {
-    const getShopProducts = async () => {
-      try {
-        const { data } = await axios.get(
-          `${API}/products/${currentSeller?._id}/shop-products`
-        );
-        setShopProducts(data.products);
-      } catch (error) {
-        console.error("Error fetching shop products:", error);
-      }
-    };
-    getShopProducts();
-  }, [currentSeller]);
+    dispatch(clearErrors());
+    dispatch(fetchSellerOrders());
 
-  // Fetch delivered orders
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, [dispatch]);
+
   useEffect(() => {
-    const getShopOrders = async () => {
-      try {
-        dispatch(fetchSellerOrdersRequest());
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller?._id}`
-        );
-        const deliveredOrders = data.sellerOrders.filter(
-          (order) => order.status === "Delivered"
-        );
-        setDeliveredShopOrders(deliveredOrders);
-      } catch (error) {
-        console.error("Error fetching delivered orders:", error);
-      }
-    };
-    getShopOrders();
-  }, [currentSeller, dispatch]);
+    dispatch(clearSellerErrors());
+    dispatch(fetchSingleSeller());
 
-  // Calculate earnings
-  const totalEarningsWithoutTax = deliveredShopOrders.reduce(
-    (acc, order) => acc + order.totalPrice,
-    0
+    return () => {
+      dispatch(clearSellerErrors());
+    };
+  }, [dispatch]);
+
+  const deliveredShopOrders = orders.filter(
+    (order) => order.orderStatus === "Delivered"
   );
-  const serviceCharge = totalEarningsWithoutTax * 0.1;
-  const totalEarnings = totalEarningsWithoutTax - serviceCharge;
-  const shopIncome = totalEarnings.toFixed(2);
 
-  const availableBalance = currentSeller?.availableBalance?.toFixed() || "0";
+  const totalShopIncome = shopDetails?.availableBalance?.toFixed(2) || "0";
 
-  // Data Grid Columns
+  const rows = deliveredShopOrders.map((order) => ({
+    id: order._id,
+    createdAt: order.createdAt,
+    quantity:
+      order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
+      0,
+    method: order.payment?.method || "Unknown",
+    grandTotal: order.grandTotal ?? 0,
+    orderStatus: order.orderStatus || "Unknown",
+  }));
+
   const columns = [
-    { field: "id", headerName: "Order ID", minWidth: 250, flex: 0.7 },
-    { field: "status", headerName: "Status", minWidth: 130, flex: 0.7 },
     {
-      field: "quantity",
-      headerName: "Quantity",
-      type: "number",
-      minWidth: 130,
-      flex: 0.7,
+      field: "createdAt",
+      headerName: "Order Date",
+      minWidth: 180,
+      flex: 0.8,
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
     },
     {
-      field: "total",
-      headerName: "Total",
+      field: "quantity",
+      headerName: "Total Items",
       type: "number",
       minWidth: 130,
+      flex: 0.6,
+    },
+    {
+      field: "method",
+      headerName: "Payment Method",
+      minWidth: 150,
       flex: 0.8,
     },
     {
-      field: " ",
-      flex: 1,
-      minWidth: 150,
-      headerName: "",
+      field: "grandTotal",
+      headerName: "Total Amount",
       type: "number",
+      minWidth: 150,
+      flex: 0.8,
+      renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
+    },
+    {
+      field: "orderStatus",
+      headerName: "Order Status",
+      minWidth: 140,
+      flex: 0.7,
+      renderCell: (params) => (
+        <span
+          style={{
+            color: params.value === "Pending" ? "orange" : "green",
+            fontWeight: "bold",
+          }}
+        >
+          {params.value}
+        </span>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Details",
+      minWidth: 150,
+      flex: 0.7,
       sortable: false,
       renderCell: (params) => (
         <Link to={`/shop/order/${params.id}`}>
@@ -119,80 +130,73 @@ const DashboardOverview = () => {
     },
   ];
 
-  // Data Grid Rows
-  const rows = deliveredShopOrders.map((order) => ({
-    id: order._id,
-    quantity: order.cart.reduce((acc, item) => acc + item.qty, 0),
-    total: `$${order.totalPrice}`,
-    status: order.status,
-  }));
-
-  // Loading & Error States Handling
-  if (sellerOrdersLoading) return <p>Loading orders...</p>;
-  if (sellerOrdersError)
-    return <p className="error-message">Error: {sellerOrdersError}</p>;
-
   return (
     <section className="overview-dashboard-wrapper">
       <h2 className="overview-dashboard-title">Overview</h2>
 
-      <div className="summary-overview">
-        {/* Account Balance */}
-        <article className="article-box account-balance">
-          <aside className="aside-box account-balance">
-            <MdPriceChange className="icon" />
+      {shopLoading ? (
+        <p>Loading shop details...</p>
+      ) : shopError ? (
+        <p style={{ color: "red" }}>Error: {shopError}</p>
+      ) : (
+        <div className="summary-overview">
+          <article className="article-box account-balance">
+            <aside className="aside-box account-balance">
+              <MdPriceChange className="icon" />
+              <h3 className="subTitle">
+                Account Balance of {shopDetails?.name}
+              </h3>
+            </aside>
+            <h3 className="subTitle">${totalShopIncome}</h3>
+            <Link to="/dashboard-withdraw-money" className="link">
+              Withdraw Money
+            </Link>
+          </article>
+
+          <article className="article-box orders-wrapper">
+            <aside className="aside-box all-orders">
+              <FaFirstOrderAlt className="icon" />
+              <h3 className="subTitle">All Orders from {shopDetails?.name}</h3>
+            </aside>
             <h3 className="subTitle">
-              Account Balance of {currentSeller?.name}
+              {deliveredShopOrders ? deliveredShopOrders.length : "0"}
             </h3>
-          </aside>
-          <h3 className="subTitle">${shopIncome}</h3>
-          <Link to="/dashboard-withdraw-money" className="link">
-            Withdraw Money
-          </Link>
-        </article>
+            <Link to="/dashboard-orders" className="link">
+              View Orders
+            </Link>
+          </article>
 
-        {/* Orders */}
-        <article className="article-box orders-wrapper">
-          <aside className="aside-box all-orders">
-            <FaFirstOrderAlt className="icon" />
-            <h3 className="subTitle">All Orders from {currentSeller?.name}</h3>
-          </aside>
-          <h3 className="subTitle">
-            {sellerOrdersData ? sellerOrdersData.length : "0"}
-          </h3>
-          <Link to="/dashboard-orders" className="link">
-            View Orders
-          </Link>
-        </article>
+          <article className="article-box all-products-wrapper">
+            <aside className="aside-box all-products">
+              <FaProductHunt className="icon" />
+              <h3 className="subTitle">All Products of {shopDetails?.name}</h3>
+            </aside>
+            <h3 className="subTitle">{shopDetails ? shopDetails?.shopProducts?.length : "0"}</h3>
+            <Link to="/dashboard-products">View Products</Link>
+          </article>
+        </div>
+      )}
 
-        {/* Products */}
-        <article className="article-box all-products-wrapper">
-          <aside className="aside-box all-products">
-            <FaProductHunt className="icon" />
-            <h3 className="subTitle">All Products of {currentSeller?.name}</h3>
-          </aside>
-          <h3 className="subTitle">
-            {shopProducts ? shopProducts.length : "0"}
-          </h3>
-          <Link to="/dashboard-products">View Products</Link>
-        </article>
-      </div>
+      <h3 className="latest-orders">Delivered Orders of {shopDetails?.name}</h3>
 
-      {/* Latest Orders */}
-      <h3 className="latest-orders">
-        Delivered Orders of {currentSeller?.name}
-      </h3>
+      <div style={{ padding: "20px" }}>
+        <h2>Your Orders</h2>
 
-      {/* Data Grid */}
-      <div className="data-grid-wrapper">
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
-          autoHeight
-          loading={sellerOrdersLoading} // Shows loading spinner in DataGrid
-        />
+        {loading ? (
+          <div>Loading orders...</div>
+        ) : error ? (
+          <div style={{ color: "red" }}>Error: {error}</div>
+        ) : orders.length === 0 ? (
+          <div>No orders found.</div>
+        ) : (
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={10}
+            disableSelectionOnClick
+            autoHeight
+          />
+        )}
       </div>
     </section>
   );

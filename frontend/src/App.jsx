@@ -3,14 +3,11 @@ import { Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Home from "./views/homePage/Home";
-import EventsPage from "./views/eventsPage/EventsPage";
-import BestSellings from "./views/bestSellingpage/BestSellings";
 import Contact from "./views/contactPage/Contact";
 import NotFound from "./views/notFound/NotFound";
 import ProfilePage from "./views/userPages/profilePage/ProfilePage";
 import Forgotpassword from "./views/userPages/passwordPage/Forgotpassword";
 import ResetPassword from "./views/userPages/passwordPage/ResetPassword";
-import SellerProtectedRoute from "./protectedRoutes/SellerProtectedRoute";
 import UserProtectedRoute from "./protectedRoutes/UserProtectedRoute";
 import ShopLoginPage from "./views/shopPages/shopLoginPage/ShopLoginPage";
 import CreateNewShop from "./views/shopPages/shopCreatePage/CreateNewShop";
@@ -45,6 +42,10 @@ import { API } from "./utils/security/secreteKey";
 import { fetchUser } from "./redux/actions/user";
 import { fetchSingleSeller } from "./redux/actions/seller";
 import ShopDashboardPage from "./views/shopPages/shopDashbaordPage/ShopDashboardPage";
+import ShopOrderDetailsPage from "./views/shopPages/shopOrderDetailsPage/ShopOrderDetailsPage";
+import WomenProductsPage from "./views/womenPage/WomenProductsPage";
+import MenProductsPage from "./views/menPage/MenProductsPage";
+import KidsProductsPage from "./views/kidsPage/KidsProductsPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -94,8 +95,9 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productID" element={<SingleProduct />} />
-        <Route path="/best-sellings" element={<BestSellings />} />
-        <Route path="/events" element={<EventsPage />} />
+        <Route path="/women" element={<WomenProductsPage />} />
+        <Route path="/men" element={<MenProductsPage />} />
+        <Route path="/kids" element={<KidsProductsPage />} />
 
         {/* User Pages */}
         <Route path="/register" element={<Register />} />
@@ -122,7 +124,7 @@ const App = () => {
         />
 
         <Route
-          path="/user/order/:id"
+          path="/orders/:id"
           element={
             <UserProtectedRoute>
               <UserOrderDetailsPage />
@@ -160,14 +162,9 @@ const App = () => {
 
         <Route path="/shop/dashboard" element={<ShopDashboardPage />} />
 
-        <Route
-          path="/shop/:id"
-          element={
-            <SellerProtectedRoute>
-              <ShopHome />
-            </SellerProtectedRoute>
-          }
-        />
+        <Route path="/shop/:id" element={<ShopHome />} />
+
+        <Route path="/shop/order/:id" element={<ShopOrderDetailsPage />} />
 
         {/* Admin Routes */}
         <Route

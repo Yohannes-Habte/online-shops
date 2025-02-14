@@ -1,0 +1,717 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+// Mobile Screen Size
+.header {
+  display: flex;
+  flex-direction: column;
+  // top header wrapper
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background-color: $header-bg;
+
+    // Logo
+    .logo {
+      @include title;
+      font-size: $afs;
+
+      .shopping {
+        color: $blue;
+        &:hover {
+          color: $green;
+        }
+      }
+
+      &:hover {
+        color: $tomato;
+      }
+    }
+
+    // Search bar
+    .search-form {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 40%;
+      position: relative;
+      margin-top: 0.5rem;
+      display: none;
+
+      .input-container {
+        @include inputContainer;
+
+        .input-field {
+          @include inputField;
+          @include shadow3;
+          background-color: $search-bg5;
+          border: 1px solid $gray;
+
+          &::placeholder {
+            font-size: $afs;
+          }
+        }
+
+        .input-highlight {
+          position: absolute;
+          bottom: 1rem;
+          left: 0;
+          height: 2px;
+          width: 0;
+          background-color: $yellow;
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+          font-size: $afs;
+          font-weight: $afw;
+        }
+
+        .input-field:focus + .input-highlight {
+          width: 100%;
+        }
+      }
+
+      .search-btn {
+        position: absolute;
+        right: 1rem;
+        border: none;
+        background-color: $search-bg5;
+
+        .search-icon {
+          font-size: $afs;
+          cursor: pointer;
+
+          &:hover {
+            color: $red;
+          }
+        }
+      }
+
+      .search-results {
+        position: absolute;
+        top: 5rem;
+        left: 0;
+        background-color: $header-bg;
+        width: 100%;
+        z-index: 99;
+
+        .subTitle {
+          @include subTitle;
+        }
+      }
+    }
+
+    // Become seller
+    .become-seller {
+      @include flexCenter;
+      @include button3;
+      font-size: $sfs;
+
+      .icon {
+        font-size: $afs;
+      }
+    }
+  }
+
+  // Navbar, cat and user
+  .navbar-cart-user-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: $navbar-bg5;
+    padding: 0 2rem;
+
+    // categories
+    .categories {
+      display: none;
+
+      .top-icon {
+        font-size: $afs;
+      }
+
+      .btn {
+        font-size: $afs;
+        border: none;
+        outline: none;
+        cursor: pointer;
+      }
+
+      .bottom-icon {
+        font-size: $aafs;
+      }
+    }
+
+    // Wish list, Car and logged in user
+    .wish-list-cart-user-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      // Wish List
+      .wishlist-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .wishlist-item {
+          position: absolute;
+          top: -0.9rem;
+          right: 0.6rem;
+          color: $white;
+          font-size: $afs;
+          font-weight: $aafw;
+        }
+      }
+
+      // Cart
+      .cart-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .cart-item {
+          position: absolute;
+          top: -0.9rem;
+          right: 0.6rem;
+          color: $white;
+          font-size: $afs;
+          font-weight: $aafw;
+        }
+      }
+
+      // Logged in user
+      .logged-in-user {
+        position: relative;
+
+        .user-image-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .image {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+          }
+        }
+
+        .user-history {
+          position: absolute;
+          right: -2rem;
+          top: 3rem;
+          width: 220px;
+          height: fit-content;
+          background-color: $navbar-bg5;
+          padding: 1rem 2rem;
+          border-radius: 0 0 0 $radius;
+
+          .list-item {
+            @include paragraph;
+            color: $white;
+            cursor: pointer;
+
+            &:hover {
+              background-color: $navbar-hover5;
+              color: $tomato;
+            }
+            .link {
+              color: $white;
+              &:hover {
+                color: $tomato;
+              }
+            }
+          }
+        }
+      }
+
+      .icon {
+        font-size: $aafs;
+        color: $white;
+      }
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .header {
+    display: flex;
+    flex-direction: column;
+    // top header wrapper
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background-color: $header-bg;
+
+      // Logo
+      .logo {
+        @include title;
+
+        .shopping {
+          color: $blue;
+          &:hover {
+            color: $green;
+          }
+        }
+
+        &:hover {
+          color: $tomato;
+        }
+      }
+
+      // Search bar
+      .search-form {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 40%;
+        position: relative;
+        margin-top: 0.5rem;
+
+        .input-container {
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            @include shadow3;
+            background-color: $search-bg5;
+            border: 1px solid $gray;
+
+            &::placeholder {
+              font-size: $afs;
+            }
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 1rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $yellow;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus {
+            font-size: $afs;
+            font-weight: $afw;
+          }
+
+          .input-field:focus + .input-highlight {
+            width: 100%;
+          }
+        }
+
+        .search-btn {
+          position: absolute;
+          right: 1rem;
+          border: none;
+          background-color: $search-bg5;
+
+          .search-icon {
+            font-size: $afs;
+            cursor: pointer;
+
+            &:hover {
+              color: $red;
+            }
+          }
+        }
+
+        .search-results {
+          position: absolute;
+          top: 5rem;
+          left: 0;
+          background-color: $header-bg;
+          width: 100%;
+          z-index: 99;
+
+          .subTitle {
+            @include subTitle;
+          }
+        }
+      }
+
+      // Become seller
+      .become-seller {
+        @include flexCenter;
+        @include button3;
+
+        .icon {
+          font-size: $aafs;
+        }
+      }
+    }
+
+    // Navbar, cat and user
+    .navbar-cart-user-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: $navbar-bg5;
+      padding: 0 2rem;
+
+      // categories
+      .categories {
+        display: none;
+
+        .top-icon {
+          font-size: $afs;
+        }
+
+        .btn {
+          font-size: $afs;
+          border: none;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .bottom-icon {
+          font-size: $aafs;
+        }
+      }
+
+      // Wish list, Car and logged in user
+      .wish-list-cart-user-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+
+        // Wish List
+        .wishlist-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+
+          .wishlist-item {
+            position: absolute;
+            top: -0.9rem;
+            right: 0.6rem;
+            color: $white;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+        }
+
+        // Cart
+        .cart-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+
+          .cart-item {
+            position: absolute;
+            top: -0.9rem;
+            right: 0.6rem;
+            color: $white;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+        }
+
+        // Logged in user
+        .logged-in-user {
+          position: relative;
+
+          .image {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+          }
+
+          .user-history {
+            position: absolute;
+            right: -2rem;
+            top: 3rem;
+            width: 220px;
+            height: fit-content;
+            background-color: $navbar-bg5;
+            padding: 1rem 2rem;
+            border-radius: 0 0 0 $radius;
+
+            .list-item {
+              @include paragraph;
+              color: $white;
+              cursor: pointer;
+
+              &:hover {
+                background-color: $navbar-hover5;
+                color: $tomato;
+              }
+              .link {
+                color: $white;
+                &:hover {
+                  color: $tomato;
+                }
+              }
+            }
+          }
+        }
+
+        .icon {
+          font-size: $aafs;
+          color: $white;
+        }
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .header {
+    display: flex;
+    flex-direction: column;
+    // top header wrapper
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background-color: $header-bg;
+
+      // Logo
+      .logo {
+        @include title;
+
+        .shopping {
+          color: $blue;
+          &:hover {
+            color: $green;
+          }
+        }
+
+        &:hover {
+          color: $tomato;
+        }
+      }
+
+      // Search bar
+      .search-form {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 40%;
+        position: relative;
+        margin-top: 0.5rem;
+
+        .input-container {
+          @include inputContainer;
+
+          .input-field {
+            @include inputField;
+            @include shadow3;
+            background-color: $search-bg5;
+            border: 1px solid $gray;
+
+            &::placeholder {
+              font-size: $afs;
+            }
+          }
+
+          .input-highlight {
+            position: absolute;
+            bottom: 1rem;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background-color: $yellow;
+            transition: all 0.3s ease;
+          }
+
+          .input-field:focus {
+            font-size: $afs;
+            font-weight: $afw;
+          }
+
+          .input-field:focus + .input-highlight {
+            width: 100%;
+          }
+        }
+
+        .search-btn {
+          position: absolute;
+          right: 1rem;
+          border: none;
+          background-color: $search-bg5;
+
+          .search-icon {
+            font-size: $afs;
+            cursor: pointer;
+
+            &:hover {
+              color: $red;
+            }
+          }
+        }
+
+        .search-results {
+          position: absolute;
+          top: 5rem;
+          left: 0;
+          background-color: $header-bg;
+          width: 100%;
+          z-index: 99;
+
+          .subTitle {
+            @include subTitle;
+          }
+        }
+      }
+
+      // Become seller
+      .become-seller {
+        @include flexCenter;
+        @include button3;
+
+        .icon {
+          font-size: $aafs;
+        }
+      }
+    }
+
+    // Navbar, cat and user
+    .navbar-cart-user-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: $navbar-bg5;
+      padding: 0 2rem;
+
+      // categories
+      .categories {
+        position: relative;
+        background-color: $white;
+        width: 10.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+
+        .top-icon {
+          font-size: $afs;
+        }
+
+        .select-category {
+          font-size: 1rem;
+         text-align: center;
+          border: none;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .bottom-icon {
+          font-size: $aafs;
+        }
+      }
+
+      // Wish list, Car and logged in user
+      .wish-list-cart-user-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+
+        // Wish List
+        .wishlist-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+
+          .wishlist-item {
+            position: absolute;
+            top: -0.9rem;
+            right: 0.6rem;
+            color: $white;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+        }
+
+        // Cart
+        .cart-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+
+          .cart-item {
+            position: absolute;
+            top: -0.9rem;
+            right: 0.6rem;
+            color: $white;
+            font-size: $afs;
+            font-weight: $aafw;
+          }
+        }
+
+        // Logged in user
+        .logged-in-user {
+          position: relative;
+
+          .image {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+          }
+
+          .user-history {
+            position: absolute;
+            right: -2rem;
+            top: 3rem;
+            width: 220px;
+            height: fit-content;
+            background-color: $navbar-bg5;
+            padding: 1rem 2rem;
+            border-radius: 0 0 0 $radius;
+
+            .list-item {
+              @include paragraph;
+              color: $white;
+              cursor: pointer;
+
+              &:hover {
+                background-color: $navbar-hover5;
+                color: $tomato;
+              }
+              .link {
+                color: $white;
+                &:hover {
+                  color: $tomato;
+                }
+              }
+            }
+          }
+        }
+
+        .icon {
+          font-size: $aafs;
+          color: $white;
+        }
+      }
+    }
+  }
+}

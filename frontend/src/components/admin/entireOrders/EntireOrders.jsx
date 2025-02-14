@@ -36,7 +36,6 @@ const EntireOrders = () => {
     orderStatus: order.orderStatus || "Unknown",
   }));
 
-  console.log("✅ Final Rows Data:", rows);
 
   // **Columns for DataGrid**
   const columns = [
