@@ -107,6 +107,24 @@ const SingleProduct = () => {
     );
   };
 
+  // ===========================================================================
+  // Single Product Rating section
+  // =========================================================================
+
+  const singleProductRating = () => (
+    <div className="product-rating-wrapper">
+      Rating:
+      <Ratings ratings={currentProduct?.ratings?.average} />{" "}
+      <span> ({currentProduct?.ratings.average.toFixed(1)}/5) </span>
+      <span className="reviewers-count">
+        <strong className="reviewers-number">
+          {currentProduct?.ratings?.count || 0}
+        </strong>{" "}
+        people reviewed this product
+      </span>
+    </div>
+  );
+
   return (
     <main className="single-product-page">
       <Header />
@@ -143,17 +161,8 @@ const SingleProduct = () => {
             <h1 className="product-title">{currentProduct?.title}</h1>
             <p className="product-description">{currentProduct?.description}</p>
 
-            <div className="product-rating-wrapper">
-              Rating:
-              <Ratings ratings={currentProduct?.ratings?.average} />{" "}
-              <span> ({currentProduct?.ratings.average.toFixed(1)}/5) </span>
-              <span className="reviewers-count">
-                <strong className="reviewers-number">
-                  {currentProduct?.ratings?.count || 0}
-                </strong>{" "}
-                people reviewed this product
-              </span>
-            </div>
+            {/* Single Product Rating */}
+            {singleProductRating()}
 
             <div className="product-parts-wrapper">
               <article className="product-infos">
@@ -238,22 +247,24 @@ const SingleProduct = () => {
 
               <article className="product-size-selection-wrapper">
                 <h2 className="product-size-title">Select Product Size</h2>
-                <form className="size-selection-form" onSubmit={addToCartHandler}>
-                 
-                    <label htmlFor="size-selector">Choose Size:</label>
-                    <select
-                      id="size-selector"
-                      value={selectedSize}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                    >
-                      {selectedVariant?.productSizes?.map((sizeObj, index) => (
-                        <option key={index} value={sizeObj.size}>
-                          {sizeObj.size}{" "}
-                          {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                
+                <form
+                  className="size-selection-form"
+                  onSubmit={addToCartHandler}
+                >
+                  <label htmlFor="size-selector">Choose Size:</label>
+                  <select
+                    id="size-selector"
+                    value={selectedSize}
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                  >
+                    {selectedVariant?.productSizes?.map((sizeObj, index) => (
+                      <option key={index} value={sizeObj.size}>
+                        {sizeObj.size}{" "}
+                        {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
+                      </option>
+                    ))}
+                  </select>
+
                   <button
                     type="button"
                     className="size-button"

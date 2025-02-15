@@ -1,0 +1,89 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.register-page {
+  .register-page-container {
+    width: $mobile;
+    margin: 2rem auto;
+    min-height: 100vh;
+
+    .register-page-title {
+      @include title;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .register-page {
+    .register-page-container {
+      width: $mobile;
+   
+
+      .register-page-title {
+        font-size: $nfs;
+      }
+    }
+  }
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .register-page {
+    .register-page-container {
+      width: $mobileLandscape;
+   
+
+      .register-page-title {
+        font-size: $afs;
+      }
+    }
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .register-page {
+    .register-page-container {
+      width: $tablet;
+    
+
+      .register-page-title {
+        font-size: $aafs;
+      }
+    }
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .register-page {
+    .register-page-container {
+      width: $laptop;
+      margin: 2rem auto 3rem;
+      padding: 0 2rem;
+
+      .register-page-title {
+        @include title;
+      }
+    }
+  }
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+  .register-page {
+    .register-page-container {
+      width: 60%;
+      margin: 2rem auto 3rem;
+      padding: 0 2rem;
+
+      .register-page-title {
+        @include title;
+      }
+    }
+  }
+}
+
+

@@ -29,7 +29,7 @@ const GoogleSignupLogin = ({ login, signup }) => {
         image: result.user.photoURL,
         agree: true,
       };
-      const { data } = await axios.post(`${API}/auths/google`, userData);
+      const { data } = await axios.post(`${API}/auth/google`, userData);
 
       dispatch(Action.loginSuccess(data.user));
       navigate('/profile');

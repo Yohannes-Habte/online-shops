@@ -5,18 +5,18 @@ import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { validEmail, validPassword } from "../../../utils/validators/Validate";
+import { validEmail, validPassword } from "../../utils/validators/Validate";
 import { toast } from "react-toastify";
-import ButtonLoader from "../../../utils/loader/ButtonLoader";
-import { API } from "../../../utils/security/secreteKey";
-import GoogleSignupLogin from "../../../components/userLayout/googleRegisterLongin/GoogleSignupLogin";
+import ButtonLoader from "../../utils/loader/ButtonLoader";
+import { API } from "../../utils/security/secreteKey";
 import Cookies from "js-cookie";
 import {
   clearErrors,
   loginFailure,
   loginStart,
   loginSuccess,
-} from "../../../redux/reducers/userReducer";
+} from "../../redux/reducers/userReducer";
+import GoogleSignupLogin from "../../components/layouts/googleRegisterLongin/GoogleSignupLogin";
 
 const initialState = {
   email: "",
@@ -122,7 +122,6 @@ const Login = () => {
 
   return (
     <section className="login-container">
-      <h3 className="login-title">Login</h3>
       <form onSubmit={handleSubmit} className="login-form">
         {/* Email input container */}
         <div className="input-container">

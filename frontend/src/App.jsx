@@ -17,8 +17,6 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import ShopDetailsPage from "./views/shopPages/shopDetailsPage/ShopDetailsPage";
 import TrackOrderPage from "./views/userPages/trackOrderPage/TrackOrderPage";
-import Register from "./views/userPages/registerPage/Register";
-import Login from "./views/userPages/loginPage/Login";
 import CheckoutPage from "./views/userPages/checkoutPage/CheckoutPage";
 import UserOrderDetailsPage from "./views/userPages/userOrderDetailsPage/UserOrderDetailsPage";
 import Products from "./views/productPages/productsPage/Products";
@@ -46,6 +44,8 @@ import ShopOrderDetailsPage from "./views/shopPages/shopOrderDetailsPage/ShopOrd
 import WomenProductsPage from "./views/womenPage/WomenProductsPage";
 import MenProductsPage from "./views/menPage/MenProductsPage";
 import KidsProductsPage from "./views/kidsPage/KidsProductsPage";
+import RegisterPage from "./views/userPages/registerPage/RegisterPage";
+import LoginPage from "./views/userPages/loginPage/LoginPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -100,8 +100,8 @@ const App = () => {
         <Route path="/kids" element={<KidsProductsPage />} />
 
         {/* User Pages */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/order/success" element={<OrderSuccess />} />
         <Route path="/forgot-password" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />

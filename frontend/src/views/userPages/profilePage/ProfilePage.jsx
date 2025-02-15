@@ -1,47 +1,27 @@
-import { useEffect, useState } from "react";
-import "./ProfilePage.scss";
-import { useSelector } from "react-redux";
-import UserProfile from "../../../components/user/userProfile/UserProfile";
-import { Link, useNavigate } from "react-router-dom";
-import { FaArrowAltCircleLeft } from "react-icons/fa";
-import UserSidebar from "../../../components/layouts/userSidebar/UserSidebar";
+import { useState } from "react";
+import "./UserProfilePage.scss";
+import UserSidebar from "../../../components/layouts/userSidebar/UserProfileSidebar";
+import UserContents from "../../../components/user/userContent/UserContents";
+import { Helmet } from "react-helmet-async";
 
-const ProfilePage = () => {
-  // State  variables
-  const { currentUser, loading } = useSelector((state) => state.user);
-  const [active, setActive] = useState(1);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!currentUser) {
-      navigate("/login");
-    }
-  }, []);
+const UserProfilePage = () => {
+  const [isActive, setIsActive] = useState(1);
 
   return (
-    <main className="profile-page">
-      <Link to="/" className="go-back-link">
-        <FaArrowAltCircleLeft /> Home
-      </Link>
-      <section className="profile-container">
-        <h1 className="profile-title"> Details of {currentUser.name} </h1>
+    <main className="user-profile-page">
+      <Helmet>
+        <title>User Profile</title>
+      </Helmet>
+      <section className="user-profile-page-container">
+        <h1 className="user-profile-page-title"> User profile </h1>
 
-        <div className="sidebar-and-usrProfile-wrapper">
-          <div className="user-profile-sidebar-wrapper">
-            <UserSidebar active={active} setActive={setActive} />
-          </div>
-
-          <div className="user-profile-wrapper">
-            <UserProfile
-              currentUser={currentUser}
-              loading={loading}
-              active={active}
-            />
-          </div>
+        <div className="user-profile-wrapper">
+          <UserSidebar isActive={isActive} setIsActive={setIsActive} />
+          <UserContents isActive={isActive} setIsActive={setIsActive} />
         </div>
       </section>
     </main>
   );
 };
 
-export default ProfilePage;
+export default UserProfilePage;

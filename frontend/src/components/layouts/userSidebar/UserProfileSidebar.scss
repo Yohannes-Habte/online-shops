@@ -1,0 +1,186 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.user-profile-sidebar-wrapper {
+  width: 18%;
+  border-radius: 0;
+  background-color: $userSidebar-bg;
+  .user-sidebar-hamburger-menu {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  // Big screens
+  .user-sidebar-menu-container {
+    display: flex;
+    flex-direction: column;
+
+    .user-profile-sidebar-title {
+      @include subTitle;
+    }
+
+    .user-profile-sidebar-item {
+      @include flexRow;
+      @include shadow1;
+      align-items: center;
+      font-size: $nfs;
+      padding: 0.5rem 0;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      z-index: 9999;
+
+      &:hover {
+        color: $red;
+        background: $userSidebar-hover;
+        border-radius: $radius;
+      }
+
+      .active-text {
+        color: $red;
+        font-size: $nfs;
+      }
+
+      .passive-text {
+        color: $black;
+        font-size: $nfs;
+
+        &:hover {
+          color: $red;
+        }
+      }
+
+      .active-icon {
+        color: $red;
+        font-size: $afs;
+      }
+
+      .passive-icon {
+        color: $iconColor;
+        font-size: $afs;
+
+        &:hover {
+          color: $red;
+        }
+      }
+    }
+  }
+}
+
+/* User sidebar menu, initially hidden on mobile */
+
+.user-profile-sidebar-wrapper.opened-user-sidebar-menu {
+  .user-sidebar-menu-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 3rem;
+    left: 0rem;
+    background-color: $userSidebar-bg;
+    width: 100%;
+    min-height: 100vh;
+    padding: 1rem 2rem;
+    z-index: 9999;
+  }
+  .user-profile-sidebar-item {
+    display: flex;
+
+    .active-text {
+      font-size: $sfs;
+    }
+
+    .passive-text {
+      font-size: $sfs;
+    }
+
+    .active-icon {
+      font-size: $sfs;
+    }
+
+    .passive-icon {
+      font-size: $sfs;
+    }
+  }
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .user-profile-sidebar-wrapper {
+    width: 100%;
+
+    .user-profile-sidebar-title {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-sidebar-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .user-profile-sidebar-wrapper {
+    width: 100%;
+
+    .user-sidebar-hamburger-menu {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-size: $afs;
+    }
+
+    .user-sidebar-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .user-profile-sidebar-wrapper {
+    width: 100%;
+
+    .user-sidebar-hamburger-menu {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-size: $aafs;
+    }
+
+    .user-sidebar-menu-container {
+      display: none;
+    }
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .user-profile-sidebar-wrapper {
+    width: 100%;
+
+    .user-sidebar-hamburger-menu {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-size: $lfs;
+    }
+
+    .user-sidebar-menu-container {
+      display: none;
+    }
+  }
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+  .user-profile-sidebar-wrapper {
+    padding-left: 1rem;
+    min-height: 100vh;
+
+    .user-sidebar-hamburger-menu {
+      display: none;
+    }
+  }
+}

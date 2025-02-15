@@ -1,0 +1,82 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.user-profile-page {
+  .user-profile-page-container {
+    min-height: 100vh;
+
+    .user-profile-page-title {
+      @include title;
+      @include shadow1;
+      background-color: $userSidebar-bg;
+      z-index: 999;
+    }
+
+    .user-profile-wrapper {
+      @include flexColumn;
+    }
+  }
+}
+
+/* Portrait Phones (max-width: 575px) */
+@media (max-width: 575px) {
+  .user-profile-page {
+    .user-profile-page-container {
+      .user-profile-page-title {
+        background-color: $priest-header-bg;
+        font-size: $afs;
+      }
+    }
+  }
+}
+
+/* Landscape Phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .user-profile-page {
+    .user-profile-page-container {
+      .user-profile-page-title {
+        font-size: $afs;
+        background-color: $priest-header-bg;
+      }
+    }
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .user-profile-page {
+    .user-profile-page-container {
+      .user-profile-page-title {
+        font-size: $afs;
+        background-color: $priest-header-bg;
+      }
+    }
+  }
+}
+
+/*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .user-profile-page {
+    .user-profile-page-container {
+      .user-profile-page-title {
+        font-size: $aafs;
+        background-color: $priest-header-bg;
+      }
+    }
+  }
+}
+
+/* Ultra-High-Resolution Devices (1367px and above) */
+@media (min-width: 1367px) {
+  .user-profile-page {
+    .user-profile-page-container {
+      .user-profile-page-title {
+        font-size: $aafs;
+      }
+
+      .user-profile-wrapper {
+        @include flexRow;
+      }
+    }
+  }
+}
