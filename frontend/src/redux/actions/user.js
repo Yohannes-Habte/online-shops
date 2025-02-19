@@ -98,11 +98,11 @@ export const fetchUser = () => async (dispatch) => {
 //==============================================================================
 // Action to update user profile
 //==============================================================================
-export const updateUser = (userData) => async (dispatch) => {
+export const updateUserProfile = (userData) => async (dispatch) => {
   try {
     dispatch(updateUserStart());
 
-    const res = await axios.put(`${API}/users/update`, userData, {
+    const res = await axios.put(`${API}/auth/update/profile`, userData, {
       withCredentials: true,
     });
 
@@ -161,7 +161,7 @@ export const updateUserAddress = (addressData) => async (dispatch) => {
   try {
     dispatch(updateUserAddressStart());
 
-    const res = await axios.put(`${API}/users/address`, addressData, {
+    const res = await axios.put(`${API}/users/user/address`, addressData, {
       withCredentials: true,
     });
 
@@ -176,20 +176,25 @@ export const updateUserAddress = (addressData) => async (dispatch) => {
 
 //==============================================================================
 // Action to delete user address
-//==============================================================================
+//==============================================================================expo
+
 export const deleteUserAddress = (addressId) => async (dispatch) => {
   try {
     dispatch(deleteUserAddressStart());
 
-    const res = await axios.delete(`${API}/users/address/${addressId}`, {
-      withCredentials: true,
-    });
+    const res = await axios.delete(
+      `${API}/users/addresses/delete/${addressId}`,
+      {
+        withCredentials: true,
+      }
+    );
 
-    const user = res.data.user;
-    dispatch(deleteUserAddressSuccess(user));
-    toast.success("Address deleted successfully!");
+    const updatedUser = res.data.user;
+    dispatch(deleteUserAddressSuccess(updatedUser));
+    toast.success(res.data.message);
   } catch (error) {
     const { message } = handleError(error);
     dispatch(deleteUserAddressFailure(message));
+    toast.error(message);
   }
 };

@@ -7,9 +7,9 @@ import UserInbox from "../userInbox/UserInbox";
 import UserProfile from "../userProfile/UserProfile";
 import "./UserContents.scss";
 
-const UserContents = ({isActive}) => {
+const UserContents = ({ isActive }) => {
   return (
-    <div>
+    <div className="user-profile-contents-container">
       {isActive === 1 && <UserProfile />}
 
       {isActive === 2 && <Address />}
@@ -23,8 +23,6 @@ const UserContents = ({isActive}) => {
       {isActive === 6 && <AllRefundOrders />}
 
       {isActive === 7 && <UserInbox />}
-
-     
     </div>
   );
 };

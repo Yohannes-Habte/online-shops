@@ -1,596 +1,138 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+// Address.scss
 
-/* Mobile screen size */
 .addresses-wrapper {
-  .modal {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: #83a8ec86;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-    z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
 
-    // New User Address
-    .new-address {
-      position: relative;
-      padding: 0 3rem;
-      border-radius: 0.5rem;
-      background-color: $main-bg;
-
-      .address-close-icon {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        cursor: pointer;
-
-        &:hover {
-          color: $tomato;
-        }
-      }
-
-      .new-address-title {
-        @include subTitle;
-        font-size: $afs;
-        z-index: 999;
-      }
-
-      .form-address {
-        .input-container {
-          position: relative;
-          @include inputContainer;
-
-          .input-field {
-            @include inputField;
-            margin-bottom: $radius;
-            padding-left: 2rem;
-
-            &::placeholder {
-              color: gray;
-            }
-          }
-
-          .input-label {
-            position: absolute;
-            top: 0;
-            left: 2rem;
-            color: rgba(204, 204, 204, 0);
-          }
-
-          .input-highlight {
-            position: absolute;
-            bottom: 0.2rem;
-            left: 0;
-            height: 2px;
-            width: 0;
-            background-color: $yellow;
-            transition: all 0.3s ease;
-          }
-
-          .input-field:focus + .input-label {
-            top: -20px;
-            font-size: 12px;
-            color: #007bff;
-          }
-
-          .input-field:focus + .input-label + .input-highlight {
-            width: 100%;
-          }
-
-          .icon {
-            position: absolute;
-            top: 1.1rem;
-            left: 0.5rem;
-            font-size: 1rem;
-          }
-
-          // displaying password
-          .password-display {
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translatey(-50%);
-            font-size: 1.3rem;
-            cursor: pointer;
-          }
-        }
-
-        // Select input container
-        .select-container {
-          width: 100%;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          gap: 0.5rem;
-
-          .select-icon {
-            font-size: 1.4rem;
-          }
-
-          .select-label-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5rem;
-
-            .label {
-              flex: 1;
-              font-weight: $aafw;
-            }
-
-            .select-options {
-              flex: 2;
-              @include inputField;
-              width: 100%;
-              .option {
-                display: block;
-              }
-            }
-          }
-        }
-
-        .address-btn {
-          @include button1;
-        }
-      }
-    }
-  }
-
-  // Previous address
   .previous-address {
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 2rem;
+    overflow-x: auto;
+
     .error {
-      background-color: $yellow;
-      font-size: $sfs;
+      color: #d9534f;
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
     }
+
     .title-add-new-address-wrapper {
-      width: $laptop;
-      margin: auto;
       display: flex;
-      flex-direction: row;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
 
       .address-title {
-        @include subTitle;
-        font-size: $afs;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
       }
 
       .add-new-address-btn {
-        @include button1;
-        font-size: $sfs;
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #0056b3;
+        }
       }
     }
 
+    // Address table styling
     .table-address {
-      width: $mobile;
-      margin: auto;
-      overflow-x: scroll;
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
 
       .table-head {
-        background-color: $header-bg;
+        background-color: #007bff;
+        color: #ffffff;
+
         .head-row {
           .head-cell {
-            text-align: start;
-            font-size: $sfs;
-            padding: 1rem;
-            border-bottom: 1px solid $blue;
+            padding: 0.8rem;
+            text-align: left;
+            font-size: 1rem;
           }
         }
       }
 
       .table-body {
         .body-row {
+          border-bottom: 1px solid #ddd;
+          transition: background 0.3s ease;
+
+          &:hover {
+            background-color: #f1f1f1;
+          }
+
           .body-cell {
-            text-align: start;
-            font-size: $sfs;
-            padding: 1rem;
-            border-bottom: 1px solid $gray;
+            padding: 0.8rem;
+            font-size: 0.95rem;
+            color: #333;
+          }
 
-            .delete-icon {
-              @include deleteIcon;
+          .delete-icon {
+            color: #d9534f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.3s ease;
+
+            &:hover {
+              transform: scale(1.1);
+              color: #c9302c;
             }
           }
         }
       }
+    }
+
+    .subTitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #666;
+      margin-top: 1rem;
     }
   }
 }
 
+// Responsive Design
+@media (max-width: 768px) {
+  .previous-address {
+    padding: 1.5rem;
 
+    .title-add-new-address-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
 
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .addresses-wrapper {
-    .modal {
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #83a8ec86;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 0;
-      z-index: 999;
-  
-      // New User Address
-      .new-address {
-        position: relative;
-        padding: 0 3rem;
-        border-radius: 0.5rem;
-        background-color: $main-bg;
-  
-        .address-close-icon {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
-        }
-  
-        .new-address-title {
-          @include subTitle;
-          z-index: 999;
-        }
-  
-        .form-address {
-          .input-container {
-            position: relative;
-            @include inputContainer;
-  
-            .input-field {
-              @include inputField;
-              margin-bottom: $radius;
-              padding-left: 2rem;
-  
-              &::placeholder {
-                color: gray;
-              }
-            }
-  
-            .input-label {
-              position: absolute;
-              top: 0;
-              left: 2rem;
-              color: rgba(204, 204, 204, 0);
-            }
-  
-            .input-highlight {
-              position: absolute;
-              bottom: 0.2rem;
-              left: 0;
-              height: 2px;
-              width: 0;
-              background-color: $yellow;
-              transition: all 0.3s ease;
-            }
-  
-            .input-field:focus + .input-label {
-              top: -20px;
-              font-size: 12px;
-              color: #007bff;
-            }
-  
-            .input-field:focus + .input-label + .input-highlight {
-              width: 100%;
-            }
-  
-            .icon {
-              position: absolute;
-              top: 1.1rem;
-              left: 0.5rem;
-              font-size: 1rem;
-            }
-  
-            // displaying password
-            .password-display {
-              position: absolute;
-              top: 50%;
-              right: 1rem;
-              transform: translatey(-50%);
-              font-size: 1.3rem;
-              cursor: pointer;
-            }
-          }
-  
-          // Select input container
-          .select-container {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5rem;
-  
-            .select-icon {
-              font-size: 1.4rem;
-            }
-  
-            .select-label-wrapper {
-              width: 100%;
-              display: flex;
-              flex-direction: row;
-              align-items: center;
-              gap: 0.5rem;
-  
-              .label {
-                flex: 1;
-                font-weight: $aafw;
-              }
-  
-              .select-options {
-                flex: 2;
-                @include inputField;
-                width: 100%;
-                .option {
-                  display: block;
-                }
-              }
-            }
-          }
-  
-          .address-btn {
-            @include button1;
-          }
-        }
-      }
-    }
-  
-    // Previous address
-    .previous-address {
-      .error {
-        background-color: $yellow;
-        font-size: $afs;
-      }
-      .title-add-new-address-wrapper {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-  
-        .address-title {
-          @include subTitle;
-          font-size: $aafs;
-        }
-  
-        .add-new-address-btn {
-          @include button1;
-        }
-      }
-  
-      .table-address {
+      .add-new-address-btn {
+        margin-top: 1rem;
         width: 100%;
-  
-        .table-head {
-          background-color: $header-bg;
-          .head-row {
-            .head-cell {
-              text-align: start;
-              font-size: $afs;
-              padding: 1rem;
-              border-bottom: 1px solid $blue;
-            }
-          }
-        }
-  
-        .table-body {
-          .body-row {
-            .body-cell {
-              text-align: start;
-              font-size: $afs;
-              padding: 1rem;
-              border-bottom: 1px solid $gray;
-  
-              .delete-icon {
-                @include deleteIcon;
-              }
-            }
-          }
-        }
+        text-align: center;
       }
     }
-  }
-}
 
+    .table-address {
+      font-size: 0.9rem;
 
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {
-  .addresses-wrapper {
-    .modal {
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #83a8ec86;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 0;
-      z-index: 999;
-  
-      // New User Address
-      .new-address {
-        position: relative;
-        padding: 0 3rem;
-        border-radius: 0.5rem;
-        background-color: $main-bg;
-  
-        .address-close-icon {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
-        }
-  
-        .new-address-title {
-          @include subTitle;
-          z-index: 999;
-        }
-  
-        .form-address {
-          .input-container {
-            position: relative;
-            @include inputContainer;
-  
-            .input-field {
-              @include inputField;
-              margin-bottom: $radius;
-              padding-left: 2rem;
-  
-              &::placeholder {
-                color: gray;
-              }
-            }
-  
-            .input-label {
-              position: absolute;
-              top: 0;
-              left: 2rem;
-              color: rgba(204, 204, 204, 0);
-            }
-  
-            .input-highlight {
-              position: absolute;
-              bottom: 0.2rem;
-              left: 0;
-              height: 2px;
-              width: 0;
-              background-color: $yellow;
-              transition: all 0.3s ease;
-            }
-  
-            .input-field:focus + .input-label {
-              top: -20px;
-              font-size: 12px;
-              color: #007bff;
-            }
-  
-            .input-field:focus + .input-label + .input-highlight {
-              width: 100%;
-            }
-  
-            .icon {
-              position: absolute;
-              top: 1.1rem;
-              left: 0.5rem;
-              font-size: 1rem;
-            }
-  
-            // displaying password
-            .password-display {
-              position: absolute;
-              top: 50%;
-              right: 1rem;
-              transform: translatey(-50%);
-              font-size: 1.3rem;
-              cursor: pointer;
-            }
-          }
-  
-          // Select input container
-          .select-container {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5rem;
-  
-            .select-icon {
-              font-size: 1.4rem;
-            }
-  
-            .select-label-wrapper {
-              width: 100%;
-              display: flex;
-              flex-direction: row;
-              align-items: center;
-              gap: 0.5rem;
-  
-              .label {
-                flex: 1;
-                font-weight: $aafw;
-              }
-  
-              .select-options {
-                flex: 2;
-                @include inputField;
-                width: 100%;
-                .option {
-                  display: block;
-                }
-              }
-            }
-          }
-  
-          .address-btn {
-            @include button1;
-          }
-        }
-      }
-    }
-  
-    // Previous address
-    .previous-address {
-      .error {
-        background-color: $yellow;
-        font-size: $afs;
-      }
-      .title-add-new-address-wrapper {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-  
-        .address-title {
-          @include subTitle;
-          font-size: $aafs;
-        }
-  
-        .add-new-address-btn {
-          @include button1;
-        }
-      }
-  
-      .table-address {
-        width: 100%;
-  
-        .table-head {
-          background-color: $header-bg;
-          .head-row {
-            .head-cell {
-              text-align: start;
-              font-size: $afs;
-              padding: 1rem;
-              border-bottom: 1px solid $blue;
-            }
-          }
-        }
-  
-        .table-body {
-          .body-row {
-            .body-cell {
-              text-align: start;
-              font-size: $afs;
-              padding: 1rem;
-              border-bottom: 1px solid $gray;
-  
-              .delete-icon {
-                @include deleteIcon;
-              }
-            }
-          }
-        }
+      .table-head .head-cell,
+      .table-body .body-cell {
+        padding: 0.6rem;
       }
     }
   }

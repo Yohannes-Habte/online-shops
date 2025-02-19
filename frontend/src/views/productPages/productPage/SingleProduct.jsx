@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./SingleProduct.scss";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../redux/actions/product";
 import { clearProductErrors } from "../../../redux/reducers/productReducer";
@@ -10,8 +10,16 @@ import Footer from "../../../components/layouts/footer/Footer";
 import { addToCart } from "../../../redux/reducers/cartReducer";
 import { toast } from "react-toastify";
 import Ratings from "../../../components/products/ratings/Ratings";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../../redux/reducers/wishListReducer";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
+import ProductDetails from "../../../components/products/productDetails/ProductDetails";
 
 const SingleProduct = () => {
+  const navigate = useNavigate();
   const { productID } = useParams();
   const dispatch = useDispatch();
 
@@ -28,17 +36,15 @@ const SingleProduct = () => {
 
   const { currentProduct, products } = useSelector((state) => state.product);
   const { cart } = useSelector((state) => state.cart);
-
-  console.log("products:", products);
-  console.log("currentProduct:", currentProduct);
+  const { currentSeller } = useSelector((state) => state.seller);
+  const { currentUser } = useSelector((state) => state.user);
 
   const [selectedImage, setSelectedImage] = useState(null);
-  const [variantToggles, setVariantToggles] = useState([]);
-  const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
-
-  console.log("Related products:", relatedProducts);
+  const [variantToggles, setVariantToggles] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [clickWishlist, setClickWishlist] = useState(false);
 
   useEffect(() => {
     const related = products.filter(
@@ -67,6 +73,22 @@ const SingleProduct = () => {
       setVariantToggles(new Array(currentProduct.variants.length).fill(false));
     }
   }, [currentProduct]);
+
+  // ===========================================================================
+  // Add to Wishlist Handler and remove from Wishlist Handler
+  // ===========================================================================
+
+  // Add wishlist
+  const addToWishlistHandler = (product) => {
+    setClickWishlist(!clickWishlist);
+    dispatch(addToWishlist(product));
+  };
+
+  // Remove wishlist
+  const removeFromWishlistHandler = (id) => {
+    setClickWishlist(!clickWishlist);
+    dispatch(removeFromWishlist(id));
+  };
 
   // ===========================================================================
   // Add to Cart Handler
@@ -107,9 +129,35 @@ const SingleProduct = () => {
     );
   };
 
+  // =========================================================
+  // Handle conversation Submit Function
+  // =========================================================
+  const handleMessageSubmit = async () => {
+    if (currentUser) {
+      // body
+      const newConversation = {
+        groupTitle: currentProduct._id + currentUser._id,
+        userId: currentUser._id,
+        sellerId: currentSeller._id,
+      };
+
+      try {
+        const { data } = await axios.post(
+          `${API}/conversations/create-conversation`,
+          newConversation
+        );
+        navigate(`/inbox?${data.conversation._id}`);
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
+    } else {
+      toast.error("Please login to create a conversation");
+    }
+  };
+
   // ===========================================================================
   // Single Product Rating section
-  // =========================================================================
+  // ===========================================================================
 
   const singleProductRating = () => (
     <div className="product-rating-wrapper">
@@ -142,7 +190,7 @@ const SingleProduct = () => {
               {currentProduct?.variants.map((variant, index) => (
                 <img
                   key={index}
-                  src={variant.productImage || "/placeholder-image.jpg"}
+                  src={variant.productImage}
                   alt={`${variant.productColor}`}
                   onClick={() => {
                     setSelectedVariant(variant);
@@ -158,123 +206,27 @@ const SingleProduct = () => {
           </div>
 
           <section className="product-details">
-            <h1 className="product-title">{currentProduct?.title}</h1>
-            <p className="product-description">{currentProduct?.description}</p>
+            <h1 className="single-product-title">{currentProduct?.title}</h1>
+            <p className="single-product-description">
+              {currentProduct?.description}
+            </p>
 
             {/* Single Product Rating */}
             {singleProductRating()}
 
-            <div className="product-parts-wrapper">
-              <article className="product-infos">
-                <h3>Product Details</h3>
-                <p>
-                  <strong>Discounted Price:</strong> $
-                  {currentProduct?.discountPrice} $
-                  {currentProduct?.originalPrice}
-                </p>
-                <p>
-                  <strong>Shop:</strong> {currentProduct?.shop?.name || "N/A"}
-                </p>
-                <p>
-                  <strong>Supplier:</strong>{" "}
-                  {currentProduct?.supplier?.supplierName || "N/A"}
-                </p>
-                <p>
-                  <strong>Category:</strong>{" "}
-                  {currentProduct?.category?.categoryName || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Subcategory:</strong>{" "}
-                  {currentProduct?.subcategory?.subcategoryName || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Customer Category:</strong>{" "}
-                  {currentProduct?.customerCategory || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Brand:</strong>{" "}
-                  {currentProduct?.brand?.brandName || "N/A"}
-                </p>
-                <p>
-                  <strong>Status:</strong> {currentProduct?.status}
-                </p>
-                <p>
-                  <strong>Sold Out:</strong> {currentProduct?.soldOut}
-                </p>
-                <p>
-                  <strong>Ratings:</strong> {currentProduct?.ratings?.average} (
-                  {currentProduct?.ratings?.count} reviews)
-                </p>
-              </article>
-
-              <div className="product-variants">
-                <h2>Product Variants</h2>
-                {currentProduct?.variants.length > 0 ? (
-                  <ul className="variants-list">
-                    {currentProduct?.variants.map((variant, index) => (
-                      <li key={index} className="variant-item">
-                        <p>
-                          <strong>Color:</strong> {variant.productColor}{" "}
-                          <button
-                            className="toggle-button"
-                            onClick={() => handleToggle(index)}
-                          >
-                            {variantToggles[index]
-                              ? "Hide Details"
-                              : "Show Details"}
-                          </button>
-                        </p>
-                        {variantToggles[index] && (
-                          <ul className="variant-details">
-                            {variant.productSizes.map((size, idx) => (
-                              <li key={idx}>
-                                <strong>Size:</strong> {size.size} -{" "}
-                                {size.stock} in stock
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No variants available.</p>
-                )}
-              </div>
-
-              <article className="product-size-selection-wrapper">
-                <h2 className="product-size-title">Select Product Size</h2>
-                <form
-                  className="size-selection-form"
-                  onSubmit={addToCartHandler}
-                >
-                  <label htmlFor="size-selector">Choose Size:</label>
-                  <select
-                    id="size-selector"
-                    value={selectedSize}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                  >
-                    {selectedVariant?.productSizes?.map((sizeObj, index) => (
-                      <option key={index} value={sizeObj.size}>
-                        {sizeObj.size}{" "}
-                        {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
-                      </option>
-                    ))}
-                  </select>
-
-                  <button
-                    type="button"
-                    className="size-button"
-                    onClick={addToCartHandler}
-                  >
-                    Add to Cart
-                  </button>
-                </form>
-              </article>
-            </div>
+            <ProductDetails
+              variantToggles={variantToggles}
+              addToCartHandler={addToCartHandler}
+              selectedSize={selectedSize}
+              setSelectedSize={setSelectedSize}
+              currentProduct={currentProduct}
+              selectedVariant={selectedVariant}
+              handleToggle={handleToggle}
+              handleMessageSubmit={handleMessageSubmit}
+              addToWishlistHandler={addToWishlistHandler}
+              removeFromWishlistHandler={removeFromWishlistHandler}
+              clickWishlist={clickWishlist}
+            />
           </section>
         </section>
 

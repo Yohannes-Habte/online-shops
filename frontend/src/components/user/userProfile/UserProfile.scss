@@ -50,7 +50,7 @@
 
     .profile-legend {
       @include legend;
-      font-size: $afs;
+      font-size: $sfs;
     }
 
     .profile-form {
@@ -123,8 +123,9 @@
         flex-direction: row;
         justify-content: flex-start;
         gap: 0.5rem;
+        margin: 1rem 0;
 
-        .profile-consent-input {
+        .profile-input-checkbox {
           height: 1.6rem;
           width: 1.3rem;
         }
@@ -139,11 +140,23 @@
         }
       }
 
-      .profile-button {
-        width: 100%;
+      .input-field-error {
+        color: $red;
+        font-size: $sfsx;
+      }
+
+      .file-container {
+        .input-field {
+          background-color: white;
+        }
+      }
+
+      .update-profile-btn {
         @include button3;
-        margin: 0 0 1rem 0;
-        align-self: flex-start;
+
+        &:hover {
+          background-color: $button-hover3;
+        }
       }
     }
   }
@@ -199,6 +212,7 @@
 
       .profile-legend {
         @include legend;
+        font-size: $sfsx;
       }
 
       .profile-form {
@@ -288,11 +302,8 @@
           }
         }
 
-        .profile-button {
-          width: 100%;
+        .update-profile-btn {
           @include button3;
-          margin: 0 0 1rem 0;
-          align-self: flex-start;
         }
       }
     }
@@ -349,6 +360,8 @@
 
       .profile-legend {
         @include legend;
+        font-size: $sfsx;
+        text-align: center;
       }
 
       .profile-form {
@@ -439,11 +452,8 @@
           }
         }
 
-        .profile-button {
-          width: 100%;
+        .update-profile-btn {
           @include button3;
-          margin: 0 0 1rem 0;
-          align-self: flex-start;
         }
       }
     }

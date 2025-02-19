@@ -14,8 +14,8 @@ const userRouter = express.Router();
 // User routes
 userRouter.get("/user", isAuthenticated, getUser);
 userRouter.get("/", getUsers);
-userRouter.put("/:id/update-user-address/", updateUserAddress);
-userRouter.delete("/delete-user-address/:id", deleteUserAddress);
+userRouter.put("/user/address/", isAuthenticated, updateUserAddress);
+userRouter.delete("/addresses/delete/:addressId", isAuthenticated, deleteUserAddress);
 userRouter.delete("/delete-user/:id", deleteUser);
 
 // Export auth Router

@@ -16,7 +16,6 @@
   display: flex;
   flex-direction: column;
 }
-
 // Tablet page container
 @mixin tabletPageContainer {
   width: $tablet;
@@ -51,7 +50,8 @@
 // Three variety of Shadows
 @mixin shadow1 {
   padding: 1rem;
-  box-shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   border-radius: $radius;
   line-height: 1.5rem;
 }
@@ -97,14 +97,6 @@
   outline: none;
   font-size: 16px;
   transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #007bff;
-  }
-
-  &.input-field[type="date"] {
-    padding: 8px 40px;
-  }
 }
 
 // Four types of buttons
@@ -119,11 +111,6 @@
   border-radius: $radius;
   cursor: pointer;
   transition: 0.5s;
-
-  &:hover {
-    background-color: $google-button-hover;
-    color: $red;
-  }
 }
 
 @mixin button1 {
@@ -148,22 +135,6 @@
   font-weight: 600;
   color: #606060;
   text-shadow: 0 1px $white;
-
-  &:hover {
-    box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
-      0 -6px 4px #fefefe, inset 0 0 3px 3px #cecfd1;
-    color: $red;
-  }
-
-  &:active {
-    box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
-      0 -6px 4px #fefefe, inset 0 0 5px 3px #999, inset 0 0 30px #aaa;
-  }
-
-  &:focus {
-    box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
-      0 -6px 4px #fefefe, inset 0 0 5px 3px #999, inset 0 0 30px #aaa;
-  }
 }
 
 @mixin button2 {
@@ -179,16 +150,6 @@
   transition: all 0.2s ease-in-out 0ms;
   user-select: none;
   font-family: "Poppins", sans-serif;
-
-  &:hover {
-    background-color: #5fa8d3c4;
-    box-shadow: 0px 0px 20px -18px;
-    color: $red;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
 }
 
 @mixin button3 {
@@ -196,45 +157,14 @@
   color: white;
   border: 2px solid #007bff;
   border-radius: 4px;
-  padding: 12px 30px;
-  font-size: 16px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
-  }
-
-  &:active {
-    background-color: #004085;
-    border-color: #004085;
-    transform: scale(0.98);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
-  }
-
-  &:disabled {
-    background-color: #b8daff;
-    color: #6c757d;
-    border-color: #b8daff;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 14px 32px;
-  }
 }
 
 @mixin deleteButton {
@@ -250,36 +180,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: #c0392b;
-    border-color: #c0392b;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  &:active {
-    background-color: #9b2d20;
-    border-color: #9b2d20;
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
-  }
-
-  &:disabled {
-    background-color: #f5b7b1;
-    color: #b2b2b2;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 14px 28px;
-  }
 }
 
 @mixin editButton {
@@ -295,36 +195,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: #2980b9;
-    border-color: #2980b9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  &:active {
-    background-color: #1f6fa7;
-    border-color: #1f6fa7;
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-  }
-
-  &:disabled {
-    background-color: #aed6f1;
-    color: #b2b2b2;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 14px 28px;
-  }
 }
 
 // Search
@@ -394,10 +264,6 @@
   color: $yellow;
   font-size: $aafs;
   cursor: pointer;
-
-  &:hover {
-    color: $tomato;
-  }
 }
 
 @mixin close {
@@ -405,29 +271,17 @@
   top: 0;
   right: 1rem;
   cursor: pointer;
-
-  &:hover {
-    color: $tomato;
-  }
 }
 
 @mixin deleteIcon {
   font-size: $aafs;
   cursor: pointer;
-
-  &:hover {
-    color: $tomato;
-  }
 }
 
 @mixin addIcon {
   color: $yellow;
   font-size: $aafs;
   cursor: pointer;
-
-  &:hover {
-    color: $tomato;
-  }
 }
 
 @mixin hr {
@@ -562,14 +416,6 @@
   outline: none;
   font-size: 16px;
   transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #007bff;
-  }
-
-  &.input-field[type="date"] {
-    padding: 8px 40px;
-  }
 }
 
 @mixin inputLabel {
@@ -641,4 +487,54 @@
   color: $red;
   font-size: $sfs;
   margin: 0 0.5rem;
+}
+
+// ==============================================================================================
+// Modal styling
+// ==============================================================================================
+
+@mixin modal {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: $modal-bg;
+  @include flexCenter();
+  padding: 2rem 0;
+  z-index: 99999;
+}
+
+@mixin popupBox {
+  position: relative;
+  padding: 0 3rem;
+  border-radius: 0.5rem;
+  background-color: $main-bg;
+  @include shadow1;
+}
+
+@mixin closeModal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+
+  &:hover {
+    color: $tomato;
+  }
+}
+
+// Select field
+@mixin selectField {
+  width: 100%;
+  max-width: 100%; 
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  font-size: 1rem;
+  color: #333;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

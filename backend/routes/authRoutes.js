@@ -13,6 +13,7 @@ import {
 import requiredValues from '../validators/requiredValues.js';
 import userRegisterValidator from '../validators/userRegisterValidator.js';
 import checkValidation from '../validators/checkValidation.js';
+import { isAuthenticated } from '../middleware/auth.js';
 
 // Auth Router
 const authRouter = express.Router();
@@ -30,7 +31,7 @@ authRouter.post('/login', loginUser);
 authRouter.get('/logout', userLogout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.patch('/reset-password/:token', resetForgotPassword);
-authRouter.put('/update/profile', updateUserProfile);
+authRouter.put('/update/profile', isAuthenticated, updateUserProfile);
 authRouter.put('/:id/change-user-password', changeUserPassword);
 authRouter.delete('/delete-account/:account', deleteAccount);
 

@@ -1,51 +1,61 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Home from "./views/homePage/Home";
 import Contact from "./views/contactPage/Contact";
 import NotFound from "./views/notFound/NotFound";
-import ProfilePage from "./views/userPages/profilePage/ProfilePage";
-import Forgotpassword from "./views/userPages/passwordPage/Forgotpassword";
 import ResetPassword from "./views/userPages/passwordPage/ResetPassword";
 import UserProtectedRoute from "./protectedRoutes/UserProtectedRoute";
-import ShopLoginPage from "./views/shopPages/shopLoginPage/ShopLoginPage";
-import CreateNewShop from "./views/shopPages/shopCreatePage/CreateNewShop";
-import ShopHome from "./views/shopPages/shopHomePage/ShopHome";
-import axios from "axios";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import ShopDetailsPage from "./views/shopPages/shopDetailsPage/ShopDetailsPage";
-import TrackOrderPage from "./views/userPages/trackOrderPage/TrackOrderPage";
-import CheckoutPage from "./views/userPages/checkoutPage/CheckoutPage";
-import UserOrderDetailsPage from "./views/userPages/userOrderDetailsPage/UserOrderDetailsPage";
-import Products from "./views/productPages/productsPage/Products";
-import SingleProduct from "./views/productPages/productPage/SingleProduct";
-import PaymentPage from "./views/userPages/paymentPage/PaymentPage";
-import OrderSuccess from "./views/userPages/orderSuccessPage/OrderSuccess";
-import UserInboxPage from "./views/userPages/userInboxPage/UserInboxPage";
-import AdminDashboardPage from "./views/adminPages/adminDashboardPage/AdminDashboardPage";
+
 import AdminProtectedRoute from "./protectedRoutes/AdminProtectedRoute";
-import AdminDashboardUsers from "./views/adminPages/adminDashboardUsers/AdminDashboardUsers";
-import AdminDashboardShops from "./views/adminPages/adminDashboardShops/AdminDashboardShops";
-import AdminDashboardOrders from "./views/adminPages/adminDashboardOrders/AdminDashboardOrders";
-import AdminDashboardProducts from "./views/adminPages/adminDashboardProducts/AdminDashboardProducts";
-import AdminDashboardEvents from "./views/adminPages/adminDashboardEvents/AdminDashboardEvents";
-import AdminDashboardWithdraws from "./views/adminPages/adminDashboardWithdraws/AdminDashboardWithdraws";
-import ShopForgotpassword from "./views/shopPages/shopPasswordPage/ShopForgotpassword";
 import ShopResetPassword from "./views/shopPages/shopPasswordPage/ShopResetPassword";
 import { useDispatch } from "react-redux";
-// import { fetchUserData } from './redux/reducers/userReducer';
 import { API } from "./utils/security/secreteKey";
 import { fetchUser } from "./redux/actions/user";
 import { fetchSingleSeller } from "./redux/actions/seller";
-import ShopDashboardPage from "./views/shopPages/shopDashbaordPage/ShopDashboardPage";
-import ShopOrderDetailsPage from "./views/shopPages/shopOrderDetailsPage/ShopOrderDetailsPage";
 import WomenProductsPage from "./views/womenPage/WomenProductsPage";
 import MenProductsPage from "./views/menPage/MenProductsPage";
 import KidsProductsPage from "./views/kidsPage/KidsProductsPage";
-import RegisterPage from "./views/userPages/registerPage/RegisterPage";
-import LoginPage from "./views/userPages/loginPage/LoginPage";
+
+import {
+  RegisterPage,
+  LoginPage,
+  ProfilePage,
+  Forgotpassword,
+  CheckoutPage,
+  PaymentPage,
+  OrderSuccess,
+  TrackOrderPage,
+  UserInboxPage,
+  UserOrderDetailsPage,
+} from "./routes/user/UserRoutes";
+
+import { SingleProduct, Products } from "./routes/product/ProductRoutes";
+
+import {
+  CreateNewShop,
+  ShopLoginPage,
+  ShopDashboardPage,
+  ShopDetailsPage,
+  ShopHome,
+  ShopOrderDetailsPage,
+  ShopForgotpassword,
+} from "./routes/shop/ShopRoutes";
+
+import {
+  AdminDashboardPage,
+  AdminDashboardOrders,
+  AdminDashboardEvents,
+  AdminDashboardProducts,
+  AdminDashboardShops,
+  AdminDashboardUsers,
+  AdminDashboardWithdraws,
+} from "./routes/admin/AdminRoutes";
+
 
 const App = () => {
   const dispatch = useDispatch();

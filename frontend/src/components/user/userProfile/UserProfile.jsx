@@ -1,138 +1,147 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./UserProfile.scss";
 import axios from "axios";
 import { FaUser, FaUserAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
-import { AiFillEyeInvisible } from "react-icons/ai";
-import { HiOutlineEye } from "react-icons/hi";
-import { toast } from "react-toastify";
+import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  validEmail,
-  validPassword,
-} from "../../../utils/validators/Validate.js";
+import { FaCloudUploadAlt } from "react-icons/fa";
 import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
-  API,
   cloud_URL,
   cloud_name,
   upload_preset,
 } from "../../../utils/security/secreteKey.js";
-import {
-  updateUserFailure,
-  updateUserStart,
-  updateUserSuccess,
-} from "../../../redux/reducers/userReducer.js";
+import { updateUserProfile } from "../../../redux/actions/user.js";
+import { validPassword } from "../../../utils/validators/Validate.js";
 
 const UserProfile = () => {
   const { currentUser, loading } = useSelector((state) => state.user);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Local State variables
-  const [name, setName] = useState(currentUser?.name || "");
-  const [email, setEmail] = useState(currentUser?.email || "");
-  const [phone, setPhone] = useState(currentUser?.phone || "");
-  const [password, setPassword] = useState("");
-  const [image, setImage] = useState("");
-  const [agree, setAgree] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [updateUser, setUpdateUser] = useState({
+    name: currentUser?.name || "",
+    image: null,
+    confirmEmail: currentUser?.email || "",
+    confirmPassword: "",
+    showPassword: false,
+    agree: false,
+  });
 
-  // Update image
-  const updateImage = (e) => {
-    setImage(e.target.files[0]);
-  };
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (currentUser) {
+      setUpdateUser((prev) => ({
+        ...prev,
+        name: currentUser.name || "",
+        phone: currentUser.phone || "",
+        confirmEmail: currentUser.email || "",
+      }));
+    }
+  }, [currentUser]);
+
+  const { name, image, confirmEmail, confirmPassword, showPassword, agree } =
+    updateUser;
 
   // Update input data
   const updateChange = (e) => {
-    switch (e.target.name) {
-      case "name":
-        setName(e.target.value);
-        break;
-      case "email":
-        setEmail(e.target.value);
-        break;
-      case "password":
-        setPassword(e.target.value);
-        break;
-      case "phone":
-        setPhone(e.target.value);
-        break;
-      case "agree":
-        setAgree(e.target.checked);
-        break;
-      default:
-        break;
-    }
+    const { name, value, type, checked, files } = e.target;
+
+    setUpdateUser((prev) => ({
+      ...prev,
+      [name]:
+        type === "file" ? files[0] : type === "checkbox" ? checked : value,
+    }));
+
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // Function to show/hide password
-  const displayPassword = () => {
-    setShowPassword((prevState) => !prevState);
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setUpdateUser((prev) => ({
+      ...prev,
+      showPassword: !prev.showPassword,
+    }));
   };
 
-  // Reset all state variables for the profile form
+  // Reset form state
   const resetVariables = () => {
-    setEmail("");
-    setPassword("");
+    setUpdateUser({
+      name: currentUser?.name || "",
+      image: null,
+      confirmEmail: currentUser?.email || "",
+      confirmPassword: "",
+      showPassword: false,
+      agree: false,
+    });
+    setErrors({});
   };
 
-  // Submit logged in user Function
+  // Validate form fields
+  const validateForm = () => {
+    let validationErrors = {};
+    if (!name.trim()) validationErrors.name = "Name is required.";
+    if (!confirmEmail.trim())
+      validationErrors.confirmEmail = "Email is required.";
+    if (!confirmPassword.trim()) {
+      validationErrors.confirmPassword =
+        "Password is required for confirmation.";
+    } else if (!validPassword(confirmPassword)) {
+      validationErrors.password = "Invalid password.";
+    }
+
+    if (!agree)
+      validationErrors.agree = "Please agree to the terms and conditions.";
+
+    return validationErrors;
+  };
+
+  // Handle form submission
   const submitUpdatedUserProfile = async (event) => {
     event.preventDefault();
 
-    if (!validEmail(email)) {
-      return toast.error("Please enter a valid email");
+    // Validate input fields
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
     }
 
-    if (!validPassword(password)) {
-      return toast.error("In valid password");
-    }
-
-    try {
-      dispatch(updateUserStart());
-      // Image validation
+    let imageUrl = currentUser.image;
+    if (image) {
       const userPhoto = new FormData();
       userPhoto.append("file", image);
-      userPhoto.append("cloud_name", cloud_name);
       userPhoto.append("upload_preset", upload_preset);
+      userPhoto.append("cloud_name", cloud_name);
 
-      // Save image to cloudinary
-      const response = await axios.post(cloud_URL, userPhoto);
-      const { url } = response.data;
-      // The body
-      const newUser = {
-        name: name,
-        email: email,
-        password: password,
-        phone: phone,
-        image: url,
-      };
-
-      const { data } = await axios.put(`${API}/auths/update/profile`, newUser);
-
-      dispatch(updateUserSuccess(data.update));
-      resetVariables();
-      navigate("/profile");
-    } catch (err) {
-      dispatch(updateUserFailure(err.response.data.message));
+      // Upload image to Cloudinary
+      const { data } = await axios.post(cloud_URL, userPhoto);
+      imageUrl = data.url;
     }
+
+    const newUser = {
+      name,
+      image: imageUrl,
+      confirmEmail,
+      confirmPassword, // Used for confirmation but NOT updated
+      agree,
+    };
+
+    dispatch(updateUserProfile(newUser));
+    resetVariables();
   };
 
   return (
     <section className="profile-form-container">
-      {/* {error ? <p className="error-message"> {error} </p> : null} */}
       <h1 className="profile-form-title">Update Your Profile</h1>
 
       <figure className="image-container">
-        {currentUser ? (
+        {currentUser?.image ? (
           <img
             className="image"
-            src={
-              currentUser.image ? currentUser.image : URL.createObjectURL(image)
-            }
+            src={currentUser.image}
             alt={currentUser.name}
           />
         ) : (
@@ -142,100 +151,78 @@ const UserProfile = () => {
 
       <fieldset className="profile-fieldset">
         <legend className="profile-legend">
-          {currentUser ? currentUser.name : "User Profile"}
+          {currentUser?.name || "User Profile"}
         </legend>
+
         <form onSubmit={submitUpdatedUserProfile} className="profile-form">
+          {/* Name Field */}
           <div className="input-container">
             <FaUserAlt className="icon" />
             <input
               type="text"
-              name={"name"}
-              id={"name"}
-              autoComplete="name"
-              required
+              name="name"
               value={name}
               onChange={updateChange}
-              placeholder="Enter First Name and Last Name"
+              placeholder="Enter Full Name"
               className="input-field"
             />
-
-            <label htmlFor={"firstName"} className="input-label">
-              First Name
-            </label>
-            <span className="input-highlight"></span>
+            {errors.name && (
+              <span className="input-field-error">{errors.name}</span>
+            )}
           </div>
 
+          {/* Profile Picture Upload */}
+          <div className="input-container file-container">
+            <FaCloudUploadAlt className="icon" />
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={updateChange}
+              className="input-field"
+            />
+            {errors.image && (
+              <span className="input-field-error">{errors.image}</span>
+            )}
+          </div>
+
+          {/* Email Confirmation */}
           <div className="input-container">
             <MdEmail className="icon" />
             <input
               type="email"
-              name="email"
-              id="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={updateChange}
-              placeholder="Enter Email"
+              name="confirmEmail"
+              value={confirmEmail}
+              readOnly
               className="input-field"
             />
-            <label htmlFor="email" className="input-label">
-              Email Address
-            </label>
-            <span className="input-highlight"></span>
+            {errors.confirmEmail && (
+              <span className="input-field-error">{errors.confirmEmail}</span>
+            )}
           </div>
 
+          {/* Password Confirmation */}
           <div className="input-container">
             <RiLockPasswordFill className="icon" />
             <input
               type={showPassword ? "text" : "password"}
-              name="password"
-              id="password"
-              autoComplete="current-password"
-              required
-              value={password}
+              name="confirmPassword"
+              value={confirmPassword}
               onChange={updateChange}
-              //onBlur={checkPasswordFormat}
-              placeholder="Enter Password"
+              placeholder="Enter Password for Confirmation"
               className="input-field"
             />
-            <label htmlFor="password" className="input-label">
-              Password
-            </label>
-            <span className="input-highlight"></span>
-            <span onClick={displayPassword} className="password-display">
-              {showPassword ? <AiFillEyeInvisible /> : <HiOutlineEye />}
+            <span
+              onClick={togglePasswordVisibility}
+              className="password-display"
+            >
+              {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
             </span>
-          </div>
-
-          <div className="input-container">
-            <FaUserAlt className="icon" />
-            <input
-              type="text"
-              name={"phone"}
-              id={"phone"}
-              autoComplete="phone"
-              required
-              value={phone}
-              onChange={updateChange}
-              placeholder="Enter Phone Number"
-              className="input-field"
-            />
-
-            <label htmlFor={"phone"} className="input-label">
-              Phone Number
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          <div className="input-container">
-            <RiLockPasswordFill className="icon" />
-            <input
-              type="file"
-              name="image"
-              id="image"
-              onChange={updateImage}
-              className="input-field"
-            />
+            {errors.confirmPassword && (
+              <span className="input-field-error">
+                {errors.confirmPassword}
+              </span>
+            )}
           </div>
 
           <div className="input-consent">
@@ -243,17 +230,21 @@ const UserProfile = () => {
               type="checkbox"
               id="consent"
               name="agree"
-              required
               checked={agree}
               onChange={updateChange}
+              className="profile-input-checkbox"
             />
-            <label htmlFor="consent" className="consent-label">
+            <label htmlFor="consent">
               I consent to the processing of my data in accordance with the
               privacy policy.
             </label>
           </div>
+          {errors.agree && (
+            <span className="input-field-error">{errors.agree}</span>
+          )}
 
-          <button type="submit" className="btn-profile">
+          {/* Submit Button */}
+          <button type="submit" className="update-profile-btn">
             {loading ? <ButtonLoader /> : "Update Profile"}
           </button>
         </form>

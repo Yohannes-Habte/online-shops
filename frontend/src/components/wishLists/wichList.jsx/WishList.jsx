@@ -1,32 +1,53 @@
-import React from 'react';
-import './WishList.scss';
-import { AiOutlineHeart } from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeFromWishlist } from '../../../redux/reducers/wishListReducer';
-import { addToCart } from '../../../redux/reducers/cartReducer';
-import { RxCross1 } from 'react-icons/rx';
-import CartSingle from '../singleWishList/CartSingle';
+import "./WishList.scss";
+import { AiOutlineHeart } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { removeFromWishlist } from "../../../redux/reducers/wishListReducer";
+import { addToCart } from "../../../redux/reducers/cartReducer";
+import { RxCross1 } from "react-icons/rx";
+import CartSingle from "../singleWishList/CartSingle";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 const WishList = ({ setOpenWishList }) => {
   // Global state variables
-  const { wishList } = useSelector((state) => state.wishList);
   const dispatch = useDispatch();
+  const { wishList } = useSelector((state) => state.wishList);
 
-  // Total price
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  // Total price calculation
   const totalPrice = wishList.reduce(
-    (acc, item) => acc + item.discountPrice,
+    (acc, itemPrice) => acc + itemPrice.discountPrice,
     0
   );
 
-  // Change quantity handler
+  // Add to cart handler
   const addToCartHandler = (data) => {
-    const newData = { ...data, qty: 1 };
+    if (!selectedVariant) {
+      toast.error("Please select a variant!");
+      return;
+    }
+
+    const newData = {
+      ...data,
+      qty: 1,
+      variant: selectedVariant,
+      productImage: selectedVariant?.productImage,
+    };
+
+    console.log("Adding to Cart:", newData);
     dispatch(addToCart(newData));
     setOpenWishList(false);
   };
+
   // Remove from wishlist handler
   const removeFromWishlistHandler = (id) => {
     dispatch(removeFromWishlist(id));
+  };
+
+  // Handle variant selection (size/color)
+  const handleVariantSelection = (variant) => {
+    setSelectedVariant(variant);
   };
 
   return (
@@ -38,7 +59,7 @@ const WishList = ({ setOpenWishList }) => {
               className="close-empty-icon"
               onClick={() => setOpenWishList(false)}
             />
-            <h2 className="empty-cart">Cart wishlist Items is empty!</h2>
+            <h2 className="empty-cart">Wishlist is empty!</h2>
           </section>
         ) : (
           <section className="wishlist-order-wrapper">
@@ -47,18 +68,15 @@ const WishList = ({ setOpenWishList }) => {
               onClick={() => setOpenWishList(false)}
             />
 
-            {/* Item length */}
-            <AiOutlineHeart size={25} style={{ color: 'red' }} />
+            {/* Wishlist Item Count */}
+            <AiOutlineHeart size={25} style={{ color: "red" }} />
             <h5 className="wishlist-items">
-              {wishList &&
-                wishList.length === 0 &&
-                `THere is ${wishList.length} Item in the Wishlist`}
-              {wishList &&
-                wishList.length > 1 &&
-                `THere are ${wishList.length} Items in the Wishlist`}
+              {wishList.length === 1
+                ? `There is ${wishList.length} Item in the Wishlist`
+                : `There are ${wishList.length} Items in the Wishlist`}
             </h5>
 
-            {/* cart Single Items */}
+            {/* Cart Single Items */}
             <div className="single-cart-wrapper">
               {wishList &&
                 wishList.map((product) => (
@@ -67,12 +85,14 @@ const WishList = ({ setOpenWishList }) => {
                     data={product}
                     addToCartHandler={addToCartHandler}
                     removeFromWishlistHandler={removeFromWishlistHandler}
+                    handleVariantSelection={handleVariantSelection} // Pass handler to CartSingle
+                    selectedVariant={selectedVariant || product?.variants[0]} // Pass default variant if none selected
                   />
                 ))}
             </div>
           </section>
         )}
-        <h3> Total Price: ${totalPrice} </h3>
+        <h3>Total Price: ${totalPrice}</h3>
       </article>
     </main>
   );

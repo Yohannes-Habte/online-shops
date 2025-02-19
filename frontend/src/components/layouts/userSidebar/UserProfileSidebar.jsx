@@ -45,7 +45,7 @@ const UserProfileSidebar = ({ isActive, setIsActive }) => {
         {openUserSidebar ? <MdOutlineClose /> : <GiHamburgerMenu />}
       </div>
 
-      <section className="user-sidebar-menu-container">
+      <aside className="user-sidebar-menu-container">
         <h2 className="user-profile-sidebar-title">Dashboard</h2>
 
         <aside
@@ -174,7 +174,7 @@ const UserProfileSidebar = ({ isActive, setIsActive }) => {
             Log Out
           </h4>
         </aside>
-      </section>
+      </aside>
     </div>
   );
 };

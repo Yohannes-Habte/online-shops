@@ -1,232 +1,185 @@
-import { useEffect, useState } from 'react';
-import './ProductDtails.scss';
-import { toast } from 'react-toastify';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import { MdAddBox } from 'react-icons/md';
-import { TbSquareMinusFilled } from 'react-icons/tb';
-import { AiFillHeart, AiOutlineHeart, AiOutlineMessage } from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import RelatedProducts from '../relatedProducts/RelatedProducts';
-import ProductInfos from '../productInfos/ProductInfos';
-import { addToCart } from '../../../redux/reducers/cartReducer';
-import {
-  addToWishlist,
-  removeFromWishlist,
-} from '../../../redux/reducers/wishListReducer';
-import { API } from '../../../utils/security/secreteKey';
+import { AiFillHeart, AiOutlineHeart, AiOutlineMessage } from "react-icons/ai";
 
-/**
- 1. ProductDetails component receive data from SinglePage.jsx page
- 2. The date received by ProductDetails from SinglePage.jsx further transfered to ProductInfos.jsx component
- 3. Data is further used for the Ratings.jx component
- */
-//
-const ProductDetails = ({ data }) => {
-  const navigate = useNavigate();
+const ProductDetails = ({
+  variantToggles,
+  addToCartHandler,
+  selectedSize,
+  setSelectedSize,
+  currentProduct,
+  selectedVariant,
+  handleToggle,
+  handleMessageSubmit,
+  addToWishlistHandler,
+  removeFromWishlistHandler,
+  clickWishlist,
+}) => {
+  // ===========================================================================
+  // Handle conversion for a product
+  // ===========================================================================
 
-  // Global state variables
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { currentUser } = useSelector((state) => state.user);
-  const { wishList } = useSelector((state) => state.wishList);
-  const { cart } = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
+  const handleConversationAside = () => (
+    <aside className="product-message-aside-wrapper">
+      <h4 className="send-message-title">Have Questions About This Product?</h4>
+      <p className="send-message-paragraph">
+        We are here to help. Click the message icon to chat with us:
+      </p>
 
-  // Local variables
-  const [quantity, setQuantity] = useState(1);
-  const [click, setClick] = useState(false);
-  const [select, setSelect] = useState(0);
-  const [products, setProducts] = useState([]);
+      <p onClick={handleMessageSubmit} className="send-message">
+        Send a Message <AiOutlineMessage className="send-message-icon" />
+      </p>
+    </aside>
+  );
 
-  useEffect(() => {
-    const bestdealtProducts = async () => {
-      try {
-        // dispatch(productsShopFetchStart());
-        const { data } = await axios.get(
-          `${API}/products/${currentSeller._id}/shop-products`
-        );
-        // dispatch(productsShopFetchSuccess(data));
-        setProducts(data.products);
-      } catch (error) {
-        console.log(error);
-        // dispatch(productsShopFetchFailure(error.response.data.message));
-      }
-    };
-    bestdealtProducts();
-  }, []);
+  // ===========================================================================
+  // Handle wishlist for a product
+  // ===========================================================================
 
-  // Display all products for a shop
-  // useEffect(() => {
-  //   dispatch(productsShopFetchSuccess(data && data._id));
-  //   if (wishList && wishList.find((i) => i._id === data?._id)) {
-  //     setClick(true);
-  //   } else {
-  //     setClick(false);
-  //   }
-  // }, [data, wishList]);
-
-  // Increasing count by one
-  const incrementCount = () => {
-    if (data.stock > quantity) {
-      setQuantity(quantity + 1);
-    } else {
-      toast.error(
-        'The maximum available in the stock is reached! If you want more, please send us message!'
-      );
-    }
-  };
-
-  // Decreasing count by one
-  const decrementCount = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  // Add wishlist
-  const addToWishlistHandler = (id) => {
-    setClick(!click);
-    dispatch(addToWishlist(id));
-  };
-
-  // Remove wishlist
-  const removeFromWishlistHandler = (id) => {
-    setClick(!click);
-    dispatch(removeFromWishlist(id));
-  };
-
-  // Add to cart
-  const addToCartHandler = (id) => {
-    const isItemExists = cart && cart.find((i) => i._id === id);
-    if (isItemExists) {
-      toast.error('Item already in cart!');
-    } else if (data.stock < quantity) {
-      toast.error('Product is out of stock!');
-    } else {
-      const cartData = { ...data, qty: quantity };
-      dispatch(addToCart(cartData));
-      toast.success('Item added to cart successfully!');
-    }
-  };
-
-  // How many times a particular product is reviewed
-  const totalReviewsLength =
-    products &&
-    products.reduce((acc, product) => acc + product.reviews.length, 0);
-
-  // The total sum of rating done by users
-  const totalRatings =
-    products &&
-    products.reduce(
-      (acc, product) =>
-        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
-      0
-    );
-
-  const average = totalRatings / totalReviewsLength || 0;
-
-  const averageRating = average.toFixed(2);
-
-  // =========================================================
-  // Handle conversation Submit Function
-  // =========================================================
-  const handleMessageSubmit = async () => {
-    if (currentUser) {
-      // body
-      const newConversation = {
-        groupTitle: data._id + currentUser._id,
-        userId: currentUser._id,
-        sellerId: data.shopId,
-      };
-
-      try {
-        const { data } = await axios.post(
-          `${API}/conversations/create-conversation`,
-          newConversation
-        );
-        navigate(`/inbox?${data.conversation._id}`);
-      } catch (error) {
-        toast.error(error.response.data.message);
-      }
-    } else {
-      toast.error('Please login to create a conversation');
-    }
-  };
-
+  const handleWishlistAside = () => (
+    <aside className="product-wishlist-aside-wrapper">
+      <h4 className="product-wishlist-aside-title">
+        Do you like this product?
+      </h4>
+      <p className="wishlist">
+        {clickWishlist ? (
+          <AiFillHeart
+            className={clickWishlist ? "active-wishlist" : "passive-wishlist"}
+            onClick={() => removeFromWishlistHandler(currentProduct._id)}
+            color={clickWishlist ? "red" : "black"}
+            title="Remove from wishlist"
+          />
+        ) : (
+          <AiOutlineHeart
+            className={clickWishlist ? "active-wishlist" : "passive-wishlist"}
+            onClick={() => addToWishlistHandler(currentProduct)}
+            color={clickWishlist ? "active" : "passive"}
+            title="Add to wishlist"
+          />
+        )}
+      </p>
+    </aside>
+  );
   return (
-    <section className="single-product-details">
-      <article className="product-details">
-        {/* Product image */}
-        <figure className="image-container">
-          <img className="image" src={data.images} alt={data.name} />
-        </figure>
+    <div className="single-product-parts-wrapper">
+      <aside className="product-size-aside-wrapper">
+        <h2 className="product-size-title">Select Product Size</h2>
+        <form className="size-selection-form" onSubmit={addToCartHandler}>
+          <label htmlFor="size-selector">Choose Size:</label>
+          <select
+            id="size-selector"
+            value={selectedSize}
+            onChange={(e) => setSelectedSize(e.target.value)}
+          >
+            {selectedVariant?.productSizes?.map((sizeObj, index) => (
+              <option key={index} value={sizeObj.size}>
+                {sizeObj.size} {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
+              </option>
+            ))}
+          </select>
 
-        {/* Product Description and add to cart */}
-        <section className="product-description">
-          <h3 className={'subTitle'}> {data.name} </h3>
-          <p className="description">{data.description}</p>
+          <button
+            type="button"
+            className="size-button"
+            onClick={addToCartHandler}
+          >
+            Add to Cart
+          </button>
+        </form>
 
-          {/* Add to cart aside */}
-          <article className="quantity-add-to-cart-wishlist">
-            <section className="quantity-wrapper">
-              <TbSquareMinusFilled
-                onClick={decrementCount}
-                className="icon-add-to-cart"
-              />
+        {/* Single Product Chatting */}
+        {handleConversationAside()}
 
-              <h3 className="amount-subTitle"> {quantity} </h3>
+        {/* Single Product Wishlist */}
+        {handleWishlistAside()}
+      </aside>
 
-              <MdAddBox onClick={incrementCount} className="icon-add-to-cart" />
-            </section>
+      <aside className="product-infos-aside-wrapper">
+        <h3 className="product-info-title">Product Details</h3>
+        <p className="product-prices-info">
+          <strong>Discounted Price:</strong>
+          <span className="discounted-price">
+            {" "}
+            ${currentProduct?.discountPrice}
+          </span>
+          <span className="original-price">
+            {" "}
+            ${currentProduct?.originalPrice}
+          </span>
+        </p>
+        <p className="product-info">
+          <strong>Shop:</strong> {currentProduct?.shop?.name || "N/A"}
+        </p>
 
-            <h3
-              onClick={() => addToCartHandler(data)}
-              className="add-to-cart-btn"
-            >
-              Add to Cart
-            </h3>
+        <p className="product-info">
+          <strong>Supplier:</strong>{" "}
+          {currentProduct?.supplier?.supplierName || "N/A"}
+        </p>
 
-            {click ? (
-              <AiFillHeart
-                className={click ? 'active-wishlist' : 'passive-wishlist'}
-                onClick={() => removeFromWishlistHandler(data._id)}
-                color={click ? 'red' : 'black'}
-                title="Remove from wishlist"
-              />
-            ) : (
-              <AiOutlineHeart
-                className={click ? 'active-wishlist' : 'passive-wishlist'}
-                onClick={() => addToWishlistHandler(data)}
-                color={click ? 'active' : 'passive'}
-                title="Add to wishlist"
-              />
-            )}
-          </article>
+        <p className="product-info">
+          <strong>Category:</strong>{" "}
+          {currentProduct?.category?.categoryName || "N/A"}
+        </p>
 
-          {/* Product rating message */}
-          <aside className="product-rating">
-            <img src="" alt="" />
-            <h3 className="product-name">
-              <Link to={`/shop/${data._id}`}>{data.name} </Link>
-            </h3>
-            <p className="rating"> Rating: {averageRating} </p>
-            <span onClick={handleMessageSubmit} className="send-message">
-              Send Message <AiOutlineMessage />
-            </span>
-          </aside>
-        </section>
-      </article>
+        <p className="product-info">
+          <strong>Subcategory:</strong>{" "}
+          {currentProduct?.subcategory?.subcategoryName || "N/A"}
+        </p>
 
-      <ProductInfos
-        data={data}
-        products={products}
-        totalReviewsLength={totalReviewsLength}
-        averageRating={averageRating}
-      />
+        <p className="product-info">
+          <strong>Customer Category:</strong>{" "}
+          {currentProduct?.customerCategory || "N/A"}
+        </p>
 
-      {/* Include related Products */}
-      <RelatedProducts />
-    </section>
+        <p className="product-info">
+          <strong>Brand:</strong> {currentProduct?.brand?.brandName || "N/A"}
+        </p>
+
+        <p className="product-info">
+          <strong>Status:</strong> {currentProduct?.status}
+        </p>
+
+        <p className="product-info">
+          <strong>Sold Out:</strong> {currentProduct?.soldOut}
+        </p>
+
+        <p className="product-info">
+          <strong>Ratings:</strong> {currentProduct?.ratings?.average} (
+          {currentProduct?.ratings?.count} reviews)
+        </p>
+      </aside>
+
+      <aside className="product-variants-aside-wrapper">
+        <h2 className="product-variants-title">Product Variants</h2>
+        {currentProduct?.variants.length > 0 ? (
+          <ul className="variants-list">
+            {currentProduct?.variants.map((variant, index) => (
+              <li key={index} className="variant-item">
+                <p className="variant-color">
+                  <strong>Color:</strong> {variant.productColor}{" "}
+                  <button
+                    className="toggle-button"
+                    onClick={() => handleToggle(index)}
+                  >
+                    {variantToggles[index] ? "Hide Details" : "Show Details"}
+                  </button>
+                </p>
+                {variantToggles[index] && (
+                  <ul className="variant-size-details">
+                    {variant.productSizes.map((size, idx) => (
+                      <li key={idx}>
+                        <strong>Size:</strong> {size.size} - {size.stock} in
+                        stock
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No variants available.</p>
+        )}
+      </aside>
+    </div>
   );
 };
 

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import sendEmail from "../utils/sendMail.js";
 import generateUserToken from "../middleware/userToken.js";
+import mongoose from "mongoose";
 
 //=========================================================================
 // Create an account
@@ -313,35 +314,43 @@ export const userLogout = async (req, res, next) => {
 //=========================================================================
 
 export const updateUserProfile = async (req, res, next) => {
+  const { name, confirmEmail, confirmPassword, phone, image, agree } = req.body;
+  const userId = req.user.id;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return next(createError(400, "User id is not valid"));
+  }
+
   try {
-    const { name, email, password, phone, image } = req.body;
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
 
     if (!user) {
       return next(createError(400, "User not found"));
     }
 
-    // If user exist in the database, check password validity
-    const isPasswordValid = bcrypt.compare(password, user.password);
-
+    // Validate password before allowing updates
+    const isPasswordValid = await bcrypt.compare(
+      confirmPassword,
+      user.password
+    );
     if (!isPasswordValid) {
-      return next(createError(400, "Invalid password"));
+      return next(createError(401, "Invalid password"));
     }
 
-    // Update user data
-    user.name = name;
-    user.email = email;
-    user.phoneNumber = phone;
-    user.image = image;
+    // Prepare updated fields
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (confirmEmail) updatedFields.email = confirmEmail;
+    if (phone) updatedFields.phone = phone;
+    if (image) updatedFields.image = image;
+    if (agree !== undefined) updatedFields.agree = agree;
 
-    // Save user in the database
-    try {
-      await user.save();
-    } catch (error) {
-      return next(createError(500, "User could not be saved"));
-    }
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
+      new: true,
+      runValidators: true,
+    });
 
-    return res.status(201).json({ success: true, update: user });
+    return res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
     console.log(error);
     next(createError(500, "User account could not update! Please try again!"));

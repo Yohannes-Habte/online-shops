@@ -1,5 +1,6 @@
-import User from '../models/userModel.js';
-import createError from 'http-errors';
+import mongoose, { mongo } from "mongoose";
+import User from "../models/userModel.js";
+import createError from "http-errors";
 
 //====================================================================
 // Get a user
@@ -28,10 +29,10 @@ export const getUsers = async (req, res, next) => {
     if (users) {
       res.status(200).json({ success: true, users });
     } else {
-      return next(createError(404, 'Users do not found!'));
+      return next(createError(404, "Users do not found!"));
     }
   } catch (error) {
-    next(createError(500, 'Database could not query!'));
+    next(createError(500, "Database could not query!"));
   }
 };
 
@@ -40,23 +41,48 @@ export const getUsers = async (req, res, next) => {
 //====================================================================
 
 export const updateUserAddress = async (req, res, next) => {
+  const {
+    country,
+    state,
+    city,
+    streetName,
+    houseNumber,
+    zipCode,
+    addressType,
+  } = req.body;
+
+  const userId = req.user.id;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return next(createError(404, "Invalid user ID!"));
+  }
+
   try {
-    // Identify the user by id
-    // const user = await User.findById(req.user._id);
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(userId);
 
     if (!user) {
-      return next(createError(404, 'User not found'));
+      return next(createError(404, "User not found"));
     }
+
+    const houseNum = parseInt(houseNumber);
+    const zip = parseInt(zipCode);
+
+    const addressFields = {
+      country,
+      state,
+      city,
+      streetName,
+      houseNumber: houseNum,
+      zipCode: zip,
+      addressType,
+    };
 
     // Is the same address type
     const sameAddressType = user.addresses.find(
-      (address) => address.addressType === req.body.addressType
+      (address) => address.addressType === addressType
     );
     if (sameAddressType) {
-      return next(
-        createError(400, `${req.body.addressType} address already exist!`)
-      );
+      return next(createError(400, `${addressType} address already exist!`));
     }
 
     // Is address exist
@@ -64,12 +90,11 @@ export const updateUserAddress = async (req, res, next) => {
       (address) => address._id === req.body._id
     );
 
-    // If address exist, update the exist address. Otherwise, you need to add new address
     if (existAddress) {
-      Object.assign(existAddress, req.body);
+      Object.assign(existAddress, addressFields);
     } else {
       // Add new Address to the array
-      user.addresses.push(req.body);
+      user.addresses.push(addressFields);
     }
 
     // After updating the address, save the user in the database
@@ -79,7 +104,7 @@ export const updateUserAddress = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     next(
-      createError(500, 'The address could not be updated! Please try again!')
+      createError(500, "The address could not be updated! Please try again!")
     );
   }
 };
@@ -90,15 +115,19 @@ export const updateUserAddress = async (req, res, next) => {
 
 export const deleteUserAddress = async (req, res, next) => {
   try {
-    const userId = req.user._id;
-    const addressId = req.params.id;
+    const userId = req.user.id;
+    const { addressId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(createError(404, "Invalid user ID!"));
+    }
 
     const user = await User.findById(userId);
 
     if (!user) {
-      return next(createError(404, 'User not found'));
+      return next(createError(404, "User not found"));
     }
-    // instead of findByIdAndUpdate, you can use updateOne
+
     await User.findByIdAndUpdate(
       {
         _id: userId,
@@ -107,10 +136,10 @@ export const deleteUserAddress = async (req, res, next) => {
     );
 
     // Update user data (address)
-    res.status(200).json(user);
+    res.status(200).json({ success: true, user, message: "Address deleted!" });
   } catch (error) {
     next(
-      createError(500, 'The address could not be deleted! Please try again!')
+      createError(500, "The address could not be deleted! Please try again!")
     );
   }
 };
@@ -124,16 +153,16 @@ export const deleteUser = async (req, res, next) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return next(createError(404, 'User does not exist!'));
+      return next(createError(404, "User does not exist!"));
     }
 
     await User.findByIdAndDelete(req.params.id);
 
     res.status(201).json({
       success: true,
-      message: 'User deleted successfully!',
+      message: "User deleted successfully!",
     });
   } catch (error) {
-    next(createError(500, 'User could not be deleted! Please try again!'));
+    next(createError(500, "User could not be deleted! Please try again!"));
   }
 };

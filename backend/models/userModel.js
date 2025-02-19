@@ -14,16 +14,23 @@ const userSchema = new Schema(
         country: { type: String, required: true },
         state: { type: String, required: true },
         city: { type: String, required: true },
-        address: { type: String, required: true },
+        streetName: { type: String, required: true },
+        houseNumber: { type: Number, required: true },
         zipCode: { type: Number, required: true },
-        addressType: { type: String, required: true },
+        addressType: {
+          type: String,
+          enum: ["Office", "Home", "Business"],
+          required: true,
+        },
       },
     ],
+
     image: {
       type: String,
       default: "https://i.ibb.co/4pDNDk1/avatar.png",
       required: true,
     },
+
     role: {
       type: String,
       default: "customer",
