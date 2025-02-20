@@ -6,7 +6,7 @@ import AdminHeader from "../../../components/admin/adminHeader/AdminHeader";
 
 import moment from "moment";
 import { fetchAllOrders } from "../../../redux/actions/order";
-import { clearErrors } from "../../../redux/reducers/orderReducer";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import AdminSidebar from "../../../components/layouts/adminSidebar/AdminSidebar";
 
 const AdminDashboardOrders = () => {
@@ -16,12 +16,12 @@ const AdminDashboardOrders = () => {
   const { data: orders = [], loading, error } = allOrders || {};
 
   useEffect(() => {
-    dispatch(clearErrors()); // Ensure errors are cleared before fetching
+    dispatch(clearOrderErrors());
 
     dispatch(fetchAllOrders());
 
     return () => {
-      dispatch(clearErrors()); // Cleanup errors when unmounting
+      dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 

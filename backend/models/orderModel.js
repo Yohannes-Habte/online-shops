@@ -76,6 +76,13 @@ const orderSchema = new Schema(
   {
     customer: { type: Schema.Types.ObjectId, ref: "User", required: true },
     orderedItems: { type: [orderItemSchema], required: true },
+    itemsQty: {
+      type: Number,
+      required: true,
+      default: function () {
+        return this.orderedItems.reduce((sum, item) => sum + item.quantity, 0);
+      },
+    },
     shippingAddress: { type: shippingAddressSchema, required: true },
     payment: { type: paymentSchema },
     subtotal: { type: Number, required: true, min: 0 }, // Total price of ordered items before tax, shipping, and service fees
@@ -93,6 +100,7 @@ const orderSchema = new Schema(
         "Delivered",
         "Cancelled",
         "Returned",
+        "Refunded",
       ],
       default: "Pending",
     },
@@ -107,6 +115,7 @@ const orderSchema = new Schema(
             "Delivered",
             "Cancelled",
             "Returned",
+            "Refunded",
           ],
         },
         changedAt: { type: Date, default: Date.now }, // Date of status change

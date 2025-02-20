@@ -9,7 +9,6 @@ import {
   fetchCustomerOrdersRequest,
   fetchCustomerOrdersSuccess,
   fetchCustomerOrdersFailure,
-  clearErrors,
 } from "../reducers/orderReducer";
 import { API } from "../../utils/security/secreteKey";
 import { toast } from "react-toastify";
@@ -76,9 +75,4 @@ export const fetchCustomerOrders = () => async (dispatch) => {
   }
 };
 
-//==============================================================================
-// Clear Errors
-//==============================================================================
-export const clearOrderErrors = () => (dispatch) => {
-  dispatch(clearErrors());
-};
+

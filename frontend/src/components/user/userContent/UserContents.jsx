@@ -2,7 +2,7 @@ import Address from "../address/Address";
 import UserOrders from "../allOrders/UserOrders";
 import ChangePassword from "../changePassword/ChangePassword";
 import AllRefundOrders from "../refunds/AllRefundOrders";
-import TrackOrder from "../trackOrder/TrackOrder";
+import TrackOrderTable from "../trackOrderTable/TrackOrderTable";
 import UserInbox from "../userInbox/UserInbox";
 import UserProfile from "../userProfile/UserProfile";
 import "./UserContents.scss";
@@ -18,7 +18,7 @@ const UserContents = ({ isActive }) => {
 
       {isActive === 4 && <UserOrders />}
 
-      {isActive === 5 && <TrackOrder />}
+      {isActive === 5 && <TrackOrderTable />}
 
       {isActive === 6 && <AllRefundOrders />}
 

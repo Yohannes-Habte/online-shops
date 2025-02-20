@@ -1,7 +1,101 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-.user-orders-wrraper {
+.user-orders-wrapper {
+  @include shadow1;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 20px auto;
+  font-family: "Arial", sans-serif;
 
-    .subTitle {}
+  .order-status-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  .loading-message,
+  .error-message {
+    font-size: 1rem;
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+
+  .loading-message {
+    background: #f8f9fa;
+    color: #007bff;
+  }
+
+  .error-message {
+    background: #ffe6e6;
+    color: #d9534f;
+  }
+
+  .order-status-history {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    .order-status-history-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 10px;
+    }
+
+    .status-history-processes-list {
+      list-style: none;
+      padding: 0;
+
+      .status-history-process {
+        background: #ffffff;
+        border-left: 5px solid #007bff;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 1rem;
+        color: #555;
+
+        .status-history-message {
+          .status-info-strong {
+            font-weight: bold;
+            color: #007bff;
+          }
+
+          .status-info-span {
+            color: #666;
+            font-size: 0.95rem;
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .no-status-history {
+    font-size: 1rem;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    color: #666;
+  }
+}
+
+// Responsive design for mobile screens
+@media (max-width: 768px) {
+  .user-orders-wrapper {
+    padding: 15px;
+  }
+
+  .status-history-process{
+    font-size: 0.9rem;
+  }
 }

@@ -1,4 +1,3 @@
-import DashboardOverview from "../../shopDashboard/dashboardOverview/DashboardOverview";
 import ShopInbox from "../../shopDashboard/shopInbox/ShopInbox";
 import AllCoupons from "../allCoupons/AllCoupons";
 import AllSellerOrders from "../allOrders/AllSellerOrders";
@@ -14,6 +13,7 @@ import WithdrawMoney from "../withdrawMoney/WithDrawMoney";
 import "./ShopContent.scss";
 import Supplier from "../supplier/Supplier";
 import Subcategory from "../subcategory/Subcategory";
+import DashboardOverview from "../dashboardOverview/DashboardOverview";
 
 const ShopContent = ({ isActive }) => {
   return (

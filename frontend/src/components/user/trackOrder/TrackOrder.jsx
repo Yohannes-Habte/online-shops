@@ -1,93 +1,113 @@
-import { useEffect, useState } from 'react';
-import './TrackOrder.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import TrackOrderCard from '../trackOrderCard/TrackOrderCard';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import "./TrackOrder.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import TrackOrderCard from "../trackOrderCard/TrackOrderCard";
+import { fetchCustomerOrders } from "../../../redux/actions/order";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 
 const TrackOrder = () => {
   const { id } = useParams();
+  console.log("TrackOrder ~ id", id);
+  const dispatch = useDispatch();
+
   // Global state variables
-  const { orders } = useSelector((state) => state.order);
   const { currentUser } = useSelector((state) => state.user);
   const { currentSeller } = useSelector((state) => state.seller);
-  const dispatch = useDispatch();
-  const [userOrders, setUserOrders] = useState([]);
+  const { customerOrders } = useSelector((state) => state.order);
 
-  // Get all user orders
+  const { data: orders = [], loading, error } = customerOrders || {};
+  const [orderData, setOrderData] = useState(null);
+
+  console.log("TrackOrder:", orderData);
+
+  console.log("Track orders =>", orders);
+
+  // Fetch orders on component mount
   useEffect(() => {
-    const getAllUserOrders = async () => {
-      try {
-        const { data } = await axios.get(
-          `${API}/orders/user/${currentUser._id}`
-        );
-        setUserOrders(data.orders);
-      } catch (error) {
-        toast.error(error.response.data.message);
-      }
+    dispatch(fetchCustomerOrders());
+    return () => {
+      dispatch(clearOrderErrors());
     };
-    getAllUserOrders();
-  }, []);
+  }, [dispatch]);
 
-  // =============================================================
-  // Find the order that a user want to track
-  // =============================================================
-  const orderData = userOrders && userOrders.find((order) => order._id === id);
-  console.log('order data', orderData);
+  // Find the order based on the ID passed in the URL params
+  useEffect(() => {
+    if (orders.length > 0) {
+      const foundOrder = orders.find((order) => order._id === id);
+      setOrderData(foundOrder);
+    }
+  }, [orders, id]);
+
+  // Handle if the order is not found
+  if (!orderData) {
+    return <div className="error-message">Order not found.</div>;
+  }
+
+  // Check order status
+  const getOrderStatus = (status) => {
+    switch (status) {
+      case "Processing":
+        return "Processing";
+      case "Shipped":
+        return "Shipped";
+      case "Delivered":
+        return "Delivered";
+      case "Cancelled":
+        return "Cancelled";
+      case "Returned":
+        return "Returned";
+      case "Refunded":
+        return "Refunded";
+      default:
+        return "Pending";
+    }
+  };
 
   return (
-    <section className="user-orders-wrraper">
-      {orderData && orderData?.status === 'Processing' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Transferred to delivery partner' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Shipping' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Received' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'On the way' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Delivered' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Processing refund' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : orderData?.status === 'Successfully refunded' ? (
-        <TrackOrderCard
-          user={currentUser}
-          shop={currentSeller}
-          order={orderData}
-        />
-      ) : null}
+    <section className="user-orders-wrapper">
+      {loading && (
+        <div className="loading-message">Loading order details...</div>
+      )}
+      {error && <div className="error-message">Error: {error}</div>}
+
+      {!loading && !error && orderData && (
+        <>
+          <h2 className="order-status-title">
+            Order Status: {getOrderStatus(orderData.orderStatus)}
+          </h2>
+
+          {/* Render statusHistory if it exists */}
+          {orderData.statusHistory && orderData.statusHistory.length > 0 ? (
+            <div className="order-status-history">
+              <h3 className="order-status-history-title">Status History</h3>
+              <ul className="status-history-processes-list">
+                {orderData.statusHistory.map((status, index) => (
+                  <li key={index} className="status-history-process">
+                    <p className="status-history-message">
+                      <strong className="status-info-strong">{getOrderStatus(status.status)}:</strong>
+                      <span className="status-info-span">{status.message}</span>
+                      <span className="status-info-span">
+                        {" "}
+                        - {new Date(status.changedAt).toLocaleDateString()}
+                      </span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div>No status history available.</div>
+          )}
+
+          {/* Render TrackOrderCard with relevant data */}
+          <TrackOrderCard
+            user={currentUser}
+            shop={currentSeller}
+            order={orderData}
+          />
+        </>
+      )}
     </section>
   );
 };

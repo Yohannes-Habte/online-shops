@@ -54,7 +54,7 @@ const orderReducer = createSlice({
       setFailureState(state, action, "customerOrders"),
 
     // Clear errors
-    clearErrors: (state) => {
+    clearOrderErrors: (state) => {
       state.allOrders.error = null;
       state.sellerOrders.error = null;
       state.customerOrders.error = null;
@@ -72,7 +72,7 @@ export const {
   fetchCustomerOrdersRequest,
   fetchCustomerOrdersSuccess,
   fetchCustomerOrdersFailure,
-  clearErrors,
+  clearOrderErrors,
 } = orderReducer.actions;
 
 export default orderReducer.reducer;

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import './ShopInbox.scss';
 import { AiOutlineSend } from 'react-icons/ai';
 import { IoIosAttach } from 'react-icons/io';

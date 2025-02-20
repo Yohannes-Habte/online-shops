@@ -49,7 +49,7 @@ const DashboardMessages = () => {
   }, []);
 
   // ===============================================================
-  // Dispaly the last arrived message, which is chat updating
+  // Display the last arrived message, which is chat updating
   // ===============================================================
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const DashboardMessages = () => {
   }, [currentSeller, messages]);
 
   // ===============================================================
-  // Dispaly active seller
+  // Display active seller
   // ===============================================================
   useEffect(() => {
     if (currentSeller) {

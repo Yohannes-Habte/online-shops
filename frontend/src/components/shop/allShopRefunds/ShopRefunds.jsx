@@ -4,7 +4,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
-import { clearOrderErrors, fetchSellerOrders } from '../../../redux/actions/order';
+import { fetchSellerOrders } from '../../../redux/actions/order';
+import { clearOrderErrors } from '../../../redux/reducers/orderReducer';
 
 const ShopRefunds = () => {
   // Global variables

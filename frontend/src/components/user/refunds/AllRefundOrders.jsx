@@ -3,10 +3,8 @@ import { RxArrowRight } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
-import {
-  clearOrderErrors,
-  fetchCustomerOrders,
-} from "../../../redux/actions/order";
+import { fetchCustomerOrders } from "../../../redux/actions/order";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 
 const AllRefundOrders = () => {
   const { orders } = useSelector((state) => state.order);

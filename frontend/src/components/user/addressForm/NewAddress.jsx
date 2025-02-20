@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
-import { FaAddressCard } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
 import { Country, State, City } from "country-state-city";
 import { RiFileZipFill } from "react-icons/ri";
 import { useDispatch } from "react-redux";
 import { updateUserAddress } from "../../../redux/actions/user";
 import "./NewAddress.scss";
+import { FaHouseUser } from "react-icons/fa";
+import { FaStreetView } from "react-icons/fa6";
 
 // Initial state for form inputs
 const initialState = {
@@ -187,7 +188,7 @@ const NewAddress = ({ setOpenNewAddress }) => {
 
           {/* Street Name */}
           <div className="input-container">
-            <FaAddressCard className="icon" />
+            <FaStreetView className="icon" />
             <input
               type="text"
               name="streetName"
@@ -204,7 +205,7 @@ const NewAddress = ({ setOpenNewAddress }) => {
 
           {/* House Number */}
           <div className="input-container">
-            <FaAddressCard className="icon" />
+            <FaHouseUser className="icon" />
             <input
               type="number"
               name="houseNumber"

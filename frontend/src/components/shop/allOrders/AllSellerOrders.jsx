@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
 import { DataGrid } from "@mui/x-data-grid";
 import { fetchSellerOrders } from "../../../redux/actions/order";
-import { clearErrors } from "../../../redux/reducers/orderReducer";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 
 const AllSellerOrders = () => {
@@ -19,7 +19,7 @@ const AllSellerOrders = () => {
     dispatch(fetchSellerOrders());
 
     return () => {
-      dispatch(clearErrors());
+      dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 

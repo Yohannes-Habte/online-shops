@@ -19,9 +19,21 @@ const Address = () => {
     }
   }, [currentUser]);
 
+
+  // Handle delete address
   const handleDelete = async (addressId) => {
-    await dispatch(deleteUserAddress(addressId));
+    const isConfirmed = window.confirm("Are you sure you want to delete this address?");
+    if (isConfirmed) {
+      await dispatch(deleteUserAddress(addressId));
+  
+      // Update the state to remove the deleted address
+      setAddresses((prevAddresses) =>
+        prevAddresses.filter((address) => address._id !== addressId)
+      );
+    }
   };
+  
+  
 
   return (
     <div className="addresses-wrapper">

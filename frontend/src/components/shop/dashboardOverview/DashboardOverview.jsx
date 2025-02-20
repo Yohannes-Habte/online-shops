@@ -8,7 +8,7 @@ import { FaFirstOrderAlt } from "react-icons/fa6";
 import { FaProductHunt } from "react-icons/fa";
 import { fetchSellerOrders } from "../../../redux/actions/order";
 import "./DashboardOverview.scss";
-import { clearErrors } from "../../../redux/reducers/orderReducer";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 
 import {
@@ -28,20 +28,20 @@ const DashboardOverview = () => {
   const { data: orders = [], loading, error } = sellerOrders || {};
 
   useEffect(() => {
-    dispatch(clearErrors());
+    dispatch(clearOrderErrors());
     dispatch(fetchSellerOrders());
 
     return () => {
-      dispatch(clearErrors());
+      dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(clearErrors());
+    dispatch(clearOrderErrors());
     dispatch(fetchSellerOrders());
 
     return () => {
-      dispatch(clearErrors());
+      dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 

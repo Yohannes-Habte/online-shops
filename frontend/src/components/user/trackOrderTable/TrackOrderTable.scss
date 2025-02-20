@@ -1,3 +1,30 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
+/* Payment Status Colors */
+.payment-completed {
+  color: #008000;
+  font-weight: bold;
+}
+
+.payment-pending {
+  color: orange;
+}
+
+/* Order Status Colors */
+.order-pending {
+  color: #ff5e00;
+}
+
+.order-processing {
+  color: #ffc31e;
+}
+
+.order-shipped {
+  color: #6d78d8;
+}
+
+.order-delivered {
+  color: #008000;
+  font-weight: bold;
+}

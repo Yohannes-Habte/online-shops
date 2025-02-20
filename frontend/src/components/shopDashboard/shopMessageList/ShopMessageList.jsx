@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import './ShopMessageList.scss';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,7 +14,6 @@ const ShopMessageList = ({
   setUserData,
   userData,
   setActiveStatus,
-  loading,
   online,
 }) => {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ const ShopMessageList = ({
 
   // Handle click
   const handleClick = (id) => {
-    navigate(`/dashboard-messages?${id}`);
+    navigate(`/shop/dashboard?${id}`);
     setOpen(true);
   };
 

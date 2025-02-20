@@ -6,10 +6,11 @@ import { GiProfit } from "react-icons/gi";
 import { FaShopSlash } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { FaCartShopping } from "react-icons/fa6";
-import { clearOrderErrors, fetchAllOrders } from "../../../redux/actions/order";
+import { fetchAllOrders } from "../../../redux/actions/order";
 import { getAllSellers } from "../../../redux/actions/seller";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 
 const AdminDashboardOverview = () => {
   // Global state variables

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
 import { DataGrid } from "@mui/x-data-grid";
 import { fetchCustomerOrders } from "../../../redux/actions/order";
-import { clearErrors } from "../../../redux/reducers/orderReducer";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 
 const UserOrders = () => {
@@ -14,12 +14,12 @@ const UserOrders = () => {
   const { data: orders = [], loading, error } = customerOrders || {};
 
   useEffect(() => {
-    dispatch(clearErrors()); // Ensure errors are cleared before fetching
+    dispatch(clearOrderErrors()); // Ensure errors are cleared before fetching
 
     dispatch(fetchCustomerOrders());
 
     return () => {
-      dispatch(clearErrors()); // Cleanup errors when unmounting
+      dispatch(clearOrderErrors()); // Cleanup errors when unmounting
     };
   }, [dispatch]);
 

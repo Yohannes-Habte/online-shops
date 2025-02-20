@@ -3,7 +3,23 @@
 
 .user-profile-page {
   .user-profile-page-container {
+    position: relative;
     min-height: 100vh;
+
+    .go-back-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: absolute;
+      top: 1rem;
+      left: 2rem;
+      color: $green;
+
+      .go-back-icon {
+        font-size: $afs;
+        margin-right: 0.5rem;
+      }
+    }
 
     .user-profile-page-title {
       @include title;

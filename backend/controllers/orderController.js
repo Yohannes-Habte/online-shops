@@ -779,17 +779,19 @@ export const orderRefundByShop = async (req, res, next) => {
 
 export const getAllUserOrders = async (req, res, next) => {
   try {
-    if (!req.user?.id) {
+    const userId = req.user.id;
+
+    if (!userId) {
       return next(
         createError(401, "Unauthorized: Please login to view your orders")
       );
     }
 
-    if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
       return next(createError(400, "Invalid user ID format"));
     }
 
-    const user = await User.findById(req.user.id).populate("myOrders").lean();
+    const user = await User.findById(userId).populate("myOrders").lean();
 
     if (!user) {
       return next(createError(404, "User not found"));
