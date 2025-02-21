@@ -1,0 +1,116 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
+
+
+.order-update-processing-wrapper {
+  @include shadow1;
+  margin: 1rem 0;
+  background-color: #bde0fe;
+
+  .order-status-update-title {
+    @include subTitle;
+  }
+  .order-status-update-form {
+    display: flex;
+    flex-direction: column;
+
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .select-field {
+        @include inputField;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 10px;
+        font-size: 1.2rem;
+        color: #555;
+      }
+    }
+
+    .textarea-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .textarea-field {
+        @include inputField;
+      }
+
+      .input-icon {
+        position: absolute;
+        top: 1rem;
+        left: 10px;
+        font-size: 1.2rem;
+        color: #555;
+      }
+    }
+
+    .tracking-information-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .select-field {
+          @include inputField;
+        }
+
+        .input-icon {
+          position: absolute;
+          left: 10px;
+          font-size: 1.2rem;
+          color: #555;
+        }
+
+        .generate-tracking-btn {
+          max-width: fit-content;
+          margin-left: 1rem;
+          background: #007bff;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: $sfs;
+          transition: background 0.3s ease;
+
+          &:hover {
+            background: #0056b3;
+          }
+
+          &:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #0056b3;
+      }
+
+      &:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

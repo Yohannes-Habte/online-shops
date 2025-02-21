@@ -1,192 +1,64 @@
 @import "../../../styles/mixins.scss";
 @import "../../../styles/Mixins.scss";
 
-
-.shop-order-details {
+.shop-order-details-container {
   max-width: 900px;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 2rem 0;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 
-  header {
+  // Header Section
+  .order-details-header-wrapper {
     text-align: center;
     margin-bottom: 2rem;
 
-    h1 {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #333;
+    .order-details-header-title {
+      @include title;
     }
 
-    p {
+    .order-details-header-date {
       font-size: 1rem;
       color: #666;
       margin-top: 0.5rem;
     }
   }
 
-  .ordered-items {
-    margin-bottom: 2rem;
 
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #444;
+  // Order Cancelled Section
+  .order-cancellation-reason-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8d7da;
+    border-radius: 8px;
+
+    .order-cancellation-reason-title {
+      @include subTitle;
+      color: #721c24;
     }
 
-    .product-card {
-      display: grid;
-      grid-template-columns:repeat(2, 1fr); 
-      align-items: center;
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-      margin-bottom: 1rem;
-
-      img {
-        width: 380px;
-        height: 380px;
-        object-fit: cover;
-        border-radius: 8px;
-      }
-
-      div {
-        flex: 1;
-
-        h3 {
-          font-size: 1.2rem;
-          font-weight: 600;
-          color: #333;
-        }
-
-        p {
-          font-size: 0.9rem;
-          color: #666;
-          margin: 0.3rem 0;
-        }
-      }
+    .order-cancellation-reason-paragraph {
+      font-size: 0.9rem;
+      color: #721c24;
     }
   }
 
-  .order-summary-and-shipping-address {
-    @include shadow1;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    box-shadow: 0px 4px 10px #0000001a;
-    padding: 1rem 1rem 0 1rem;
-  }
 
-  .order-summary,
-  .shipping-address,
-  .order-processing,
-  .reviews {
-    margin-bottom: 2rem;
+  // Order Return Section
+  .order-return-reason-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8d7da;
+    border-radius: 8px;
 
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #444;
+    .order-return-reason-title {
+      @include subTitle;
+      color: #721c24;
     }
 
-    p {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .order-update-processing {
-    @include shadow1;
-    margin: 1rem 0;
-    .order-status-form {
-      display: flex;
-      flex-direction: column;
-
-      .input-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      
-      .input-icon {
-        position: absolute;
-        left: 10px;
-        font-size: 1.2rem;
-        color: #555;
-      }
-      
-      .input-container select,
-      .input-container textarea {
-       @include inputField;
-      }
-      
-
-      button {
-        background: #007bff;
-        color: white;
-        padding: 0.6rem 1.2rem;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background 0.3s ease;
-
-        &:hover {
-          background: #0056b3;
-        }
-
-        &:disabled {
-          background: #aaa;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
-
-  .refund-order-processing-container {
-    @include shadow1;
-  }
-
-  .reviews {
-    .review {
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-
-      p {
-        margin: 0.3rem 0;
-      }
-
-      strong {
-        color: #222;
-      }
-    }
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .shop-order-details {
-    padding: 1.5rem;
-
-    .ordered-items {
-      .product-card {
-        flex-direction: column;
-        align-items: flex-start;
-
-        img {
-          width: 100%;
-          max-width: 200px;
-          height: auto;
-        }
-      }
-    }
-
-    .order-processing {
-      form {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    .order-return-reason-paragraph {
+      font-size: 0.9rem;
+      color: #721c24;
     }
   }
 }

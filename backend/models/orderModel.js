@@ -91,7 +91,7 @@ const orderSchema = new Schema(
     serviceFee: { type: Number, default: 0 }, // Service charges for the app or platform
     grandTotal: { type: Number, required: true, min: 0 }, // subtotal + tax + shipping + service fees
     orderStatus: {
-      type: String, // Status of the order
+      type: String, 
       required: true,
       enum: [
         "Pending",
@@ -107,7 +107,7 @@ const orderSchema = new Schema(
     statusHistory: [
       {
         status: {
-          type: String, // Historical status of the order
+          type: String, 
           enum: [
             "Pending",
             "Processing",

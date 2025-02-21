@@ -16,8 +16,6 @@ const ShopBiodata = () => {
 
   const { shopProducts, error, loading } = ShopProducts();
 
-  console.log("Shop Products", shopProducts);
-
   // Shop owner Details
   useEffect(() => {
     dispatch(fetchSingleSeller());
@@ -103,7 +101,7 @@ const ShopBiodata = () => {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <p className="text average"> {averageRating} </p>
+          <p className="text average"> {averageRating?.toFixed(1)}/5 </p>
         )}
       </article>
 

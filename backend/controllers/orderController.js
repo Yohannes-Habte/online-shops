@@ -218,7 +218,7 @@ export const getOrder = async (req, res, next) => {
       })
       .populate({
         path: "orderedItems.product",
-        select: "title description discountPrice",
+        model: "Product",
       })
       .populate({
         path: "orderedItems.category",
@@ -277,7 +277,7 @@ export const shopOrder = async (req, res, next) => {
       })
       .populate({
         path: "orderedItems.product",
-        select: "title description discountPrice",
+        model: "Product",
       })
       .populate({
         path: "orderedItems.category",

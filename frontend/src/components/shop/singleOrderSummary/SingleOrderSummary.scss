@@ -1,0 +1,36 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
+
+.order-summary-and-shipping-address-container {
+  @include shadow1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 1rem 1rem 0 1rem;
+  background-color: #f8f9fa;
+
+  .order-summary-wrapper {
+    .order-summary-title {
+      @include subTitle;
+      padding: 0;
+    }
+
+    .order-summary-info {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  }
+
+  .shipping-address-wrapper {
+    padding-bottom: 1rem;
+
+    .shipping-address-title {
+      @include subTitle;
+      padding: 0;
+    }
+
+    .shipping-address-info {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  }
+}
