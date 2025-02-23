@@ -1,0 +1,48 @@
+.order-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 2rem;
+
+    .summary-details {
+      flex: 1;
+
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 1rem;
+        margin: 0.3rem 0;
+        color: #444;
+      }
+
+      h3 {
+        font-size: 1.3rem;
+        margin-top: 1rem;
+      }
+    }
+
+    .shipping-address {
+      flex: 1;
+      padding-left: 1.5rem;
+      border-left: 1px solid #ddd;
+
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 1rem;
+        margin: 0.3rem 0;
+        color: #444;
+      }
+    }
+  }

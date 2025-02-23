@@ -7,49 +7,72 @@ import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 
+const statusColors = {
+  paymentStatus: {
+    pending: "orange",
+    completed: "green",
+    refunded: "blue",
+    cancelled: "red",
+  },
+  orderStatus: {
+    Pending: "orange",
+    Processing: "lightblue",
+    Shipped: "darkblue",
+    Delivered: "green",
+    Cancelled: "red",
+    "Refund Requested": "pink",
+    Returned: "gray",
+    Refunded: "blue",
+  },
+};
+
 const AllSellerOrders = () => {
   const dispatch = useDispatch();
-
   const { sellerOrders } = useSelector((state) => state.order);
   const { data: orders = [], loading, error } = sellerOrders || {};
-  console.log("Orders", sellerOrders);
 
-  // Get all orders of the admin
   useEffect(() => {
     dispatch(fetchSellerOrders());
-
     return () => {
       dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 
-  // **Process orders into rows for DataGrid**
   const rows = orders.map((order) => ({
     id: order._id,
     createdAt: order.createdAt,
     quantity:
       order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
       0,
+    provider: order.payment?.provider || "Unknown",
     method: order.payment?.method || "Unknown",
+    paymentStatus: order.payment?.paymentStatus || "Unknown",
     grandTotal: order.grandTotal ?? 0,
     orderStatus: order.orderStatus || "Unknown",
   }));
 
-  // **Columns for DataGrid**
   const columns = [
     {
       field: "createdAt",
-      headerName: "Order Date",
+      headerName: "Ordered Date",
       minWidth: 180,
       flex: 0.8,
-      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"), // Format date
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
     },
     {
       field: "quantity",
       headerName: "Total Items",
       type: "number",
-      minWidth: 130,
+      minWidth: 50,
       flex: 0.6,
+    },
+    {
+      field: "grandTotal",
+      headerName: "Total Amount",
+      type: "number",
+      minWidth: 150,
+      flex: 0.8,
+      renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
     },
     {
       field: "method",
@@ -57,18 +80,23 @@ const AllSellerOrders = () => {
       minWidth: 150,
       flex: 0.8,
     },
-
     {
-      field: "grandTotal",
-      headerName: "Total Amount",
-      type: "number",
+      field: "paymentStatus",
+      headerName: "Payment Status",
       minWidth: 150,
       flex: 0.8,
-      renderCell: (params) => {
-        return `$${(params.row.grandTotal ?? 0).toFixed(2)}`;
-      },
+      renderCell: (params) => (
+        <span
+          style={{
+            color:
+              statusColors.paymentStatus[params.value.toLowerCase()] || "black",
+            fontWeight: "bold",
+          }}
+        >
+          {params.value}
+        </span>
+      ),
     },
-
     {
       field: "orderStatus",
       headerName: "Order Status",
@@ -77,7 +105,7 @@ const AllSellerOrders = () => {
       renderCell: (params) => (
         <span
           style={{
-            color: params.value === "Pending" ? "orange" : "green",
+            color: statusColors.orderStatus[params.value] || "black",
             fontWeight: "bold",
           }}
         >
@@ -102,7 +130,6 @@ const AllSellerOrders = () => {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Your Orders</h2>
-
       {loading ? (
         <div>Loading orders...</div>
       ) : error ? (

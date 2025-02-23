@@ -41,11 +41,11 @@ const paymentSchema = new Schema({
     required: true,
     enum: ["paypal", "stripe", "Credit Card", "Cash On Delivery"],
   },
-  provider: { type: String, enum: ["paypal", "stripe", "Credit Card"] }, // Payment provider
+  provider: { type: String, enum: ["paypal", "stripe"] },
   paymentStatus: {
     type: String,
     required: true,
-    enum: ["pending", "completed", "failed", "refunded", "cancelled"],
+    enum: ["pending", "completed", "refunded", "cancelled"],
     default: "pending",
   },
   transactionId: { type: String, unique: true, sparse: true }, // Transaction ID
@@ -57,7 +57,6 @@ const paymentSchema = new Schema({
   },
   amountPaid: { type: Number, required: true },
   paymentDate: { type: Date, default: Date.now },
-  error: { type: String, trim: true },
   refunds: [
     {
       refundId: { type: String },
@@ -91,7 +90,7 @@ const orderSchema = new Schema(
     serviceFee: { type: Number, default: 0 }, // Service charges for the app or platform
     grandTotal: { type: Number, required: true, min: 0 }, // subtotal + tax + shipping + service fees
     orderStatus: {
-      type: String, 
+      type: String,
       required: true,
       enum: [
         "Pending",
@@ -99,6 +98,7 @@ const orderSchema = new Schema(
         "Shipped",
         "Delivered",
         "Cancelled",
+        "Refund Requested",
         "Returned",
         "Refunded",
       ],
@@ -107,13 +107,14 @@ const orderSchema = new Schema(
     statusHistory: [
       {
         status: {
-          type: String, 
+          type: String,
           enum: [
             "Pending",
             "Processing",
             "Shipped",
             "Delivered",
             "Cancelled",
+            "Refund Requested",
             "Returned",
             "Refunded",
           ],

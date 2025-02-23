@@ -1,7 +1,7 @@
 import "./UserOrderDetailsPage.scss";
-import UserOrderDetails from "../../../components/cart/userOrderDetails/UserOrderDetails";
 import Header from "../../../components/layouts/header/Header";
 import Footer from "../../../components/layouts/footer/Footer";
+import UserOrderDetails from "../../../components/user/userOrderDetails/UserOrderDetails";
 
 
 const UserOrderDetailsPage = () => {

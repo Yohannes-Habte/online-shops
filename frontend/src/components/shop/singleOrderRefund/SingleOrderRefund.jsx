@@ -1,42 +1,29 @@
 import "./SingleOrderRefund.scss";
-import { BadgeDollarSign, FileText, History, } from "lucide-react";
+import { BadgeDollarSign, FileText, History } from "lucide-react";
 
 const SingleOrderRefund = ({
   order,
-  handleRefund,
-  refundAmount,
-  setRefundAmount,
+  handleShopOrderRefund,
   refundReason,
   setRefundReason,
   processing,
-  status,
 }) => {
   // Corrected logic for disabling the refund button
   const isRefundDisabled =
-    !order ||
-    !order.payment ||
-    !order.payment.paymentStatus ||
-    order.payment.paymentStatus !== "completed" ||
-    ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].includes(
-      order.orderStatus
-    ) ||
-    status !== "Returned" ||
-    processing ||
-    (order.payment.refunds && order.payment.refunds.length > 0);
+    order.payment.paymentStatus !== "completed" || processing;
 
   return (
     <div className="refund-order-processing-container">
       {order?.payment?.paymentStatus === "completed" && (
         <section className="order-refund-form-wrapper">
           <h2 className="order-refund-form-title">Refund Order</h2>
-          <form onSubmit={handleRefund} className="order-refund-form">
+          <form onSubmit={handleShopOrderRefund} className="order-refund-form">
             <div className="input-container">
               <BadgeDollarSign className="input-icon" size={20} />
               <input
                 type="number"
                 placeholder="Refund Amount"
-                value={refundAmount}
-                onChange={(e) => setRefundAmount(e.target.value)}
+                value={order.grandTotal}
                 className="input-field"
               />
             </div>

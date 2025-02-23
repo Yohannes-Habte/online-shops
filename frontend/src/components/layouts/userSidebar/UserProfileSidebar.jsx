@@ -142,7 +142,7 @@ const UserProfileSidebar = ({ isActive, setIsActive }) => {
           />
 
           <h4 className={isActive === 7 ? "active-text" : "passive-text"}>
-            Inbox
+            User Inbox
           </h4>
         </aside>
 

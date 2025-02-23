@@ -14,12 +14,11 @@ const UserOrders = () => {
   const { data: orders = [], loading, error } = customerOrders || {};
 
   useEffect(() => {
-    dispatch(clearOrderErrors()); // Ensure errors are cleared before fetching
-
+    dispatch(clearOrderErrors());
     dispatch(fetchCustomerOrders());
 
     return () => {
-      dispatch(clearOrderErrors()); // Cleanup errors when unmounting
+      dispatch(clearOrderErrors());
     };
   }, [dispatch]);
 
@@ -42,13 +41,13 @@ const UserOrders = () => {
       headerName: "Order Date",
       minWidth: 180,
       flex: 0.8,
-      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"), // Format date
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
     },
     {
       field: "quantity",
       headerName: "Total Items",
       type: "number",
-      minWidth: 130,
+      minWidth: 100,
       flex: 0.6,
     },
     {
@@ -57,33 +56,64 @@ const UserOrders = () => {
       minWidth: 150,
       flex: 0.8,
     },
-
     {
       field: "grandTotal",
       headerName: "Total Amount",
       type: "number",
-      minWidth: 150,
+      minWidth: 100,
       flex: 0.8,
       renderCell: (params) => {
         return `$${(params.row.grandTotal ?? 0).toFixed(2)}`;
       },
     },
-
     {
       field: "orderStatus",
       headerName: "Order Status",
       minWidth: 140,
       flex: 0.7,
-      renderCell: (params) => (
-        <span
-          style={{
-            color: params.value === "Pending" ? "orange" : "green",
-            fontWeight: "bold",
-          }}
-        >
-          {params.value}
-        </span>
-      ),
+      renderCell: (params) => {
+        let color;
+
+        switch (params.value.trim().toLowerCase()) {
+          case "pending":
+            color = "orange";
+            break;
+          case "processing":
+            color = "lightgreen";
+            break;
+          case "shipped":
+            color = "blue";
+            break;
+          case "delivered":
+            color = "green";
+            break;
+          case "cancelled":
+            color = "red";
+            break;
+          case "refund requested":
+            color = "purple";
+            break;
+          case "returned":
+            color = "tomato";
+            break;
+          case "refunded":
+            color = "black";
+            break;
+          default:
+            color = "black"; // Default color if no match
+        }
+
+        return (
+          <span
+            style={{
+              color: color,
+              fontWeight: "bold",
+            }}
+          >
+            {params.value}
+          </span>
+        );
+      },
     },
     {
       field: "action",
@@ -92,10 +122,7 @@ const UserOrders = () => {
       flex: 0.7,
       sortable: false,
       renderCell: (params) => (
-        <Link
-          to={`/orders/${params.id}`}
-          style={{ textDecoration: "none" }}
-        >
+        <Link to={`/orders/${params.id}`} style={{ textDecoration: "none" }}>
           <RxArrowRight size={20} />
         </Link>
       ),

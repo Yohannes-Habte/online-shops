@@ -25,7 +25,7 @@ const ShopOrderDetails = () => {
     trackingNumber: "",
     estimatedDeliveryDate: null,
   });
-
+  console.log("order", order);
   // Allowed order status sequence
   const orderStatusSequence = [
     "Pending",
@@ -163,6 +163,36 @@ const ShopOrderDetails = () => {
     }
   };
 
+  // Handle refund request
+  const handleShopOrderRefund = async (e) => {
+    e.preventDefault();
+    if (!refundReason) return toast.error("Please provide refund amount.");
+
+    setProcessing(true);
+    try {
+      const newOrderRefund = {
+        orderStatus: "Refunded",
+        paymentStatus: "refunded",
+        refundAmount: order.grandTotal,
+        refundReason,
+      };
+      const { data } = await axios.put(
+        `${API}/orders/${id}/refund/completed`,
+        newOrderRefund,
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Error processing refund request"
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) return <p>Loading order details...</p>;
   if (error) return <p className="error">{error}</p>;
 
@@ -209,7 +239,7 @@ const ShopOrderDetails = () => {
 
       <SingleOrderRefund
         order={order}
-        handleRefund={() => {}}
+        handleShopOrderRefund={handleShopOrderRefund}
         refundAmount={refundAmount}
         setRefundAmount={setRefundAmount}
         refundReason={refundReason}
