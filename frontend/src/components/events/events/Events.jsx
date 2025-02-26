@@ -1,45 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import './Events.scss';
-import { useSelector } from 'react-redux';
-import EventCard from '../eventCartd/EventCard';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect } from "react";
+import "./Events.scss";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearEventErrorsAction,
+  fetchAllEvents,
+} from "../../../redux/actions/event";
+import EventCard from "../eventCartd/EventCard";
 
 const Events = () => {
-  // Global state variables
+  const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.event);
-  const { currentSeller } = useSelector((state) => state.seller);
 
-  // local state variables
-  const [eventsData, setEventsData] = useState([]);
-
-  // Display events data
   useEffect(() => {
-    const getAllEvents = async () => {
-      try {
-        // dispatch(eventsShopFetchStart());
-        const { data } = await axios.get(
-          `${API}/events/${currentSeller?._id}/shop-events`
-        );
-        setEventsData(data.events);
-        // dispatch(eventsShopFetchSuccess(data));
-      } catch (error) {
-        console.log(error);
-        // dispatch(eventsShopFetchFailure(error.response.data.message));
+    dispatch(clearEventErrorsAction());
+    dispatch(fetchAllEvents());
+
+    return () => {
+      if (error) {
+        dispatch(clearEventErrorsAction());
       }
     };
-    getAllEvents();
-  }, []);
+  }, [dispatch]);
+
+  // Find the latest event based on createdAt timestamp
+  const latestEvent =
+    events?.length > 0
+      ? [...events].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )[0]
+      : null;
 
   return (
     <section className="popular-events-wrapper">
-      <h2 className="subTitle">Popular Events</h2>
+      <h2 className="subTitle">Latest Event</h2>
 
-      <article className="event-cards-wrapper">
-        {eventsData.length !== 0 &&
-          eventsData.map((event) => <EventCard data={event} key={event?._id} />)}
-        <h4>{eventsData?.length === 0 && 'New Events are coming soon!'}</h4>
-      </article>
+      {loading ? (
+        <p className="loading-message">Loading event...</p>
+      ) : error ? (
+        <p className="error-message">
+          Error loading event. Please try again later.
+        </p>
+      ) : latestEvent ? (
+        <article className="event-cards-wrapper">
+          <EventCard data={latestEvent} />
+        </article>
+      ) : (
+        <h4 className="no-events-message">New events are coming soon!</h4>
+      )}
     </section>
   );
 };

@@ -2,7 +2,7 @@ import { check } from 'express-validator';
 
 const eventValidator = () => {
   return [
-    check('name')
+    check('eventName')
       .notEmpty()
       .escape()
       .isLength({ min: 2, max: 50 })

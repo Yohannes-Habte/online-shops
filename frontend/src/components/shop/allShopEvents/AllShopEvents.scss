@@ -1,7 +1,7 @@
 @import '../../../styles/Variables.scss';
 @import '../../../styles/Mixins.scss';
 
-.all-shop-events-wrapper {
+.shop-events-wrapper {
   @include mobileDashboardScreen;
 
   .title {
@@ -12,7 +12,7 @@
 
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-  .all-shop-events-wrapper {
+  .shop-events-wrapper {
     @include tabletDashboardScreen;
 
     .title {
@@ -22,10 +22,10 @@
   }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
-  .all-shop-events-wrapper {
-    @include desktopDashboardScreen;
+  .shop-events-wrapper {
+    width: 100%;
     
     .title {
       @include title;

@@ -1,374 +1,460 @@
-import React, { useState, useRef } from 'react';
-import './CreateEvent.scss';
-import { AiFillTags } from 'react-icons/ai';
-import { BiSolidCategoryAlt } from 'react-icons/bi';
-import { FaAudioDescription, FaUpload } from 'react-icons/fa';
-import { MdEmojiEvents, MdMedicalServices } from 'react-icons/md';
-import { MdOutlineDateRange, MdPriceChange } from 'react-icons/md';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import { useState, useRef, useEffect } from "react";
+import "./CreateEvent.scss";
 import {
-  eventShopPostFailure,
-  eventShopPostStart,
-  eventShopPostSuccess,
-} from '../../../redux/reducers/eventReducer';
+  MdEvent,
+  MdDescription,
+  MdLabel,
+  MdCloudUpload,
+  MdAttachMoney,
+  MdEventAvailable,
+  MdInventory,
+  MdCheckBox,
+  MdCategory,
+} from "react-icons/md";
+
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 import {
   API,
   cloud_URL,
   cloud_name,
   upload_preset,
-} from '../../../utils/security/secreteKey';
+} from "../../../utils/security/secreteKey";
+import { toast } from "react-toastify";
+import { createNewEvent } from "../../../redux/actions/event";
+
+// Initial state
+const initialState = {
+  eventName: "",
+  description: "",
+  tags: [],
+  images: [],
+  originalPrice: "",
+  discountPrice: "",
+  startDate: "",
+  endDate: "",
+  stock: "",
+  purposes: [],
+  category: "",
+  subcategory: "",
+  brand: "",
+  supplier: "",
+};
 
 const CreateEvent = () => {
-  const navigate = useNavigate();
   const startingDateRef = useRef();
-
-  // Global state variables
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { events } = useSelector((state) => state.event);
   const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.event);
+  const { currentSeller } = useSelector((state) => state.seller);
 
-  // Local state variables
-  const [images, setImages] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [tags, setTags] = useState('');
-  const [originalPrice, setOriginalPrice] = useState();
-  const [discountPrice, setDiscountPrice] = useState();
-  const [stock, setStock] = useState();
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  // Local state
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  // Handle start date change
-  const handleStartDateChange = (e) => {
-    const startDate = new Date(e.target.value);
-    const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
-    const minEndDateISO = minEndDate.toISOString().slice(0, 10);
-    setStartDate(startDate);
-    setEndDate(null);
-    startingDateRef.current.name = minEndDateISO;
+  const eventPurposeOptions = [
+    "Selling affordable, durable shoes",
+    "Selling affordable, durable handbags",
+    "Selling affordable, durable clothing",
+    "Selling affordable, durable accessories",
+    "Selling affordable, durable electronics",
+    "Selling affordable, long-lasting perfumes",
+    "Buying quality, budget-friendly shoes",
+    "Buying quality, budget-friendly handbags",
+    "Buying quality, budget-friendly clothing",
+    "Buying quality, budget-friendly accessories",
+    "Buying quality, budget-friendly electronics",
+    "Buying quality, long-lasting perfumes",
+  ];
+
+  // Toggle checkbox dropdown
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
 
-  // Handle end date change
-  const handleEndDateChange = (e) => {
-    const endDate = new Date(e.target.value);
-    setEndDate(endDate);
-  };
+  // Fetch dropdown data
+  useEffect(() => {
+    const fetchData = async (endpoint, setter) => {
+      try {
+        const response = await axios.get(`${API}/${endpoint}`, {
+          withCredentials: true,
+        });
+        setter(response.data[endpoint]);
+      } catch (error) {
+        toast.error(`Failed to load ${endpoint}`);
+      }
+    };
 
-  // Minimum start date will be today
-  const today = new Date().toISOString().slice(0, 10);
+    fetchData("categories", setCategories);
+    fetchData("subcategories", setSubcategories);
+    fetchData("brands", setBrands);
+    fetchData("suppliers", setSuppliers);
+  }, []);
 
-  // Minimum end date will be three days from today
-  const minEndDate = startDate
-    ? new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 10)
-    : '';
-
-  // Update input data
+  // Handle input changes
   const updateChange = (e) => {
-    switch (e.target.name) {
-      case 'name':
-        setName(e.target.value);
-        break;
+    const { name, value, files } = e.target;
 
-      case 'description':
-        setDescription(e.target.value);
-        break;
-
-      case 'category':
-        setCategory(e.target.value);
-        break;
-
-      case 'tags':
-        setTags(e.target.value);
-        break;
-
-      case 'originalPrice':
-        setOriginalPrice(e.target.value);
-        break;
-
-      case 'discountPrice':
-        setDiscountPrice(e.target.value);
-        break;
-
-      case 'stock':
-        setStock(e.target.value);
-        break;
-
-      default:
-        break;
+    if (files) {
+      setFormData((prevData) => ({
+        ...prevData,
+        images: [...prevData.images, ...Array.from(files)],
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
 
-  // Reset
-  const reset = () => {
-    setImages('');
-    setName('');
-    setDescription('');
-    setCategory('');
-    setTags('');
-    setOriginalPrice('');
-    setDiscountPrice('');
-    setStock('');
-    setStartDate('');
-    setEndDate('');
+  // Handle selection
+  const handlePurposeChange = (purpose) => {
+    setFormData((prevData) => {
+      const updatedPurposes = prevData.purposes.includes(purpose)
+        ? prevData.purposes.filter((p) => p !== purpose) // Remove if already selected
+        : [...prevData.purposes, purpose]; // Add if not selected
+
+      return { ...prevData, purposes: updatedPurposes };
+    });
   };
 
-  // Handle submit
+  // Handle date changes
+  const handleStartDateChange = (e) => {
+    const newStartDate = e.target.value;
+    const minEndDate = new Date(newStartDate);
+    minEndDate.setDate(minEndDate.getDate() + 3); // Enforce min 3-day gap
+
+    setFormData((prevData) => ({
+      ...prevData,
+      startDate: newStartDate,
+      endDate: "", // Reset endDate when startDate changes
+    }));
+
+    startingDateRef.current.min = minEndDate.toISOString(); // Ensure correct format
+  };
+
+  const handleEndDateChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      endDate: e.target.value, // Store as string
+    }));
+  };
+
+  // Validate input fields
+  const validate = () => {
+    let tempErrors = {};
+
+    if (!formData.eventName) tempErrors.eventName = "Event name is required";
+    if (!formData.category) tempErrors.category = "Category is required";
+    if (!formData.originalPrice || isNaN(formData.originalPrice))
+      tempErrors.originalPrice = "Valid original price is required";
+    if (!formData.discountPrice || isNaN(formData.discountPrice))
+      tempErrors.discountPrice = "Valid discount price is required";
+    if (!formData.startDate) tempErrors.startDate = "Start date is required";
+    if (!formData.endDate) tempErrors.endDate = "End date is required";
+    if (!formData.stock || isNaN(formData.stock))
+      tempErrors.stock = "Valid stock quantity is required";
+    if (!formData.purposes) tempErrors.purposes = "Purpose is required";
+    if (!formData.description)
+      tempErrors.description = "Description is required";
+    if (formData.images.length === 0)
+      tempErrors.images = "At least one image is required";
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  // Reset form
+  const resetEventForm = () => {
+    setFormData(initialState);
+    setErrors({});
+  };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      dispatch(eventShopPostStart());
+    if (!validate()) return;
 
-      const productImages = new FormData();
-      productImages.append('file', images);
-      productImages.append('cloud_name', cloud_name);
-      productImages.append('upload_preset', upload_preset);
+    // Upload images to Cloudinary
+    const uploadPromises = formData.images.map(async (image) => {
+      const imageData = new FormData();
+      imageData.append("file", image);
+      imageData.append("upload_preset", upload_preset);
+      imageData.append("cloud_name", cloud_name);
 
-      // Save image to cloudinary
-      const response = await axios.post(cloud_URL, productImages);
-      const { url } = response.data;
+      const response = await axios.post(cloud_URL, imageData);
+      return response.data.url;
+    });
 
-      // The body
-      const newProduct = {
-        shopId: currentSeller._id,
-        name: name,
-        description: description,
-        category: category,
-        tags: tags,
-        originalPrice: originalPrice,
-        discountPrice: discountPrice,
-        stock: stock,
-        images: url,
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-      };
+    const imageUrls = await Promise.all(uploadPromises);
 
-      const { data } = await axios.post(
-        `${API}/events/create-event`,
-        newProduct
-      );
+    // Prepare event data
+    const newEvent = {
+      ...formData,
+      images: imageUrls,
+      shop: currentSeller._id,
+    };
 
-      dispatch(eventShopPostSuccess(data.event));
-      reset();
-    } catch (error) {
-      console.log(error);
-      dispatch(eventShopPostFailure(error.response.data.message));
-    }
+    // Send data to API
+    await dispatch(createNewEvent(newEvent));
+    resetEventForm();
   };
 
   return (
     <section className="create-event-wrapper">
       <h5 className="title">Create Event</h5>
-      {/* create event form */}
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit} className="form">
-        {/* Event name */}
+        {/* Event Name */}
         <div className="input-container">
-          <MdEmojiEvents className="icon" />
+          <MdEvent className="icon" />
           <input
             type="text"
-            name="name"
-            id="name"
-            autoComplete="name"
-            required
-            value={name}
+            name="eventName"
+            value={formData.eventName}
             onChange={updateChange}
             placeholder="Enter Event Name"
             className="input-field"
           />
-          <label htmlFor="name" className="input-label">
-            Event Name
-          </label>
-          <span className="input-highlight"></span>
+          {errors.eventName && (
+            <span className="error">{errors.eventName}</span>
+          )}
         </div>
 
-        {/* Product category */}
+        {/* Description */}
         <div className="input-container">
-          <BiSolidCategoryAlt className="icon" />
-          <label htmlFor="category" className="input-label">
-            Event Category <span className="mark">*</span>
-          </label>
-          <select
-            name="category"
-            id="category"
-            value={category}
+          <MdDescription className="icon" />
+          <textarea
+            name="description"
+            value={formData.description}
             onChange={updateChange}
+            placeholder="Enter Event Description"
             className="input-field"
-          >
-            <option value="default">Choose Event Category</option>
-            <option value="phone"> Phone </option>
-            <option value="laptop"> Laptop </option>
-            <option value="shoes"> Shoes </option>
-            <option value="clothes"> Clothes </option>
-            <option value="accesseries"> Accesseries </option>
-          </select>
+          />
+          {errors.description && (
+            <span className="error">{errors.description}</span>
+          )}
         </div>
 
-        {/* Product tags */}
+        {/* Tags */}
         <div className="input-container">
-          <AiFillTags className="icon" />
+          <MdLabel className="icon" />
           <input
             type="text"
             name="tags"
-            id="tags"
-            autoComplete="tags"
-            required
-            value={tags}
+            value={formData.tags}
             onChange={updateChange}
-            placeholder="Enter Event tags"
+            placeholder="Enter Tags (comma separated)"
             className="input-field"
           />
-          <label htmlFor="tags" className="input-label">
-            Event tags
-          </label>
-          <span className="input-highlight"></span>
         </div>
 
-        {/* Event Original Price */}
-        <div className="input-container">
-          <MdPriceChange className="icon" />
-          <input
-            type="number"
-            name="originalPrice"
-            id="originalPrice"
-            autoComplete="originalPrice"
-            required
-            value={originalPrice}
-            onChange={updateChange}
-            placeholder="Enter Event Original Price"
-            className="input-field"
-          />
-          <label htmlFor="originalPrice" className="input-label">
-            Event Original Price
-          </label>
-          <span className="input-highlight"></span>
-        </div>
-
-        {/* Event discount Price */}
-        <div className="input-container">
-          <MdPriceChange className="icon" />
-          <input
-            type="number"
-            name="discountPrice"
-            id="discountPrice"
-            autoComplete="discountPrice"
-            required
-            value={discountPrice}
-            onChange={updateChange}
-            placeholder="Enter Event Discount Price"
-            className="input-field"
-          />
-          <label htmlFor="discountPrice" className="input-label">
-            Event Discount Price
-          </label>
-          <span className="input-highlight"></span>
-        </div>
-
-        {/* Event stock */}
-        <div className="input-container">
-          <MdMedicalServices className="icon" />
-          <input
-            type="number"
-            name="stock"
-            id="stock"
-            autoComplete="stock"
-            required
-            value={stock}
-            onChange={updateChange}
-            placeholder="Enter Event Stock"
-            className="input-field"
-          />
-          <label htmlFor="stock" className="input-label">
-            Event Stock
-          </label>
-          <span className="input-highlight"></span>
-        </div>
-
-        {/* Event Starting date */}
-        <div className="input-container">
-          <MdOutlineDateRange className="icon" />
-          <input
-            type="date"
-            name="startDate"
-            id="startDate"
-            ref={startingDateRef}
-            value={startDate ? startDate.toISOString().slice(0, 10) : ''}
-            onChange={handleStartDateChange}
-            min={today}
-            placeholder="Enter  Event Start Date"
-            className="input-field"
-          />
-          <label htmlFor="startDate" className="input-label">
-            Event Start Date
-          </label>
-          <span className="input-highlight"></span>
-        </div>
-
-        {/* Event Ending date */}
-        <div className="input-container">
-          <MdOutlineDateRange className="icon" />
-          <input
-            type="date"
-            name="endDate"
-            id="endDate"
-            required
-            value={endDate ? endDate.toISOString().slice(0, 10) : ''}
-            onChange={handleEndDateChange}
-            min={minEndDate}
-            placeholder="Enter Event End Date"
-            className="input-field"
-          />
-          <label htmlFor="endDate" className="input-label">
-            Event Start Date
-          </label>
-          <span className="input-highlight"></span>
-        </div>
-
-        {/* Images of products */}
+        {/* Image Upload */}
         <div className="file-container">
-          <label htmlFor="images" className="image-label">
-            <FaUpload className="icon" />
-            Upload Images <span className="mark">*</span>
+          <label htmlFor="images" className="file-label">
+            <MdCloudUpload className="icon" /> Upload Images
           </label>
           <input
             type="file"
             name="images"
-            id="images"
             multiple
-            onChange={(e) => setImages(e.target.files[0])}
+            onChange={updateChange}
+            className="input-file-field"
+          />
+          {errors.images && <span className="error">{errors.images}</span>}
+        </div>
+
+        {/* Original Price */}
+        <div className="input-container">
+          <MdAttachMoney className="icon" />
+          <input
+            type="number"
+            name="originalPrice"
+            value={formData.originalPrice}
+            onChange={updateChange}
+            placeholder="Original Price"
             className="input-field"
           />
+          {errors.originalPrice && (
+            <span className="error">{errors.originalPrice}</span>
+          )}
         </div>
 
-        {/* Event Description */}
+        {/* Discount Price */}
         <div className="input-container">
-          <FaAudioDescription className="icon" />
-          <textarea
-            type="text"
-            name="description"
-            id="description"
-            cols="30"
-            rows="7"
-            autoComplete="description"
-            required
-            value={description}
+          <MdAttachMoney className="icon" />
+          <input
+            type="number"
+            name="discountPrice"
+            value={formData.discountPrice}
             onChange={updateChange}
-            placeholder="Enter Even Description"
+            placeholder="Discount Price"
             className="input-field"
-          ></textarea>
-          <label htmlFor="description" className="input-label">
-            Event Description
-          </label>
-          <span className="input-highlight"></span>
+          />
+          {errors.discountPrice && (
+            <span className="error">{errors.discountPrice}</span>
+          )}
         </div>
 
-        <button className="create-event-btn">Submit</button>
+        {/* Start Date */}
+        <div className="input-container">
+          <MdEventAvailable className="icon" />
+          <input
+            type="date"
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleStartDateChange}
+            className="input-field"
+          />
+          {errors.startDate && (
+            <span className="error">{errors.startDate}</span>
+          )}
+        </div>
+
+        {/* End Date */}
+        <div className="input-container">
+          <MdEventAvailable className="icon" />
+          <input
+            type="date"
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleEndDateChange}
+            ref={startingDateRef}
+            className="input-field"
+          />
+          {errors.endDate && <span className="error">{errors.endDate}</span>}
+        </div>
+
+        {/* Stock */}
+        <div className="input-container">
+          <MdInventory className="icon" />
+          <input
+            type="number"
+            name="stock"
+            value={formData.stock}
+            onChange={updateChange}
+            placeholder="Available Stock"
+            className="input-field"
+          />
+          {errors.stock && <span className="error">{errors.stock}</span>}
+        </div>
+
+        {/* Event purposes */}
+        <div className="input-container">
+          <MdCheckBox className="icon" />
+          <div className="dropdown">
+            {/* Clickable input area */}
+            <div className="dropdown-input" onClick={toggleDropdown}>
+              {formData.purposes.length > 0
+                ? formData.purposes.join(", ")
+                : "Select purposes"}
+            </div>
+
+            {/* Dropdown checkbox list */}
+            {showDropdown && (
+              <div className="dropdown-list">
+                {eventPurposeOptions.map((purpose, index) => (
+                  <label key={index} className="dropdown-item">
+                    <input
+                      type="checkbox"
+                      name="purposes"
+                      checked={formData.purposes.includes(purpose)}
+                      onChange={() => handlePurposeChange(purpose)}
+                      className="checkbox-field"
+                    />
+                    {purpose}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          {errors.purposes && <span className="error">{errors.category}</span>}
+        </div>
+
+        {/* Category */}
+        <div className="input-container">
+          <MdCategory className="icon" />
+          <select
+            name="category"
+            value={formData.category}
+            onChange={updateChange}
+            className="input-field"
+          >
+            <option value="">Choose Event Category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.categoryName}
+              </option>
+            ))}
+          </select>
+          {errors.category && <span className="error">{errors.category}</span>}
+        </div>
+
+        {/* Subcategory */}
+        <div className="input-container">
+          <MdCategory className="icon" />
+          <select
+            name="subcategory"
+            value={formData.subcategory}
+            onChange={updateChange}
+            className="input-field"
+          >
+            <option value="">Choose Subcategory</option>
+            {subcategories.map((sub) => (
+              <option key={sub._id} value={sub._id}>
+                {sub.subcategoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Brand */}
+        <div className="input-container">
+          <MdCategory className="icon" />
+          <select
+            name="brand"
+            value={formData.brand}
+            onChange={updateChange}
+            className="input-field"
+          >
+            <option value="">Choose Brand</option>
+            {brands.map((brand) => (
+              <option key={brand._id} value={brand._id}>
+                {brand.brandName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Supplier */}
+        <div className="input-container">
+          <MdCategory className="icon" />
+          <select
+            name="supplier"
+            value={formData.supplier}
+            onChange={updateChange}
+            className="input-field"
+          >
+            <option value="">Choose Supplier</option>
+            {suppliers.map((supplier) => (
+              <option key={supplier._id} value={supplier._id}>
+                {supplier.supplierName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Submit Button */}
+        <button type="submit" disabled={loading} className="create-event-btn">
+          Submit
+        </button>
       </form>
     </section>
   );

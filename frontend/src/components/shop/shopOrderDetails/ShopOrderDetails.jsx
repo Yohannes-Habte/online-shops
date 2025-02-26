@@ -15,7 +15,8 @@ const ShopOrderDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("");
-  const [processing, setProcessing] = useState(false);
+  const [processStatus, setProcessStatus] = useState(false);
+  const [processRefund, setProcessRefund] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [returnReason, setReturnReason] = useState("");
   const [refundAmount, setRefundAmount] = useState("");
@@ -32,6 +33,7 @@ const ShopOrderDetails = () => {
     "Processing",
     "Shipped",
     "Delivered",
+    "Refund Requested",
     "Returned",
     "Refunded",
   ];
@@ -43,7 +45,9 @@ const ShopOrderDetails = () => {
     return newIndex === currentIndex + 1; // Only allow moving forward
   };
 
+  // =========================================================================
   // Fetch order details
+  // =========================================================================
   useEffect(() => {
     const fetchOrderDetails = async () => {
       setLoading(true);
@@ -90,7 +94,10 @@ const ShopOrderDetails = () => {
       .toUpperCase()}`;
   };
 
+
+  // =========================================================================
   // Update order status
+  // =========================================================================
   const updateOrderStatus = async (e) => {
     e.preventDefault();
     if (!status) return toast.error("Please select an order status.");
@@ -127,7 +134,7 @@ const ShopOrderDetails = () => {
       };
     }
 
-    setProcessing(true);
+    setProcessStatus(true);
     try {
       const { data } = await axios.put(
         `${API}/orders/${id}/update/status`,
@@ -159,16 +166,18 @@ const ShopOrderDetails = () => {
         error.response?.data?.message || "Error updating order status"
       );
     } finally {
-      setProcessing(false);
+      setProcessStatus(false);
     }
   };
 
+  // =========================================================================
   // Handle refund request
+  // =========================================================================
   const handleShopOrderRefund = async (e) => {
     e.preventDefault();
     if (!refundReason) return toast.error("Please provide refund amount.");
 
-    setProcessing(true);
+    setProcessRefund(true);
     try {
       const newOrderRefund = {
         orderStatus: "Refunded",
@@ -189,7 +198,7 @@ const ShopOrderDetails = () => {
         error.response?.data?.message || "Error processing refund request"
       );
     } finally {
-      setProcessing(false);
+      setProcessRefund(false);
     }
   };
 
@@ -220,7 +229,7 @@ const ShopOrderDetails = () => {
         returnReason={returnReason}
         setReturnReason={setReturnReason}
         order={order}
-        processing={processing}
+        processStatus={processStatus}
       />
 
       {order?.orderStatus === "Cancelled" && order?.cancellationReason && (
@@ -244,7 +253,7 @@ const ShopOrderDetails = () => {
         setRefundAmount={setRefundAmount}
         refundReason={refundReason}
         setRefundReason={setRefundReason}
-        processing={processing}
+        processRefund={processRefund}
         status={status}
       />
     </section>

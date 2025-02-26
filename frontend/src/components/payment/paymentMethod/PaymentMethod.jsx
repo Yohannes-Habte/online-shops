@@ -86,6 +86,7 @@ const PaymentMethod = () => {
         const order = createOrderObject(
           result.paymentIntent.id,
           "Credit Card",
+          "Stripe",
           "completed"
         );
         await submitOrder(order);
@@ -130,6 +131,7 @@ const PaymentMethod = () => {
         const order = createOrderObject(
           paymentInfo.id, // Use PayPal capture ID
           "PayPal",
+          "PayPal",
           "completed"
         );
         await submitOrder(order); // Submit order
@@ -168,7 +170,7 @@ const PaymentMethod = () => {
   // ================================================================================
   // Create Order Object
   // ================================================================================
-  const createOrderObject = (paymentId, method, status) => ({
+  const createOrderObject = (paymentId, method, provider, status) => ({
     orderedItems: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
     subTotal: orderData?.subTotal,
@@ -178,7 +180,7 @@ const PaymentMethod = () => {
     customer: currentUser?._id,
     payment: {
       method,
-      provider: method === "Cash On Delivery" ? undefined : method,
+      provider: method === "Cash On Delivery" ? undefined : provider,
       paymentStatus: status,
       transactionId: paymentId || undefined,
       amountPaid: orderData?.grandTotal,

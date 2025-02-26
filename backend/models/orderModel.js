@@ -39,9 +39,9 @@ const paymentSchema = new Schema({
   method: {
     type: String,
     required: true,
-    enum: ["paypal", "stripe", "Credit Card", "Cash On Delivery"],
+    enum: ["Credit Card", "PayPal", "Cash On Delivery"],
   },
-  provider: { type: String, enum: ["paypal", "stripe"] },
+  provider: { type: String, enum: ["Stripe", "PayPal"] },
   paymentStatus: {
     type: String,
     required: true,

@@ -19,7 +19,7 @@ const SingleOrderStatusUpdate = ({
   returnReason,
   setReturnReason,
   order,
-  processing,
+  processStatus,
 }) => {
   return (
     <section className="order-update-processing-wrapper">
@@ -40,6 +40,7 @@ const SingleOrderStatusUpdate = ({
               "Shipped",
               "Delivered",
               "Cancelled",
+              "Refund Requested",
               "Returned",
               "Refunded",
             ].map((selectStatus) => (
@@ -146,7 +147,7 @@ const SingleOrderStatusUpdate = ({
         )}
 
         <button type="submit" disabled={order?.orderStatus === "Refunded"}>
-          {processing ? "Updating..." : "Update Status"}
+          {processStatus ? "Updating..." : "Update Status"}
         </button>
       </form>
     </section>

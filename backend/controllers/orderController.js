@@ -826,6 +826,25 @@ export const orderRefundByShop = async (req, res, next) => {
       );
     }
 
+    // If the order status is "Pending", "Processing", "Shipped", "Delivered", or "Cancelled", it cannot be refunded
+    const validOrderStatuses = [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    if (validOrderStatuses.includes(order.orderStatus)) {
+      await session.abortTransaction();
+      return next(
+        createError(
+          400,
+          `We're sorry, but an order with the status "${order.orderStatus}" is not eligible for a refund. Refunds can only be processed for orders with a refund request status. Please contact our support team if you have any questions or need further assistance.`
+        )
+      );
+    }
+
     // Check if the order has already been refunded
     if (order.orderStatus === "Refunded") {
       await session.abortTransaction();
@@ -897,14 +916,23 @@ export const orderRefundByShop = async (req, res, next) => {
 
     // Restore stock if fully refunded
     if (orderStatus === "Refunded") {
-      for (const item of order.orderedItems) {
-        await restoreStock(
-          item.product,
-          item.productColor,
-          item.size,
-          item.quantity
-        );
-      }
+      await Promise.all(
+        order.orderedItems.map((item) =>
+          restoreStock(
+            item.product,
+            item.productColor,
+            item.size,
+            item.quantity
+          )
+        )
+      );
+
+      // Log stock restoration
+      // order.orderedItems.forEach((item) => {
+      //   console.log(
+      //     `Stock restored for Product: ${item.product}, Color: ${item.productColor}, Size: ${item.size}, Quantity: ${item.quantity}`
+      //   );
+      // });
     }
 
     // Save order update
@@ -918,6 +946,7 @@ export const orderRefundByShop = async (req, res, next) => {
       message: "Order refund processed successfully.",
     });
   } catch (error) {
+    console.error("Error processing refund:", error);
     await session.abortTransaction();
     session.endSession();
     next(createError(500, "Database error: Unable to process refund."));

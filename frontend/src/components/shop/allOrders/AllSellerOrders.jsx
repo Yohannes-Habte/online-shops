@@ -6,6 +6,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
+import "./AllSellerOrders.scss";
 
 const statusColors = {
   paymentStatus: {
@@ -58,27 +59,36 @@ const AllSellerOrders = () => {
       minWidth: 180,
       flex: 0.8,
       valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
+      cellClassName: "left-center",
     },
     {
       field: "quantity",
       headerName: "Total Items",
-      type: "number",
       minWidth: 50,
       flex: 0.6,
+      cellClassName: "left-center",
     },
     {
       field: "grandTotal",
       headerName: "Total Amount",
-      type: "number",
       minWidth: 150,
       flex: 0.8,
       renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
+      cellClassName: "left-center",
+    },
+    {
+      field: "provider",
+      headerName: "Payment Provider",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
     },
     {
       field: "method",
       headerName: "Payment Method",
-      minWidth: 150,
+      minWidth: 180,
       flex: 0.8,
+      cellClassName: "left-center",
     },
     {
       field: "paymentStatus",
@@ -96,6 +106,7 @@ const AllSellerOrders = () => {
           {params.value}
         </span>
       ),
+      cellClassName: "left-center",
     },
     {
       field: "orderStatus",
@@ -112,6 +123,7 @@ const AllSellerOrders = () => {
           {params.value}
         </span>
       ),
+      cellClassName: "left-center",
     },
     {
       field: "action",
@@ -121,14 +133,15 @@ const AllSellerOrders = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/shop/order/${params.id}`}>
-          <RxArrowRight size={20} />
+          <RxArrowRight className="icon-cell-arrow" size={20} />
         </Link>
       ),
+      cellClassName: "middle-center",
     },
   ];
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px" }} className="shop-orders-container">
       <h2>Your Orders</h2>
       {loading ? (
         <div>Loading orders...</div>

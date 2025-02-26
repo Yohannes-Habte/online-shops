@@ -9,6 +9,7 @@ import UserSingleOrderItems from "../userSingleOrderItems/UserSingleOrderItems";
 import UserSingleOrderItemReview from "../userSingleOrderItemReview/UserSingleOrderItemReview";
 import UserSingleOrderRefund from "../userSingleOrderRefund/UserSingleOrderRefund";
 import UserSingleOrderSummary from "../userSingleOrderSummary/UserSingleOrderSummary";
+import UserSingleOrderRefundInfo from "../userSingleOrderRefundInfo/UserSingleOrderRefundInfo";
 
 const initialState = {
   comment: "",
@@ -144,13 +145,11 @@ const UserOrderDetails = () => {
           Placed on: <strong>{orderInfos?.createdAt?.slice(0, 10)}</strong>
         </p>
       </header>
-
       <UserSingleOrderItems
         orderInfos={orderInfos}
         setOpen={setOpen}
         setSelectedProduct={setSelectedProduct}
       />
-
       {open && (
         <UserSingleOrderItemReview
           reviewHandler={reviewHandler}
@@ -159,40 +158,19 @@ const UserOrderDetails = () => {
           resetForm={resetForm}
         />
       )}
-
       <UserSingleOrderSummary
         orderInfos={orderInfos}
         currentUser={currentUser}
       />
 
-      <UserSingleOrderRefund
-        refundHandler={refundHandler}
-        refundReason={refundReason}
-        setRefundReason={setRefundReason}
-      />
-
-      {/* Refund Details Section */}
-      {orderInfos?.payment?.refunds?.length > 0 && (
-        <section className="refund-details">
-          <h2>Refund Details</h2>
-          {orderInfos.payment.refunds.map((refund, index) => (
-            <div key={index} className="refund-item">
-              <p>
-                <strong>Refund ID:</strong> {refund.refundId}
-              </p>
-              <p>
-                <strong>Amount:</strong> ${refund.amount.toFixed(2)}
-              </p>
-              <p>
-                <strong>Reason:</strong> {refund.reason || "No reason provided"}
-              </p>
-              <p>
-                <strong>Refund Date:</strong>{" "}
-                {new Date(refund.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
-        </section>
+      {orderInfos?.orderStatus === "Refunded" ? (
+        <UserSingleOrderRefundInfo orderInfos={orderInfos} />
+      ) : (
+        <UserSingleOrderRefund
+          refundHandler={refundHandler}
+          refundReason={refundReason}
+          setRefundReason={setRefundReason}
+        />
       )}
     </section>
   );

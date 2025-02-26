@@ -1,22 +1,19 @@
-import './Cart.scss';
-import { RxCross1 } from 'react-icons/rx';
-import { IoBagHandleOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import SingleCart from '../singleCart/SingleCart';
-import { addToCart, removeFromCart } from '../../../redux/reducers/cartReducer';
+import "./Cart.scss";
+import { RxCross1 } from "react-icons/rx";
+import { IoBagHandleOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import SingleCart from "../singleCart/SingleCart";
+import { addToCart, removeFromCart } from "../../../redux/reducers/cartReducer";
 
 const Cart = ({ setOpenCart }) => {
   // Global state variables
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
-
-  console.log("Cart Items:",cart);
-
   // Remove from cart handler
-  const removeFromCartHandler = (id) => {
-    dispatch(removeFromCart(id));
+  const removeFromCartHandler = (productId, productColor, size) => {
+    dispatch(removeFromCart({ productId, productColor, size }));
   };
 
   // Total price
@@ -26,8 +23,8 @@ const Cart = ({ setOpenCart }) => {
   );
 
   // Change quantity handler
-  const quantityChangeHandler = (id) => {
-    dispatch(addToCart(id));
+  const quantityChangeHandler = (productId, productColor, size, qty) => {
+    dispatch(addToCart({ productId, productColor, size, qty }));
   };
 
   return (
@@ -64,10 +61,23 @@ const Cart = ({ setOpenCart }) => {
                 {cart &&
                   cart.map((product) => (
                     <SingleCart
-                      key={product._id}
+                      key={`${product._id}-${product.variant.productColor}-${product.variant.size}`} // Unique key
                       data={product}
-                      quantityChangeHandler={quantityChangeHandler}
-                      removeFromCartHandler={removeFromCartHandler}
+                      quantityChangeHandler={() =>
+                        quantityChangeHandler(
+                          product._id,
+                          product.variant.productColor,
+                          product.variant.size,
+                          1 // Increase by 1
+                        )
+                      }
+                      removeFromCartHandler={() =>
+                        removeFromCartHandler(
+                          product._id,
+                          product.variant.productColor,
+                          product.variant.size
+                        )
+                      }
                     />
                   ))}
               </div>

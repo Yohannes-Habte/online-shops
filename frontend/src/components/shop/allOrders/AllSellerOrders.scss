@@ -1,20 +1,32 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-.shop-orders-wrappe{
-    @include mobileDashboardScreen;
+.left-center {
+  display: flex;
+  align-items: center;
+}
+
+.middle-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem
+}
+
+.shop-orders-container {
+  @include mobileDashboardScreen;
 }
 
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-    .shop-orders-wrappe{
-        @include tabletDashboardScreen;
-    }
+  .shop-orders-container {
+    @include tabletDashboardScreen;
+  }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
-    .shop-orders-wrappe{
-        @include desktopDashboardScreen;
-    }
+  .shop-orders-container {
+    @include desktopDashboardScreen;
+  }
 }

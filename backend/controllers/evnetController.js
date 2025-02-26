@@ -1,66 +1,129 @@
-import Shop from '../models/shopModel.js';
-import Event from '../models/eventModel.js';
-import createError from 'http-errors';
+import Shop from "../models/shopModel.js";
+import Event from "../models/eventModel.js";
+import createError from "http-errors";
+import mongoose, { model } from "mongoose";
+import crypto from "crypto";
 
 //==============================================================================
 // Create Event
 //==============================================================================
 export const createEvent = async (req, res, next) => {
-  try {
-    // Find shop ID
-    const shopId = req.body.shopId;
-    const shop = await Shop.findById(shopId);
+  const {
+    eventName,
+    description,
+    tags,
+    images,
+    originalPrice,
+    discountPrice,
+    startDate,
+    endDate,
+    stock,
+    purposes,
+    category,
+    subcategory,
+    shop,
+    brand,
+    supplier,
+  } = req.body;
 
-    if (!shop) {
-      return createError(401, 'Shop not found! Please login!');
+  const shopId = req.shop.id;
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID format"));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(shop)) {
+    return next(createError(400, "Shop ID is not valid."));
+  }
+
+  if (shopId !== shop) {
+    return next(createError(400, "Shop ID is not valid."));
+  }
+
+  try {
+    const shopExists = await Shop.findById(shopId);
+    if (!shopExists) {
+      return next(createError(404, "Shop not found"));
     }
+
+    // Generate a secure event identification code (UUID)
+    const eventIdentificationCode = crypto.randomUUID();
+
+    const eventExists = await Event.findOne({
+      eventCode: eventIdentificationCode,
+    });
+    if (eventExists) {
+      return next(createError(400, "Event code already exists!"));
+    }
+
     // Create new event
-    const event = new Event({
-      ...req.body,
-      shop: shop,
+    const newEvent = new Event({
+      eventName,
+      description,
+      tags,
+      images,
+      originalPrice,
+      discountPrice,
+      startDate,
+      endDate,
+      stock,
+      purposes,
+      category,
+      subcategory,
+      shop,
+      brand,
+      supplier,
+      eventCode: eventIdentificationCode, // Save secure event code
     });
 
-    try {
-      await event.save();
-    } catch (error) {
-      return createError(500, 'Event is not saved! Please try again!');
-    }
+    // Save the event
+    await newEvent.save();
 
-    return res.status(201).json({ success: true, event: event });
+    return res.status(201).json({
+      success: true,
+      message: "Event created successfully!",
+      event: newEvent,
+    });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Event could not be created! Please try again!'));
+    console.error("Error creating event:", error);
+    next(createError(500, "Event could not be created! Please try again."));
   }
 };
-
 //==============================================================================
 // Get Single Event
 //==============================================================================
 export const getShopSingleEvent = async (req, res, next) => {
   try {
-    // Get the ids for the shop and the Event
-    const shopID = req.params.shopID;
-    const eventID = req.params.eventID;
+    const { eventID } = req.params;
 
-    // find the shop id (seller id) and then find the Event id
-    const shop = await Shop.findById(shopID);
-    if (!shop) {
-      return next(createError(400, 'Shop not found!'));
+    if (!mongoose.Types.ObjectId.isValid(eventID)) {
+      return next(createError(400, "Invalid Event ID format"));
     }
 
-    // Event id
-    const event = await Event.findById(eventID);
+    const event = await Event.findById(eventID)
+      .populate([
+        { path: "shop", model: "Shop" },
+        { path: "category", model: "Category" },
+        { path: "subcategory", model: "Subcategory" },
+        { path: "brand", model: "Brand" },
+        { path: "supplier", model: "Supplier" },
+      ])
+      .select("-__v")
+      .lean();
+
     if (!event) {
-      return next(createError(400, `Event not found in ${shop.name} shop !`));
+      return next(createError(404, "Event not found"));
     }
 
-    // If shop and Event exist, then you can get the Event for that particular shop
-    if (shop && event) {
-      return res.status(200).json(event);
-    }
+    return res.status(200).json({ success: true, event });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Event could not be accessed! Please try again!'));
+    console.error("Error fetching event:", error);
+    next(
+      createError(
+        500,
+        "An error occurred while retrieving the event. Please try again."
+      )
+    );
   }
 };
 
@@ -69,42 +132,180 @@ export const getShopSingleEvent = async (req, res, next) => {
 //==============================================================================
 export const getAllShopEvents = async (req, res, next) => {
   try {
-    const shopID = req.params.shopID;
+    const shopID = req.shop.id;
 
-    const shop = await Shop.findById(shopID);
+    if (!mongoose.Types.ObjectId.isValid(shopID)) {
+      return next(createError(400, "Invalid Shop ID format"));
+    }
+
+    const shop = await Shop.findById(shopID).select("name location");
 
     if (!shop) {
-      return next(createError(400, 'Shop not found!'));
+      return next(createError(404, "Shop not found"));
     }
 
-    const events = await Event.find({ shopId: shopID });
+    const events = await Event.find({ shop: shopID })
+      .populate([
+        { path: "shop", model: "Shop", select: "name shopAddress" }, // Limit fields
+        { path: "category", model: "Category", select: "categoryName" },
+        {
+          path: "subcategory",
+          model: "Subcategory",
+          select: "subcategoryName",
+        },
+        { path: "brand", model: "Brand", select: "brandName" },
+        { path: "supplier", model: "Supplier", select: "supplierName" },
+      ])
+      .select("-__v")
+      .lean();
 
-    if (!events) {
-      return next(createError(400, 'Events not found!'));
+    if (!events.length) {
+      return next(createError(404, "No events found for this shop"));
     }
-    if (shop && events) {
-      return res.status(200).json({ success: true, events: events });
-    }
+
+    return res.status(200).json({
+      success: true,
+      count: events.length,
+      events,
+    });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Events could not query! Please try again!'));
+    console.error("Error fetching shop events:", error.message);
+    next(
+      createError(
+        500,
+        "An error occurred while retrieving events. Please try again."
+      )
+    );
   }
 };
 
 //==============================================================================
-// Get All Events for all shops
+// Get All Events for All Shops
 //==============================================================================
 export const getAllShopsEvents = async (req, res, next) => {
   try {
-    const events = await Event.find();
-    if (!events) {
-      return next(createError(400, 'Events not found!'));
-    } else {
-      return res.status(200).json(events);
+    const events = await Event.find()
+      .populate([
+        { path: "shop", model: "Shop" },
+        { path: "category", model: "Category" },
+        { path: "subcategory", model: "Subcategory" },
+        { path: "brand", model: "Brand" },
+        { path: "supplier", model: "Supplier" },
+      ])
+      .select("-__v") // Exclude metadata fields
+      .lean(); // Optimize query performance
+
+    if (!events.length) {
+      return next(createError(404, "No events found"));
     }
+
+    return res.status(200).json({
+      success: true,
+      count: events.length,
+      events,
+    });
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Events could not query! Please try again!'));
+    console.error("Error fetching events:", error.message);
+    next(
+      createError(
+        500,
+        "An error occurred while retrieving events. Please try again."
+      )
+    );
+  }
+};
+
+//==============================================================================
+// Update a Single Event from a Specific Shop
+//==============================================================================
+//==============================================================================
+// Update a Single Event from a Specific Shop
+//==============================================================================
+
+export const updateShopSingleEvent = async (req, res, next) => {
+  try {
+    const {
+      eventName,
+      description,
+      tags,
+      images,
+      originalPrice,
+      discountPrice,
+      startDate,
+      endDate,
+      stock,
+      purposes,
+      category,
+      subcategory,
+      shop,
+      brand,
+      supplier,
+    } = req.body;
+
+    const shopId = req.shop.id;
+    const { eventID } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(shopId)) {
+      return next(createError(400, "Invalid Shop ID format"));
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(eventID)) {
+      return next(createError(400, "Invalid Event ID format"));
+    }
+
+    if (
+      !mongoose.Types.ObjectId.isValid(shop) ||
+      shopId.toString() !== shop.toString()
+    ) {
+      return next(createError(403, "Unauthorized: Shop ID mismatch."));
+    }
+
+    // Check if shop exists
+    const shopExists = await Shop.findById(shopId);
+    if (!shopExists) {
+      return next(createError(404, "Shop not found"));
+    }
+
+    // Check if event exists and belongs to the shop
+    const eventExists = await Event.findOne({ _id: eventID, shop: shopId });
+    if (!eventExists) {
+      return next(
+        createError(404, "Event not found or does not belong to this shop")
+      );
+    }
+
+    // Update the event
+    const updatedEvent = await Event.findOneAndUpdate(
+      { _id: eventID, shop: shopId }, // Ensures the event belongs to the shop
+      {
+        $set: {
+          eventName,
+          description,
+          tags,
+          images,
+          originalPrice,
+          discountPrice,
+          startDate,
+          endDate,
+          stock,
+          purposes,
+          category,
+          subcategory,
+          brand,
+          supplier,
+        },
+      },
+      { new: true, runValidators: true }
+    ).select("-__v");
+
+    return res.status(200).json({
+      success: true,
+      message: "Event updated successfully!",
+      event: updatedEvent,
+    });
+  } catch (error) {
+    console.error("Error updating event:", error.message);
+    next(createError(500, "An error occurred while updating the event"));
   }
 };
 
@@ -113,43 +314,40 @@ export const getAllShopsEvents = async (req, res, next) => {
 //==============================================================================
 export const deleteShopSingleEvent = async (req, res, next) => {
   try {
-    // Event id
-    const event = await Event.findById(req.params.eventID);
+    const shopId = req.shop.id;
+    const { eventID } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(shopId)) {
+      return next(createError(400, "Invalid Shop ID format"));
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(eventID)) {
+      return next(createError(400, "Invalid Event ID format"));
+    }
+
+    // Check if event exists and belongs to the shop
+    const event = await Event.findOne({ _id: eventID, shop: shopId });
+
     if (!event) {
-      return next(createError(400, `Event not found!`));
+      return next(
+        createError(404, "Event not found or does not belong to this shop")
+      );
     }
 
-    // If shop and Event exist, then you can get the Event for that particular shop
-    if (event) {
-      await Event.findByIdAndDelete(req.params.eventID);
-      return res
-        .status(200)
-        .json(`The ${event.name} has been successfully deleted!`);
-    }
-  } catch (error) {
-    console.log(error);
-    next(createError(500, 'Event could not be deleted! Please try again!'));
-  }
-};
+    // Delete the event
+    await Event.findOneAndDelete({ _id: eventID, shop: shopId });
 
-//==============================================================================
-// Admin has mandate to access all Events for all shops
-//==============================================================================
-export const allShopsEvents = async (req, res, next) => {
-  try {
-    const events = await Event.find().sort({
-      createdAt: -1,
+    return res.status(200).json({
+      success: true,
+      message: "Event deleted successfully!",
     });
-    if (!events) {
-      return next(createError(400, 'Events not found!'));
-    } else {
-      return res.status(200).json({
-        success: true,
-        events,
-      });
-    }
   } catch (error) {
-    console.log(error);
-    next(createError(500, 'Events could not query! Please try again!'));
+    console.error("Error deleting event:", error.message);
+    next(
+      createError(
+        500,
+        "An error occurred while deleting the event. Please try again."
+      )
+    );
   }
 };

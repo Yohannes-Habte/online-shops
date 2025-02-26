@@ -6,11 +6,13 @@ const SingleOrderRefund = ({
   handleShopOrderRefund,
   refundReason,
   setRefundReason,
-  processing,
+  processRefund,
 }) => {
   // Corrected logic for disabling the refund button
   const isRefundDisabled =
-    order.payment.paymentStatus !== "completed" || processing;
+    order.payment.paymentStatus !== "completed" || processRefund;
+
+  console.log("order:", order);
 
   return (
     <div className="refund-order-processing-container">
@@ -23,7 +25,7 @@ const SingleOrderRefund = ({
               <input
                 type="number"
                 placeholder="Refund Amount"
-                value={order.grandTotal}
+                value={order?.grandTotal?.toFixed(2)}
                 className="input-field"
               />
             </div>
@@ -46,7 +48,7 @@ const SingleOrderRefund = ({
               disabled={isRefundDisabled}
               className="order-refund-btn"
             >
-              {processing ? "Processing..." : "Process Refund"}
+              {processRefund ? "Processing..." : "Process Refund"}
             </button>
           </form>
         </section>

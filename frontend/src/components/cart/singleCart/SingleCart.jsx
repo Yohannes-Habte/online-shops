@@ -9,7 +9,7 @@ const SingleCart = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
   const [value, setValue] = useState(data.qty);
   const totalPrice = data.discountPrice * value;
 
-  console.log("data from single cart:", data);
+  console.log("data =", data);  
 
   // Incremental function
   const increment = (data) => {

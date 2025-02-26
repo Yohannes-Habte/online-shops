@@ -1,42 +1,24 @@
-import express from 'express';
+import express from "express";
 import {
-  allShopsEvents,
   createEvent,
   deleteShopSingleEvent,
   getAllShopEvents,
   getAllShopsEvents,
+  updateShopSingleEvent,
   getShopSingleEvent,
-} from '../controllers/evnetController.js';
-import requiredValues from '../validators/requiredValues.js';
-import eventValidator from '../validators/eventValidator.js';
-import checkValidation from '../validators/checkValidation.js';
+} from "../controllers/evnetController.js";
+import { isSellerAuthenticated } from "../middleware/shopAuth.js";
 
 // event Router
 const eventRouter = express.Router();
 
 // event routes
-eventRouter.post(
-  '/create-event',
-  requiredValues([
-    'name',
-    'description',
-    'category',
-    'startDate',
-    'endDate',
-    'originalPrice',
-    'discountPrice',
-    'stock',
-    'images',
-  ]),
-  eventValidator(),
-  checkValidation,
-  createEvent
-);
-eventRouter.get('/', getAllShopsEvents);
-eventRouter.get('/all-events', allShopsEvents);
-eventRouter.get('/:shopID/shop-events', getAllShopEvents);
-eventRouter.get('/:shopID/:eventID', getShopSingleEvent);
-eventRouter.delete('/:eventID', deleteShopSingleEvent);
+eventRouter.post("/create", isSellerAuthenticated, createEvent);
+eventRouter.get("/", getAllShopsEvents);
+eventRouter.get("/seller", isSellerAuthenticated, getAllShopEvents);
+eventRouter.get("/:eventID", isSellerAuthenticated, getShopSingleEvent);
+eventRouter.put("/:eventID", isSellerAuthenticated, updateShopSingleEvent);
+eventRouter.delete("/:eventID", isSellerAuthenticated, deleteShopSingleEvent);
 
 // Export event Router
 export default eventRouter;

@@ -47,8 +47,6 @@ const Products = () => {
     totalPages,
   } = useSelector((state) => state.product);
 
-  console.log("Products:", products);
-
   // ===================================================================================================================================================================
   // This useEffect is used to set up the initial state (queryParams) when the component loads or when the URL changes (because searchParams changes).
   // It is also used here to populate the component's local state (query).
