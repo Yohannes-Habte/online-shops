@@ -81,8 +81,6 @@ const SingleProduct = () => {
   // ===========================================================================
 
   const addToWishlistHandler = () => {
-    console.log("Selected Variant before wishlist:", selectedVariant);
-    console.log("Selected Size before wishlist:", selectedSize);
 
     if (!selectedVariant || !selectedSize) {
       toast.error("Please select a color and size before adding to wishlist.");

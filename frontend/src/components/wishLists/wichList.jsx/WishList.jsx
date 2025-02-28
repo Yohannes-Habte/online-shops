@@ -15,9 +15,9 @@ const WishList = ({ setOpenWishList }) => {
   );
 
   // Remove from wishlist handler
-  const removeFromWishlistHandler = (productId) => {
+  const removeFromWishlistHandler = (productId, productColor, size) => {
     console.log("productId =", productId);
-    dispatch(removeFromWishlist(productId));
+    dispatch(removeFromWishlist({ productId, productColor, size }));
   };
 
   return (

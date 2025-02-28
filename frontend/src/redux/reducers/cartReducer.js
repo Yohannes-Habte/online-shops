@@ -11,7 +11,10 @@ const cartReducer = createSlice({
     // Add to cart
 
     addToCart: (state, action) => {
+      // item comes from action.payload, meaning it is the product that the user is trying to add to the cart
       const item = action.payload;
+      console.log("cart item from action.payload =", item);
+      console.log("state.cart =", state.cart);
 
       // Check if item in the shopping cart from the same shop
       if (state.cart.length > 0) {
@@ -56,6 +59,8 @@ const cartReducer = createSlice({
 
     // Remove from cart
     removeFromCart: (state, action) => {
+      const item = action.payload;
+      console.log("item const item = action.payload =", item);
       const { productId, productColor, size } = action.payload;
 
       return {
