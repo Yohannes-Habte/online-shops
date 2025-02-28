@@ -17,12 +17,12 @@ const RelatedProductCard = ({ product }) => {
         </Link>
       </figure>
 
-      <aide className="product-details">
+      <aside className="product-details">
         <h3 className="shop-name">{product.shop.name}</h3>
         <Link to={`/products/${product._id}`}>
           <p className="product-title">{ShortenText(title, 40)}</p>
         </Link>
-      </aide>
+      </aside>
     </section>
   );
 };

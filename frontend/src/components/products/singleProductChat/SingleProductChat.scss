@@ -1,0 +1,52 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.single-product-message-wrapper {
+  .send-message-title {
+    @include subTitle;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .send-message-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .send-message-paragraph {
+    font-size: 0.875rem;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  .send-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #007bff;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background-color: #e8f0fe;
+
+    &:hover {
+      color: #0056b3;
+      background-color: #d0e2ff;
+    }
+
+    .send-message-icon {
+      font-size: 1.2rem;
+    }
+  }
+}

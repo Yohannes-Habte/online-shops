@@ -1,105 +1,132 @@
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "./ShopInfo.scss";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Ratings from "../../products/ratings/Ratings";
 import ProductCard from "../../products/productCard/ProductCard";
 import { formatDistanceToNow } from "date-fns";
 import ShopProducts from "../../../hooks/ShopProducts";
+import {
+  clearEventErrorsAction,
+  fetchShopEvents,
+} from "../../../redux/actions/event";
+import EventCard from "../../events/eventCart/EventCard";
 
-// The isOwner comes from ShopHome.jsx page
 const ShopInfo = () => {
+  const dispatch = useDispatch();
+
   // Global state variables
   const { currentSeller } = useSelector((state) => state.seller);
-  // const { shopProducts } = useSelector((state) => state.product);
-  const { events } = useSelector((state) => state.event);
-
+  const { loading, shopEvents, error } = useSelector((state) => state.event);
   const { shopProducts } = ShopProducts();
 
   // Local state variables
-  const [active, setActive] = useState(1);
+  const [activeTab, setActiveTab] = useState(1);
 
-  // All reviews
-  const allReviews =
-    shopProducts && shopProducts.map((product) => product.reviews).flat();
+  // Memoized computed value for performance optimization
+  const allReviews = useMemo(() => {
+    return shopProducts
+      ? shopProducts.flatMap((product) => product.reviews || [])
+      : [];
+  }, [shopProducts]);
+
+  useEffect(() => {
+    if (currentSeller) {
+      dispatch(clearEventErrorsAction());
+      dispatch(fetchShopEvents());
+    }
+
+    return () => {
+      if (error) {
+        dispatch(clearEventErrorsAction());
+      }
+    };
+  }, [dispatch, currentSeller, error]);
 
   return (
-    <section className="shop-info-contianer">
-      <h1 className="shop-title"> {currentSeller?.name} </h1>
+    <section className="shop-info-container">
+      <h1 className="shop-title">{currentSeller?.name || "Shop"}</h1>
 
       <article className="tabs-wrapper">
         <h3
-          onClick={() => setActive(1)}
-          className={active === 1 ? "active" : "passive"}
+          onClick={() => setActiveTab(1)}
+          className={activeTab === 1 ? "active" : "passive"}
         >
           Shop Products
         </h3>
 
         <p
-          onClick={() => setActive(2)}
-          className={active === 2 ? "active" : "passive"}
+          onClick={() => setActiveTab(2)}
+          className={activeTab === 2 ? "active" : "passive"}
         >
           Running Events
         </p>
 
         <p
-          onClick={() => setActive(3)}
-          className={active === 3 ? "active" : "passive"}
+          onClick={() => setActiveTab(3)}
+          className={activeTab === 3 ? "active" : "passive"}
         >
           Shop Reviews
         </p>
       </article>
 
       {/* Shop Products */}
-      {active === 1 && (
+      {activeTab === 1 && (
         <div className="shop-products">
-          {shopProducts &&
+          {shopProducts?.length > 0 ? (
             shopProducts.map((product, index) => (
-              <ProductCard product={product} key={index} isShop={true} />
-            ))}
+              <ProductCard
+                product={product}
+                key={product._id || index}
+                isShop
+              />
+            ))
+          ) : (
+            <h3 className="no-products">No products available.</h3>
+          )}
         </div>
       )}
 
       {/* Shop Events */}
-      {active === 2 && (
+      {activeTab === 2 && (
         <article className="shop-events-wrapper">
-          <div className="shop-events">
-            {/* {shopEvents.map((event, index) => (
-                <ProductCard
-                  product={event}
-                  key={index}
-                  isShop={true}
-                  isEvent={true}
-                />
-              ))} */}
-          </div>
-          {events && events.length === 0 && (
-            <h3 className="no-events">No Events have for this shop!</h3>
+          {loading ? (
+            <p className="loading">Loading events...</p>
+          ) : shopEvents?.length > 0 ? (
+            <div className="shop-events">
+              {shopEvents.map((event, index) => (
+                <EventCard data={event} key={event._id || index} />
+              ))}
+            </div>
+          ) : (
+            <h3 className="no-events">No events available for this shop.</h3>
           )}
         </article>
       )}
 
       {/* Shop Reviews */}
-      {active === 3 && (
+      {activeTab === 3 && (
         <article className="shop-reviews-wrapper">
-          {allReviews &&
-            allReviews.map((reviewer) => {
-              // Find the product associated with this review
+          {allReviews?.length > 0 ? (
+            allReviews.map((review) => {
               const product = shopProducts.find((p) =>
-                p.reviews.some((rev) => rev._id === reviewer._id)
+                p.reviews.some((rev) => rev._id === review._id)
               );
 
               return (
-                <div key={reviewer._id} className="shop-review">
+                <div key={review._id} className="shop-review">
                   <figure className="image-container">
                     <img
-                      src={`${reviewer.user.image}`}
+                      src={review.user?.image || "/default-avatar.png"}
                       className="image"
                       alt="User Avatar"
+                      loading="lazy"
                     />
                   </figure>
                   <section className="user-rating">
-                    <h3 className="reviewer-name">{reviewer.user?.name}</h3>
-                    <p>{reviewer.user?.email}</p>
+                    <h3 className="reviewer-name">
+                      {review.user?.name || "Anonymous"}
+                    </h3>
+                    <p>{review.user?.email || "No email provided"}</p>
                     <div className="rating-wrapper">
                       <Ratings ratings={product?.ratings?.average || 0} />
                       <span>
@@ -109,18 +136,22 @@ const ShopInfo = () => {
                       </span>
                     </div>
 
-                    <p className="comment">{reviewer?.comment}</p>
+                    <p className="comment">
+                      {review?.comment || "No comment provided"}
+                    </p>
                     <p className="review-date">
-                      {formatDistanceToNow(new Date(reviewer.createdAt), {
-                        addSuffix: true,
-                      })}
+                      {review.createdAt
+                        ? formatDistanceToNow(new Date(review.createdAt), {
+                            addSuffix: true,
+                          })
+                        : "Date not available"}
                     </p>
                   </section>
                 </div>
               );
-            })}
-          {allReviews && allReviews.length === 0 && (
-            <h3 className="no-review">No Reviews for this shop!</h3>
+            })
+          ) : (
+            <h3 className="no-review">No reviews for this shop yet.</h3>
           )}
         </article>
       )}

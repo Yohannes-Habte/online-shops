@@ -55,7 +55,6 @@ const cartReducer = createSlice({
     },
 
     // Remove from cart
-    // Remove from cart
     removeFromCart: (state, action) => {
       const { productId, productColor, size } = action.payload;
 

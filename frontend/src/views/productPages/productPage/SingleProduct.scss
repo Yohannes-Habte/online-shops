@@ -4,57 +4,23 @@
 .single-product-page {
   .single-product-page-container {
     width: 80%;
+    min-height: 100vh;
     margin: 2rem auto;
 
-    .single-product-container {
+    .single-product-wrapper {
       display: flex;
       flex-wrap: wrap;
       margin: 2rem 0;
 
-      .product-image-section {
-        flex: 0 0 40%;
-        padding: 1rem;
-
-        .large-image-container {
-          position: relative;
-
-          img.large-image {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-          }
-        }
-
-        .thumbnail-images {
-          display: flex;
-          flex-wrap: wrap;
-          margin-top: 1rem;
-
-          img.thumbnail-image {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            margin: 0.5rem;
-            cursor: pointer;
-            border: 1px solid #ddd;
-            transition: all 0.2s ease-in-out;
-
-            &:hover {
-              border-color: #ccc;
-            }
-          }
-        }
-
-        .add-to-cart-btn {
-          @include button2;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-        }
+      .add-to-cart-btn {
+        @include button2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
       }
 
-      .product-details {
+      .product-details-wrapper {
         flex: 1;
         padding: 1rem;
 
@@ -65,208 +31,6 @@
         .single-product-description {
           @include paragraph;
           font-size: 1rem;
-        }
-
-        .product-rating-wrapper {
-          display: flex;
-          align-items: center;
-          margin: 1rem 0 2rem 0.5rem;
-
-          .reviewers-count {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #7e7e7e;
-            margin-left: 8px;
-
-            .reviewers-number {
-              color: blue;
-              font-size: 1rem;
-            }
-          }
-        }
-
-        .single-product-parts-wrapper {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          column-gap: 1rem;
-          row-gap: 1rem;
-        }
-
-        .product-size-aside-wrapper {
-          @include shadow1;
-          max-height: fit-content;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-
-          .product-size-title {
-            @include subTitle;
-          }
-
-          .size-selection-form {
-            display: flex;
-            gap: 0.5rem;
-            flex-direction: column;
-            padding: 1rem;
-          }
-
-          .product-message-aside-wrapper {
-            background-color: #f9f9f9;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: 1rem auto;
-
-            .send-message-title {
-              font-size: 0.9rem;
-              color: #333;
-              margin-bottom: 10px;
-            }
-
-            .send-message-paragraph {
-              font-size: 0.7rem;
-              color: #555;
-              margin-bottom: 15px;
-            }
-
-            .send-message {
-              display: inline-flex;
-              align-items: center;
-              gap: 8px;
-              font-size: 1rem;
-              color: #007bff;
-              font-weight: 600;
-              cursor: pointer;
-              transition: color 0.3s ease;
-
-              &:hover {
-                color: #0056b3;
-              }
-
-              .send-message-icon {
-                font-size: 1.2rem;
-              }
-            }
-          }
-
-          .product-wishlist-aside-wrapper {
-            background-color: #fdf5f5;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: 1rem auto;
-
-            .product-wishlist-aside-title {
-              font-size: 0.8rem;
-              color: #333;
-              font-weight: bold;
-              margin-bottom: 12px;
-            }
-
-            .wishlist {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              gap: 10px;
-              font-size: 2.5rem;
-              cursor: pointer;
-
-              .active-wishlist {
-                color: red;
-                transition: transform 0.3s ease;
-
-                &:hover {
-                  transform: scale(1.2);
-                }
-              }
-
-              .passive-wishlist {
-                color: black;
-                transition: transform 0.3s ease, color 0.3s ease;
-
-                &:hover {
-                  color: #ff4d4d;
-                  transform: scale(1.1);
-                }
-              }
-            }
-          }
-        }
-
-        .product-infos-aside-wrapper {
-          @include shadow1;
-          margin-bottom: 1rem;
-          max-height: fit-content;
-
-          .product-info-title {
-            @include subTitle;
-          }
-
-          .product-prices-info {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-
-            .discounted-price {
-              font-weight: 600;
-            }
-
-            .original-price {
-              color: red;
-              text-decoration: line-through;
-            }
-          }
-
-          .product-info {
-            font-size: 0.8rem;
-          }
-        }
-
-        .product-variants-aside-wrapper {
-          @include shadow1;
-          max-height: fit-content;
-          margin-bottom: 1rem;
-
-          .product-variants-title {
-            @include subTitle;
-          }
-
-          .variants-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-
-            .variant-item {
-              margin-bottom: 0.5rem;
-              font-size: 0.8rem;
-
-              .toggle-button {
-                color: blue;
-              }
-
-              .variant-info {
-                margin-bottom: 0.25rem;
-              }
-
-              .variant-size-details {
-                list-style: none;
-                padding: 1rem;
-                margin: 0;
-
-                li {
-                  margin-bottom: 0.25rem;
-                }
-              }
-            }
-          }
         }
       }
     }

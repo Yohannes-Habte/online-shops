@@ -9,19 +9,21 @@ import Header from "../../../components/layouts/header/Header";
 import Footer from "../../../components/layouts/footer/Footer";
 import { addToCart } from "../../../redux/reducers/cartReducer";
 import { toast } from "react-toastify";
-import Ratings from "../../../components/products/ratings/Ratings";
 import {
   addToWishlist,
   removeFromWishlist,
 } from "../../../redux/reducers/wishListReducer";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
-import ProductDetails from "../../../components/products/productDetails/ProductDetails";
+import SingleProductDetails from "../../../components/products/singleProductDetails/SingleProductDetails";
+import SingleProductRating from "../../../components/products/singleProductRating/SingleProductRating";
+import SingleProductImages from "../../../components/products/singleProductImages/SingleProductImages";
 
 const SingleProduct = () => {
   const navigate = useNavigate();
   const { productID } = useParams();
   const dispatch = useDispatch();
+  const { wishList } = useSelector((state) => state.wishList);
 
   // Fetch product data
   useEffect(() => {
@@ -39,12 +41,12 @@ const SingleProduct = () => {
   const { currentSeller } = useSelector((state) => state.seller);
   const { currentUser } = useSelector((state) => state.user);
 
-  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [clickWishlist, setClickWishlist] = useState(false);
   const [variantToggles, setVariantToggles] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [clickWishlist, setClickWishlist] = useState(false);
 
   useEffect(() => {
     const related = products.filter(
@@ -75,16 +77,45 @@ const SingleProduct = () => {
   }, [currentProduct]);
 
   // ===========================================================================
-  // Add to Wishlist Handler and remove from Wishlist Handler
+  // Add to Wishlist Handler
   // ===========================================================================
 
-  // Add wishlist
-  const addToWishlistHandler = (product) => {
-    setClickWishlist(!clickWishlist);
-    dispatch(addToWishlist(product));
+  const addToWishlistHandler = () => {
+    console.log("Selected Variant before wishlist:", selectedVariant);
+    console.log("Selected Size before wishlist:", selectedSize);
+
+    if (!selectedVariant || !selectedSize) {
+      toast.error("Please select a color and size before adding to wishlist.");
+      return;
+    }
+
+    const item = {
+      ...currentProduct,
+      variant: {
+        productColor: selectedVariant.productColor,
+        size: selectedSize,
+      },
+    };
+
+    const isInWishlist = wishList.some(
+      (i) =>
+        i._id === item._id &&
+        i.variant?.productColor === item.variant?.productColor &&
+        i.variant?.size === item.variant?.size
+    );
+
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(item._id));
+      toast.info("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(item));
+      toast.success("Added to wishlist");
+    }
   };
 
-  // Remove wishlist
+  // ===========================================================================
+  // Remove from Wishlist Handler
+  // ===========================================================================
   const removeFromWishlistHandler = (id) => {
     setClickWishlist(!clickWishlist);
     dispatch(removeFromWishlist(id));
@@ -155,66 +186,31 @@ const SingleProduct = () => {
     }
   };
 
-  // ===========================================================================
-  // Single Product Rating section
-  // ===========================================================================
-
-  const singleProductRating = () => (
-    <div className="product-rating-wrapper">
-      Rating:
-      <Ratings ratings={currentProduct?.ratings?.average} />{" "}
-      <span> ({currentProduct?.ratings.average.toFixed(1)}/5) </span>
-      <span className="reviewers-count">
-        <strong className="reviewers-number">
-          {currentProduct?.ratings?.count || 0}
-        </strong>{" "}
-        people reviewed this product
-      </span>
-    </div>
-  );
-
   return (
     <main className="single-product-page">
       <Header />
       <div className="single-product-page-container">
-        <section className="single-product-container">
-          <div className="product-image-section">
-            <figure className="large-image-container">
-              <img
-                src={selectedImage}
-                alt="Large product"
-                className="large-image"
-              />
-            </figure>
-            <div className="thumbnail-images">
-              {currentProduct?.variants.map((variant, index) => (
-                <img
-                  key={index}
-                  src={variant.productImage}
-                  alt={`${variant.productColor}`}
-                  onClick={() => {
-                    setSelectedVariant(variant);
-                    setSelectedSize(""); // Reset size when color changes
-                    setSelectedImage(variant.productImage);
-                  }}
-                  className={`thumbnail-image ${
-                    selectedVariant === variant ? "selected" : ""
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+        <section className="single-product-wrapper">
+          <SingleProductImages
+            currentProduct={currentProduct}
+            selectedImage={selectedImage}
+            setSelectedVariant={setSelectedVariant}
+            setSelectedSize={setSelectedSize}
+            setSelectedImage={setSelectedImage}
+            selectedVariant={selectedVariant}
+          />
 
-          <section className="product-details">
+          <section className="product-details-wrapper">
             <h1 className="single-product-title">{currentProduct?.title}</h1>
             <p className="single-product-description">
               {currentProduct?.description}
             </p>
 
             {/* Single Product Rating */}
-            {singleProductRating()}
+            <SingleProductRating currentProduct={currentProduct} />
 
-            <ProductDetails
+            {/* Single Product Details */}
+            <SingleProductDetails
               variantToggles={variantToggles}
               addToCartHandler={addToCartHandler}
               selectedSize={selectedSize}

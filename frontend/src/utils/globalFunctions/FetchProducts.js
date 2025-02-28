@@ -1,44 +1,42 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { handleError } from "../errorHandler/ErrorMessage";
+import { API } from "../security/secreteKey";
 
-const FetchProducts = (url) => {
-  // Global state variables for fetching comments from the backend
+const useFetchSuppliers = (url) => {
+  // State variables
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // Display data on the brower
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      try {
-        const { data } = await axios.get(url);
-        setData(data);
-        setLoading(false);
-      } catch (err) {
-        setError(toast.error(err.response.data.message));
-        setLoading(false);
-      }
-    };
-
-    fetch();
-  }, [url]);
-
-  // Function to refetch data
-  const reFetch = async () => {
+  // Fetch data from API
+  const fetchData = useCallback(async () => {
     setLoading(true);
+    setError(""); // Clear previous errors
     try {
-      const { data } = await axios.get(url);
-      setData(data);
-      setLoading(false);
+      const response = await axios.get(`${API}/${url}`);
+      setData(response.data);
     } catch (err) {
-      setError(err);
+      const errorMessage = handleError(err);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
       setLoading(false);
     }
-  };
+  }, [url]);
 
-  return { data, loading, error, reFetch };
+  // Fetch data on mount and when URL changes
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) fetchData();
+
+    return () => {
+      isMounted = false; // Cleanup to prevent state updates on unmounted components
+    };
+  }, [fetchData]);
+
+  return { data, loading, error };
 };
 
-export default FetchProducts;
+export default useFetchSuppliers;

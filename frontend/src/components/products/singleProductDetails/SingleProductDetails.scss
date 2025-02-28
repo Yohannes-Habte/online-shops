@@ -1,0 +1,21 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.single-product-details-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .single-product-add-to-cart-wrapper-wishlist-chat-wrapper {
+    @include shadow1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 1rem;
+  }
+
+  .single-product-info-variants-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 1rem;
+  }
+}

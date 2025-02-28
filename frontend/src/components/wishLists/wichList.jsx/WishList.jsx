@@ -1,98 +1,75 @@
-import "./WishList.scss";
 import { AiOutlineHeart } from "react-icons/ai";
+import { RxCross1 } from "react-icons/rx";
+import WishlistCart from "../singleWishList/WishlistCart";
+import "./WishList.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromWishlist } from "../../../redux/reducers/wishListReducer";
-import { addToCart } from "../../../redux/reducers/cartReducer";
-import { RxCross1 } from "react-icons/rx";
-import CartSingle from "../singleWishList/CartSingle";
-import { useState } from "react";
-import { toast } from "react-toastify";
 
 const WishList = ({ setOpenWishList }) => {
-  // Global state variables
-  const dispatch = useDispatch();
   const { wishList } = useSelector((state) => state.wishList);
+  const dispatch = useDispatch();
 
-  const [selectedVariant, setSelectedVariant] = useState(null);
-
-  // Total price calculation
   const totalPrice = wishList.reduce(
-    (acc, itemPrice) => acc + itemPrice.discountPrice,
+    (acc, item) => acc + (item.discountPrice || 0),
     0
   );
 
-  // Add to cart handler
-  const addToCartHandler = (data) => {
-    if (!selectedVariant) {
-      toast.error("Please select a variant!");
-      return;
-    }
-
-    const newData = {
-      ...data,
-      qty: 1,
-      variant: selectedVariant,
-      productImage: selectedVariant?.productImage,
-    };
-
-    console.log("Adding to Cart:", newData);
-    dispatch(addToCart(newData));
-    setOpenWishList(false);
-  };
-
   // Remove from wishlist handler
-  const removeFromWishlistHandler = (id) => {
-    dispatch(removeFromWishlist(id));
-  };
-
-  // Handle variant selection (size/color)
-  const handleVariantSelection = (variant) => {
-    setSelectedVariant(variant);
+  const removeFromWishlistHandler = (productId) => {
+    console.log("productId =", productId);
+    dispatch(removeFromWishlist(productId));
   };
 
   return (
-    <main className="whilist">
-      <article className="wishlist-container">
-        {wishList && wishList.length === 0 ? (
-          <section className="empty-wishlist-wrapper">
+    <main className="wishlist-page">
+      <article className="wishlist-page-container">
+        {wishList.length === 0 ? (
+          <section className="empty-wishlist-section">
             <RxCross1
               className="close-empty-icon"
               onClick={() => setOpenWishList(false)}
             />
-            <h2 className="empty-cart">Wishlist is empty!</h2>
+            <h2 className="empty-wishlist-title">Your Wishlist is empty!</h2>
           </section>
         ) : (
-          <section className="wishlist-order-wrapper">
+          <section className="wishlist-items-wrapper">
             <RxCross1
               className="close-order-icon"
               onClick={() => setOpenWishList(false)}
             />
+            <AiOutlineHeart size={25} color="red" />
+            <h5 className="wishlist-items-count">{`You have ${wishList.length} item(s) in your wishlist`}</h5>
+            <div className="single-wishlist-cart-container">
+              {wishList.map((product) => {
+                const variant = product.variant || {
+                  productColor: "Unknown",
+                  size: "N/A",
+                };
 
-            {/* Wishlist Item Count */}
-            <AiOutlineHeart size={25} style={{ color: "red" }} />
-            <h5 className="wishlist-items">
-              {wishList.length === 1
-                ? `There is ${wishList.length} Item in the Wishlist`
-                : `There are ${wishList.length} Items in the Wishlist`}
-            </h5>
-
-            {/* Cart Single Items */}
-            <div className="single-cart-wrapper">
-              {wishList &&
-                wishList.map((product) => (
-                  <CartSingle
-                    key={product._id}
+                return (
+                  <WishlistCart
+                    key={`${product._id}-${variant.productColor}-${variant.size}`}
                     data={product}
-                    addToCartHandler={addToCartHandler}
-                    removeFromWishlistHandler={removeFromWishlistHandler}
-                    handleVariantSelection={handleVariantSelection} // Pass handler to CartSingle
-                    selectedVariant={selectedVariant || product?.variants[0]} // Pass default variant if none selected
+                    removeFromWishlistHandler={() =>
+                      removeFromWishlistHandler(
+                        product._id,
+                        variant.productColor,
+                        variant.size
+                      )
+                    }
+                    setOpenWishList={setOpenWishList}
                   />
-                ))}
+                );
+              })}
             </div>
           </section>
         )}
-        <h3>Total Price: ${totalPrice}</h3>
+
+        <div className="wishlist-horizontal-line"></div>
+
+        <h3 className="wishlist-items-total-price">
+          Total Price: <strong className="total-price-amount">${totalPrice.toFixed(2)}</strong>
+        </h3>
       </article>
     </main>
   );

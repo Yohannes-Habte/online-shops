@@ -1,0 +1,25 @@
+.all-suppliers-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+  
+    .title {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+  
+    .loading-message,
+    .no-suppliers-message {
+      font-size: 18px;
+      color: #777;
+      text-align: center;
+      margin-top: 20px;
+    }
+  
+    .suppliers-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+  }
+  

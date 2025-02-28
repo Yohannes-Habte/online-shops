@@ -25,8 +25,6 @@
     display: flex;
     justify-content: center;
 
-   
-
     .product-image {
       max-width: 100%;
       max-height: 100%;
@@ -103,11 +101,9 @@
         .discount-price {
           font-size: 1rem;
           font-weight: 400;
-        
 
           .price {
             font-weight: 600;
-           
           }
         }
 
@@ -122,28 +118,47 @@
         font-size: 1rem;
         font-weight: 400;
       }
-
-   
-
-      
     }
 
     .variant-selector {
-      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
 
-      select {
-        width: 100%;
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        font-size: 14px;
+      label {
+        font-weight: bold;
+        font-size: 16px;
         color: #333;
-        outline: none;
+      }
+
+      .select-size {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: white;
         cursor: pointer;
-        transition: border 0.3s ease-in-out;
+        outline: none;
+        transition: border 0.3s ease;
+
+        &:hover {
+          border-color: #007bff;
+        }
 
         &:focus {
-          border-color: #ff6347;
+          border-color: #0056b3;
+          box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        option {
+          font-size: 14px;
+          padding: 5px;
+        }
+
+        .out-of-stock {
+          color: orange !important;
+          font-weight: bold;
+          background-color: #fff8e1 !important;
         }
       }
     }

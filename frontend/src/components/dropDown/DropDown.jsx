@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchAllProductsForAllShops } from "../../../redux/actions/product"; // Make sure this action exists
+import { fetchAllProductsForAllShops } from "../../redux/actions/product"; // Make sure this action exists
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { API } from "../../../utils/security/secreteKey";
+import { API } from "../../utils/security/secreteKey";
 import "./DrpDown.scss";
 
 const DropDown = ({ setDropDown }) => {

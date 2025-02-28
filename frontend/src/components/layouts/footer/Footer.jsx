@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react';
-import './Footer.scss';
-import { NavLink } from 'react-router-dom';
-import { FaLinkedin } from 'react-icons/fa';
-import { FaFacebookSquare } from 'react-icons/fa';
-import { FaYoutube } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
-import { FaTwitterSquare } from 'react-icons/fa';
-import { FaPhoneSquare } from 'react-icons/fa';
-import { MdOutlineMessage } from 'react-icons/md';
-import { FaLocationDot } from 'react-icons/fa6';
-import { API } from '../../../utils/security/secreteKey';
-import PageLoader from '../../../utils/loader/PageLoader';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useEffect, useState } from "react";
+import "./Footer.scss";
+import { NavLink } from "react-router-dom";
+import { FaLinkedin } from "react-icons/fa";
+import { FaFacebookSquare } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { FaTwitterSquare } from "react-icons/fa";
+import { FaPhoneSquare } from "react-icons/fa";
+import { MdOutlineMessage } from "react-icons/md";
+import { FaLocationDot } from "react-icons/fa6";
+import { API } from "../../../utils/security/secreteKey";
+import PageLoader from "../../../utils/loader/PageLoader";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Footer = () => {
   // Local State variables
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [data, setData] = useState({});
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Display footer data
@@ -39,19 +39,19 @@ const Footer = () => {
 
   // NavLink stayling
   const NavLinkStyling = ({ isActive }) =>
-    isActive ? 'ActiveLink' : 'passiveLink';
+    isActive ? "ActiveLink" : "passiveLink";
 
   // Copyright date
   const date = new Date();
   const year = date.getFullYear();
 
   return (
-    <footer className="footer">
-      <section className="subscription">
-        <h3 className="subtTitle">
+    <footer className="footer-container">
+      <section className="subscription-wrapper">
+        <h3 className="subscription-title">
           Subscribe to be informed immediately about offers, news and events
         </h3>
-        <form action="" className="form">
+        <form action="" className="subscription-form">
           <div className="input-container">
             <MdEmail className="icon" />
             <input
@@ -68,7 +68,6 @@ const Footer = () => {
             <label htmlFor="email" className="input-label">
               Email Address
             </label>
-            <span className="input-highlight"></span>
           </div>
           <button className="subscribe-btn">Subscribe</button>
         </form>
@@ -84,12 +83,6 @@ const Footer = () => {
             <h2 className="footer-subTitle"> {data?.sitemap} </h2>
 
             <ul className="footer-items">
-              <li className="footer-item">
-                <NavLink to="/best-sellings" className={NavLinkStyling}>
-                  {data?.bestSelling}
-                </NavLink>
-              </li>
-
               <li className="footer-item">
                 <NavLink to="/products" className={NavLinkStyling}>
                   {data?.products}
@@ -207,6 +200,7 @@ const Footer = () => {
           </section>
         </div>
       )}
+      <div className="footer-horizontal-line"></div>
 
       <p className="copyright"> &copy; {year} All Rights Reserved!</p>
     </footer>

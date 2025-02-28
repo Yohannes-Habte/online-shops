@@ -1,0 +1,23 @@
+.supplier-cart-container {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  .supplier-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .description {
+    font-size: 14px;
+    color: #555;
+  }
+
+  p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+  }
+}

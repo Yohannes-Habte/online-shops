@@ -1,0 +1,34 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.single-product-infos-wrapper {
+  @include shadow1;
+  margin-bottom: 1rem;
+  max-height: fit-content;
+
+  .product-info-title {
+    @include subTitle;
+  }
+
+  .product-prices-info {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.8rem;
+
+    .discounted-price {
+      font-size: $one;
+      font-weight: 600;
+    }
+
+    .original-price {
+      color: red;
+      text-decoration: line-through;
+    }
+  }
+
+  .product-info {
+    font-size: 0.8rem;
+  }
+}

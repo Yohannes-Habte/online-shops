@@ -1,69 +1,91 @@
-import { useState } from "react";
 import "./SingleCart.scss";
 import { toast } from "react-toastify";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart, removeFromCart } from "../../../redux/reducers/cartReducer";
 
-const SingleCart = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
-  // Local state variable
-  const [value, setValue] = useState(data.qty);
-  const totalPrice = data.discountPrice * value;
+const SingleCart = ({ data, setOpenCart }) => {
+  const dispatch = useDispatch();
 
-  console.log("data =", data);  
+  // Increment quantity
 
-  // Incremental function
-  const increment = (data) => {
-    if (data.stock < value) {
-      toast.error(
-        "You have reached the maximum available products in the stock!"
-      );
+  const increment = () => {
+    if (data.stock <= data.qty) {
+      toast.error("You have reached the maximum available products in stock!");
     } else {
-      setValue(value + 1);
-      const updateCartData = { ...data, qty: value + 1 };
-      quantityChangeHandler(updateCartData);
+      dispatch(
+        addToCart({
+          ...data,
+          qty: data.qty + 1,
+        })
+      );
     }
   };
 
-  // Decremental function
-  const decrement = (data) => {
-    setValue(value === 1 ? 1 : value - 1);
-    const updateCartData = { ...data, qty: value === 1 ? 1 : value - 1 };
-    quantityChangeHandler(updateCartData);
+  // Decrement quantity
+  const decrement = () => {
+    if (data.qty > 1) {
+      dispatch(
+        addToCart({
+          ...data,
+          qty: data.qty - 1,
+        })
+      );
+    }
   };
+
+  // Remove from cart
+  const removeFromCartHandler = () => {
+    dispatch(
+      removeFromCart({
+        productId: data._id,
+        productColor: data.variant.productColor,
+        size: data.variant.size,
+      })
+    );
+  };
+
+  // Total price
+  const totalPrice = data.discountPrice * data.qty;
+  const totalItemPrice = totalPrice.toFixed(2);
 
   return (
     <div className="single-cart-container">
-      <article className="quantity-management-wrapper">
-        <FaMinusSquare
-          onClick={() => decrement(data)}
-          className="decrease-quantity"
-        />
-        <h3 className="quantity">{data.qty}</h3>
-        <FaPlusSquare
-          onClick={() => increment(data)}
-          className="increase-quantity"
-        />
+      <article className="cart-product-quantity-wrapper">
+        <FaPlusSquare onClick={increment} className="increase-quantity" />
+        <h3 className="product-quantity">{data.qty}</h3>
+        <FaMinusSquare onClick={decrement} className="decrease-quantity" />
       </article>
 
-      {/* Updated to use the variant image */}
       <figure className="image-container">
-        <img
-          src={data?.variant?.productImage}
-          alt={data.title}
-          className="image"
-        />
+        <Link to={`/products/${data._id}`}>
+          <img
+            src={data?.variant?.productImage}
+            alt={data.title}
+            className="image"
+            onClick={() => setOpenCart(false)}
+          />
+        </Link>
       </figure>
 
-      <article className="price-wrapper">
-        <h3 className="name">{data.title}</h3>
-        <p className="price">
-          ${data.discountPrice} * {value} = ${totalPrice}
+      <article className="product-title-price-and-size-wrapper">
+        <h3 className="product-title" onClick={() => setOpenCart(false)}>
+          <Link to={`/products/${data._id}`} style={{ color: "blue" }}>
+            {data.title}
+          </Link>
+        </h3>
+        <p className="product-size">Size: {data?.variant?.size}</p>
+        <p className="product-price">
+          Price: ${data.discountPrice.toFixed(2)} * {data.qty} ={" "}
+          <strong className="price">${totalItemPrice}</strong>
         </p>
       </article>
 
       <MdDelete
-        className="delete-icon"
-        onClick={() => removeFromCartHandler(data._id)}
+        className="cart-product-delete-icon"
+        onClick={removeFromCartHandler}
       />
     </div>
   );

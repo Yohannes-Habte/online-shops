@@ -4,57 +4,42 @@ const initialState = {
   wishList: [],
 };
 
-const wishListReducer = createSlice({
+const wishListSlice = createSlice({
   name: "wishList",
   initialState,
   reducers: {
-    // Add to wish list
+    // Add to wishlist
     addToWishlist: (state, action) => {
       const item = action.payload;
-      const isItemExist = state.wishList.find(
+
+      const exists = state.wishList.some(
         (i) =>
-          (i._id === i._id) === item._id &&
+          i._id === item._id &&
           i.variant?.productColor === item.variant?.productColor &&
           i.variant?.size === item.variant?.size
       );
 
-      if (isItemExist) {
-        return {
-          ...state,
-          wishList: state.wishList.map((i) =>
-            i._id === isItemExist._id &&
-            i.variant.productColor === isItemExist.variant.productColor &&
-            i.variant.size === isItemExist.variant.size
-              ? item
-              : i
-          ),
-        };
-      } else {
-        return {
-          ...state,
-          wishList: [...state.wishList, item],
-        };
+      if (!exists) {
+        state.wishList.push(item);
       }
     },
 
-    // Remove from wish list
+    // Remove from wishlist
+
     removeFromWishlist: (state, action) => {
-      return {
-        ...state,
-        wishList: state.wishList.filter((item) => item._id !== action.payload),
-      };
+      const item = action.payload;
+      console.log("item =", item);
+      state.wishList = state.wishList.filter(
+        (product) => product._id !== item
+      );
     },
 
-    // Clear wishlist
     clearWishlist: (state) => {
       state.wishList = [];
     },
   },
 });
 
-// Destructure wishlist reducer methods
 export const { addToWishlist, removeFromWishlist, clearWishlist } =
-  wishListReducer.actions;
-
-// export wishlist reducer
-export default wishListReducer.reducer;
+  wishListSlice.actions;
+export default wishListSlice.reducer;

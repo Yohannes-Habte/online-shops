@@ -1,0 +1,58 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+
+.single-product-variants-wrapper {
+    @include shadow1;
+    margin-bottom: 1rem;
+  
+    .product-variants-title {
+      @include subTitle;
+    }
+  
+    .variants-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+  
+      .variant-item {
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+  
+        .toggle-button {
+          color: blue;
+        }
+  
+        .variant-info {
+          margin-bottom: 0.25rem;
+        }
+  
+        .variant-size-details {
+          list-style: none;
+          padding: 1rem;
+          margin: 0;
+  
+          li {
+            padding: 10px;
+            margin: 0.2rem 0;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #f4f4f4;
+            color: #333;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+  
+            &:hover {
+              background-color: #eaeaea;
+            }
+  
+            &.out-of-stock {
+              background-color: rgb(243, 181, 12) !important;
+              color: #fa0808 !important;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }

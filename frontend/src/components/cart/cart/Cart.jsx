@@ -17,7 +17,7 @@ const Cart = ({ setOpenCart }) => {
   };
 
   // Total price
-  const totalPrice = cart?.reduce(
+  const totalItemsPrice = cart?.reduce(
     (acc, item) => acc + item.qty * item.discountPrice,
     0
   );
@@ -63,6 +63,7 @@ const Cart = ({ setOpenCart }) => {
                     <SingleCart
                       key={`${product._id}-${product.variant.productColor}-${product.variant.size}`} // Unique key
                       data={product}
+                      setOpenCart={setOpenCart}
                       quantityChangeHandler={() =>
                         quantityChangeHandler(
                           product._id,
@@ -82,16 +83,22 @@ const Cart = ({ setOpenCart }) => {
                   ))}
               </div>
             </section>
-            <hr />
-            <h2 className="total-price">
-              Total Price: <span className="amount">${totalPrice}</span>
+           
+            <div className="cart-horizontal-line"></div>
+            <h2 className="cart-items-total-price">
+              Total Price:{" "}
+              <span className="cart-items-total-price-amount">
+                ${totalItemsPrice.toFixed(2)}
+              </span>
             </h2>
             <hr />
 
             {/* checkout buttons */}
-            <Link to="/checkout">
+          <div className="cart-checkout-btn-container">
+          <Link to="/checkout">
               <button className="checkout-now-btn">Checkout Now</button>
             </Link>
+          </div>
           </>
         )}
       </article>

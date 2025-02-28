@@ -1,177 +1,124 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-// Mobile screen
 .single-cart-container {
+  @include shadow1;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  @include shadow3;
+  gap: 1.5rem;
+  padding: 1rem;
+  border-radius: $radius;
+  background-color: $white;
+  transition: all 0.3s ease-in-out;
 
-  .quantity-management-wrapper {
+  &:hover {
+    @include shadow1;
+  }
+
+  .cart-product-quantity-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    @include shadow3;
+    gap: 0.3rem;
 
-    .decrease-quantity {
-      @include cartQuantity;
-      font-size: $one;
+    .increase-quantity, .decrease-quantity {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: $gray;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $tomato;
+      }
     }
 
-    .quantity {
-      @include subTitle;
-      font-size: $one;
-    }
-
-    .increase-quantity {
-      @include cartQuantity;
-      font-size: $one;
+    .product-quantity {
+      font-size: 1.2rem;
+      font-weight: bold;
     }
   }
 
   .image-container {
+    flex-shrink: 0;
     .image {
-      width: 3rem;
-      height: 3rem;
+      width: 6rem;
+      height: 6rem;
       object-fit: cover;
+      border-radius: $radius;
+      transition: transform 0.2s ease-in-out;
+
+      &:hover {
+        transform: scale(1.05);
+      }
     }
   }
 
-  .price-wrapper {
-    .name {
-      @include subTitle;
-      font-size: $one;
-    }
-
-    .price {
-      color: $blue;
-      font-weight: $aafw;
-      font-size: $one;
-    }
-  }
-
-  .delete-icon {
-    @include deleteIcon;
-    font-size: $one;
-  }
-}
-
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .single-cart-container {
+  .product-title-price-and-size-wrapper {
+    flex: 1;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    @include shadow3;
-  
-    .quantity-management-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      @include shadow3;
-  
-      .decrease-quantity {
-        @include cartQuantity;
-        font-size: $one;
-      }
-  
-      .quantity {
-        @include subTitle;
-        font-size: $one;
-      }
-  
-      .increase-quantity {
-        @include cartQuantity;
-        font-size: $one;
-      }
-    }
-  
-    .image-container {
-      .image {
-        width: 6rem;
-        height: 6rem;
-        object-fit: cover;
-      }
-    }
-  
-    .price-wrapper {
-      .name {
-        @include subTitle;
-      }
-  
-      .price {
+    flex-direction: column;
+    gap: 0.3rem;
+
+    .product-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: $black;
+      transition: color 0.2s;
+      cursor: pointer;
+
+      &:hover {
         color: $blue;
-        font-weight: $aafw;
       }
     }
-  
-    .delete-icon {
-      @include deleteIcon;
+
+    .product-size {
+      font-size: 0.9rem;
+      color: $gray;
+    }
+
+    .product-price {
+      font-size: 1rem;
+      font-weight: bold;
+
+      .price {
+        color: $green;
+      }
+    }
+  }
+
+  .cart-product-delete-icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: $tomato;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $red;
     }
   }
 }
 
-
-/* Labtop screen size */
-@media screen and (min-width: 1024px)  {
+// Responsive Styles
+@media (max-width: 768px) {
   .single-cart-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.8rem;
     gap: 1rem;
-    @include shadow3;
-  
-    .quantity-management-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      @include shadow3;
-  
-      .decrease-quantity {
-        @include cartQuantity;
-       
-      }
-  
-      .quantity {
-        @include subTitle;
-      }
-  
-      .increase-quantity {
-        @include cartQuantity;
-      
-      }
+  }
+
+  .image-container .image {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .product-title-price-and-size-wrapper {
+    .product-title {
+      font-size: 0.9rem;
     }
-  
-    .image-container {
-      .image {
-        width: 6rem;
-        height: 6rem;
-        object-fit: cover;
-      }
-    }
-  
-    .price-wrapper {
-      .name {
-        @include subTitle;
-      }
-  
-      .price {
-        color: $blue;
-        font-weight: $aafw;
-      }
-    }
-  
-    .delete-icon {
-      @include deleteIcon;
+
+    .product-size, .product-price {
+      font-size: 0.85rem;
     }
   }
 }

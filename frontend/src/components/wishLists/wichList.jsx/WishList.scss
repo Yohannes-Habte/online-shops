@@ -1,7 +1,7 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-.whilist {
+.wishlist-page {
   width: 100%;
   min-height: 100vh;
   position: fixed;
@@ -10,7 +10,7 @@
   z-index: 999;
   background-color: $popup-bg;
 
-  .wishlist-container {
+  .wishlist-page-container {
     position: fixed;
     top: 0;
     right: 0;
@@ -19,35 +19,57 @@
     background-color: $popup-display-bg;
     @include shadow1;
     overflow: scroll;
-    scrollbar-color: $red $yellow;
+    scrollbar-color: $gray $yellow;
     scrollbar-width: thin;
 
     // When there is no order
-    .empty-wishlist-wrapper {
+    .empty-wishlist-section {
       position: relative;
 
       .close-empty-icon {
         @include close;
       }
 
-      .empty-cart {
+      .empty-wishlist-title {
         @include subTitle;
       }
     }
     // When there is an order
 
-    .wishlist-order-wrapper {
+    .wishlist-items-wrapper {
       position: relative;
 
       .close-order-icon {
         @include close;
       }
 
-      .wishlist-items {
+      .wishlist-items-count {
         @include subTitle;
+        margin: 1rem;
       }
 
-      .single-cart-wrapper {
+      .single-wishlist-cart-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 1rem;
+        row-gap: 1rem;
+        width: 100%;
+      }
+    }
+
+    .wishlist-horizontal-line {
+      margin-top: 2rem;
+      width: 100%;
+      height: 0.1rem;
+      background-color: #beb3b3;
+      margin: 1rem 0;
+    }
+
+    .wishlist-items-total-price {
+      font-size: $afs;
+      margin: 1rem 0 0 1.5rem;
+      .total-price-amount {
+        color: $green;
       }
     }
   }

@@ -1,42 +1,39 @@
 import { useState } from "react";
 import "./EventCard.scss";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import CountDown from "../countDown/CountDown";
-import { addToCart } from "../../../redux/reducers/cartReducer";
 
 const EventCard = ({ data }) => {
-  const dispatch = useDispatch();
-  const { cart } = useSelector((state) => state.cart);
+  // const dispatch = useDispatch();
+  // const { cart } = useSelector((state) => state.cart);
 
   // Set the default big image to the first image in the array
   const [mainImage, setMainImage] = useState(data?.images?.[0]);
 
   // Add to cart handler
-  const addToCartHandler = (data) => {
-    if (
-      !data ||
-      data.eventStatus === "completed" ||
-      data.eventStatus === "canceled"
-    ) {
-      return toast.error("This event is no longer available.");
-    }
+  // const addToCartHandler = (data) => {
+  //   if (
+  //     !data ||
+  //     data.eventStatus === "completed" ||
+  //     data.eventStatus === "canceled"
+  //   ) {
+  //     return toast.error("This event is no longer available.");
+  //   }
 
-    const isItemExists = cart?.some(
-      (item) => item.eventCode === data.eventCode
-    );
-    if (isItemExists) {
-      return toast.error("Item already in cart!");
-    }
+  //   const isItemExists = cart?.some(
+  //     (item) => item.eventCode === data.eventCode
+  //   );
+  //   if (isItemExists) {
+  //     return toast.error("Item already in cart!");
+  //   }
 
-    if (data.stock < 1) {
-      return toast.error("Out of stock!");
-    }
+  //   if (data.stock < 1) {
+  //     return toast.error("Out of stock!");
+  //   }
 
-    dispatch(addToCart({ ...data, qty: 1 }));
-    toast.success("Item added to cart!");
-  };
+  //   dispatch(addToCart({ ...data, qty: 1 }));
+  //   toast.success("Item added to cart!");
+  // };
 
   return (
     <section className="event-card-container">
@@ -75,7 +72,7 @@ const EventCard = ({ data }) => {
         <div className="event-actions">
           <button
             className="cart-btn"
-            onClick={() => addToCartHandler(data)}
+            // onClick={() => addToCartHandler(data)}
             disabled={
               data.eventStatus === "completed" ||
               data.eventStatus === "canceled"

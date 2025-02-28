@@ -76,7 +76,8 @@ const ProductCard = ({ product }) => {
         <p className="product-description">{ShortenText(description, 100)}</p>
         <div className="display-rating-flex-row">
           Rating:
-          <Ratings ratings={ratings?.average} /> <span> ({ratings.average.toFixed(1)}/5) </span>
+          <Ratings ratings={ratings?.average} />{" "}
+          <span> ({ratings.average.toFixed(1)}/5) </span>
           <span className="reviewers-count">
             <strong className="reviewers-number">{ratings?.count || 0}</strong>{" "}
             people reviewed this product
@@ -122,9 +123,15 @@ const ProductCard = ({ product }) => {
           <select
             id="size-selector"
             onChange={(e) => setSelectedSize(e.target.value)}
+            className="select-size"
           >
             {selectedVariant?.productSizes?.map((sizeObj, index) => (
-              <option key={index} value={sizeObj.size}>
+              <option
+                key={index}
+                value={sizeObj.size}
+                className={sizeObj.stock < 1 ? "out-of-stock" : ""}
+                disabled={sizeObj.stock < 1}
+              >
                 {sizeObj.size} {sizeObj.stock < 1 ? "(Out of Stock)" : ""}
               </option>
             ))}

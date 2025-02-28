@@ -249,7 +249,7 @@ export const getAllProducts = async (req, res, next) => {
 
 export const getProductsByCustomerCategory = async (req, res, next) => {
   try {
-    const { customerCategory } = req.params; // Get category from params
+    const { customerCategory } = req.params;
 
     const customerProducts = await Product.find({
       customerCategory: { $regex: new RegExp(customerCategory, "i") },

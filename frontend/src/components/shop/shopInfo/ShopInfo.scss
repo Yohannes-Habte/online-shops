@@ -1,7 +1,7 @@
 @import '../../../styles/Variables.scss';
 @import '../../../styles/Mixins.scss';
 
-.shop-info-contianer {
+.shop-info-container {
   @include mobileDashboardScreen;
   @include shadow3;
   position: relative;
@@ -53,7 +53,9 @@
   // Shop Events
   .shop-events-wrapper {
     .shop-events {
-      @include mobileProducts;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
     }
 
     .no-events {
@@ -108,7 +110,7 @@
 
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-  .shop-info-contianer {
+  .shop-info-container {
     @include tabletDashboardScreen;
     @include shadow3;
     position: relative;
@@ -160,7 +162,7 @@
     // Shop Events
     .shop-events-wrapper {
       .shop-events {
-        @include tabletProductsGrid;
+        padding: 1rem;
       }
 
       .no-events {
@@ -211,7 +213,7 @@
 
 /* Labtop screen size */
 @media screen and (min-width: 1024px) {
-  .shop-info-contianer {
+  .shop-info-container {
     @include desktopDashboardScreen;
     position: relative;
 
@@ -260,7 +262,7 @@
     // Shop Events
     .shop-events-wrapper {
       .shop-events {
-        @include productsGrid;
+        padding: 1rem;
       }
 
       .no-events {

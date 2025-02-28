@@ -1,0 +1,51 @@
+.supplier-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.supplier-page-content {
+  max-width: 800px;
+  margin: 40px auto;
+  min-height: 100vh;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.supplier-card {
+  padding: 20px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.supplier-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+}
+
+.supplier-description {
+  font-size: 18px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.supplier-info {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.supplier-info p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.loading-message,
+.error-message,
+.no-data-message {
+  font-size: 18px;
+  color: #777;
+  text-align: center;
+  margin-top: 20px;
+}

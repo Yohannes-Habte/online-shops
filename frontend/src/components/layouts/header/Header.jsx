@@ -5,13 +5,13 @@ import { BiUserCircle } from "react-icons/bi";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { BsCart } from "react-icons/bs";
 import "./Header.scss";
-import DropDown from "../../userLayout/dropDown/DropDown";
 import Navbar from "../navbar/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import WishList from "../../wishLists/wichList.jsx/WishList";
 import Cart from "../../cart/cart/Cart";
 import Logout from "../../../utils/globalFunctions/Logout";
 import { fetchUser } from "../../../redux/actions/user";
+import DropDown from "../../dropDown/DropDown";
 
 const Header = () => {
   // Global state variables using redux

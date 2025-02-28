@@ -1,5 +1,5 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
 // Mobile screen
 .cart {
@@ -15,7 +15,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 100%;
+    width: 50%;
     height: 100vh;
     background-color: $popup-display-bg;
     @include shadow1;
@@ -63,180 +63,38 @@
 
       // single cart
       .single-cart-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
       }
     }
 
-    .total-price {
-      padding: 1rem 0;
+    .cart-horizontal-line {
+      width: 100%;
+      height: 0.1rem;
+      background-color: #beb3b3;
+    }
+
+    .cart-items-total-price {
+      padding: 1rem;
       font-size: $one;
-      .amount {
+      .cart-items-total-price-amount {
         color: $blue;
         font-size: $one;
       }
     }
 
     // checkout buttons
-    .checkout-now-btn {
-      @include button1;
-      font-size: $one;
-    }
-  }
-}
-
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .cart {
-    width: 100%;
-    min-height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    background-color: $popup-bg;
-  
-    .cart-container {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 80%;
-      height: 100vh;
-      background-color: $popup-display-bg;
-      @include shadow1;
-      overflow: scroll;
-      scrollbar-color: $red $yellow;
-      scrollbar-width: thin;
-  
-      // Empty cart
-      .empty-cart-wrapper {
-        .close-icon {
-          position: absolute;
-          top: 0.6rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
-        }
-        .empty-cart {
-          @include subTitle;
-        }
-      }
-  
-      // cart order wrapper
-      .cart-order-wrapper {
-        position: relative;
-  
-        .close-icon {
-          position: absolute;
-          top: 0.6rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
-        }
-  
-        .subTitle {
-          @include subTitle;
-        }
-  
-        // single cart
-        .single-cart-wrapper {
-        }
-      }
-  
-      .total-price {
-        padding: 1rem 0;
-        .amount {
-          color: $blue;
-        }
-      }
-  
-      // checkout buttons
+    .cart-checkout-btn-container {
+      margin: 0 1rem;
       .checkout-now-btn {
-        @include button1;
-      }
-    }
-  }
-}
+        @include button3;
+        font-size: $one;
 
-
-/* Labtop screen size */
-@media screen and (min-width: 1024px)  {
-  .cart {
-    width: 100%;
-    min-height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    background-color: $popup-bg;
-  
-    .cart-container {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 40%;
-      height: 100vh;
-      background-color: $popup-display-bg;
-      @include shadow1;
-      overflow: scroll;
-      scrollbar-color: $red $yellow;
-      scrollbar-width: thin;
-  
-      // Empty cart
-      .empty-cart-wrapper {
-        .close-icon {
-          position: absolute;
-          top: 0.6rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
+        &:hover {
+          background-color: #6161df;
         }
-        .empty-cart {
-          @include subTitle;
-        }
-      }
-  
-      // cart order wrapper
-      .cart-order-wrapper {
-        position: relative;
-  
-        .close-icon {
-          position: absolute;
-          top: 0.6rem;
-          right: 1rem;
-          cursor: pointer;
-  
-          &:hover {
-            color: $tomato;
-          }
-        }
-  
-        .subTitle {
-          @include subTitle;
-        }
-  
-        // single cart
-        .single-cart-wrapper {
-        }
-      }
-  
-      .total-price {
-        padding: 1rem 0;
-        .amount {
-          color: $blue;
-        }
-      }
-  
-      // checkout buttons
-      .checkout-now-btn {
-        @include button1;
       }
     }
   }
