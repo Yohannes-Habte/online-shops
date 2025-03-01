@@ -115,7 +115,7 @@ const Header = () => {
                   <ul className="user-history">
                     <li className="list-item">
                       <NavLink to={`/profile`} className={"link"}>
-                        Profile
+                        User Profile
                       </NavLink>
                     </li>
 

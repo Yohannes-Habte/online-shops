@@ -5,16 +5,16 @@ const TrackOrderCard = ({ user, shop, order }) => {
     <section className="track-order-card">
       <h3 className="tracking-order-title">
         {" "}
-        Track Your Order form {shop.name}{" "}
+        Track Your Order form {shop?.name}{" "}
       </h3>
 
       <p className="tracking-message">
         Hello <span className="tracking-user-info">{user?.name}</span>, thank
         you for shopping with{" "}
-        <span className="tracking-shop-info">{shop.name}</span>. Your order is
+        <span className="tracking-shop-info">{shop?.name}</span>. Your order is
         currently{" "}
-        <strong className="tracking-order-info">{order.orderStatus}</strong>. At{" "}
-        <span className="tracking-shop-info">{shop.name}</span>, we value
+        <strong className="tracking-order-info">{order?.orderStatus}</strong>. At{" "}
+        <span className="tracking-shop-info">{shop?.name}</span>, we value
         transparency and appreciate your trust in us. Your loyalty means a lot,
         and we are committed to providing you with the best shopping experience.
         We look forward to serving you again!
@@ -22,7 +22,7 @@ const TrackOrderCard = ({ user, shop, order }) => {
 
       <div className="ordered-items-container">
         {/* User Order Details */}
-        {order.orderedItems.map((product) => {
+        {order?.orderedItems.map((product) => {
           return (
             <figure key={product._id} className="images-container">
               <img

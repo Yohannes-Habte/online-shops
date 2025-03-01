@@ -8,7 +8,6 @@ import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 
 const TrackOrder = () => {
   const { id } = useParams();
-  console.log("TrackOrder ~ id", id);
   const dispatch = useDispatch();
 
   // Global state variables
@@ -18,10 +17,6 @@ const TrackOrder = () => {
 
   const { data: orders = [], loading, error } = customerOrders || {};
   const [orderData, setOrderData] = useState(null);
-
-  console.log("TrackOrder:", orderData);
-
-  console.log("Track orders =>", orders);
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -55,6 +50,8 @@ const TrackOrder = () => {
         return "Delivered";
       case "Cancelled":
         return "Cancelled";
+      case "Refund Requested":
+        return "Refund Requested";
       case "Returned":
         return "Returned";
       case "Refunded":
@@ -85,7 +82,9 @@ const TrackOrder = () => {
                 {orderData.statusHistory.map((status, index) => (
                   <li key={index} className="status-history-process">
                     <p className="status-history-message">
-                      <strong className="status-info-strong">{getOrderStatus(status.status)}:</strong>
+                      <strong className="status-info-strong">
+                        {getOrderStatus(status.status)}:
+                      </strong>
                       <span className="status-info-span">{status.message}</span>
                       <span className="status-info-span">
                         {" "}

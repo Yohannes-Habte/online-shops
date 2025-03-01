@@ -38,15 +38,19 @@ const EventCard = ({ data }) => {
   return (
     <section className="event-card-container">
       {/* Image Gallery */}
-      <figure className="event-image">
-        <img src={mainImage} alt={data.eventName} className="main-image" />
-        <div className="thumbnail-container">
+      <figure className="event-product-images">
+        <img
+          src={mainImage}
+          alt={data.eventName}
+          className="event-large-product-image"
+        />
+        <div className="event-thumbnail-images-container">
           {data.images?.map((img, index) => (
             <img
               key={index}
               src={img}
               alt={`Thumbnail ${index + 1}`}
-              className="thumbnail"
+              className="event-small-product-image"
               onClick={() => setMainImage(img)}
             />
           ))}
@@ -54,13 +58,13 @@ const EventCard = ({ data }) => {
       </figure>
 
       {/* Event Details */}
-      <article className="event-details">
+      <article className="event-details-wrapper">
         <h2 className="event-title">{data.eventName}</h2>
         <p className="event-description">{data.description}</p>
 
-        <div className="event-meta">
+        <div className="event-meta-wrapper">
           <h5 className="discounted-price">Price: ${data.discountPrice}</h5>
-          <p className="old-price">${data.originalPrice.toFixed(2)}</p>
+          <p className="original-price">${data.originalPrice.toFixed(2)}</p>
 
           <span className={`status ${data.eventStatus}`}>
             {data.eventStatus}
@@ -69,9 +73,9 @@ const EventCard = ({ data }) => {
         </div>
 
         {/* Event Actions */}
-        <div className="event-actions">
+        <div className="event-actions-wrapper">
           <button
-            className="cart-btn"
+            className="event-cart-btn"
             // onClick={() => addToCartHandler(data)}
             disabled={
               data.eventStatus === "completed" ||
@@ -81,7 +85,7 @@ const EventCard = ({ data }) => {
             Add to Cart
           </button>
           <CountDown data={data} />
-          <Link to={`/event/${data.eventCode}`} className="details-btn">
+          <Link to={`/event/${data.eventCode}`} className="event-details-btn">
             See Details
           </Link>
         </div>

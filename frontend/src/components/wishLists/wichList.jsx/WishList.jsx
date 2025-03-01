@@ -16,7 +16,6 @@ const WishList = ({ setOpenWishList }) => {
 
   // Remove from wishlist handler
   const removeFromWishlistHandler = (productId, productColor, size) => {
-    console.log("productId =", productId);
     dispatch(removeFromWishlist({ productId, productColor, size }));
   };
 
@@ -41,6 +40,7 @@ const WishList = ({ setOpenWishList }) => {
             <h5 className="wishlist-items-count">{`You have ${wishList.length} item(s) in your wishlist`}</h5>
             <div className="single-wishlist-cart-container">
               {wishList.map((product) => {
+                
                 const variant = product.variant || {
                   productColor: "Unknown",
                   size: "N/A",
@@ -68,7 +68,10 @@ const WishList = ({ setOpenWishList }) => {
         <div className="wishlist-horizontal-line"></div>
 
         <h3 className="wishlist-items-total-price">
-          Total Price: <strong className="total-price-amount">${totalPrice.toFixed(2)}</strong>
+          Total Price:{" "}
+          <strong className="total-price-amount">
+            ${totalPrice.toFixed(2)}
+          </strong>
         </h3>
       </article>
     </main>

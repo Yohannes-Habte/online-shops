@@ -206,17 +206,21 @@
         .user-history {
           position: absolute;
           right: -2rem;
-          top: 3rem;
+          top: 2.9rem;
           width: 220px;
           height: fit-content;
           background-color: $navbar-bg5;
-          padding: 1rem 2rem;
           border-radius: 0 0 0 $radius;
+          padding: 1rem;
 
           .list-item {
-            @include paragraph;
             color: $white;
             cursor: pointer;
+            font-size: 0.8rem;
+            line-height: 2rem;
+            padding: 0.2rem 0.5rem;
+            margin-top: 0.5rem;
+            border-bottom: 1px solid $gray;
 
             &:hover {
               background-color: $navbar-hover5;
@@ -438,15 +442,15 @@
           .user-history {
             position: absolute;
             right: -2rem;
-            top: 3rem;
+            top: 2.9rem;
             width: 220px;
             height: fit-content;
             background-color: $navbar-bg5;
-            padding: 1rem 2rem;
+
             border-radius: 0 0 0 $radius;
 
             .list-item {
-              @include paragraph;
+              font-size: 0.8rem;
               color: $white;
               cursor: pointer;
 
@@ -614,7 +618,7 @@
 
         .select-category {
           font-size: 1rem;
-         text-align: center;
+          text-align: center;
           border: none;
           outline: none;
           cursor: pointer;
@@ -681,15 +685,15 @@
           .user-history {
             position: absolute;
             right: -2rem;
-            top: 3rem;
+            top: 2.9rem;
             width: 220px;
             height: fit-content;
             background-color: $navbar-bg5;
-            padding: 1rem 2rem;
+          
             border-radius: 0 0 0 $radius;
 
             .list-item {
-              @include paragraph;
+              font-size: 0.9rem;
               color: $white;
               cursor: pointer;
 

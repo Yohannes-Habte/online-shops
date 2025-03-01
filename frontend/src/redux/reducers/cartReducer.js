@@ -11,19 +11,17 @@ const cartReducer = createSlice({
     // Add to cart
 
     addToCart: (state, action) => {
-      // item comes from action.payload, meaning it is the product that the user is trying to add to the cart
+      // The product that the user is trying to add to the cart by clicking the "Add to Cart" button
       const item = action.payload;
-      console.log("cart item from action.payload =", item);
-      console.log("state.cart =", state.cart);
+      // The shop ID of the product that the user is trying to add to the cart
+      const itemShopId = item.shop._id;
 
       // Check if item in the shopping cart from the same shop
       if (state.cart.length > 0) {
-        const currentShopId = state.cart[0].shop._id; // Get the shop ID of the first item in the cart
+        // Get the shop ID of the first item in the cart
+        const currentShopId = state.cart[0].shop._id;
 
-        console.log("currentShopId =", currentShopId);
-        console.log("const item = action.payload =", item);
-
-        if (currentShopId !== item.shop._id) {
+        if (currentShopId !== itemShopId) {
           alert(
             "For a single order, all items must be from the same shop. To purchase items from a different shop, please create a separate order. Consider saving items from the other shop to your wishlist for later purchase."
           );
@@ -31,25 +29,28 @@ const cartReducer = createSlice({
         }
       }
 
+      // Check if the item already exists in the cart array
       const isItemExist = state.cart.find(
-        (i) =>
-          i._id === item._id &&
-          i.variant?.productColor === item.variant?.productColor &&
-          i.variant?.size === item.variant?.size // Match size as well
+        (product) =>
+          product._id === item._id &&
+          product.variant?.productColor === item.variant?.productColor &&
+          product.variant?.size === item.variant?.size
       );
 
       if (isItemExist) {
+        // If the item already exists in the cart, update the quantity
         return {
           ...state,
-          cart: state.cart.map((i) =>
-            i._id === isItemExist._id &&
-            i.variant.productColor === isItemExist.variant.productColor &&
-            i.variant.size === isItemExist.variant.size
+          cart: state.cart.map((product) =>
+            product._id === isItemExist._id &&
+            product.variant.productColor === isItemExist.variant.productColor &&
+            product.variant.size === isItemExist.variant.size
               ? item
-              : i
+              : product
           ),
         };
       } else {
+        // If the item does not exist in the cart, add the item to the cart array
         return {
           ...state,
           cart: [...state.cart, item],
@@ -57,6 +58,7 @@ const cartReducer = createSlice({
       }
     },
 
+    
     // Remove from cart
     removeFromCart: (state, action) => {
       const item = action.payload;
