@@ -9,7 +9,7 @@ import {
 const conversationRouter = express.Router();
 
 // conversation routes
-conversationRouter.post("/create-conversation", createConversation);
+conversationRouter.post("/create", createConversation);
 conversationRouter.put("/update-lastMessage/:id", updateLastMessage);
 
 conversationRouter.get("/shop-conversations/:id", getAllShopConversations);

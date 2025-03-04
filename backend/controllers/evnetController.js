@@ -1,7 +1,7 @@
 import Shop from "../models/shopModel.js";
 import Event from "../models/eventModel.js";
 import createError from "http-errors";
-import mongoose, { model } from "mongoose";
+import mongoose from "mongoose";
 import crypto from "crypto";
 
 //==============================================================================
@@ -9,15 +9,17 @@ import crypto from "crypto";
 //==============================================================================
 export const createEvent = async (req, res, next) => {
   const {
-    eventName,
+    title,
     description,
     tags,
     images,
+    stockLevels,
+    sizes,
+    colors,
     originalPrice,
     discountPrice,
     startDate,
     endDate,
-    stock,
     purposes,
     category,
     subcategory,
@@ -56,17 +58,23 @@ export const createEvent = async (req, res, next) => {
       return next(createError(400, "Event code already exists!"));
     }
 
+    // Convert the stock levels into numbers
+    const stockLevelsArray = stockLevels.map((stock) => {
+      return parseInt(stock);
+    });
     // Create new event
     const newEvent = new Event({
-      eventName,
+      title,
       description,
       tags,
       images,
+      stockLevels: stockLevelsArray,
+      sizes,
+      colors,
       originalPrice,
       discountPrice,
       startDate,
       endDate,
-      stock,
       purposes,
       category,
       subcategory,
@@ -146,12 +154,16 @@ export const getAllShopEvents = async (req, res, next) => {
 
     const events = await Event.find({ shop: shopID })
       .populate([
-        { path: "shop", model: "Shop", select: "name shopAddress" }, // Limit fields
-        { path: "category", model: "Category", select: "categoryName" },
+        { path: "shop", model: "Shop" },
+        {
+          path: "category",
+          model: "Category",
+          select: "categoryName categoryDescription",
+        },
         {
           path: "subcategory",
           model: "Subcategory",
-          select: "subcategoryName",
+          select: "subcategoryName subcategoryDescription",
         },
         { path: "brand", model: "Brand", select: "brandName" },
         { path: "supplier", model: "Supplier", select: "supplierName" },

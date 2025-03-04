@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 
 // Import and connect socket.io-client
 import socketIO from "socket.io-client";
-import { format } from "timeago.js";
 import MessageList from "../../../components/user/userMessageList/MessageList";
 import { API } from "../../../utils/security/secreteKey";
 import Header from "../../../components/layouts/header/Header";
@@ -25,7 +24,7 @@ const UserInboxPage = () => {
   const [conversations, setConversations] = useState([]);
 
   // Local state variables for sending new message using Message Model
-  const [images, setImages] = useState();
+
   const [textMessage, setTextMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [open, setOpen] = useState(false);
@@ -55,7 +54,7 @@ const UserInboxPage = () => {
   }, []);
 
   // ===============================================================
-  // Dispaly the last arrived message, which is chat updating
+  // Display the last arrived message, which is chat updating
   // ===============================================================
 
   useEffect(() => {
@@ -83,7 +82,7 @@ const UserInboxPage = () => {
   }, [currentUser, messages]);
 
   // ===============================================================
-  // Dispaly active seller
+  // Display active seller
   // ===============================================================
   useEffect(() => {
     if (currentUser) {
@@ -184,7 +183,7 @@ const UserInboxPage = () => {
         messageSenderId: currentUser._id,
       };
 
-      const { data } = await axios.put(
+      await axios.put(
         `${API}/conversations/update-lastMessage/${currentChat._id}`,
         updateMessage
       );
@@ -220,7 +219,6 @@ const UserInboxPage = () => {
             })}
         </section>
         <div className="chat-messages-container">
-          {/* If open is true, then show us Chatting Shop inbox */}
           {open && (
             <UserInbox
               setOpen={setOpen}

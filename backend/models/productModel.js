@@ -49,7 +49,7 @@ const productSchema = new Schema(
     },
 
     tags: {
-      type: [String], // Tags for filtering or categorization, such as "New", "Sale", etc.
+      type: [String], // Tags for filtering or categorization
       default: [],
       validate: [arrayLimit, "Exceeds the limit of tags"], // Limit tags to 10
     },
@@ -75,8 +75,9 @@ const productSchema = new Schema(
   { timestamps: true }
 );
 
+// Helper function to limit array size
 function arrayLimit(val) {
-  return val.length <= 10; // Helper function to limit array size
+  return val.length <= 10;
 }
 
 // Pre-save hook to ensure discountPrice is valid

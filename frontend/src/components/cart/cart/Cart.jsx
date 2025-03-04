@@ -4,7 +4,11 @@ import { IoBagHandleOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SingleCart from "../singleCart/SingleCart";
-import { addToCart, removeFromCart } from "../../../redux/reducers/cartReducer";
+import {
+  addToCart,
+  removeEventFromCart,
+  removeFromCart,
+} from "../../../redux/reducers/cartReducer";
 
 const Cart = ({ setOpenCart }) => {
   // Global state variables
@@ -12,19 +16,49 @@ const Cart = ({ setOpenCart }) => {
   const dispatch = useDispatch();
 
   // Remove from cart handler
-  const removeFromCartHandler = (productId, productColor, size) => {
-    dispatch(removeFromCart({ productId, productColor, size }));
+  // const removeFromCartHandler = (productId, color, size) => {
+  //   dispatch(removeFromCart({ productId, productColor: color, size }));
+  // };
+  const removeFromCartHandler = (product) => {
+    const isEvent = product.selectedColor && product.selectedSize;
+    // dispatch(
+    //   removeFromCart({
+    //     productId: product._id,
+    //     productColor: isEvent
+    //       ? product.selectedColor
+    //       : product.variant?.productColor,
+    //     size: isEvent ? product.selectedSize : product.variant?.size,
+    //   })
+    // );
+
+    if (isEvent) {
+      dispatch(
+        removeEventFromCart({
+          productId: product._id,
+          productColor: product.selectedColor,
+          size: product.selectedSize,
+        })
+      );
+    } else {
+      dispatch(
+        removeFromCart({
+          productId: product._id,
+          productColor: product.variant?.productColor,
+          size: product.variant?.size,
+        })
+      );
+    }
   };
 
-  // Total price
+  // Total price calculation
   const totalItemsPrice = cart?.reduce(
     (acc, item) => acc + item.qty * item.discountPrice,
     0
   );
 
   // Change quantity handler
-  const quantityChangeHandler = (productId, productColor, size, qty) => {
-    dispatch(addToCart({ productId, productColor, size, qty }));
+  const quantityChangeHandler = (productId, color, size, qty) => {
+    dispatch(addToCart({ productId, productColor: color, size, qty }));
   };
 
   return (
@@ -46,44 +80,44 @@ const Cart = ({ setOpenCart }) => {
                 onClick={() => setOpenCart(false)}
               />
 
-              {/* Item length */}
-
+              {/* Item count */}
               <IoBagHandleOutline className="icon" />
               <h5 className="subTitle">
-                {cart.length === 1 &&
-                  `There is ${cart && cart.length} Item in the  Shopping Cart`}
-                {cart.length > 1 &&
-                  `There are ${cart && cart.length} Items in the Shopping Cart`}
+                {cart.length === 1
+                  ? `There is ${cart.length} item in the shopping cart`
+                  : `There are ${cart.length} items in the shopping cart`}
               </h5>
 
-              {/* cart Single Items */}
+              {/* Cart items */}
               <div className="single-cart-wrapper">
                 {cart &&
-                  cart.map((product) => (
-                    <SingleCart
-                      key={`${product._id}-${product.variant.productColor}-${product.variant.size}`} // Unique key
-                      data={product}
-                      setOpenCart={setOpenCart}
-                      quantityChangeHandler={() =>
-                        quantityChangeHandler(
-                          product._id,
-                          product.variant.productColor,
-                          product.variant.size,
-                          1 // Increase by 1
-                        )
-                      }
-                      removeFromCartHandler={() =>
-                        removeFromCartHandler(
-                          product._id,
-                          product.variant.productColor,
-                          product.variant.size
-                        )
-                      }
-                    />
-                  ))}
+                  cart.map((product) => {
+                    const isEvent =
+                      product.selectedColor && product.selectedSize;
+                    const color = isEvent
+                      ? product.selectedColor
+                      : product.variant?.productColor;
+                    const size = isEvent
+                      ? product.selectedSize
+                      : product.variant?.size;
+
+                    return (
+                      <SingleCart
+                        key={`${product._id}-${color}-${size}`}
+                        data={product}
+                        setOpenCart={setOpenCart}
+                        quantityChangeHandler={() =>
+                          quantityChangeHandler(product._id, color, size, 1)
+                        }
+                        removeFromCartHandler={() =>
+                          removeFromCartHandler(product)
+                        }
+                      />
+                    );
+                  })}
               </div>
             </section>
-           
+
             <div className="cart-horizontal-line"></div>
             <h2 className="cart-items-total-price">
               Total Price:{" "}
@@ -93,12 +127,12 @@ const Cart = ({ setOpenCart }) => {
             </h2>
             <hr />
 
-            {/* checkout buttons */}
-          <div className="cart-checkout-btn-container">
-          <Link to="/checkout">
-              <button className="checkout-now-btn">Checkout Now</button>
-            </Link>
-          </div>
+            {/* Checkout button */}
+            <div className="cart-checkout-btn-container">
+              <Link to="/checkout">
+                <button className="checkout-now-btn">Checkout Now</button>
+              </Link>
+            </div>
           </>
         )}
       </article>

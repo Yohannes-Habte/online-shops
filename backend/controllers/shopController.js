@@ -270,7 +270,15 @@ export const getShop = async (req, res, next) => {
     }
 
     // Fetch shop from database
-    const shop = await Shop.findById(shopId).lean(); // lean() returns a plain JS object, improving performance
+    const shop = await Shop.findById(shopId).populate([
+      { path: "categories", select: "categoryName categoryDescription" },
+      { path: "subCategories", select: "subcategoryName subcategoryDescription" },
+      { path: "brands", select: "brandName brandDescription" },
+      { path: "shopProducts", select: "title description" },
+      { path: "soldProducts", select: "title description" },
+      { path: "suppliers", select: "supplierName supplierDescription" },
+      { path: "orders", select: "orderedItems grandTotal orderStatus" },
+    ]).lean();
 
     // Check if shop exists
     if (!shop) {

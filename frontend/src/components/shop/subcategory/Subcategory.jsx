@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaTag, FaRegEdit } from "react-icons/fa";
 import { API } from "../../../utils/security/secreteKey";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Subcategory = () => {
   const { currentSeller } = useSelector((state) => state.seller);
@@ -63,11 +64,16 @@ const Subcategory = () => {
     };
 
     try {
+      let response;
       if (editId) {
         // Update subcategory
-        await axios.put(`${API}/subcategories/${editId}`, updateSubcategory, {
-          withCredentials: true,
-        });
+        response = await axios.put(
+          `${API}/subcategories/${editId}`,
+          updateSubcategory,
+          {
+            withCredentials: true,
+          }
+        );
         setSubcategories((prev) =>
           prev.map((sub) =>
             sub._id === editId ? { ...sub, ...updateSubcategory } : sub
@@ -76,7 +82,7 @@ const Subcategory = () => {
         setEditId(null);
       } else {
         // Add new subcategory
-        const response = await axios.post(
+        response = await axios.post(
           `${API}/subcategories/create`,
           newSubcategory,
           { withCredentials: true }
@@ -87,20 +93,28 @@ const Subcategory = () => {
       setSubcategoryName("");
       setSubcategoryDescription("");
       setCategoryId("");
+
+      toast.success(response.data.message);
     } catch (error) {
-      console.error("Error saving subcategory:", error);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(errorMessage);
     }
   };
 
   // Delete a subcategory
   const handleDelete = async (id) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete the ${subcategoryName} subcategory?`
+    );
+    if (!isConfirmed) return;
     try {
       await axios.delete(`${API}/subcategories/${id}`, {
         withCredentials: true,
       });
       setSubcategories((prev) => prev.filter((sub) => sub._id !== id));
     } catch (error) {
-      console.error("Error deleting subcategory:", error);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(errorMessage);
     }
   };
 

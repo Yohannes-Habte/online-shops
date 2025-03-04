@@ -81,7 +81,6 @@ const SingleProduct = () => {
   // ===========================================================================
 
   const addToWishlistHandler = () => {
-
     if (!selectedVariant || !selectedSize) {
       toast.error("Please select a color and size before adding to wishlist.");
       return;
@@ -103,20 +102,27 @@ const SingleProduct = () => {
     );
 
     if (isInWishlist) {
-      dispatch(removeFromWishlist(item._id));
+      dispatch(
+        removeFromWishlist({
+          productId: item._id,
+          productColor: item.variant.productColor,
+          size: item.variant.size,
+        })
+      );
       toast.info("Removed from wishlist");
     } else {
       dispatch(addToWishlist(item));
       toast.success("Added to wishlist");
     }
+    
   };
 
   // ===========================================================================
   // Remove from Wishlist Handler
   // ===========================================================================
-  const removeFromWishlistHandler = (id) => {
+  const removeFromWishlistHandler = (productId, productColor, size) => {
     setClickWishlist(!clickWishlist);
-    dispatch(removeFromWishlist(id));
+    dispatch(removeFromWishlist(productId, productColor, size));
   };
 
   // ===========================================================================
@@ -172,7 +178,7 @@ const SingleProduct = () => {
 
       try {
         const { data } = await axios.post(
-          `${API}/conversations/create-conversation`,
+          `${API}/conversations/create`,
           newConversation
         );
         navigate(`/inbox?${data.conversation._id}`);

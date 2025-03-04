@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaTag, FaRegEdit } from "react-icons/fa"; // Importing React Icons
 import { API } from "../../../utils/security/secreteKey";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const ProductCategory = () => {
   const { currentSeller } = useSelector((state) => state.seller);
@@ -73,13 +74,20 @@ const ProductCategory = () => {
 
   // Delete a category
   const handleDelete = async (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this category?"
+    );
+
+    if (!isConfirmed) return;
+
     try {
       await axios.delete(`${API}/categories/${id}`, {
         withCredentials: true,
       });
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
     } catch (error) {
-      console.error("Error deleting category:", error);
+      const errorMessage = error.response.data.message;
+      toast.error(errorMessage);
     }
   };
 

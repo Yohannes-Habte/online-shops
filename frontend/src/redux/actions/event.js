@@ -143,7 +143,7 @@ export const fetchAllEvents = () => async (dispatch) => {
   } catch (error) {
     const { message } = handleError(error);
     dispatch(fetchAllEventsFailure(message));
-    toast.error(message);
+    
   }
 };
 

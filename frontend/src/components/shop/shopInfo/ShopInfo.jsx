@@ -91,7 +91,7 @@ const ShopInfo = () => {
         <article className="shop-events-wrapper">
           {loading ? (
             <p className="loading">Loading events...</p>
-          ) : shopEvents?.length > 0 ? (
+          ) : shopEvents&& shopEvents?.length > 0 ? (
             <div className="shop-events">
               {shopEvents.map((event, index) => (
                 <EventCard data={event} key={event._id || index} />

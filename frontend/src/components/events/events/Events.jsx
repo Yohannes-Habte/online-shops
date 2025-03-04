@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import "./Events.scss";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearEventErrorsAction,
@@ -10,28 +9,32 @@ import EventCard from "../eventCart/EventCard";
 const Events = () => {
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.event);
+  const [hasFetched, setHasFetched] = useState(false); // 🆕 Added to track API call status
 
   useEffect(() => {
-    dispatch(clearEventErrorsAction());
-    dispatch(fetchAllEvents());
+    // Only fetch if we haven't already tried
+    if (!loading && !hasFetched) {
+      dispatch(fetchAllEvents());
+      setHasFetched(true); // Prevents further fetching
+    }
 
     return () => {
       if (error) {
         dispatch(clearEventErrorsAction());
       }
     };
-  }, [dispatch, error]);
+  }, [dispatch, loading, hasFetched]);
 
-  // Filter events to show only ongoing ones
-  const ongoingEvents =
-    events?.filter((event) => event.eventStatus === "ongoing") || [];
+  const ongoingEvents = Array.isArray(events)
+    ? events.filter((event) => event.eventStatus === "ongoing")
+    : [];
 
-  // Find the latest ongoing event based on createdAt timestamp
-  const latestOngoingEvent = ongoingEvents.length
-    ? ongoingEvents.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      )[0]
-    : null;
+  const latestOngoingEvent =
+    ongoingEvents.length > 0
+      ? [...ongoingEvents].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )[0]
+      : null;
 
   return (
     <section className="popular-events-wrapper">
@@ -41,7 +44,7 @@ const Events = () => {
         <p className="loading-message">Loading event...</p>
       ) : error ? (
         <p className="error-message">
-          Error loading event. Please try again later.
+          {error.message || "Error loading event. Please try again later."}
         </p>
       ) : latestOngoingEvent ? (
         <article className="event-cards-wrapper">

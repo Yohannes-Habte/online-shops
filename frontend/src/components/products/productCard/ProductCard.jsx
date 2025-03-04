@@ -27,6 +27,18 @@ const ProductCard = ({ product }) => {
     variants[0]?.productSizes[0]?.size // Default size for the first variant
   );
 
+  // handle change in color
+  const handleColorChange = (e) => {
+    const selected = variants.find(
+      (variant) => variant.productColor === e.target.value
+    );
+    setSelectedVariant(selected);
+    setSelectedSize(selected?.productSizes[0]?.size); // Reset size on color change
+  };
+
+  // handle change in size
+  const handleSizeChange = (e) => setSelectedSize(e.target.value);
+
   // Add to cart handler
   const addToCartHandler = () => {
     const isItemExists =
@@ -57,24 +69,24 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <section className={"product-card"}>
-      <figure className="image-container">
+    <section className={"product-card-container"}>
+      <figure className="product-cart-image-wrapper">
         <Link to={`/products/${product._id}`}>
           <img
             src={selectedVariant?.productImage}
             alt={title}
-            className="product-image"
+            className="product-cart-image"
           />
         </Link>
       </figure>
 
-      <div className="product-details">
+      <div className="product-details-wrapper">
         <h3 className="shop-name">{product?.shop?.name}</h3>
         <Link to={`/products/${product._id}`}>
           <h4 className="product-title">{ShortenText(title, 40)}</h4>
         </Link>
         <p className="product-description">{ShortenText(description, 100)}</p>
-        <div className="display-rating-flex-row">
+        <div className="product-rating-wrapper">
           Rating:
           <Ratings ratings={ratings?.average} />{" "}
           <span> ({ratings.average.toFixed(1)}/5) </span>
@@ -84,30 +96,33 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        <div className="product-price-sold-out-wrapper">
-          <div className="price-wrapper">
-            <span className="discount-price">
-              Price: <strong className="price">${discountPrice}</strong>
-            </span>
-            {originalPrice && originalPrice > discountPrice && (
-              <span className="original-price">${originalPrice}</span>
-            )}
-          </div>
-          <div className="sold-out-wrapper">Sold: {soldOut}</div>
+        <div className="product-price-sold-out-count-wrapper">
+          <Link to={`/products/${product._id}`}>
+            <div className="price-wrapper">
+              <span className="discount-price">
+                Price: <strong className="price">${discountPrice}</strong>
+              </span>
+              {originalPrice && originalPrice > discountPrice && (
+                <span className="original-price">${originalPrice}</span>
+              )}
+            </div>
+          </Link>
+          <Link to={`/products/${product._id}`}>
+            <p className="sold-out-count">
+              Sold: <strong style={{ color: "blue" }}>{soldOut}</strong>
+            </p>
+          </Link>
         </div>
 
         {/* Color Selector */}
-        <div className="variant-selector">
-          <label htmlFor="color-selector">Choose Color:</label>
+        <div className="variant-selector-wrapper">
+          <label htmlFor="color-selector" className="variant-select-label">
+            Choose Color:
+          </label>
           <select
             id="color-selector"
-            onChange={(e) => {
-              const selected = variants.find(
-                (variant) => variant.productColor === e.target.value
-              );
-              setSelectedVariant(selected);
-              setSelectedSize(selected?.productSizes[0]?.size); // Reset size on color change
-            }}
+            onChange={handleColorChange}
+            className="select-field-for-variant"
           >
             {variants.map((variant, index) => (
               <option key={index} value={variant.productColor}>
@@ -118,12 +133,20 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Size Selector */}
-        <div className="variant-selector">
-          <label htmlFor="size-selector">Choose Size:</label>
+        <div className="variant-selector-wrapper">
+          <label htmlFor="size-selector" className="variant-select-label">
+            Choose Size:
+          </label>
           <select
             id="size-selector"
-            onChange={(e) => setSelectedSize(e.target.value)}
-            className="select-size"
+            onChange={handleSizeChange}
+            className={`select-field-for-variant ${
+              selectedVariant?.productSizes?.find(
+                (product) => product.size === selectedSize
+              )?.stock < 1
+                ? "product-out-of-stock"
+                : ""
+            }`}
           >
             {selectedVariant?.productSizes?.map((sizeObj, index) => (
               <option
@@ -138,12 +161,7 @@ const ProductCard = ({ product }) => {
           </select>
         </div>
 
-        <button
-          className={`add-to-cart-btn ${
-            soldOut || !selectedSize ? "disabled" : ""
-          }`}
-          onClick={addToCartHandler}
-        >
+        <button className={`add-to-cart-btn `} onClick={addToCartHandler}>
           <AiOutlineShoppingCart /> Add to Cart
         </button>
       </div>

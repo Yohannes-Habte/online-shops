@@ -14,8 +14,9 @@
   }
 
   .proceed-payment {
-    @include button1;
+    @include button3;
     width: fit-content;
+    margin-top: 1rem;
   }
 }
 
@@ -33,8 +34,9 @@
     }
 
     .proceed-payment {
-      @include button1;
+      @include button3;
       width: fit-content;
+      margin-top: 2rem;
     }
   }
 }
@@ -53,8 +55,9 @@
     }
 
     .proceed-payment {
-      @include button1;
+      @include button3;
       width: fit-content;
+      margin-top: 2rem;
     }
   }
 }

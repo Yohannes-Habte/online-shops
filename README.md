@@ -60,7 +60,7 @@ supplier
 category
 subcategory
 
-## A seller can create a product his shop
+## A seller can create a product for his shop
 The shop owner has the mandate to create, update and delete his own products only
 The product has relationship with the shop, supplier, category, subcategory and brand
 Consider the following attributes:
@@ -79,7 +79,7 @@ ratings
 reviews
 variants
 
-## A seller can create an event his shop
+## A seller can create an event for his shop
 The shop owner has the mandate to create, update and delete his own events only
 The event has relationship with the shop, category, subcategory and brand.
 Consider the following attributes:
@@ -98,6 +98,30 @@ discountPrice
 stock
 images
 soldOut
+
+### Shop Relationship
+The shop has the following relationships with:
+1. categories
+2. subCategories
+3. brands
+4. shopProducts
+5. soldProducts
+6. suppliers
+7. orders
+When one of the above items will be deleted, it has to be deleted from shop as well
+### User Relationship
+The user has the following relationships with:
+1. myOrders
+2. comments
+
+When an order or a comment will be deleted, it has to be deleted user collection as well
+
+### Product Variant and Review
+1. When a product variant, such as productColor, productImage and ProductSizes are updated, it has to update the product
+2. When a product variant, such as ProductSizes' size or/and stock are updated, it has to update the product
+3. When a product variant will be deleted, it has to update the product
+4. When a product variant's productSizes will be deleted, it has to update the product
+5. When a product review will be deleted, it has to update the product
 
 ## Single Shop Detail information
 

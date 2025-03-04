@@ -9,7 +9,6 @@ const cartReducer = createSlice({
   initialState,
   reducers: {
     // Add to cart
-
     addToCart: (state, action) => {
       // The product that the user is trying to add to the cart by clicking the "Add to Cart" button
       const item = action.payload;
@@ -58,7 +57,6 @@ const cartReducer = createSlice({
       }
     },
 
-    
     // Remove from cart
     removeFromCart: (state, action) => {
       const item = action.payload;
@@ -76,6 +74,64 @@ const cartReducer = createSlice({
       };
     },
 
+    // Add Event to Cart
+    addEventToCart: (state, action) => {
+      const eventItem = action.payload;
+      const eventItemAddToCartShopId = eventItem.shop._id;
+
+      if (state.cart.length > 0) {
+        const currentCartEventItemShopId = state.cart[0].shop._id;
+
+        if (currentCartEventItemShopId !== eventItemAddToCartShopId) {
+          alert(
+            "For a single order, all items must be from the same shop. To purchase items from a different shop, please create a separate order. Consider saving items from the other shop to your wishlist for later purchase."
+          );
+          return state;
+        }
+      }
+
+      const existingEvent = state.cart.find(
+        (event) =>
+          event._id === eventItem._id &&
+          event.selectedColor === eventItem.selectedColor &&
+          event.selectedSize === eventItem.selectedSize
+      );
+
+      if (existingEvent) {
+        return {
+          ...state,
+          cart: state.cart.map((event) =>
+            event._id === existingEvent._id &&
+            event.selectedColor === existingEvent.selectedColor &&
+            event.selectedSize === existingEvent.selectedSize
+              ? eventItem
+              : event
+          ),
+        };
+      } else {
+        // If the event does not exist in the cart, add the event to the cart array
+        return {
+          ...state,
+          cart: [...state.cart, eventItem],
+        };
+      }
+    },
+
+    // Remove Event from Cart
+    removeEventFromCart: (state, action) => {
+      const { productId, productColor, size } = action.payload;
+
+      return {
+        ...state,
+        cart: state.cart.filter(
+          (event) =>
+            event._id !== productId ||
+            event.selectedColor !== productColor ||
+            event.selectedSize !== size
+        ),
+      };
+    },
+
     // Clear cart after placing an order
     clearFromCart: (state) => {
       return { ...state, cart: [] };
@@ -84,7 +140,13 @@ const cartReducer = createSlice({
 });
 
 // Destructure wishlist reducer methods
-export const { addToCart, removeFromCart, clearFromCart } = cartReducer.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  addEventToCart,
+  removeEventFromCart,
+  clearFromCart,
+} = cartReducer.actions;
 
 // export wishlist reducer
 export default cartReducer.reducer;

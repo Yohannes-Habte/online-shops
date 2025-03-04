@@ -11,7 +11,7 @@ export const createConversation = async (req, res, next) => {
     const foundConversation = await Conversation.findOne({ groupTitle });
 
     if (foundConversation) {
-      // This is used to avoid error when the group title is arleady exist
+      // This is used to avoid error when the group title is already exist
       const conversation = foundConversation;
       res.status(201).json({
         success: true,
