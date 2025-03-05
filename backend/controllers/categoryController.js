@@ -2,8 +2,12 @@ import Category from "../models/categoryModel.js";
 import createError from "http-errors";
 import Shop from "../models/shopModel.js";
 import mongoose from "mongoose";
+import Product from "../models/productModel.js";
+import Event from "../models/eventModel.js";
 
+// ========================================================================
 // Create a new category
+// ========================================================================
 export const createNewCategory = async (req, res, next) => {
   const { categoryName, categoryDescription, shopId } = req.body;
 
@@ -42,8 +46,17 @@ export const createNewCategory = async (req, res, next) => {
       return next(createError(404, "Shop not found"));
     }
 
-    shop.categories.push(newCategory._id);
-    await shop.save({ session });
+    // Update the shop's categories and approvedCategories arrays
+    await Shop.findByIdAndUpdate(
+      shopId,
+      {
+        $push: {
+          categories: newCategory._id,
+          approvedCategories: newCategory._id,
+        },
+      },
+      { new: true, session }
+    );
 
     // Commit transaction if everything is successful
     await session.commitTransaction();
@@ -62,7 +75,9 @@ export const createNewCategory = async (req, res, next) => {
   }
 };
 
+// ========================================================================
 // Get all categories
+// ========================================================================
 export const getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.find();
@@ -76,14 +91,22 @@ export const getAllCategories = async (req, res, next) => {
   }
 };
 
+// ========================================================================
 // Get a single category
+// ========================================================================
 export const getSingleCategory = async (req, res, next) => {
   const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    return next(createError(400, "Invalid category ID"));
+  }
+
   try {
     const category = await Category.findById(id);
     if (!category) {
       return next(createError(404, "Category not found"));
     }
+
     res.status(200).json({ success: true, category });
   } catch (error) {
     console.error("Error getting category:", error);
@@ -91,31 +114,11 @@ export const getSingleCategory = async (req, res, next) => {
   }
 };
 
+// ========================================================================
 // Update a category
+// ========================================================================
 export const updateCategory = async (req, res, next) => {
-  const { id } = req.params;
   const { categoryName, categoryDescription } = req.body;
-  try {
-    const category = await Category.findById(id);
-    if (!category) {
-      return next(createError(404, "Category not found"));
-    }
-    category.categoryName = categoryName;
-    category.categoryDescription = categoryDescription;
-    await category.save();
-    res.status(200).json({
-      success: true,
-      category,
-      message: "Category updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating category:", error);
-    return next(createError(500, "Something went wrong"));
-  }
-};
-
-// Delete a category
-export const deleteCategory = async (req, res, next) => {
   const { id } = req.params;
   const shopId = req.shop.id;
 
@@ -127,58 +130,193 @@ export const deleteCategory = async (req, res, next) => {
     return next(createError(400, "Invalid shop ID"));
   }
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  const transaction = await mongoose.startSession();
+  transaction.startTransaction();
 
   try {
-    const category = await Category.findById(id).session(session);
+    const category = await Category.findById(id).session(transaction);
     if (!category) {
-      await session.abortTransaction();
+      await transaction.abortTransaction();
+      transaction.endSession();
       return next(createError(404, "Category not found"));
     }
 
-    const shop = await Shop.findById(shopId).session(session);
-
+    // Find the shop by shopId
+    const shop = await Shop.findById(shopId).session(transaction);
     if (!shop) {
-      await session.abortTransaction();
+      await transaction.abortTransaction();
+      transaction.endSession();
       return next(createError(404, "Shop not found"));
     }
 
-    if (!shop.categories.includes(id)) {
-      await session.abortTransaction();
+    // Ensure the authenticated shop owns the category
+    if (category.shop.toString() !== shopId.toString()) {
+      await transaction.abortTransaction();
+      transaction.endSession();
+      return next(
+        createError(403, "Unauthorized: You can't update this category")
+      );
+    }
+
+    // Ensure the authenticated shop has the category in the approvedCategories array
+    if (!shop.approvedCategories.includes(id)) {
+      await transaction.abortTransaction();
+      transaction.endSession();
+      return next(
+        createError(403, "Unauthorized: You can't update this category")
+      );
+    }
+
+    // Update the category using findByIdAndUpdate
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      { categoryName, categoryDescription },
+      { new: true, runValidators: true, session: transaction }
+    );
+
+    // Update the category for all the shops that have this category
+    await Shop.updateMany(
+      { categories: id },
+      { $set: { "categories.$[elem]": new mongoose.Types.ObjectId(id) } },
+      {
+        arrayFilters: [{ elem: new mongoose.Types.ObjectId(id) }],
+        session: transaction,
+      }
+    );
+
+    // Update products with this category
+    await Product.updateMany(
+      { category: id },
+      { $set: { category: new mongoose.Types.ObjectId(id) } },
+      { session: transaction }
+    );
+
+    // Update events with this category
+    await Event.updateMany(
+      { category: id },
+      { $set: { category: new mongoose.Types.ObjectId(id) } },
+      { session: transaction }
+    );
+
+    // Commit the transaction if everything is successful
+    await transaction.commitTransaction();
+    transaction.endSession();
+
+    res.status(200).json({
+      success: true,
+      category: updatedCategory,
+      message: "Category updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return next(createError(500, "Something went wrong"));
+  }
+};
+
+// ========================================================================
+// Delete a category
+// ========================================================================
+export const deleteCategory = async (req, res, next) => {
+  const { id } = req.params;
+  const requestingShopId = req.shop.id;
+
+  if (!mongoose.isValidObjectId(id)) {
+    return next(createError(400, "Invalid category ID"));
+  }
+
+  if (!mongoose.isValidObjectId(requestingShopId)) {
+    return next(createError(400, "Invalid shop ID"));
+  }
+
+  const validSession = await mongoose.startSession();
+  validSession.startTransaction();
+
+  try {
+    const category = await Category.findById(id).session(validSession);
+    if (!category) {
+      await validSession.abortTransaction();
+      validSession.endSession();
+      return next(createError(404, "Category not found"));
+    }
+
+    const requestingShop = await Shop.findById(requestingShopId).session(
+      validSession
+    );
+
+    if (!requestingShop) {
+      await validSession.abortTransaction();
+      validSession.endSession();
+      return next(createError(404, "Shop not found"));
+    }
+
+    // Check if any shops are using this category
+    const shopsUsingCategory = await Shop.find({
+      categories: id,
+    }).session(validSession);
+
+    if (shopsUsingCategory.length === 0) {
+      await validSession.abortTransaction();
+      validSession.endSession();
+      return next(createError(404, "No shops found with this category"));
+    }
+
+    // Ensure all shops have approved deletion
+    const allShopsApproved = shopsUsingCategory.every((shop) =>
+      shop.approvedCategories.includes(id)
+    );
+
+    if (!allShopsApproved) {
+      await validSession.abortTransaction();
+      validSession.endSession();
+      return next(
+        createError(
+          403,
+          "Unauthorized: Not all shops have approved deletion. Please contact the shops using this category to approve deletion."
+        )
+      );
+    }
+
+    if (!requestingShop.categories.includes(id)) {
+      await validSession.abortTransaction();
+      validSession.endSession();
       return next(
         createError(403, "Unauthorized: You can't delete this category")
       );
     }
 
     // Ensure the authenticated shop owns the category
-    if (category.shop.toString() !== shopId.toString()) {
-      await session.abortTransaction();
+    if (category.shop.toString() !== requestingShopId.toString()) {
+      await validSession.abortTransaction();
+      validSession.endSession();
       return next(
         createError(403, "Unauthorized: You can't delete this category")
       );
     }
 
-    // Remove category reference from the shop
-    await Shop.findByIdAndUpdate(
-      shopId,
-      { $pull: { categories: id } },
-      { session }
+    // Cascade delete related products and events with this category
+    await Product.deleteMany({ category: id }, { session: validSession });
+    await Event.deleteMany({ category: id }, { session: validSession });
+
+    // Remove category from all shops
+    await Shop.updateMany(
+      { categories: id },
+      { $pull: { categories: id, approvedCategories: id } },
+      { session: validSession }
     );
 
     // Delete the category
-    await Category.deleteOne({ _id: id }, { session });
+    await Category.deleteOne({ _id: id }, { session: validSession });
 
-    await session.commitTransaction();
-    session.endSession();
+    await validSession.commitTransaction();
+    validSession.endSession();
 
     res
       .status(200)
       .json({ success: true, message: "Category deleted successfully" });
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     console.error("Error deleting category:", error);
+    await validSession.abortTransaction();
+    validSession.endSession();
     next(createError(500, "Something went wrong while deleting the category"));
   }
 };

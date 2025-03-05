@@ -15,8 +15,6 @@ const Subcategory = () => {
   const [categoryId, setCategoryId] = useState("");
   const [editId, setEditId] = useState(null);
 
-  console.log("subcategories", subcategories);
-
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -124,13 +122,19 @@ const Subcategory = () => {
     setSubcategoryName(subcategory?.subcategoryName);
     setSubcategoryDescription(subcategory?.subcategoryDescription);
     setCategoryId(subcategory?.category?._id);
+
+    // Scroll to the form
+    const formElement = document.getElementById("subcategory-form");
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
     <div className="container">
       <h1>Subcategories</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} id="subcategory-form">
         <div className="input-group">
           <label>Subcategory Name:</label>
           <div className="input-wrapper">

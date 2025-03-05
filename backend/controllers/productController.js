@@ -473,9 +473,10 @@ export const productReview = async (req, res, next) => {
       (sum, review) => sum + review.rating,
       0
     );
-    const averageRating = totalRatings / product.reviews.length;
-    const averageRatingFixed = averageRating.toFixed(1);
+
     const totalReviews = product.reviews.length;
+    const averageRating = totalRatings / totalReviews;
+    const averageRatingFixed = averageRating.toFixed(1);
 
     const updateRatings = {
       average: averageRatingFixed,

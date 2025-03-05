@@ -96,13 +96,23 @@ const ProductCategory = () => {
     setEditId(category?._id);
     setCategoryName(category?.categoryName);
     setCategoryDescription(category?.categoryDescription);
+
+    // Scroll to the form
+    const formElement = document.getElementById("category-form");
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
     <div className="container">
       <h1>Product Categories</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="category-form"
+        id="category-form"
+      >
         <div className="input-group">
           <label>Category Name:</label>
           <div className="input-wrapper">

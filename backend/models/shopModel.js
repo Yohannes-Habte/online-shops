@@ -53,6 +53,12 @@ const shopSchema = new Schema(
     forgotPasswordChangedAt: Date,
 
     passwordResetTokenExpires: Date,
+
+    approvedCategories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+
+    approvedSubcategories: [
+      { type: Schema.Types.ObjectId, ref: "Subcategory" },
+    ],
   },
   { timestamps: true }
 );

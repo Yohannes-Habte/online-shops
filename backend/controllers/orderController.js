@@ -141,6 +141,8 @@ export const createOrder = async (req, res, next) => {
     const calculatedGrandTotal =
       subtotalPrice + taxAmount + shippingFeeAmount - discountAmount;
 
+    const fixedGrandTotal = parseFloat(calculatedGrandTotal.toFixed(2));
+
     // Create the order
     const order = new Order({
       customer,
@@ -150,7 +152,7 @@ export const createOrder = async (req, res, next) => {
       subtotal: subtotalPrice,
       shippingFee: shippingFeeAmount,
       tax: taxAmount,
-      grandTotal: calculatedGrandTotal,
+      grandTotal: fixedGrandTotal,
       orderStatus: "Pending",
       statusHistory: [{ status: "Pending", changedAt: new Date() }], // History
     });
