@@ -22,8 +22,8 @@ productRouter.get(
   getProductsByCustomerCategory
 );
 productRouter.get("/:id", getProduct);
-productRouter.put("/:id", updateProduct);
-productRouter.delete("/:id", deleteProduct);
+productRouter.put("/:id", isSellerAuthenticated, updateProduct);
+productRouter.delete("/:id", isSellerAuthenticated, deleteProduct);
 productRouter.put("/product/review", isAuthenticated, productReview);
 
 // Export product Router

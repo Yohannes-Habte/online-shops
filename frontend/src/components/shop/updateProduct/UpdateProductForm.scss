@@ -1,0 +1,237 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Variables.scss";
+
+.update-product-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  .error-message {
+    color: #d9534f;
+    background: #f2dede;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .product-update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .form-input-container {
+      @include inputContainer;
+
+      .input-field-label {
+        font-weight: bold;
+        margin: 0.5rem 0 5px 0;
+        display: block;
+      }
+
+      .input-field {
+        @include inputField;
+
+        &:focus {
+          border-color: #007bff;
+          outline: none;
+        }
+      }
+    }
+
+    .variants-section-container {
+      margin-top: 20px;
+
+      .variants-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .single-variant-wrapper {
+        @include shadow1;
+        position: relative;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+
+        &:nth-child(odd) {
+          background: #f0f8ff; // Light blue
+        }
+
+        &:nth-child(even) {
+          background: #faebd7; // Antique white
+        }
+
+        .variant-input-container {
+          @include inputContainer;
+
+          .varian-input-field-label {
+            font-weight: bold;
+            margin: 0.5rem 0 5px 0;
+            display: block;
+          }
+
+          .variant-input-field {
+            @include inputField;
+            margin-bottom: 10px;
+
+            &:focus {
+              border-color: #007bff;
+              outline: none;
+            }
+          }
+
+          .variant-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 0.5rem;
+          }
+        }
+
+        .remove-variant-button {
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          padding: 0.3rem 0.5rem;
+          font-size: 14px;
+          background: #f1836f;
+          color: black;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+
+          &:hover {
+            background: $red;
+          }
+
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+        }
+
+        .product-sizes-section-container {
+          margin-top: 10px;
+
+          .product-size-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+          }
+
+          .single-product-size-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr 5rem;
+            column-gap: 1rem;
+            row-gap: 1rem;
+
+            .product-size-input-container {
+              .product-size-input-field-label {
+                flex: 1;
+              }
+
+              .product-size-input-field {
+                @include inputField;
+                padding: 0.3rem;
+              }
+            }
+
+            .product-size-stock-button-container {
+              display: flex;
+              justify-content: center;
+              margin-top: 1.6rem;
+
+              .remove-size-button {
+                padding: 0.3rem 0.5rem;
+                font-size: 14px;
+                background: #f1836f;
+                color: black;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+
+                &:hover {
+                  background: $red;
+                }
+
+                &:disabled {
+                  background: #ccc;
+                  cursor: not-allowed;
+                }
+              }
+            }
+          }
+
+          .add-size-button {
+            padding: 0.3rem 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 14px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+
+            &:hover {
+              background: #0056b3;
+            }
+
+            &:disabled {
+              background: #ccc;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+
+      .add-variant-btn {
+        padding: 12px;
+        font-size: 16px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+
+        &:hover {
+          background: #0056b3;
+        }
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .update-product-btn {
+      margin-top: 1rem;
+      padding: 12px;
+      font-size: 16px;
+      background: $green;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #0056b3;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

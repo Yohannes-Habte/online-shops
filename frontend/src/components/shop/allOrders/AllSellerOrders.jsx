@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
@@ -153,9 +153,22 @@ const AllSellerOrders = () => {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
           autoHeight
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
         />
       )}
     </div>

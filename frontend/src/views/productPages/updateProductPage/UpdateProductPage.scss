@@ -1,0 +1,10 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Variables.scss";
+
+.update-product-page {
+  .update-product-page-container {
+    .update-product-page-title {
+      @include title;
+    }
+  }
+}

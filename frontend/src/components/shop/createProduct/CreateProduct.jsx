@@ -18,7 +18,8 @@ import {
   cloud_URL,
   upload_preset,
 } from "../../../utils/security/secreteKey";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { createProduct } from "../../../redux/actions/product";
 
 const initialState = {
   title: "",
@@ -42,6 +43,7 @@ const initialState = {
 };
 
 const CreateProduct = () => {
+  const dispatch = useDispatch();
   const { currentSeller } = useSelector((state) => state.seller);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -50,6 +52,7 @@ const CreateProduct = () => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  console.log("Product Image File:", formData.variants[0].productImage);
 
   // Fetch required data on mount
   useEffect(() => {
@@ -95,9 +98,9 @@ const CreateProduct = () => {
       variants: [
         ...prev.variants,
         {
+          productImage: null,
           productColor: "",
           productSizes: [{ size: "", stock: "" }],
-          productImage: null,
         },
       ],
     }));
@@ -178,10 +181,7 @@ const CreateProduct = () => {
         variants: variantImages,
       };
 
-      const response = await axios.post(`${API}/products/create`, newProduct, {
-        withCredentials: true,
-      });
-      toast.success(response.data.message);
+      dispatch(createProduct(newProduct));
       setFormData(initialState);
     } catch (error) {
       console.error("Error creating product:", error);
@@ -424,7 +424,24 @@ const CreateProduct = () => {
         <fieldset className="variants-fieldset">
           <legend className="variants-legend">Variants</legend>
           {formData.variants.map((variant, variantIndex) => (
-            <div className="variant-group" key={variantIndex}>
+            <div
+              className="single-create-product-variant-wrapper"
+              key={variantIndex}
+            >
+              {/* Product Image */}
+              <div className="image-input-container">
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleVariantChange(
+                      variantIndex,
+                      "productImage",
+                      e.target.files[0]
+                    )
+                  }
+                  className="image-input"
+                />
+              </div>
               {/* Product Color */}
               <div className="color-input-container">
                 <input
@@ -440,10 +457,16 @@ const CreateProduct = () => {
                   }
                   className="color-input"
                 />
+                {variant.productImage && (
+                  <img
+                    src={URL.createObjectURL(variant.productImage)}
+                    alt="Preview"
+                  />
+                )}
               </div>
               {/* Sizes */}
               {variant.productSizes.map((size, sizeIndex) => (
-                <div className="size-group" key={sizeIndex}>
+                <div className="single-product-size-wrapper" key={sizeIndex}>
                   <input
                     type="text"
                     placeholder="Size"
@@ -475,12 +498,13 @@ const CreateProduct = () => {
                   <button
                     type="button"
                     onClick={() => removeSize(variantIndex, sizeIndex)}
-                    className="remove-size"
+                    className="remove-product-size-btn"
                   >
                     Remove Size
                   </button>
                 </div>
               ))}
+
               <button
                 type="button"
                 onClick={() => addSize(variantIndex)}
@@ -488,20 +512,7 @@ const CreateProduct = () => {
               >
                 Add Size
               </button>
-              {/* Product Image */}
-              <div className="image-input-container">
-                <input
-                  type="file"
-                  onChange={(e) =>
-                    handleVariantChange(
-                      variantIndex,
-                      "productImage",
-                      e.target.files[0]
-                    )
-                  }
-                  className="image-input"
-                />
-              </div>
+
               <button
                 type="button"
                 onClick={() => removeVariant(variantIndex)}

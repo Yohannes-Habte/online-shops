@@ -1,3 +1,6 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Variables.scss";
+
 .create-product {
   max-width: 800px;
   margin: 0 auto;
@@ -88,11 +91,22 @@
       color: #333;
     }
 
-    .variant-group {
+    .single-create-product-variant-wrapper {
+      @include shadow1;
+      position: relative;
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       margin-bottom: 1rem;
+      padding: 3rem 1rem 1rem 1rem;
+
+      &:nth-child(odd) {
+        background: #f0f8ff; // Light blue
+      }
+
+      &:nth-child(even) {
+        background: #faebd7; // Antique white
+      }
 
       .color-input-container {
         width: 100%;
@@ -111,13 +125,16 @@
         }
       }
 
-      .size-group {
+      .single-product-size-wrapper {
         display: flex;
+        flex-direction: row;
         gap: 0.5rem;
       }
 
-      .remove-size,
       .remove-variant {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
         background-color: #e74c3c;
         color: white;
         border: none;
@@ -144,6 +161,21 @@
 
         &:hover {
           background-color: #27ae60;
+        }
+      }
+
+      .remove-product-size-btn {
+        background-color: #f3897d;
+        color: black;
+        border: none;
+        padding: 5px 10px;
+        font-size: $sfs;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #c0392b;
         }
       }
 

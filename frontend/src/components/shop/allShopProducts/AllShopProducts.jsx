@@ -3,7 +3,7 @@ import "./AllShopProducts.scss";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { toast } from "react-toastify";
 import moment from "moment";
 import {
@@ -11,6 +11,7 @@ import {
   fetchProductsByShop,
 } from "../../../redux/actions/product";
 import { clearProductErrors } from "../../../redux/reducers/productReducer";
+import { MdEditSquare } from "react-icons/md";
 
 const AllShopProducts = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,6 @@ const AllShopProducts = () => {
   const handleProductDelete = useCallback(
     async (productId) => {
       if (!productId) {
-        console.error("Invalid product ID:", productId);
         toast.error("Invalid product ID.");
         return;
       }
@@ -72,16 +72,36 @@ const AllShopProducts = () => {
       minWidth: 180,
       flex: 0.8,
       valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
+      cellClassName: "left-center",
     },
-    { field: "id", headerName: "Product ID", minWidth: 150, flex: 0.7 },
-    { field: "title", headerName: "Name", minWidth: 180, flex: 1.4 },
-    { field: "price", headerName: "Price", minWidth: 100, flex: 0.6 },
+    {
+      field: "id",
+      headerName: "Product ID",
+      minWidth: 150,
+      flex: 0.7,
+      cellClassName: "left-center",
+    },
+    {
+      field: "title",
+      headerName: "Name",
+      minWidth: 180,
+      flex: 1.4,
+      cellClassName: "left-center",
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      minWidth: 100,
+      flex: 0.6,
+      cellClassName: "left-center",
+    },
     {
       field: "stock",
       headerName: "Stock",
       type: "number",
       minWidth: 80,
       flex: 0.5,
+      cellClassName: "left-center",
     },
     {
       field: "soldOut",
@@ -89,6 +109,7 @@ const AllShopProducts = () => {
       type: "number",
       minWidth: 130,
       flex: 0.6,
+      cellClassName: "left-center",
     },
     {
       field: "Preview",
@@ -96,9 +117,24 @@ const AllShopProducts = () => {
       minWidth: 100,
       flex: 0.8,
       sortable: false,
+      cellClassName: "middle-center",
       renderCell: (params) => (
-        <Link to={`/products/${params.row.id}`} className="product-icon-btn">
-          <AiOutlineEye size={20} />
+        <Link to={`/products/${params.row.id}`} className="product-view-icon-wrapper">
+          <AiOutlineEye className="product-view-icon" />
+        </Link>
+      ),
+    },
+
+    {
+      field: "Edit",
+      headerName: "Edit",
+      minWidth: 100,
+      flex: 0.8,
+      sortable: false,
+      cellClassName: "middle-center",
+      renderCell: (params) => (
+        <Link to={`/products/update/${params.row.id}`} className="product-view-icon-wrapper">
+          <MdEditSquare className="product-edit-icon" />
         </Link>
       ),
     },
@@ -111,11 +147,12 @@ const AllShopProducts = () => {
       renderCell: (params) => (
         <button
           onClick={() => handleProductDelete(params.row.id)}
-          className="delete-icon-btn"
+          className="product-delete-icon-wrapper"
         >
-          <AiOutlineDelete size={20} />
+          <AiOutlineDelete className="product-delete-icon" />
         </button>
       ),
+      cellClassName: "middle-center",
     },
   ];
 
@@ -154,9 +191,22 @@ const AllShopProducts = () => {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
           autoHeight
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
         />
       ) : (
         <p>No products found.</p>

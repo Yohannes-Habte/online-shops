@@ -56,6 +56,7 @@ import {
   AdminDashboardWithdraws,
 } from "./routes/admin/AdminRoutes";
 import SupplierPage from "./views/supplierPage/SupplierPage";
+import UpdateProductPage from "./views/productPages/updateProductPage/UpdateProductPage";
 
 
 const App = () => {
@@ -106,6 +107,7 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productID" element={<SingleProduct />} />
+        <Route path="/products/update/:id" element={<UpdateProductPage />} />
         <Route path="/suppliers/:id" element={<SupplierPage />} />
         <Route path="/women" element={<WomenProductsPage />} />
         <Route path="/men" element={<MenProductsPage />} />

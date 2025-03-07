@@ -1,5 +1,39 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.left-center {
+  display: flex;
+  align-items: center;
+}
+
+.middle-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+}
+
+.product-view-icon-wrapper {
+  .product-view-icon {
+    font-size: $afs;
+    color: $blue;
+
+    &:hover {
+      color: $green;
+    }
+  }
+}
+
+.product-delete-icon-wrapper {
+  .product-delete-icon {
+    font-size: $afs;
+    color: $red;
+
+    &:hover {
+      color: $tomato;
+    }
+  }
+}
 
 .all-shop-products-wrapper {
   @include mobileDashboardScreen;

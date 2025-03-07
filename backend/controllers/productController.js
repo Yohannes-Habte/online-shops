@@ -30,6 +30,8 @@ export const createProduct = async (req, res, next) => {
     variants,
   } = req.body;
 
+  console.log("req.body", req.body);
+
   // Validate the shop ID
   if (!mongoose.isValidObjectId(shopId)) {
     return next(createError(400, "Invalid shop ID provided."));
@@ -296,53 +298,220 @@ export const getProduct = async (req, res, next) => {
 // Update Single Product
 //==============================================================================
 
+//==============================================================================
+// Update Product
+//==============================================================================
 export const updateProduct = async (req, res, next) => {
-  const { id } = req.params;
   const {
     title,
     description,
-    shop,
-    supplier,
-    category,
-    brand,
+    originalPrice,
+    discountPrice,
+    customerCategory,
     tags,
     status,
-    stock,
-    soldOut,
     variants,
   } = req.body;
 
-  try {
-    const product = await Product.findById(id);
+  const { id } = req.params;
+  const shopId = req.shop.id;
 
-    if (!product) {
-      return next(createError(404, "Product not found"));
+  try {
+    // Validate ObjectIds
+    const objectIds = { id, shopId };
+    for (const [key, value] of Object.entries(objectIds)) {
+      if (!mongoose.Types.ObjectId.isValid(value)) {
+        return next(createError(400, `Invalid ${key} ID provided.`));
+      }
     }
 
-    // Update the product fields
-    product.title = title || product.title;
-    product.description = description || product.description;
-    product.shop = shop || product.shop;
-    product.supplier = supplier || product.supplier;
-    product.category = category || product.category;
-    product.brand = brand || product.brand;
-    product.tags = tags || product.tags;
-    product.status = status || product.status;
-    product.stock = stock || product.stock;
-    product.soldOut = soldOut || product.soldOut;
-    product.variants = variants || product.variants;
+    // Start transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    // Save the updated product
-    await product.save();
+    try {
+      // Find the product within the transaction
+      const product = await Product.findById(id).session(session);
+      if (!product) {
+        await session.abortTransaction();
+        return next(createError(404, "Product not found"));
+      }
 
-    res.status(200).json({
-      success: true,
-      product,
-      message: "Product updated successfully",
-    });
+      // Ensure the product belongs to the shop
+      if (!product.shop.equals(shopId)) {
+        await session.abortTransaction();
+        return next(
+          createError(403, "Unauthorized: Product does not belong to this shop")
+        );
+      }
+
+      // Ensure the shop exists
+      const shopExists = await Shop.findById(shopId).session(session);
+      if (!shopExists) {
+        await session.abortTransaction();
+        return next(createError(404, "Shop not found"));
+      }
+
+      // Ensure discountPrice is not greater than originalPrice
+      if (discountPrice && discountPrice > originalPrice) {
+        await session.abortTransaction();
+        return next(
+          createError(
+            400,
+            "Discount price cannot be greater than the original price"
+          )
+        );
+      }
+
+      // Create an array to hold the updated variants
+      const updatedVariants = [];
+
+      // Process existing variants (updating productColor, productImage, productSizes)
+      product.variants.forEach((variant) => {
+        const updatedVariantData = variants.find(
+          (product) => product.productColor === variant.productColor
+        );
+
+        // If the variant exists in the new variants, update it
+        if (updatedVariantData) {
+          // Update variant fields
+          variant.productImage = updatedVariantData.productImage;
+          variant.productColor = updatedVariantData.productColor;
+
+          // Update existing product sizes or add new ones
+          updatedVariantData.productSizes.forEach((updatedSize) => {
+            const existingProductSize = variant.productSizes.find(
+              (productSize) => productSize.size === updatedSize.size
+            );
+
+            if (existingProductSize) {
+              // Update stock for the existing size
+              existingProductSize.size = updatedSize.size;
+              existingProductSize.stock = updatedSize.stock;
+            } else {
+              // Add new product size if it does not exist
+              variant.productSizes.push(updatedSize);
+            }
+          });
+
+          // Remove productSizes that are no longer in the request
+          variant.productSizes = variant.productSizes.filter((productSize) =>
+            updatedVariantData.productSizes.some(
+              (updatedSize) => updatedSize.size === productSize.size
+            )
+          );
+
+          // Push the updated variant to the array
+          updatedVariants.push(variant);
+        }
+      });
+
+      // Handle new variants that need to be added
+      variants.forEach((updatedVariantData) => {
+        const variantExists = product.variants.some(
+          (variant) => variant.productColor === updatedVariantData.productColor
+        );
+
+        // If the variant doesn't exist, add it
+        if (!variantExists) {
+          updatedVariants.push(updatedVariantData);
+        }
+      });
+
+      // Remove variants from the product that are not in the updated variants
+      // const variantsToDelete = product.variants.filter(
+      //   (variant) =>
+      //     !updatedVariants.some(
+      //       (updatedVariant) =>
+      //         updatedVariant.productColor === variant.productColor
+      //     )
+      // );
+
+      // // Delete variants that should be removed
+      // await Product.updateOne(
+      //   { _id: id },
+      //   {
+      //     $pull: {
+      //       variants: {
+      //         productColor: {
+      //           $in: variantsToDelete.map((v) => v.productColor),
+      //         },
+      //       },
+      //     },
+      //   },
+      //   { session }
+      // );
+
+      const variantsToDelete = product.variants.filter(
+        (variant) =>
+          !updatedVariants.some(
+            (updatedVariant) =>
+              updatedVariant.productColor === variant.productColor &&
+              updatedVariant.productSizes.every((updatedSize) =>
+                variant.productSizes.some(
+                  (variantSize) => variantSize.size === updatedSize.size
+                )
+              )
+          )
+      );
+
+      // Only perform the update to remove variants if variantsToDelete is not empty
+      if (variantsToDelete.length > 0) {
+        await Product.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              variants: {
+                $or: variantsToDelete.map((v) => ({
+                  productColor: v.productColor,
+                  productSizes: { $ne: v.productSizes },
+                })),
+              },
+            },
+          },
+          { session }
+        );
+      }
+
+      // Update the product in the database with the updated details and variants
+      const updatedProductDetails = await Product.findByIdAndUpdate(
+        id,
+        {
+          title,
+          description,
+          originalPrice,
+          discountPrice,
+          customerCategory,
+          tags,
+          status,
+          variants: updatedVariants, // Use the updated variants array
+        },
+        { new: true, runValidators: true, session }
+      );
+
+      if (!updatedProductDetails) {
+        await session.abortTransaction();
+        return next(createError(500, "Failed to update product"));
+      }
+
+      // Commit transaction
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(200).json({
+        success: true,
+        product: updatedProductDetails,
+        message: "Product updated successfully",
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.error("Transaction error:", error);
+      return next(createError(500, "Something went wrong during update"));
+    }
   } catch (error) {
-    console.error("Error updating product:", error);
-    return next(createError(500, "Something went wrong"));
+    console.error("Update product error:", error);
+    return next(createError(500, "Internal server error"));
   }
 };
 
@@ -352,20 +521,60 @@ export const updateProduct = async (req, res, next) => {
 
 export const deleteProduct = async (req, res, next) => {
   const { id } = req.params;
+  const shopId = req.shop.id;
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID provided."));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(createError(400, "Invalid product ID provided."));
+  }
+
+  const smoothTransaction = await mongoose.startSession();
+  smoothTransaction.startTransaction();
 
   try {
-    const product = await Product.findByIdAndDelete(id);
-
+    // Check if the product exists and belongs to the shop
+    const product = await Product.findById(id).session(smoothTransaction);
     if (!product) {
-      return next(createError(404, "Product not found"));
+      await smoothTransaction.abortTransaction();
+      smoothTransaction.endSession();
+      return next(createError(404, "Product not found."));
     }
+
+    // Check if the shop exists
+    const shop = await Shop.findById(shopId).session(smoothTransaction);
+    if (!shop) {
+      await smoothTransaction.abortTransaction();
+      smoothTransaction.endSession();
+      return next(createError(404, "Shop not found."));
+    }
+
+    // Remove product from shop's shopProducts array
+    await Shop.updateOne(
+      { _id: shopId },
+      { $pull: { shopProducts: id } },
+      { session: smoothTransaction }
+    );
+
+    // Delete the product
+    await Product.deleteOne({ _id: id }).session(smoothTransaction);
+
+    // Commit transaction
+    await smoothTransaction.commitTransaction();
+    smoothTransaction.endSession();
 
     res
       .status(200)
       .json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
+    await smoothTransaction.abortTransaction();
+    smoothTransaction.endSession();
     console.error("Error deleting product:", error);
-    return next(createError(500, "Something went wrong"));
+    return next(
+      createError(500, "Something went wrong while deleting the product.")
+    );
   }
 };
 

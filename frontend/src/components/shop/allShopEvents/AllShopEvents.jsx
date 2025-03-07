@@ -3,7 +3,7 @@ import "./AllShopEvents.scss";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import {
   clearEventErrorsAction,
   deleteEvent,
@@ -45,7 +45,7 @@ const AllShopEvents = () => {
 
   const columns = [
     { field: "eventCode", headerName: "Event Code", minWidth: 400, flex: 0.8 },
-    { field: "eventName", headerName: "Event Name", minWidth: 400, flex: 1.2 },
+    { field: "title", headerName: "Event Name", minWidth: 400, flex: 1.2 },
     {
       field: "originalPrice",
       headerName: "Original Price",
@@ -124,7 +124,7 @@ const AllShopEvents = () => {
     shopEvents?.map((event) => ({
       id: event._id,
       eventCode: event.eventCode,
-      eventName: event.eventName,
+      title: event.title,
       originalPrice: `$ ${event.originalPrice}`,
       discountPrice: `$ ${event.discountPrice}`,
       stock: event.stock,
@@ -144,12 +144,25 @@ const AllShopEvents = () => {
         <p className="error-message">Error fetching events: {error}</p>
       ) : (
         <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
-          autoHeight
-        />
+        rows={rows}
+        columns={columns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 10 },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            quickFilterProps: { debounceMs: 500 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        disableRowSelectionOnClick
+      />
       )}
     </section>
   );

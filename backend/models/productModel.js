@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 
 // Variant schema for product options
 const variantSchema = new Schema({
+  productImage: { type: String, required: true },
   productColor: { type: String, required: true },
   productSizes: [
     {
@@ -14,7 +15,6 @@ const variantSchema = new Schema({
       stock: { type: Number, required: true, min: 0 }, // Stock for this specific size
     },
   ],
-  productImage: { type: String, required: true },
 });
 
 // Product review schema
