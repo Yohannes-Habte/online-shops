@@ -1,9 +1,8 @@
 @import '../../../styles/Variables.scss';
 @import '../../../styles/Mixins.scss';
 
-// Mobile screen
+
 .user-inbox-wrapper {
-  // Message sender header
   .message-header-wrapper {
     display: flex;
     flex-direction: row;

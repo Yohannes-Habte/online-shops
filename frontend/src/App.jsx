@@ -3,7 +3,6 @@ import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Home from "./views/homePage/Home";
 import Contact from "./views/contactPage/Contact";
 import NotFound from "./views/notFound/NotFound";
 import ResetPassword from "./views/userPages/passwordPage/ResetPassword";
@@ -30,7 +29,6 @@ import {
   PaymentPage,
   OrderSuccess,
   TrackOrderPage,
-  UserInboxPage,
   UserOrderDetailsPage,
 } from "./routes/user/UserRoutes";
 
@@ -57,7 +55,7 @@ import {
 } from "./routes/admin/AdminRoutes";
 import SupplierPage from "./views/supplierPage/SupplierPage";
 import UpdateProductPage from "./views/productPages/updateProductPage/UpdateProductPage";
-
+import HomePage from "./views/homePage/HomePage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -103,7 +101,7 @@ const App = () => {
       )}
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productID" element={<SingleProduct />} />
@@ -151,15 +149,6 @@ const App = () => {
           element={
             <UserProtectedRoute>
               <TrackOrderPage />
-            </UserProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/inbox"
-          element={
-            <UserProtectedRoute>
-              <UserInboxPage />
             </UserProtectedRoute>
           }
         />

@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 import "./AllShopProducts.scss";
-import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
+import { AiOutlineEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -12,6 +12,7 @@ import {
 } from "../../../redux/actions/product";
 import { clearProductErrors } from "../../../redux/reducers/productReducer";
 import { MdEditSquare } from "react-icons/md";
+import { FaTrash } from "react-icons/fa";
 
 const AllShopProducts = () => {
   const dispatch = useDispatch();
@@ -36,7 +37,7 @@ const AllShopProducts = () => {
   console.log("shopProducts", shopProducts);
 
   // ======================================================================
-  // ✅ Handle product deletion
+  // Handle product deletion
   // ======================================================================
   const handleProductDelete = useCallback(
     async (productId) => {
@@ -45,19 +46,24 @@ const AllShopProducts = () => {
         return;
       }
 
-      const isConfirmed = window.confirm(
+      // First confirmation prompt
+      const firstConfirmation = window.confirm(
         "Are you sure you want to delete this product?"
       );
-      if (!isConfirmed) return;
+      if (!firstConfirmation) return;
+
+      // Final confirmation prompt
+      const secondConfirmation = window.confirm(
+        "This action is irreversible. Do you still wish to proceed with deletion?"
+      );
+      if (!secondConfirmation) return;
 
       try {
         await dispatch(deleteProductFromAll(productId));
-        toast.success("Product deleted successfully!");
 
         // Refresh product list
         dispatch(fetchProductsByShop());
       } catch (error) {
-        console.error("Error deleting product:", error);
         toast.error("Failed to delete product. Please try again.");
       }
     },
@@ -114,12 +120,15 @@ const AllShopProducts = () => {
     {
       field: "Preview",
       headerName: "Preview",
-      minWidth: 100,
+      minWidth: 80,
       flex: 0.8,
+      headerAlign: "center",
       sortable: false,
-      cellClassName: "middle-center",
       renderCell: (params) => (
-        <Link to={`/products/${params.row.id}`} className="product-view-icon-wrapper">
+        <Link
+          to={`/products/${params.row.id}`}
+          className="products-table-icon-wrapper"
+        >
           <AiOutlineEye className="product-view-icon" />
         </Link>
       ),
@@ -128,12 +137,15 @@ const AllShopProducts = () => {
     {
       field: "Edit",
       headerName: "Edit",
-      minWidth: 100,
+      minWidth: 80,
       flex: 0.8,
+      headerAlign: "center",
       sortable: false,
-      cellClassName: "middle-center",
       renderCell: (params) => (
-        <Link to={`/products/update/${params.row.id}`} className="product-view-icon-wrapper">
+        <Link
+          to={`/products/update/${params.row.id}`}
+          className="products-table-icon-wrapper"
+        >
           <MdEditSquare className="product-edit-icon" />
         </Link>
       ),
@@ -141,18 +153,18 @@ const AllShopProducts = () => {
     {
       field: "Delete",
       headerName: "Delete",
-      minWidth: 120,
+      minWidth: 80,
       flex: 0.8,
+      headerAlign: "left",
       sortable: false,
       renderCell: (params) => (
         <button
           onClick={() => handleProductDelete(params.row.id)}
-          className="product-delete-icon-wrapper"
+          className="products-table-icon-wrapper"
         >
-          <AiOutlineDelete className="product-delete-icon" />
+          <FaTrash className="product-delete-icon" />
         </button>
       ),
-      cellClassName: "middle-center",
     },
   ];
 

@@ -1,6 +1,10 @@
-import React from 'react';
-import { AiOutlineArrowRight, AiOutlineSend } from 'react-icons/ai';
-import { TfiGallery } from 'react-icons/tfi';
+import "./SellerInbox.scss";
+import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
+import { IoIosAttach } from "react-icons/io";
+import { format } from "timeago.js";
+import { IoCall } from "react-icons/io5";
+import { LiaSearchSolid } from "react-icons/lia";
+import { IoMdVideocam } from "react-icons/io";
 
 const SellerInbox = ({
   setOpen,
@@ -8,83 +12,112 @@ const SellerInbox = ({
   setNewMessage,
   sendMessageHandler,
   messages,
-  sellerId,
-  userData,
+  messageSenderId,
+  sellerData,
   activeStatus,
   scrollRef,
   handleImageUpload,
 }) => {
+  console.log("Seller Data:", sellerData);
+ 
   return (
-    <div className="seller-message-wrapper">
-      {/* message header */}
-      <article className="message-header">
-        <figure className="image-container">
-          <img src={`${userData?.avatar?.url}`} alt="" className="image" />
-          <h1>{activeStatus ? 'Active Now' : ''}</h1>
-        </figure>
-        <h2 className="subTitle">{userData?.name}</h2>
-        <AiOutlineArrowRight
-          className="message-icon"
-          onClick={() => setOpen(false)}
-        />
+    <div className="user-inbox-wrapper">
+      {/* Message sender header */}
+      <article className="message-header-wrapper">
+        <div className="user-left-box">
+          <figure className="image-container">
+            <img
+              src={sellerData?.LogoImage}
+              alt={sellerData?.name}
+              className="image"
+            />
+          </figure>
+          <aside className="user-name-and-status">
+            <h3 className="user-name"> {sellerData?.name} </h3>
+            <p className="status">
+              {activeStatus ? "Active Now" : "not-active-status"}
+            </p>
+          </aside>
+
+          <AiOutlineArrowRight
+            size={20}
+            className="cursor-pointer"
+            onClick={() => setOpen(false)}
+          />
+        </div>
+
+        <div className="right-box">
+          <IoMdVideocam className="header-icon" />
+          <IoCall className="header-icon" />
+          <LiaSearchSolid className="header-icon" />
+        </div>
       </article>
 
-      {/* messages */}
-      <div className="messages-wrapper">
+      {/* List of Messages */}
+      <div className="message-wrapper">
         {messages &&
-          messages.map((item, index) => (
-            <div
-              className={` ${
-                item.sender === sellerId ? 'justify-end' : 'justify-start'
-              }`}
-              ref={scrollRef}
-            >
-              {item.sender !== sellerId && (
-                <img
-                  src={`${userData?.avatar?.url}`}
-                  className="image"
-                  alt=""
-                />
-              )}
-              {item.images && (
-                <img src={`${item.images?.url}`} className="images" />
-              )}
-              {item.text !== '' && (
-                <div>
-                  <div
-                    className={` ${
-                      item.sender === sellerId ? 'active' : 'passive'
-                    } `}
-                  >
-                    <p>{item.text}</p>
-                  </div>
+          messages.map((message) => {
+            return (
+              <section
+                key={message._id}
+                className={
+                  message.sender === messageSenderId
+                    ? "justify-end"
+                    : "justify-start"
+                }
+                ref={scrollRef}
+              >
+                {message?.sender !== messageSenderId && (
+                  <figure className="image-container">
+                    <img
+                      src={sellerData?.LogoImage}
+                      alt={sellerData?.name}
+                      className="image"
+                    />
+                  </figure>
+                )}
 
-                  <p className="createdAt">{/* {format(item.createdAt)} */}</p>
-                </div>
-              )}
-            </div>
-          ))}
+                {/* {message.images && (
+                  <figure className="image-container">
+                    <img src={`${message?.images}`} className="image" />
+                  </figure>
+                )} */}
+
+                {message.textMessage !== "" && (
+                  <article className="text-message-wrapper">
+                    <div
+                      className={
+                        message.sender === messageSenderId ? "active" : "passive"
+                      }
+                    />
+
+                    <h5 className="createdAt">{format(message.createdAt)}</h5>
+                    <p className="text">{message.textMessage}</p>
+                  </article>
+                )}
+              </section>
+            );
+          })}
       </div>
 
-      {/* send message input */}
-      <form
-        aria-required={true}
-        className="p-3 relative w-full flex justify-between items-center"
-        onSubmit={sendMessageHandler}
-      >
-        <div className="w-[30px]">
+      {/* Sending message form */}
+      <form className="chat-form" onSubmit={sendMessageHandler}>
+        <div className="file-container">
           <input
             type="file"
-            name=""
-            id="image"
-            className="hidden"
+            name="images"
+            id="images"
             onChange={handleImageUpload}
+            className="upload-image"
           />
-          <label htmlFor="image">
-            <TfiGallery className="message-icon" />
+
+          <label htmlFor="images" className="file-label">
+            <IoIosAttach title="Upload Images" className="icon" />
           </label>
+          <span className="input-highlight"></span>
         </div>
-        <div className="w-full">
+
+        <div className="input-container">
           <input
             type="text"
             required
@@ -93,13 +126,15 @@ const SellerInbox = ({
             onChange={(e) => setNewMessage(e.target.value)}
             className="input-field"
           />
-          <input type="submit" value="Send" className="hidden" id="send" />
-          <label htmlFor="send">
+
+          <label htmlFor="newMessage" className="input-label">
             <AiOutlineSend
-              size={20}
-              className="absolute right-4 top-5 cursor-pointer"
+              onClick={sendMessageHandler}
+              title="Send message"
+              className="icon"
             />
           </label>
+          <span className="input-highlight"></span>
         </div>
       </form>
     </div>

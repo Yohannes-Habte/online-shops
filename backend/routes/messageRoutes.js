@@ -8,8 +8,8 @@ import {
 const messageRouter = express.Router();
 
 // message routes
-messageRouter.post('/create-message', createMessage);
-messageRouter.get('/sender-messages/:id', getAllSenderMessages);
+messageRouter.post('/create-new-message', createMessage);
+messageRouter.get('/get-all-messages/:id', getAllSenderMessages);
 
 // Export message Router
 export default messageRouter;

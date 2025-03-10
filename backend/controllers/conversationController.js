@@ -21,6 +21,7 @@ export const createConversation = async (req, res, next) => {
       const conversation = await Conversation.create({
         members: [userId, sellerId],
         groupTitle: groupTitle,
+        messageSenderId: userId,
       });
 
       res.status(201).json({ success: true, conversation });

@@ -6,14 +6,12 @@
   align-items: center;
 }
 
-.middle-center {
+.products-table-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 1rem;
-}
+  height: 100%;
 
-.product-view-icon-wrapper {
   .product-view-icon {
     font-size: $afs;
     color: $blue;
@@ -22,15 +20,22 @@
       color: $green;
     }
   }
-}
 
-.product-delete-icon-wrapper {
-  .product-delete-icon {
+  .product-edit-icon {
     font-size: $afs;
-    color: $red;
+    color: $green;
 
     &:hover {
-      color: $tomato;
+      color: yellowgreen;
+    }
+  }
+
+  .product-delete-icon {
+    font-size: $afs;
+    color: $tomato;
+
+    &:hover {
+      color: $red;
     }
   }
 }

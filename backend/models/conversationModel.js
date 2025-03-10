@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const conversationSchema = new Schema(
   {
     groupTitle: { type: String },
-    members: { type: Array },
+    members: { type: Array }, //  members: [userId, sellerId],
     lastMessage: { type: String },
     messageSenderId: { type: String },
   },
@@ -15,3 +15,5 @@ const conversationSchema = new Schema(
 // Conversation Model
 const Conversation = mongoose.model('Conversation', conversationSchema);
 export default Conversation;
+
+

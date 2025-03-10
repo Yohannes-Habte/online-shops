@@ -1,7 +1,7 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { API } from '../../../utils/security/secreteKey';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { API } from "../../../utils/security/secreteKey";
+import "./MessageList.scss";
 
 const MessageList = ({
   data,
@@ -9,62 +9,67 @@ const MessageList = ({
   setOpen,
   setCurrentChat,
   me,
-  setUserData,
-  userData,
+  setSellerData,
   online,
   setActiveStatus,
   loading,
 }) => {
-  const navigate = useNavigate();
-  // Local state variables
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(null);
   const [user, setUser] = useState([]);
 
-  // Handle click
-  const handleClick = (id) => {
-    navigate(`/inbox?${id}`);
+  // Handle chat selection
+  const handleClick = () => {
+    setActive(index);
     setOpen(true);
+    setCurrentChat(data);
+    setSellerData(user);
+    setActiveStatus(online);
   };
 
-  // display shop info
+  // Fetch user/shop info
   useEffect(() => {
     setActiveStatus(online);
+
     const userId = data.members.find((user) => user !== me);
-    const getUser = async () => {
+
+    const fetchShop = async () => {
       try {
-        const res = await axios.get(
-          `${API}/shops/shop/get-shop-info/${userId}`
-        );
+        const res = await axios.get(`${API}/shops/get-shop-info/${userId}`, {
+          withCredentials: true,
+        });
         setUser(res.data.shop);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching user:", error);
       }
     };
-    getUser();
-  }, [me, data]);
 
+    fetchShop();
+  }, [me, data, online]);
+
+  console.log("User:", user);
+  console.log("Data:", data);
   return (
     <div
-      className={active === index ? 'active' : 'not-active'}
-      onClick={(e) =>
-        setActive(index) ||
-        handleClick(data._id) ||
-        setCurrentChat(data) ||
-        setUserData(user) ||
-        setActiveStatus(online)
-      }
+      className={`message-list-item ${active === index ? "active" : ""}`}
+      onClick={handleClick}
     >
       <figure className="image-container">
-        <img src={`${user?.avatar?.url}`} alt="" className="image" />
-        {online ? <div className="online" /> : <div className="offline" />}
+        <img
+          src={user?.LogoImage} // Ensure safe access
+          alt={user?.name} // Ensure fallback for null seller name
+          className="image"
+        />
+        <div className={online ? "online" : "offline"} />
       </figure>
 
-      <article className="user-info">
-        <h1 className="user-name">{user?.name}</h1>
+      <article className="shop-info">
+        <h3 className="user-name">{user?.name || "Unknown User"}</h3>
         <p className="user-message">
-          {!loading && data?.lastMessageId !== userData?._id
-            ? 'You:'
-            : userData?.name.split(' ')[0] + ': '}{' '}
+          {!loading && data?.messageSenderId !== user?._id ? (
+            <strong style={{ color: "green" }}>You:</strong>
+          ) : (
+            user?.name?.split(" ")[0] + ": "
+          )}{" "}
           {data?.lastMessage}
         </p>
       </article>

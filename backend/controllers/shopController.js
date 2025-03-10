@@ -270,15 +270,20 @@ export const getShop = async (req, res, next) => {
     }
 
     // Fetch shop from database
-    const shop = await Shop.findById(shopId).populate([
-      { path: "categories", select: "categoryName categoryDescription" },
-      { path: "subCategories", select: "subcategoryName subcategoryDescription" },
-      { path: "brands", select: "brandName brandDescription" },
-      { path: "shopProducts", select: "title description" },
-      { path: "soldProducts", select: "title description" },
-      { path: "suppliers", select: "supplierName supplierDescription" },
-      { path: "orders", select: "orderedItems grandTotal orderStatus" },
-    ]).lean();
+    const shop = await Shop.findById(shopId)
+      .populate([
+        { path: "categories", select: "categoryName categoryDescription" },
+        {
+          path: "subCategories",
+          select: "subcategoryName subcategoryDescription",
+        },
+        { path: "brands", select: "brandName brandDescription" },
+        { path: "shopProducts", select: "title description" },
+        { path: "soldProducts", select: "title description" },
+        { path: "suppliers", select: "supplierName supplierDescription" },
+        { path: "orders", select: "orderedItems grandTotal orderStatus" },
+      ])
+      .lean();
 
     // Check if shop exists
     if (!shop) {
@@ -294,6 +299,32 @@ export const getShop = async (req, res, next) => {
         "An unexpected error occurred while retrieving the shop. Please try again later."
       )
     );
+  }
+};
+
+//====================================================================
+// Get shop info by ID
+//====================================================================
+export const getShopInfo = async (req, res, next) => {
+  try {
+    const shopId = req.params.id;
+
+    if (!shopId || !mongoose.Types.ObjectId.isValid(shopId)) {
+      return next(createError(400, "Invalid Shop ID provided."));
+    }
+
+    const shop = await Shop.findById(shopId);
+
+    if (!shop) {
+      return next(createError(400, "Shop not found! Please try again!"));
+    }
+
+    res.status(200).json({
+      success: true,
+      shop,
+    });
+  } catch (error) {
+    next(createError(500, "Database could not query!"));
   }
 };
 

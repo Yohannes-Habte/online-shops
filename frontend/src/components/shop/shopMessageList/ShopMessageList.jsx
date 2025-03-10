@@ -1,25 +1,21 @@
-import  { useEffect, useState } from 'react';
-import './ShopMessageList.scss';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import "./ShopMessageList.scss";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
 
 const ShopMessageList = ({
-  conversation,
+  data,
   index,
   setOpen,
   setCurrentChat,
-  shopId,
+  me,
   setUserData,
-  userData,
-  setActiveStatus,
   online,
+  setActiveStatus,
+  loading,
 }) => {
   const navigate = useNavigate();
-  console.log('user status', online);
-
-  // Local state variables
   const [user, setUser] = useState([]);
   const [active, setActive] = useState(0);
 
@@ -31,32 +27,33 @@ const ShopMessageList = ({
 
   // Get user
   useEffect(() => {
-    const userId = conversation.members.find((user) => user != shopId);
+    const userId = data.members.find((user) => user != me);
 
     const getUser = async () => {
       try {
-        const { data } = await axios.get(`${API}/users/user/${userId}`);
-        setUser(data.user);
+        const res = await axios.get(`${API}/users/user-info/${userId}`);
+
+        setUser(res.data.user);
       } catch (error) {
-        toast.error(error.response.data.message);
+        console.log(error);
       }
     };
     getUser();
-  }, []);
+  }, [me, data]);
 
   return (
     <section
       onClick={() =>
         setActive(index) ||
-        handleClick(conversation._id) ||
-        setCurrentChat(conversation) ||
+        handleClick(data._id) ||
+        setCurrentChat(data) ||
         setUserData(user) ||
-        setActiveStatus('online')
+        setActiveStatus(online)
       }
       className={
         active
-          ? 'message-list-active-mode-wrapper'
-          : 'message-list-passive-mode-wrapper'
+          ? "message-list-active-mode-wrapper"
+          : "message-list-passive-mode-wrapper"
       }
     >
       <article className="user-and-message-container">
@@ -65,14 +62,14 @@ const ShopMessageList = ({
           {online ? <div className="online" /> : <div className="offline" />}
         </figure>
         <aside className="user-name-and-message">
-          <h3 className="user-name"> {userData?.name} </h3>
+          <h3 className="user-name"> {data?.name} </h3>
           <p className="user-message">
-            {conversation?.messageSenderId !== user?._id ? (
-              <strong style={{ color: 'green' }}>You:</strong>
+            {!loading && data?.lastMessageId !== user?._id ? (
+              <strong style={{ color: "green" }}>You:</strong>
             ) : (
-              user?.name?.split(' ')[0] + ': '
-            )}{' '}
-            {conversation?.lastMessage}
+              user?.name?.split(" ")[0] + ": "
+            )}{" "}
+            {data?.lastMessage}
           </p>
         </aside>
 

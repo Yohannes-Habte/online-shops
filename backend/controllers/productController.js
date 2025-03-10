@@ -275,6 +275,10 @@ export const getProductsByCustomerCategory = async (req, res, next) => {
 export const getProduct = async (req, res, next) => {
   const { id } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(createError(400, "Invalid product ID provided."));
+  }
+
   try {
     const product = await Product.findById(id).populate([
       { path: "shop", model: "Shop" },
@@ -293,10 +297,6 @@ export const getProduct = async (req, res, next) => {
     return next(createError(500, "Something went wrong"));
   }
 };
-
-//==============================================================================
-// Update Single Product
-//==============================================================================
 
 //==============================================================================
 // Update Product
@@ -337,19 +337,30 @@ export const updateProduct = async (req, res, next) => {
         return next(createError(404, "Product not found"));
       }
 
-      // Ensure the product belongs to the shop
-      if (!product.shop.equals(shopId)) {
-        await session.abortTransaction();
-        return next(
-          createError(403, "Unauthorized: Product does not belong to this shop")
-        );
-      }
-
       // Ensure the shop exists
       const shopExists = await Shop.findById(shopId).session(session);
       if (!shopExists) {
         await session.abortTransaction();
         return next(createError(404, "Shop not found"));
+      }
+
+      // Ensure the product exists in the shop's product list first
+      if (!shopExists.shopProducts.includes(id)) {
+        await session.abortTransaction();
+        session.endSession();
+        return next(createError(404, "Product not found in this shop."));
+      }
+
+      // Ensure the product actually belongs to the shop
+      if (!product.shop.equals(shopId)) {
+        await session.abortTransaction();
+        session.endSession();
+        return next(
+          createError(
+            403,
+            "Unauthorized: This product does not belong to the shop."
+          )
+        );
       }
 
       // Ensure discountPrice is not greater than originalPrice
@@ -419,29 +430,33 @@ export const updateProduct = async (req, res, next) => {
       });
 
       // Remove variants from the product that are not in the updated variants
-      // const variantsToDelete = product.variants.filter(
-      //   (variant) =>
-      //     !updatedVariants.some(
-      //       (updatedVariant) =>
-      //         updatedVariant.productColor === variant.productColor
-      //     )
-      // );
+      const variantsToDelete = product.variants.filter(
+        (variant) =>
+          !updatedVariants.some(
+            (updatedVariant) =>
+              updatedVariant.productColor === variant.productColor
+          )
+      );
 
-      // // Delete variants that should be removed
-      // await Product.updateOne(
-      //   { _id: id },
-      //   {
-      //     $pull: {
-      //       variants: {
-      //         productColor: {
-      //           $in: variantsToDelete.map((v) => v.productColor),
-      //         },
-      //       },
-      //     },
-      //   },
-      //   { session }
-      // );
+      // Delete variants that should be removed
+      if (variantsToDelete.length > 0) {
+        await Product.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              variants: {
+                productColor: {
+                  $in: variantsToDelete.map((v) => v.productColor),
+                },
+              },
+            },
+          },
+          { session }
+        );
+      }
 
+      /** 
+      // The variantsToDelete array stores variants that need to be removed because they no longer exist in the updated request.
       const variantsToDelete = product.variants.filter(
         (variant) =>
           !updatedVariants.some(
@@ -472,6 +487,8 @@ export const updateProduct = async (req, res, next) => {
           { session }
         );
       }
+
+      */
 
       // Update the product in the database with the updated details and variants
       const updatedProductDetails = await Product.findByIdAndUpdate(
@@ -549,6 +566,25 @@ export const deleteProduct = async (req, res, next) => {
       await smoothTransaction.abortTransaction();
       smoothTransaction.endSession();
       return next(createError(404, "Shop not found."));
+    }
+
+    // Ensure the product exists in the shop's product list first
+    if (!shop.shopProducts.includes(id)) {
+      await smoothTransaction.abortTransaction();
+      smoothTransaction.endSession();
+      return next(createError(404, "Product not found in this shop."));
+    }
+
+    // Ensure the product actually belongs to the shop
+    if (!product.shop.equals(shopId)) {
+      await smoothTransaction.abortTransaction();
+      smoothTransaction.endSession();
+      return next(
+        createError(
+          403,
+          "Unauthorized: This product does not belong to the shop."
+        )
+      );
     }
 
     // Remove product from shop's shopProducts array

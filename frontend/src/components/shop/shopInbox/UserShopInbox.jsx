@@ -1,23 +1,24 @@
+import "./UserShopInbox.scss";
+import { AiOutlineSend } from "react-icons/ai";
+import { IoIosAttach } from "react-icons/io";
+import { FaArrowCircleRight } from "react-icons/fa";
+import { format } from "timeago.js";
 
-import './ShopInbox.scss';
-import { AiOutlineSend } from 'react-icons/ai';
-import { IoIosAttach } from 'react-icons/io';
-import { FaArrowCircleRight } from 'react-icons/fa';
-import { format } from 'timeago.js';
-
-const ShopInbox = ({
+const UserShopInbox = ({
   scrollRef,
   setOpen,
-  textMessage,
-  setTextMessage,
-  sendTextMessageHandler,
+  newMessage,
+  setNewMessage, 
+  sendMessageHandler,
   messages,
   sellerId,
   userData,
   activeStatus,
   handleImageUpload,
 }) => {
-  console.log('userData in the shop info', userData);
+
+  console.log("ShopUserInbox -> userData", userData)
+
   return (
     <div className="shop-inbox-wrapper">
       {/* Message sender header */}
@@ -27,7 +28,7 @@ const ShopInbox = ({
           <aside className="user-name-and-status">
             <h3 className="user-name"> {userData?.name} </h3>
             <p className="status">
-              {activeStatus ? 'Active Now' : 'not-active-status'}
+              {activeStatus ? "Active Now" : "not-active-status"}
             </p>
           </aside>
         </figure>
@@ -46,9 +47,7 @@ const ShopInbox = ({
             return (
               <section
                 key={message._id}
-                className={
-                  message.sender === sellerId ? 'justify-end' : 'justify-start'
-                }
+                className={message.sender === sellerId ? "justify-end" : "justify-start"}
                 ref={scrollRef}
               >
                 {message.sender !== sellerId && (
@@ -65,14 +64,11 @@ const ShopInbox = ({
                   <img src={message.images} className="image" />
                 )}
 
-                {message.textMessage !== '' && (
+                {message.textMessage !== "" && (
                   <article className="text-message-wrapper">
                     <div
-                      className={
-                        message.sender === sellerId ? 'text-bg' : 'passive-bg'
-                      }
+                      className={message.sender === sellerId ? "text-bg" : "passive-bg"}
                     />
-
                     <h5 className="createdAt">{format(message.createdAt)}</h5>
                     <p className="text">{message.textMessage}</p>
                   </article>
@@ -83,7 +79,7 @@ const ShopInbox = ({
       </div>
 
       {/* Sending message form */}
-      <form className="chat-form" onSubmit={sendTextMessageHandler}>
+      <form className="chat-form" onSubmit={sendMessageHandler}>
         <div className="file-container">
           <input
             type="file"
@@ -92,7 +88,6 @@ const ShopInbox = ({
             onChange={handleImageUpload}
             className="upload-image"
           />
-
           <label htmlFor="images" className="file-label">
             <IoIosAttach title="Upload Images" className="icon" />
           </label>
@@ -104,14 +99,13 @@ const ShopInbox = ({
             type="text"
             required
             placeholder="Enter your message..."
-            value={textMessage}
-            onChange={(e) => setTextMessage(e.target.value)}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)} 
             className="input-field"
           />
-
           <label htmlFor="newMessage" className="input-label">
             <AiOutlineSend
-              onClick={sendTextMessageHandler}
+              onClick={sendMessageHandler}
               title="Send message"
               className="icon"
             />
@@ -123,4 +117,6 @@ const ShopInbox = ({
   );
 };
 
-export default ShopInbox;
+export default UserShopInbox;
+
+

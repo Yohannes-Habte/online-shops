@@ -1,4 +1,4 @@
-import ShopInbox from "../../shopDashboard/shopInbox/ShopInbox";
+
 import AllCoupons from "../allCoupons/AllCoupons";
 import AllSellerOrders from "../allOrders/AllSellerOrders";
 import AllShopEvents from "../allShopEvents/AllShopEvents";
@@ -14,6 +14,7 @@ import "./ShopContent.scss";
 import Supplier from "../supplier/Supplier";
 import Subcategory from "../subcategory/Subcategory";
 import DashboardOverview from "../dashboardOverview/DashboardOverview";
+import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage";
 
 const ShopContent = ({ isActive }) => {
   return (
@@ -40,7 +41,7 @@ const ShopContent = ({ isActive }) => {
 
       {isActive === 10 && <WithdrawMoney />}
 
-      {isActive === 11 && <ShopInbox />}
+      {isActive === 11 && <ShopInboxPage />}
 
       {isActive === 12 && <ShopRefunds />}
 

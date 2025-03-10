@@ -1,28 +1,23 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+// User Inbox Page Styling
 
 .user-inbox-page {
-  width: 100%;
   .user-inbox-container {
     width: 100%;
-    max-height: 73vh;
-    display: grid;
-    grid-template-columns: 20% 78%;
-    column-gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+    padding: 20px;
+  }
 
-    .chats-lists-wrapper {
-      @include shadow3;
-    }
-
-    .chat-messages-container {
-      width: 100%;
-      @include shadow3;
-    }
+  .user-inbox-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
   }
 }
-
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {}
-
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {}

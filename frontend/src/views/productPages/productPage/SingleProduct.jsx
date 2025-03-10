@@ -178,10 +178,10 @@ const SingleProduct = () => {
 
       try {
         const { data } = await axios.post(
-          `${API}/conversations/create`,
+          `${API}/conversations/create-new-conversation`,
           newConversation
         );
-        navigate(`/inbox?${data.conversation._id}`);
+        navigate(`/shop/dashboard?${data.conversation._id}`);
       } catch (error) {
         toast.error(error.response.data.message);
       }
@@ -189,6 +189,8 @@ const SingleProduct = () => {
       toast.error("Please login to create a conversation");
     }
   };
+
+
 
   return (
     <main className="single-product-page">

@@ -1,4 +1,4 @@
-import "./Home.scss";
+import "./HomePage.scss";
 import Events from "../../components/events/events/Events";
 import Header from "../../components/layouts/header/Header";
 import Hero from "../../components/heroSection/Hero";
@@ -8,7 +8,7 @@ import MenProducts from "../../components/products/menProducts/MenProducts";
 import KidsProducts from "../../components/products/kidsProducts/KidsProducts";
 import Footer from "../../components/layouts/footer/Footer";
 
-const Home = () => {
+const HomePage = () => {
   return (
     <main className="home-page">
       <Header />
@@ -32,4 +32,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

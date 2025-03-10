@@ -6,6 +6,7 @@ import {
   deleteWithdrawMethod,
   getAllShops,
   getShop,
+  getShopInfo,
   getShopProducts,
   loginSeller,
   resetForgotShopPassword,
@@ -47,7 +48,7 @@ shopRouter.delete("/delete", deleteSingleShop);
 shopRouter.delete("/payment-method/:id", deleteWithdrawMethod);
 shopRouter.get("/", getAllShops);
 shopRouter.get("/shop/products", isSellerAuthenticated, getShopProducts);
-
+shopRouter.get("/get-shop-info/:id", isSellerAuthenticated, getShopInfo);
 shopRouter.post("/forgotPassword", shopForgotPassword);
 shopRouter.patch("/shop-reset-password/:token", resetForgotShopPassword);
 shopRouter.put("/update-payment-methods", updatePaymentMethods);

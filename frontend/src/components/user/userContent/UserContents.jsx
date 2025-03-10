@@ -1,9 +1,9 @@
+import { UserInboxPage } from "../../../routes/user/UserRoutes";
 import Address from "../address/Address";
 import UserOrders from "../allOrders/UserOrders";
 import ChangePassword from "../changePassword/ChangePassword";
 import AllRefundOrders from "../refunds/AllRefundOrders";
 import TrackOrderTable from "../trackOrderTable/TrackOrderTable";
-import UserInbox from "../userInbox/UserInbox";
 import UserProfile from "../userProfile/UserProfile";
 import "./UserContents.scss";
 
@@ -22,7 +22,7 @@ const UserContents = ({ isActive }) => {
 
       {isActive === 6 && <AllRefundOrders />}
 
-      {isActive === 7 && <UserInbox />}
+       {isActive === 7 && <UserInboxPage />} 
     </div>
   );
 };

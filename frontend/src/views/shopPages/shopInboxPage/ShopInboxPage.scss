@@ -1,0 +1,14 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/variables.scss";
+
+.shop-inbox-page {
+  .shop-inbox-page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    margin: 2rem auto;
+
+    .shop-inbox-page-title {
+      @include subTitle;
+    }
+  }
+}
