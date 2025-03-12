@@ -1,131 +1,76 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-// Mobile screen size
-.admin-dashboard-shidebar-wrapper {
-  width: 10%;
-  @include shadow3;
+/* Sidebar Wrapper */
+.admin-dashboard-sidebar-wrapper {
+  width: 12%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: $light-gray;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+
+  /* Sidebar Items */
   .admin-dashboard-sidebar-items {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
 
+    /* Sidebar Item */
     .admin-dashboard-sidebar-item {
       display: flex;
-      flex-direction: row;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.8rem;
+      padding: 0.8rem;
+      border-radius: 8px;
+      transition: background-color 0.3s ease-in-out;
 
-      .passive-icon-status {
-        .admin-icon {
-          font-size: $afs;
-          color: $green;
-        }
+      &:hover {
+        background-color: rgba($primary-color, 0.1);
       }
 
-      .active-icon-status {
-        .admin-icon {
-          font-size: $afs;
-          color: red;
-        }
+      /* Icon Styling */
+      .admin-icon {
+        font-size: 1.5rem;
+        transition: color 0.3s ease-in-out;
+      }
+
+      /* Active & Passive States */
+      .active-icon-status .admin-icon {
+        color: $primary-color;
+      }
+
+      .passive-icon-status .admin-icon {
+        color: $dark-gray;
       }
 
       .active-tab-text {
-        color: $red;
-        font-size: $one;
+        color: $primary-color;
+        font-weight: bold;
+        font-size: 1rem;
       }
 
       .passive-tab-text {
         color: $black;
-        font-size: $one;
+        font-size: 1rem;
       }
     }
   }
 }
+
+/* Responsive Design */
 
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-  .admin-dashboard-shidebar-wrapper {
-    width: 20%;
-    @include shadow3;
-    .admin-dashboard-sidebar-items {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-
-      .admin-dashboard-sidebar-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.5rem;
-
-        .active-tab-icon {
-          .icon {
-            font-size: $afs;
-            color: $red;
-          }
-        }
-
-        .passive-tab-icon {
-          .icon {
-            font-size: $afs;
-            color: $black;
-          }
-        }
-
-        .active-tab-text {
-          color: $red;
-          font-size: $one;
-        }
-
-        .passive-tab-text {
-          color: $black;
-          font-size: $one;
-        }
-      }
-    }
+  .admin-dashboard-sidebar-wrapper {
+    width: 18%;
   }
 }
 
-/* Labtop screen size */
+/* Laptop & Larger Screens */
 @media screen and (min-width: 1024px) {
-  .admin-dashboard-shidebar-wrapper {
+  .admin-dashboard-sidebar-wrapper {
     width: 15%;
-    @include shadow3;
-    .admin-dashboard-sidebar-items {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-
-      .admin-dashboard-sidebar-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.5rem;
-
-        .active-tab-icon {
-          .icon {
-            font-size: $aafs;
-          }
-        }
-
-        .passive-tab-icon {
-          .icon {
-            font-size: $afs;
-            color: $black;
-          }
-        }
-
-        .active-tab-text {
-          color: $red;
-          font-size: $one;
-        }
-
-        .passive-tab-text {
-          color: $black;
-          font-size: $one;
-        }
-      }
-    }
   }
 }

@@ -1,14 +1,52 @@
-@import "../../../styles/mixins.scss";
-@import "../../../styles/variables.scss";
+@import '../../../styles/Variables.scss';
+@import '../../../styles/Mixins.scss';
 
-.shop-inbox-page {
-  .shop-inbox-page-wrapper {
-    min-height: 100vh;
-    width: 100%;
-    margin: 2rem auto;
+.message-dashboard-modal {
+  @include mobileDashboardScreen;
 
-    .shop-inbox-page-title {
-      @include subTitle;
+  .message-dashboard-wrapper {
+    width: $laptop;
+    margin: auto;
+    @include shadow3;
+
+    .message-dashboard-title {
+      @include title;
+      font-size: $one;
+    }
+  }
+}
+
+/* Tablet screen size */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .message-dashboard-modal {
+    @include tabletDashboardScreen;
+
+    .message-dashboard-wrapper {
+      width: $laptop;
+      margin: auto;
+      @include shadow3;
+
+      .message-dashboard-title {
+        @include title;
+        font-size: $one;
+      }
+    }
+  }
+}
+
+/* Labtop screen size */
+@media screen and (min-width: 1024px) {
+  .message-dashboard-modal {
+    @include desktopDashboardScreen;
+
+    .message-dashboard-wrapper {
+      width: $laptop;
+      margin: auto;
+      @include shadow3;
+
+      .message-dashboard-title {
+        @include title;
+      }
     }
   }
 }

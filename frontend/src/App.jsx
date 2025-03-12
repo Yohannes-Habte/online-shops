@@ -39,7 +39,7 @@ import {
   ShopLoginPage,
   ShopDashboardPage,
   ShopDetailsPage,
-  ShopHome,
+  ShopProfilePage,
   ShopOrderDetailsPage,
   ShopForgotpassword,
 } from "./routes/shop/ShopRoutes";
@@ -165,7 +165,7 @@ const App = () => {
 
         <Route path="/shop/dashboard" element={<ShopDashboardPage />} />
 
-        <Route path="/shop/:id" element={<ShopHome />} />
+        <Route path="/shop/:id" element={<ShopProfilePage />} />
 
         <Route path="/shop/order/:id" element={<ShopOrderDetailsPage />} />
 

@@ -1,4 +1,3 @@
-
 import './AdminSidebar.scss';
 import { NavLink } from 'react-router-dom';
 import { RxDashboard } from 'react-icons/rx';
@@ -19,7 +18,7 @@ const AdminSidebar = () => {
     isActive ? 'active-tab-text' : 'passive-tab-text';
 
   return (
-    <nav className="admin-dashboard-shidebar-wrapper">
+    <nav className="admin-dashboard-sidebar-wrapper">
       {/* single item */}
       <ul className="admin-dashboard-sidebar-items">
         <li className="admin-dashboard-sidebar-item">

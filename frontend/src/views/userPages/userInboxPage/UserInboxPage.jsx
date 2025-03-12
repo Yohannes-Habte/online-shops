@@ -3,9 +3,9 @@ import "./UserInboxPage.scss";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
-import MessageList from "../../../components/chat/messageList/MessageList";
-import SellerInbox from "../../../components/chat/sellerInbox/SellerInbox";
 import socketIO from "socket.io-client";
+import UserSideMessageList from "../../../components/chat/userSideMessageList/UserSideMessageList";
+import UserSideSellerInbox from "../../../components/chat/userSideSellerInbox/UserSideSellerInbox";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -208,7 +208,7 @@ const UserInboxPage = () => {
           <>
             <h1 className="user-inbox-title">All Messages</h1>
             {conversations.map((item, index) => (
-              <MessageList
+              <UserSideMessageList
                 data={item}
                 key={index}
                 index={index}
@@ -226,7 +226,7 @@ const UserInboxPage = () => {
         )}
 
         {open && (
-          <SellerInbox
+          <UserSideSellerInbox
             setOpen={setOpen}
             newMessage={newMessage}
             setNewMessage={setNewMessage}

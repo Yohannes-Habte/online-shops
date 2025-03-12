@@ -1,0 +1,134 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+// Mobile screen
+.user-side-message-list-active-mode-wrapper {
+  position: relative;
+  background-color: $chat-bg;
+  border-radius: $radius;
+  border: 1px solid $lightGray;
+  @include shadow3;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+
+  .user-side-message-list-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    .image-container {
+      .image {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .online {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: red;
+      }
+    }
+
+    .user-side-shop-info-message-wrapper {
+      .shop-name {
+        @include subTitle;
+
+        .shop-message {
+          font-size: $afs;
+        }
+      }
+    }
+  }
+
+  .active {
+    position: absolute;
+    top: 0;
+    left: 0rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: $red;
+  }
+
+  .user-side-chat-btn {
+    @include button1;
+  }
+}
+
+// message-list-passive-mode-wrapper
+
+.user-side-message-list-passive-mode-wrapper {
+  background-color: transparent;
+  border-radius: $radius;
+  border: 1px solid $lightGray;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin: 1rem 0;
+
+  .user-side-message-list-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    .image-container {
+      position: relative;
+      .image {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .offline {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: green;
+      }
+    }
+
+    .user-side-shop-info-message-wrapper {
+      .shop-name {
+        @include subTitle;
+
+        .shop-message {
+          font-size: $afs;
+        }
+      }
+    }
+  }
+
+  .active {
+    position: absolute;
+    top: 0;
+    left: 0rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: $green;
+  }
+
+  .user-side-chat-btn {
+    @include button1;
+  }
+}
+

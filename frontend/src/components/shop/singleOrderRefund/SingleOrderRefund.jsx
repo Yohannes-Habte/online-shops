@@ -15,44 +15,55 @@ const SingleOrderRefund = ({
   console.log("order:", order);
 
   return (
-    <div className="refund-order-processing-container">
-      {order?.payment?.paymentStatus === "completed" && (
-        <section className="order-refund-form-wrapper">
-          <h2 className="order-refund-form-title">Refund Order</h2>
-          <form onSubmit={handleShopOrderRefund} className="order-refund-form">
-            <div className="input-container">
-              <BadgeDollarSign className="input-icon" size={20} />
-              <input
-                type="number"
-                placeholder="Refund Amount"
-                value={order?.grandTotal?.toFixed(2)}
-                className="input-field"
-              />
-            </div>
-            <div className="textarea-input-container">
-              <FileText className="input-icon" size={20} />
-              <textarea
-                name="refundReason"
-                id="refundReason"
-                rows={4}
-                cols={30}
-                value={refundReason}
-                onChange={(e) => setRefundReason(e.target.value)}
-                placeholder="Refund Reason"
-                className="input-field"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isRefundDisabled}
-              className="order-refund-btn"
+    <div
+      className={`${
+        order?.payment?.paymentStatus === "completed" &&
+        order?.orderStatus === "Refund Requested"
+          ? "refund-order-processing-container"
+          : "no-refund-order-processing-container"
+      }`}
+    >
+      {order?.payment?.paymentStatus === "completed" &&
+        order?.orderStatus === "Refund Requested" && (
+          <section className="order-refund-form-wrapper">
+            <h2 className="order-refund-form-title">Refund Order</h2>
+            <form
+              onSubmit={handleShopOrderRefund}
+              className="order-refund-form"
             >
-              {processRefund ? "Processing..." : "Process Refund"}
-            </button>
-          </form>
-        </section>
-      )}
+              <div className="input-container">
+                <BadgeDollarSign className="input-icon" size={20} />
+                <input
+                  type="number"
+                  placeholder="Refund Amount"
+                  value={order?.grandTotal?.toFixed(2)}
+                  className="input-field"
+                />
+              </div>
+              <div className="textarea-input-container">
+                <FileText className="input-icon" size={20} />
+                <textarea
+                  name="refundReason"
+                  id="refundReason"
+                  rows={4}
+                  cols={30}
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Refund Reason"
+                  className="input-field"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isRefundDisabled}
+                className="order-refund-btn"
+              >
+                {processRefund ? "Processing..." : "Process Refund"}
+              </button>
+            </form>
+          </section>
+        )}
 
       {order?.payment?.refunds?.length > 0 && (
         <section className="order-refund-history-wrapper">

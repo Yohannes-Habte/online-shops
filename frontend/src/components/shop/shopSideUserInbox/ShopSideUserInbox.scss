@@ -1,8 +1,16 @@
 @import '../../../styles/Variables.scss';
 @import '../../../styles/Mixins.scss';
 
+// Mobile screen
+.shop-inbox-wrapper {
+  @include mobileDashboardScreen;
+  @include shadow3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
 
-.user-inbox-wrapper {
+  // Message sender header
   .message-header-wrapper {
     display: flex;
     flex-direction: row;
@@ -11,42 +19,43 @@
     background-color: $chatHeader-bg;
     border-radius: $radius;
 
-    .user-left-box {
+    .image-container {
       display: flex;
       flex-direction: row;
+      align-items: center;
       gap: 0.5rem;
-      .image-container {
-        .image {
-          @include chatMobileImage;
-        }
+
+      .image {
+        @include chatImage;
       }
 
-      .user-name-and-status {
+      .user-name-and-status-wrapper {
         .user-name {
-          font-size: $sfs;
+          @include subTitle;
+          padding: 0;
+        }
+
+        .user-online-status {
+          color: $green;
+          font-weight: $aafw;
         }
       }
     }
 
-    .right-box {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-      padding: 0 1rem;
+    .shop-go-back-icon {
+      font-size: $aafs;
+      color: $green;
+      margin: 0 1rem;
 
-      .header-icon {
-        font-size: $afs;
-        cursor: pointer;
-        &:hover {
-          color: $red;
-        }
+      &:hover {
+        color: $red;
       }
     }
   }
 
   // List of messages
   .message-wrapper {
-    height: 50.3vh;
+    height: 62vh;
     background-color: $chat-bg;
     border-radius: $radius;
     padding: 1rem;
@@ -62,7 +71,7 @@
 
       .image-container {
         .image {
-          @include chatMobileImage;
+          @include chatImage;
         }
       }
 
@@ -100,7 +109,7 @@
 
       .image-container {
         .image {
-          @include chatMobileImage;
+          @include chatImage;
         }
       }
 
@@ -189,10 +198,16 @@
     }
   }
 }
-
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-  .user-inbox-wrapper {
+  .shop-inbox-wrapper {
+    @include tabletDashboardScreen;
+    @include shadow3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+
     // Message sender header
     .message-header-wrapper {
       display: flex;
@@ -201,42 +216,45 @@
       align-items: center;
       background-color: $chatHeader-bg;
       border-radius: $radius;
-  
-      .user-left-box {
+
+      .image-container {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 0.5rem;
-        .image-container {
-          .image {
-            @include chatImage;
+
+        .image {
+          @include chatImage;
+        }
+
+        .user-name-and-status-wrapper {
+          .user-name {
+            @include subTitle;
+            padding: 0;
+          }
+
+          .user-online-status {
+            color: $green;
+            font-weight: $aafw;
           }
         }
       }
-  
-      .right-box {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
-        padding: 0 1rem;
-  
-        .header-icon {
-          font-size: $afs;
-          cursor: pointer;
-          &:hover {
-            color: $red;
-          }
-        }
+
+      .icon {
+        font-size: $aafs;
+        color: $green;
+        margin: 0 1rem;
       }
     }
-  
+
     // List of messages
     .message-wrapper {
-      height: 50.3vh;
+      height: 62vh;
       background-color: $chat-bg;
       border-radius: $radius;
       padding: 1rem;
       overflow-y: scroll;
-  
+
       // Seller test messages
       .justify-end {
         display: flex;
@@ -244,21 +262,21 @@
         justify-content: flex-end;
         gap: 0.5rem;
         margin: 0.5rem 0;
-  
+
         .image-container {
           .image {
             @include chatImage;
           }
         }
-  
+
         .text-message-wrapper {
           display: flex;
           align-items: center;
           gap: 1rem;
-  
+
           .active {
           }
-  
+
           .text {
             background-color: $me;
             background-color: $sender;
@@ -267,14 +285,14 @@
             padding: 0.2rem 0.5rem;
             margin: 0.5rem 0;
           }
-  
+
           .createdAt {
             font-size: $sfs;
             color: $gray;
           }
         }
       }
-  
+
       // User text messages
       .justify-start {
         display: flex;
@@ -282,17 +300,17 @@
         justify-content: flex-start;
         gap: 0.5rem;
         margin: 0.5rem 0;
-  
+
         .image-container {
           .image {
             @include chatImage;
           }
         }
-  
+
         .text-message-wrappe {
           .passive {
           }
-  
+
           .text {
             background-color: $sender;
             width: fit-content;
@@ -300,25 +318,25 @@
             padding: 0.2rem 0.5rem;
             margin: 0.5rem 0;
           }
-  
+
           .createdAt {
             font-size: $afs;
           }
         }
       }
     }
-  
+
     // Sending message form
     .chat-form {
       .input-container {
         position: relative;
         @include inputContainer;
-  
+
         .input-field {
           @include inputField;
           border: 1px solid $green;
         }
-  
+
         .input-highlight {
           position: absolute;
           bottom: 0.5rem;
@@ -328,17 +346,17 @@
           background-color: $green;
           transition: all 0.3s ease;
         }
-  
+
         .input-field:focus + .input-label {
           top: -5px;
           font-size: 12px;
           color: #81a3e6;
         }
-  
+
         .input-field:focus + .input-label + .input-highlight {
           width: 100%;
         }
-  
+
         .input-label {
           position: absolute;
           top: 1rem;
@@ -349,15 +367,15 @@
           cursor: pointer;
         }
       }
-  
+
       .file-container {
         position: relative;
-  
+
         .upload-image {
           display: none;
           cursor: pointer;
         }
-  
+
         .file-label {
           position: absolute;
           top: 1.5rem;
@@ -368,7 +386,7 @@
           z-index: 99;
         }
       }
-  
+
       .chat-btn {
         @include button1;
       }
@@ -378,7 +396,14 @@
 
 /* Labtop screen size */
 @media screen and (min-width: 1024px) {
-  .user-inbox-wrapper {
+  .shop-inbox-wrapper {
+    @include desktopDashboardScreen;
+    @include shadow3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+
     // Message sender header
     .message-header-wrapper {
       display: flex;
@@ -387,42 +412,45 @@
       align-items: center;
       background-color: $chatHeader-bg;
       border-radius: $radius;
-  
-      .user-left-box {
+
+      .image-container {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 0.5rem;
-        .image-container {
-          .image {
-            @include chatImage;
+
+        .image {
+          @include chatImage;
+        }
+
+        .user-name-and-status-wrapper {
+          .user-name {
+            @include subTitle;
+            padding: 0;
+          }
+
+          .user-online-status {
+            color: $green;
+            font-weight: $aafw;
           }
         }
       }
-  
-      .right-box {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
-        padding: 0 1rem;
-  
-        .header-icon {
-          font-size: $afs;
-          cursor: pointer;
-          &:hover {
-            color: $red;
-          }
-        }
+
+      .icon {
+        font-size: $aafs;
+        color: $green;
+        margin: 0 1rem;
       }
     }
-  
+
     // List of messages
     .message-wrapper {
-      height: 50.3vh;
+      height: 62vh;
       background-color: $chat-bg;
       border-radius: $radius;
       padding: 1rem;
       overflow-y: scroll;
-  
+
       // Seller test messages
       .justify-end {
         display: flex;
@@ -430,21 +458,21 @@
         justify-content: flex-end;
         gap: 0.5rem;
         margin: 0.5rem 0;
-  
+
         .image-container {
           .image {
             @include chatImage;
           }
         }
-  
+
         .text-message-wrapper {
           display: flex;
           align-items: center;
           gap: 1rem;
-  
+
           .active {
           }
-  
+
           .text {
             background-color: $me;
             background-color: $sender;
@@ -453,14 +481,14 @@
             padding: 0.2rem 0.5rem;
             margin: 0.5rem 0;
           }
-  
+
           .createdAt {
             font-size: $sfs;
             color: $gray;
           }
         }
       }
-  
+
       // User text messages
       .justify-start {
         display: flex;
@@ -468,17 +496,17 @@
         justify-content: flex-start;
         gap: 0.5rem;
         margin: 0.5rem 0;
-  
+
         .image-container {
           .image {
             @include chatImage;
           }
         }
-  
+
         .text-message-wrappe {
           .passive {
           }
-  
+
           .text {
             background-color: $sender;
             width: fit-content;
@@ -486,25 +514,25 @@
             padding: 0.2rem 0.5rem;
             margin: 0.5rem 0;
           }
-  
+
           .createdAt {
             font-size: $afs;
           }
         }
       }
     }
-  
+
     // Sending message form
     .chat-form {
       .input-container {
         position: relative;
         @include inputContainer;
-  
+
         .input-field {
           @include inputField;
           border: 1px solid $green;
         }
-  
+
         .input-highlight {
           position: absolute;
           bottom: 0.5rem;
@@ -514,17 +542,17 @@
           background-color: $green;
           transition: all 0.3s ease;
         }
-  
+
         .input-field:focus + .input-label {
           top: -5px;
           font-size: 12px;
           color: #81a3e6;
         }
-  
+
         .input-field:focus + .input-label + .input-highlight {
           width: 100%;
         }
-  
+
         .input-label {
           position: absolute;
           top: 1rem;
@@ -535,15 +563,15 @@
           cursor: pointer;
         }
       }
-  
+
       .file-container {
         position: relative;
-  
+
         .upload-image {
           display: none;
           cursor: pointer;
         }
-  
+
         .file-label {
           position: absolute;
           top: 1.5rem;
@@ -554,7 +582,7 @@
           z-index: 99;
         }
       }
-  
+
       .chat-btn {
         @include button1;
       }

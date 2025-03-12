@@ -1,7 +1,7 @@
 
 import './ShopDetailsPage.scss';
-import ShopBiodata from '../../../components/shop/shopBiodata/ShopBiodata';
-import ShopInfo from '../../../components/shop/shopInfo/ShopInfo';
+import ShopBiodata from '../../../components/shop/shopProfile/ShopProfile';
+import ShopInfo from '../../../components/shop/shopInventory/ShopInventory';
 import { Link } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from 'react-icons/fa';
 import Footer from '../../../components/layouts/footer/Footer';

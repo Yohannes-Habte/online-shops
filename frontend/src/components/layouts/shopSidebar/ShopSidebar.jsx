@@ -43,19 +43,19 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
   return (
     <div
-      className={`admin-dashboard-sidebar-wrapper ${
-        openAdminDashboardMenu ? "admin-hamburger-menu-opened" : ""
+      className={`shop-dashboard-sidebar-wrapper ${
+        openAdminDashboardMenu ? "shop-hamburger-menu-opened" : ""
       }`}
     >
       {/* Hamburger icon for small screens */}
       <div
-        className="admin-hamburger-menu"
+        className="shop-hamburger-menu"
         onClick={handleOpenAdminDashboardMenu}
       >
         {openAdminDashboardMenu ? <MdOutlineClose /> : <GiHamburgerMenu />}
       </div>
-      <section className="admin-dashboard-menu-container">
-        <h2 className="admin-dashboard-sidebar-title">
+      <section className="shop-dashboard-menu-container">
+        <h2 className="shop-dashboard-sidebar-title">
           {" "}
           {currentSeller?.name}{" "}
         </h2>
@@ -63,7 +63,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Summary of Admin Dashboard */}
         <aside
           onClick={() => setIsActive(1) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdDashboard
             title="Dashboard Overview"
@@ -78,7 +78,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Categories */}
         <aside
           onClick={() => setIsActive(2) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdOutlineCategory
             title="Categories"
@@ -93,7 +93,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           {/* Subcategories */}
           <aside
           onClick={() => setIsActive(17) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdOutlineCategory
             title="Sub Categories"
@@ -108,7 +108,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Committees */}
         <aside
           onClick={() => setIsActive(3) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <SiBrandfolder
             title="Committee"
@@ -123,7 +123,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Specific Committee */}
         <aside
           onClick={() => setIsActive(4) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <FaProductHunt
             title="Committee"
@@ -139,7 +139,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <aside
           onClick={() => setIsActive(5) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <FaProductHunt
             title="Mass Schedule"
@@ -155,7 +155,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <aside
           onClick={() => setIsActive(6) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdEvent
             title="Delegation"
@@ -171,7 +171,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <aside
           onClick={() => setIsActive(7) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdEvent
             title="Events"
@@ -187,7 +187,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <aside
           onClick={() => setIsActive(8) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdDiscount
             title="Service Categories"
@@ -203,7 +203,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <aside
           onClick={() => setIsActive(9) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <FaFirstOrderAlt
             title="Services"
@@ -218,7 +218,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Notifications */}
         <aside
           onClick={() => setIsActive(10) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <BiMoneyWithdraw
             title="Notifications"
@@ -233,7 +233,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Upload Video Form */}
         <aside
           onClick={() => setIsActive(11) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <MdOutlineMessage
             title="Add Video"
@@ -248,7 +248,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* All user comments */}
         <aside
           onClick={() => setIsActive(12) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
             title="All Comments"
@@ -263,7 +263,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Supplier */}
         <aside
           onClick={() => setIsActive(13) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
             title="All Comments"
@@ -278,7 +278,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
         {/* Update Shop*/}
         <aside
           onClick={() => setIsActive(14) || setOpenAdminDashboardMenu(false)}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
             title="All Comments"
@@ -294,7 +294,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         <Link
           to={`/shop/${currentSeller?._id}`}
-          className="admin-dashboard-sidebar-item"
+          className="shop-dashboard-sidebar-item"
         >
           <IoSettings
             title="Settings"
@@ -308,7 +308,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
         {/* Log Out */}
 
-        <aside className="admin-dashboard-sidebar-item">
+        <aside className="shop-dashboard-sidebar-item">
           <IoMdLogOut
             title="Log Out"
             className={isActive === 16 ? "active-icon" : "passive-icon"}

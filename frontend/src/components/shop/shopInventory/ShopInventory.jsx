@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import "./ShopInfo.scss";
+import "./ShopInventory.scss";
 import { useDispatch, useSelector } from "react-redux";
 import Ratings from "../../products/ratings/Ratings";
 import ProductCard from "../../products/productCard/ProductCard";
@@ -11,7 +11,7 @@ import {
 } from "../../../redux/actions/event";
 import EventCard from "../../events/eventCart/EventCard";
 
-const ShopInfo = () => {
+const ShopInventory = () => {
   const dispatch = useDispatch();
 
   // Global state variables
@@ -30,7 +30,7 @@ const ShopInfo = () => {
   }, [shopProducts]);
 
   useEffect(() => {
-    if (currentSeller) {
+    if (currentSeller && shopEvents.length === 0) {
       dispatch(clearEventErrorsAction());
       dispatch(fetchShopEvents());
     }
@@ -40,34 +40,36 @@ const ShopInfo = () => {
         dispatch(clearEventErrorsAction());
       }
     };
-  }, [dispatch, currentSeller, error]);
+  }, [dispatch, currentSeller, error, shopEvents.length]);
 
   return (
-    <section className="shop-info-container">
+    <section className="shop-inventory-container">
       <h1 className="shop-title">{currentSeller?.name || "Shop"}</h1>
 
-      <article className="tabs-wrapper">
+      <article className="shop-tabs-wrapper">
         <h3
           onClick={() => setActiveTab(1)}
-          className={activeTab === 1 ? "active" : "passive"}
+          className={activeTab === 1 ? "active-shop-tab" : "passive-shop-tab"}
         >
           Shop Products
         </h3>
 
         <p
           onClick={() => setActiveTab(2)}
-          className={activeTab === 2 ? "active" : "passive"}
+          className={activeTab === 2 ? "active-shop-tab" : "passive-shop-tab"}
         >
           Running Events
         </p>
 
         <p
           onClick={() => setActiveTab(3)}
-          className={activeTab === 3 ? "active" : "passive"}
+          className={activeTab === 3 ? "active-shop-tab" : "passive-shop-tab"}
         >
           Shop Reviews
         </p>
       </article>
+
+      <div className="horizontal-line"></div>
 
       {/* Shop Products */}
       {activeTab === 1 && (
@@ -88,19 +90,17 @@ const ShopInfo = () => {
 
       {/* Shop Events */}
       {activeTab === 2 && (
-        <article className="shop-events-wrapper">
-          {loading ? (
-            <p className="loading">Loading events...</p>
-          ) : shopEvents&& shopEvents?.length > 0 ? (
-            <div className="shop-events">
-              {shopEvents.map((event, index) => (
-                <EventCard data={event} key={event._id || index} />
-              ))}
-            </div>
-          ) : (
-            <h3 className="no-events">No events available for this shop.</h3>
-          )}
-        </article>
+        <div className="shop-events-wrapper">
+          {loading && <p className="loading">Loading events...</p>}
+
+          {error && <p className="error"> {error || "No Events Found!"}</p>}
+
+          {Array.isArray(shopEvents) &&
+            shopEvents.length > 0 &&
+            shopEvents.map((event, index) => (
+              <EventCard data={event} key={event._id || index} />
+            ))}
+        </div>
       )}
 
       {/* Shop Reviews */}
@@ -159,4 +159,4 @@ const ShopInfo = () => {
   );
 };
 
-export default ShopInfo;
+export default ShopInventory;

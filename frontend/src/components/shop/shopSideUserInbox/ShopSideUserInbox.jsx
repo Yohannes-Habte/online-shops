@@ -1,56 +1,43 @@
-import "./SellerInbox.scss";
-import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
+import "./ShopSideUserInbox.scss";
+import { AiOutlineSend } from "react-icons/ai";
 import { IoIosAttach } from "react-icons/io";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { format } from "timeago.js";
-import { IoCall } from "react-icons/io5";
-import { LiaSearchSolid } from "react-icons/lia";
-import { IoMdVideocam } from "react-icons/io";
 
-const SellerInbox = ({
+const ShopSideUserInbox = ({
+  scrollRef,
   setOpen,
   newMessage,
-  setNewMessage,
+  setNewMessage, 
   sendMessageHandler,
   messages,
-  messageSenderId,
-  sellerData,
-  activeStatus,
-  scrollRef,
+  userId,
+  userData,
   handleImageUpload,
+  activeStatus
 }) => {
-  console.log("Seller Data:", sellerData);
- 
+
+    
+
   return (
-    <div className="user-inbox-wrapper">
-      {/* Message sender header */}
+    <div className="shop-inbox-wrapper">
+      {/* Message sender header, which is the user*/}
       <article className="message-header-wrapper">
-        <div className="user-left-box">
-          <figure className="image-container">
-            <img
-              src={sellerData?.LogoImage}
-              alt={sellerData?.name}
-              className="image"
-            />
-          </figure>
-          <aside className="user-name-and-status">
-            <h3 className="user-name"> {sellerData?.name} </h3>
-            <p className="status">
-              {activeStatus ? "Active Now" : "not-active-status"}
+        <figure className="image-container">
+          <img src={userData?.image} alt={userData?.name} className="image" />
+          <aside className="user-name-and-status-wrapper">
+            <h3 className="user-name"> {userData?.name} </h3>
+            <p className="user-online-status">
+              {activeStatus ? "Online" : "Offline"}
             </p>
           </aside>
+        </figure>
 
-          <AiOutlineArrowRight
-            size={20}
-            className="cursor-pointer"
-            onClick={() => setOpen(false)}
-          />
-        </div>
-
-        <div className="right-box">
-          <IoMdVideocam className="header-icon" />
-          <IoCall className="header-icon" />
-          <LiaSearchSolid className="header-icon" />
-        </div>
+        <FaArrowAltCircleLeft
+          className="shop-go-back-icon"
+          title="Shop Message Lists"
+          onClick={() => setOpen(false)}
+        />
       </article>
 
       {/* List of Messages */}
@@ -60,37 +47,28 @@ const SellerInbox = ({
             return (
               <section
                 key={message._id}
-                className={
-                  message.sender === messageSenderId
-                    ? "justify-end"
-                    : "justify-start"
-                }
+                className={message.sender === userId ? "justify-end" : "justify-start"}
                 ref={scrollRef}
               >
-                {message?.sender !== messageSenderId && (
+                {message.sender !== userId && (
                   <figure className="image-container">
                     <img
-                      src={sellerData?.LogoImage}
-                      alt={sellerData?.name}
+                      src={userData?.image}
+                      alt={userData?.name}
                       className="image"
                     />
                   </figure>
                 )}
 
-                {/* {message.images && (
-                  <figure className="image-container">
-                    <img src={`${message?.images}`} className="image" />
-                  </figure>
-                )} */}
+                {message?.images && (
+                  <img src={message.images} className="image" />
+                )}
 
                 {message.textMessage !== "" && (
                   <article className="text-message-wrapper">
                     <div
-                      className={
-                        message.sender === messageSenderId ? "active" : "passive"
-                      }
+                      className={message.sender === userId ? "text-bg" : "passive-bg"}
                     />
-
                     <h5 className="createdAt">{format(message.createdAt)}</h5>
                     <p className="text">{message.textMessage}</p>
                   </article>
@@ -110,7 +88,6 @@ const SellerInbox = ({
             onChange={handleImageUpload}
             className="upload-image"
           />
-
           <label htmlFor="images" className="file-label">
             <IoIosAttach title="Upload Images" className="icon" />
           </label>
@@ -123,10 +100,9 @@ const SellerInbox = ({
             required
             placeholder="Enter your message..."
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={(e) => setNewMessage(e.target.value)} 
             className="input-field"
           />
-
           <label htmlFor="newMessage" className="input-label">
             <AiOutlineSend
               onClick={sendMessageHandler}
@@ -141,4 +117,6 @@ const SellerInbox = ({
   );
 };
 
-export default SellerInbox;
+export default ShopSideUserInbox;
+
+

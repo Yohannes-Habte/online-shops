@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import "./ShopMessageList.scss";
-import { useNavigate } from "react-router-dom";
+import "./ShopSideMessageList.scss";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 
-const ShopMessageList = ({
+const ShopSideMessageList = ({
   data,
-  index,
   setOpen,
   setCurrentChat,
   me,
@@ -15,14 +13,17 @@ const ShopMessageList = ({
   setActiveStatus,
   loading,
 }) => {
-  const navigate = useNavigate();
+ 
   const [user, setUser] = useState([]);
   const [active, setActive] = useState(0);
 
   // Handle click
-  const handleClick = (id) => {
-    navigate(`/shop/dashboard?${id}`);
+  const handleClick = () => {
     setOpen(true);
+    setActive(data._id);
+    setCurrentChat(data);
+    setUserData(user);
+    setActiveStatus(online);
   };
 
   // Get user
@@ -42,14 +43,8 @@ const ShopMessageList = ({
   }, [me, data]);
 
   return (
-    <section
-      onClick={() =>
-        setActive(index) ||
-        handleClick(data._id) ||
-        setCurrentChat(data) ||
-        setUserData(user) ||
-        setActiveStatus(online)
-      }
+    <div
+      onClick={handleClick}
       className={
         active
           ? "message-list-active-mode-wrapper"
@@ -64,7 +59,7 @@ const ShopMessageList = ({
         <aside className="user-name-and-message">
           <h3 className="user-name"> {data?.name} </h3>
           <p className="user-message">
-            {!loading && data?.lastMessageId !== user?._id ? (
+            {!loading && data?.messageSenderId !== user?._id ? (
               <strong style={{ color: "green" }}>You:</strong>
             ) : (
               user?.name?.split(" ")[0] + ": "
@@ -79,8 +74,8 @@ const ShopMessageList = ({
       <h5 onClick={() => setOpen(true)} className="chat-btn">
         Chat
       </h5>
-    </section>
+    </div>
   );
 };
 
-export default ShopMessageList;
+export default ShopSideMessageList;

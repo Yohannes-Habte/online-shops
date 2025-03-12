@@ -7,7 +7,7 @@ import TrackOrderTable from "../trackOrderTable/TrackOrderTable";
 import UserProfile from "../userProfile/UserProfile";
 import "./UserContents.scss";
 
-const UserContents = ({ isActive }) => {
+const UserContents = ({ isActive, conversationId, identifier }) => {
   return (
     <div className="user-profile-contents-container">
       {isActive === 1 && <UserProfile />}
@@ -22,7 +22,12 @@ const UserContents = ({ isActive }) => {
 
       {isActive === 6 && <AllRefundOrders />}
 
-       {isActive === 7 && <UserInboxPage />} 
+      {isActive === 7 && (
+        <UserInboxPage
+          conversationId={conversationId}
+          identifier={identifier}
+        />
+      )}
     </div>
   );
 };

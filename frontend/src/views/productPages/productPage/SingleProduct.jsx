@@ -114,7 +114,6 @@ const SingleProduct = () => {
       dispatch(addToWishlist(item));
       toast.success("Added to wishlist");
     }
-    
   };
 
   // ===========================================================================
@@ -165,32 +164,44 @@ const SingleProduct = () => {
   };
 
   // =========================================================
+  // Generate a secure random conversation identifier
+  // =========================================================
+  const generateConversationId = () => crypto.randomUUID();
+
+  // =========================================================
   // Handle conversation Submit Function
   // =========================================================
   const handleMessageSubmit = async () => {
-    if (currentUser) {
-      // body
-      const newConversation = {
-        groupTitle: currentProduct._id + currentUser._id,
-        userId: currentUser._id,
-        sellerId: currentSeller._id,
-      };
+    if (!currentUser) {
+      return toast.error("Please login to create a conversation");
+    }
 
-      try {
-        const { data } = await axios.post(
-          `${API}/conversations/create-new-conversation`,
-          newConversation
-        );
-        navigate(`/shop/dashboard?${data.conversation._id}`);
-      } catch (error) {
-        toast.error(error.response.data.message);
+    const newConversation = {
+      groupTitle: `${currentProduct._id}${currentUser._id}`,
+      userId: currentUser._id,
+      sellerId: currentSeller._id,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API}/conversations/create-new-conversation`,
+        newConversation
+      );
+
+      const conversationId = response?.data?.conversation?._id; // Ensure safe access
+      if (!conversationId) {
+        throw new Error("Conversation ID not found in response.");
       }
-    } else {
-      toast.error("Please login to create a conversation");
+
+      navigate(
+        `/profile?isActive=7&key=${conversationId}&identifier=${generateConversationId()}`
+      );
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+      toast.error(errorMessage);
     }
   };
-
-
 
   return (
     <main className="single-product-page">

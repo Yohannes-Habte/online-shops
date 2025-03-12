@@ -1,11 +1,37 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
-.admin-dashboard-sidebar-wrapper {
+.shop-dashboard-sidebar-wrapper {
   width: 17%;
+  padding: 1rem;
+  margin: 0.5rem 0 1rem 0;
   background-color: $sidebar-bg;
+  max-height: 100vh; // Ensure it doesn't exceed the viewport height
+  overflow-y: auto; // Enables vertical scrolling
+  scrollbar-width: thin; // For Firefox
+  scrollbar-color: #4a5568 #e2e8f0; // Thumb color and track color
 
-  .admin-hamburger-menu {
+  /* Scrollbar Styling for Chrome, Edge, and Safari */
+  &::-webkit-scrollbar {
+    width: 8px; // Thin scrollbar
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #e2e8f0; // Light gray background
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #4a5568; // Dark gray thumb
+    border-radius: 4px;
+    border: 2px solid #e2e8f0; // Creates spacing effect
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #2d3748; // Slightly darker on hover
+  }
+
+  .shop-hamburger-menu {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -14,13 +40,16 @@
   }
 
   // Big screens
-  .admin-dashboard-menu-container {
+  .shop-dashboard-menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     min-height: 100vh;
-    .admin-dashboard-sidebar-title {
+    .shop-dashboard-sidebar-title {
       @include subTitle;
     }
 
-    .admin-dashboard-sidebar-item {
+    .shop-dashboard-sidebar-item {
       @include flexRow;
       @include shadow1;
       align-items: center;
@@ -60,8 +89,8 @@
 }
 
 // Small screens
-.admin-dashboard-sidebar-wrapper.admin-hamburger-menu-opened {
-  .admin-dashboard-menu-container {
+.shop-dashboard-sidebar-wrapper.shop-hamburger-menu-opened {
+  .shop-dashboard-menu-container {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -73,7 +102,7 @@
     padding: 1rem 2rem;
     z-index: 9999;
   }
-  .admin-dashboard-sidebar-item {
+  .shop-dashboard-sidebar-item {
     display: flex;
 
     .active-icon {
@@ -98,11 +127,11 @@
 
 /* Portrait Phones (max-width: 575px) */
 @media (max-width: 575px) {
-  .admin-dashboard-sidebar-wrapper {
-    .admin-hamburger-menu {
+  .shop-dashboard-sidebar-wrapper {
+    .shop-hamburger-menu {
       font-size: $afs;
     }
-    .admin-dashboard-menu-container {
+    .shop-dashboard-menu-container {
       display: none;
     }
   }
@@ -110,11 +139,11 @@
 
 /* Landscape Phones (576px - 767px) */
 @media (min-width: 576px) and (max-width: 767px) {
-  .admin-dashboard-sidebar-wrapper {
-    .admin-sidebar-hamburger-menu {
+  .shop-dashboard-sidebar-wrapper {
+    .shop-sidebar-hamburger-menu {
       font-size: $afs;
     }
-    .admin-dashboard-menu-container {
+    .shop-dashboard-menu-container {
       display: none;
     }
   }
@@ -122,11 +151,11 @@
 
 /* Tablets (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .admin-dashboard-sidebar-wrapper {
-    .admin-sidebar-hamburger-menu {
+  .shop-dashboard-sidebar-wrapper {
+    .shop-sidebar-hamburger-menu {
       font-size: $afs;
     }
-    .admin-dashboard-menu-container {
+    .shop-dashboard-menu-container {
       display: none;
     }
   }
@@ -134,11 +163,11 @@
 
 /*  Laptops, iPad Pro, and Small Desktops (1024px - 1366px) */
 @media (min-width: 1024px) and (max-width: 1366px) {
-  .admin-dashboard-sidebar-wrapper {
-    .admin-sidebar-hamburger-menu {
+  .shop-dashboard-sidebar-wrapper {
+    .shop-sidebar-hamburger-menu {
       font-size: $lfs;
     }
-    .admin-dashboard-menu-container {
+    .shop-dashboard-menu-container {
       display: none;
     }
   }
@@ -146,7 +175,7 @@
 
 /* Ultra-High-Resolution Devices (1367px and above) */
 @media (min-width: 1367px) {
-  .admin-hamburger-menu {
+  .shop-hamburger-menu {
     display: none;
   }
 }

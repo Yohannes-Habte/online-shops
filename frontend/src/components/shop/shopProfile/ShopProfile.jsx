@@ -1,4 +1,4 @@
-import "./ShopBiodata.scss";
+import "./ShopProfile.scss";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +6,7 @@ import { fetchSingleSeller } from "../../../redux/actions/seller";
 import LogoutShowOwner from "../../../utils/globalFunctions/LogoutShopOwner";
 import ShopProducts from "../../../hooks/ShopProducts";
 
-const ShopBiodata = () => {
+const ShopProfile = () => {
   // Global state variables
   const { sellerSignOut } = LogoutShowOwner();
   const { products } = useSelector((state) => state.product);
@@ -66,8 +66,8 @@ const ShopBiodata = () => {
   const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
 
   return (
-    <div className="shop-biodata-container">
-      <article className="article-box">
+    <aside className="shop-profile-container">
+      <article className="shop-profile-box">
         <figure className="image-container">
           <img
             src={`${currentSeller?.LogoImage}`}
@@ -75,27 +75,27 @@ const ShopBiodata = () => {
             className="image"
           />
         </figure>
-        <h3 className="subTitle">{currentSeller?.name}</h3>
+        <h3 className="shop-profile-subtitle">{currentSeller?.name}</h3>
         <p className="text description">{currentSeller?.description}</p>
       </article>
 
-      <article className="article-box">
-        <h3 className="subTitle">Address</h3>
+      <article className="shop-profile-box">
+        <h3 className="shop-profile-subtitle">Address</h3>
         <p className="text address">{currentSeller?.shopAddress}</p>
       </article>
 
-      <article className="article-box">
-        <h3 className="subTitle">Phone Number</h3>
+      <article className="shop-profile-box">
+        <h3 className="shop-profile-subtitle">Phone Number</h3>
         <p className="text phone">{currentSeller?.phoneNumber}</p>
       </article>
 
-      <div className="article-box">
-        <h3 className="subTitle">Total Products</h3>
+      <div className="shop-profile-box">
+        <h3 className="shop-profile-subtitle">Total Products</h3>
         <p className="text product-length">{products && products.length}</p>
       </div>
 
-      <article className="article-box">
-        <h3 className="subTitle">Shop Ratings</h3>
+      <article className="shop-profile-box">
+        <h3 className="shop-profile-subtitle">Shop Ratings</h3>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -105,14 +105,14 @@ const ShopBiodata = () => {
         )}
       </article>
 
-      <article className="article-box">
-        <h3 className="subTitle">Joined On</h3>
+      <article className="shop-profile-box">
+        <h3 className="shop-profile-subtitle">Joined On</h3>
         <p className="text createdAt">
           {currentSeller?.createdAt?.slice(0, 10)}
         </p>
       </article>
 
-      <article className="article-box">
+      <article className="shop-profile-box">
         <Link to="/shop/dashboard">
           <p className="edit-shop"> Shop Dashboard</p>
         </Link>
@@ -123,8 +123,8 @@ const ShopBiodata = () => {
           Log Out
         </h3>
       </article>
-    </div>
+    </aside>
   );
 };
 
-export default ShopBiodata;
+export default ShopProfile;

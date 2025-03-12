@@ -1,16 +1,44 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-.shop-biodata-container {
+.shop-profile-container {
   @include mobileDashboardScreen;
   @include shadow3;
   background-color: $sidebar-bg;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 1rem;
+  margin: 0.5rem 0 1rem 0;
+  background-color: $sidebar-bg;
+  max-height: 100vh; // Ensure it doesn't exceed the viewport height
+  overflow-y: auto; // Enables vertical scrolling
+  scrollbar-width: thin; // For Firefox
+  scrollbar-color: #4a5568 #e2e8f0; // Thumb color and track color
 
-  .article-box {
-    @include shadow3;
+  /* Scrollbar Styling for Chrome, Edge, and Safari */
+  &::-webkit-scrollbar {
+    width: 8px; // Thin scrollbar
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #e2e8f0; // Light gray background
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #4a5568; // Dark gray thumb
+    border-radius: 4px;
+    border: 2px solid #e2e8f0; // Creates spacing effect
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #2d3748; // Slightly darker on hover
+  }
+
+  .shop-profile-box {
+    @include shadow2;
+    padding: 0.2rem 0.5rem;
 
     .image-container {
       .image {
@@ -21,9 +49,7 @@
       }
     }
 
-    .subTitle {
-      @include subTitle;
-      padding: 0;
+    .shop-profile-subtitle {
       font-size: $one;
     }
 
@@ -31,13 +57,13 @@
     }
 
     .edit-shop {
-    @include editButton; 
+      @include editButton;
       margin-bottom: 1rem;
       font-size: $one;
     }
 
     .logout {
-     @include editButton;
+      @include editButton;
       font-size: $one;
     }
   }
@@ -45,7 +71,7 @@
 
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
-  .shop-biodata-container {
+  .shop-profile-container {
     @include tabletDashboardScreen;
     @include shadow3;
     background-color: $sidebar-bg;
@@ -53,8 +79,9 @@
     flex-direction: column;
     gap: 1rem;
 
-    .article-box {
-      @include shadow3;
+    .shop-profile-box {
+      @include shadow2;
+      padding: 0.2rem 0.5rem;
 
       .image-container {
         .image {
@@ -65,32 +92,31 @@
         }
       }
 
-      .subTitle {
-        @include subTitle;
-        padding: 0;
+      .shop-profile-subtitle {
         font-size: $one;
+        color: $gray;
       }
 
       .text {
       }
 
       .edit-shop {
-       @include editButton;
+        @include editButton;
         margin-bottom: 1rem;
         font-size: $one;
       }
 
       .logout {
-       @include editButton;
+        @include editButton;
         font-size: $one;
       }
     }
   }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
-  .shop-biodata-container {
+  .shop-profile-container {
     width: 20%;
     @include shadow3;
     background-color: $sidebar-bg;
@@ -98,8 +124,9 @@
     flex-direction: column;
     gap: 1rem;
 
-    .article-box {
-      @include shadow3;
+    .shop-profile-box {
+      @include shadow2;
+      padding: 0.2rem 0.5rem;
 
       .image-container {
         .image {
@@ -110,21 +137,17 @@
         }
       }
 
-      .subTitle {
-        @include subTitle;
-        padding: 0;
-      }
-
-      .text {
+      .shop-profile-subtitle {
+        color: $gray;
       }
 
       .edit-shop {
-       @include editButton;
+        @include editButton;
         margin-bottom: 1rem;
       }
 
       .logout {
-       @include editButton;
+        @include editButton;
       }
     }
   }

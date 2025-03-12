@@ -16,6 +16,7 @@ import Subcategory from "../subcategory/Subcategory";
 import DashboardOverview from "../dashboardOverview/DashboardOverview";
 import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage";
 
+
 const ShopContent = ({ isActive }) => {
   return (
     <article className="admin-dashboard-right-box-wrapper">
