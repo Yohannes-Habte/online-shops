@@ -12,7 +12,7 @@ const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 const UserInboxPage = () => {
   const { currentUser, loading } = useSelector((state) => state.user);
   const [conversations, setConversations] = useState([]);
-  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [incomingMessage, setIncomingMessage] = useState(null); // Incoming message from seller to user
   const [currentChat, setCurrentChat] = useState();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -22,47 +22,48 @@ const UserInboxPage = () => {
   const [open, setOpen] = useState(false);
   const scrollRef = useRef(null);
 
+  // =============================================================================
+  // Get all shop conversations
+  // =============================================================================
   useEffect(() => {
-    socketId.on("connect", () => {
-      console.log("Socket connected:", socketId.id);
-    });
-
     socketId.on("getMessage", (data) => {
-      setArrivalMessage({
+      setIncomingMessage({
         sender: data.senderId,
         text: data.text,
         createdAt: Date.now(),
       });
     });
-
-    return () => {
-      socketId.off("connect");
-      socketId.off("getMessage");
-    };
   }, []);
 
+  // =============================================================================
+  // Incoming chat message from seller to user and update chat messages
+  // =============================================================================
   useEffect(() => {
     if (
-      arrivalMessage &&
-      currentChat?.members.includes(arrivalMessage.sender)
+      incomingMessage &&
+      currentChat?.members.includes(incomingMessage.sender)
     ) {
-      setMessages((prev) => [...prev, arrivalMessage]);
+      setMessages((prev) => [...prev, incomingMessage]);
     }
-  }, [arrivalMessage, currentChat]);
+  }, [incomingMessage, currentChat]);
 
+
+  // =============================================================================
+  // Get all user conversations
+  // =============================================================================
   useEffect(() => {
-    const getConversation = async () => {
+    const fetchConversations = async () => {
       try {
-        const res = await axios.get(
-          `${API}/conversations/get-all-conversation-user/${currentUser?._id}`,
+        const response = await axios.get(
+          `${API}/conversations/get-all-conversation-seller/${currentUser?._id}`,
           { withCredentials: true }
         );
-        setConversations(res.data.conversations);
+        setConversations(response.data.conversations);
       } catch (error) {
         console.log(error);
       }
     };
-    getConversation();
+    fetchConversations();
   }, [currentUser, messages]);
 
   useEffect(() => {
@@ -148,61 +149,12 @@ const UserInboxPage = () => {
       });
   };
 
-  const handleImageUpload = async (e) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        imageSendingHandler(reader.result);
-      }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
-
-  const imageSendingHandler = async (e) => {
-    const receiverId = currentChat.members.find(
-      (member) => member !== currentUser._id
-    );
-
-    socketId.emit("sendMessage", {
-      senderId: currentUser._id,
-      receiverId,
-      images: e,
-    });
-
-    try {
-      await axios
-        .post(`${API}/messages/create-new-message`, {
-          images: e,
-          sender: currentUser._id,
-          text: newMessage,
-          conversationId: currentChat._id,
-        })
-        .then((res) => {
-          setMessages([...messages, res.data.message]);
-          updateLastMessageForImage();
-        });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const updateLastMessageForImage = async () => {
-    await axios.put(
-      `${API}/conversations/update-last-message/${currentChat._id}`,
-      {
-        lastMessage: "Photo",
-        lastMessageId: currentUser._id,
-      }
-    );
-  };
-
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <main className="user-inbox-page">
-   
       <div className="user-inbox-container">
         {!open && (
           <>
@@ -236,7 +188,6 @@ const UserInboxPage = () => {
             sellerData={sellerData}
             activeStatus={activeStatus}
             scrollRef={scrollRef}
-            handleImageUpload={handleImageUpload}
           />
         )}
       </div>

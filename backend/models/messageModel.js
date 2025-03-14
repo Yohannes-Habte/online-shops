@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
 const messageSchema = new Schema(
   {
-    conversationId: { type: String },
+    conversationId: { type: String, required: true },
     textMessage: { type: String },
     sender: { type: String },
     images: [{ type: String }],
@@ -13,5 +13,5 @@ const messageSchema = new Schema(
 );
 
 // Message Model
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 export default Message;

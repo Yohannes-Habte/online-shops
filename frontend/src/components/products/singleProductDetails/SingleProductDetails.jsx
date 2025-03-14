@@ -13,7 +13,7 @@ const SingleProductDetails = ({
   currentProduct,
   selectedVariant,
   handleToggle,
-  handleMessageSubmit,
+  handleConversationMSubmit,
   addToWishlistHandler,
   removeFromWishlistHandler,
   clickWishlist,
@@ -40,7 +40,7 @@ const SingleProductDetails = ({
         />
 
         {/* Single Product Chatting */}
-        <SingleProductChat handleMessageSubmit={handleMessageSubmit} />
+        <SingleProductChat handleConversationMSubmit={handleConversationMSubmit} />
       </div>
 
       <div className="single-product-info-variants-wrapper">

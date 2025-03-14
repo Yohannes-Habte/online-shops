@@ -4,31 +4,31 @@ import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 
 const ShopSideMessageList = ({
-  data,
-  setOpen,
-  setCurrentChat,
-  me,
-  setUserData,
+  conversation,
+  setIsChatBoxOpen,
+  setSelectedChat,
+  shopId,
+  setActiveChatUser,
+  activeChatUser,
   online,
-  setActiveStatus,
+  setIsUserOnline,
   loading,
 }) => {
- 
   const [user, setUser] = useState([]);
   const [active, setActive] = useState(0);
 
   // Handle click
   const handleClick = () => {
-    setOpen(true);
-    setActive(data._id);
-    setCurrentChat(data);
-    setUserData(user);
-    setActiveStatus(online);
+    setIsChatBoxOpen(true);
+    setActive(conversation._id);
+    setSelectedChat(conversation);
+    setActiveChatUser(user);
+    setIsUserOnline(online);
   };
 
   // Get user
   useEffect(() => {
-    const userId = data.members.find((user) => user != me);
+    const userId = conversation.members.find((user) => user != shopId);
 
     const getUser = async () => {
       try {
@@ -40,7 +40,7 @@ const ShopSideMessageList = ({
       }
     };
     getUser();
-  }, [me, data]);
+  }, [shopId, conversation]);
 
   return (
     <div
@@ -57,21 +57,21 @@ const ShopSideMessageList = ({
           {online ? <div className="online" /> : <div className="offline" />}
         </figure>
         <aside className="user-name-and-message">
-          <h3 className="user-name"> {data?.name} </h3>
+          <h3 className="user-name"> {activeChatUser?.name} </h3>
           <p className="user-message">
-            {!loading && data?.messageSenderId !== user?._id ? (
+            {!loading && conversation?.messageSenderId !== user?._id ? (
               <strong style={{ color: "green" }}>You:</strong>
             ) : (
               user?.name?.split(" ")[0] + ": "
             )}{" "}
-            {data?.lastMessage}
+            {conversation?.lastMessage}
           </p>
         </aside>
 
         <div className="active" />
       </article>
 
-      <h5 onClick={() => setOpen(true)} className="chat-btn">
+      <h5 onClick={() => setIsChatBoxOpen(true)} className="chat-btn">
         Chat
       </h5>
     </div>

@@ -2,7 +2,6 @@
 @import '../../../styles/Mixins.scss';
 
 .message-dashboard-modal {
-  @include mobileDashboardScreen;
 
   .message-dashboard-wrapper {
     width: $laptop;
@@ -19,7 +18,6 @@
 /* Tablet screen size */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
   .message-dashboard-modal {
-    @include tabletDashboardScreen;
 
     .message-dashboard-wrapper {
       width: $laptop;
@@ -34,10 +32,9 @@
   }
 }
 
-/* Labtop screen size */
+/* Laptop screen size */
 @media screen and (min-width: 1024px) {
   .message-dashboard-modal {
-    @include desktopDashboardScreen;
 
     .message-dashboard-wrapper {
       width: $laptop;

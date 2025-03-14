@@ -17,7 +17,6 @@ const UserSideSellerInbox = ({
   messageSenderId,
   sellerData,
   scrollRef,
-  handleImageUpload,
 }) => {
   const { currentSeller } = useSelector((state) => state.seller);
   const userStatus = !!currentSeller; // If a user is logged in, they are online.
@@ -108,7 +107,6 @@ const UserSideSellerInbox = ({
             type="file"
             name="images"
             id="images"
-            onChange={handleImageUpload}
             className="upload-image"
           />
 

@@ -1,7 +1,7 @@
 import { AiOutlineMessage } from "react-icons/ai";
 import "./SingleProductChat.scss";
 
-const SingleProductChat = ({ handleMessageSubmit }) => {
+const SingleProductChat = ({ handleConversationMSubmit }) => {
   return (
     <aside className="single-product-message-wrapper">
       <h4 className="send-message-title">Have Questions?</h4>
@@ -9,7 +9,7 @@ const SingleProductChat = ({ handleMessageSubmit }) => {
         <p className="send-message-paragraph">
           Need help? Click the message icon to chat.
         </p>
-        <p onClick={handleMessageSubmit} className="send-message">
+        <p onClick={handleConversationMSubmit} className="send-message">
           Send a Message <AiOutlineMessage className="send-message-icon" />
         </p>
       </div>

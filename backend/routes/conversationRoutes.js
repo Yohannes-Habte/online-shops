@@ -12,7 +12,11 @@ import { isSellerAuthenticated } from "../middleware/shopAuth.js";
 const conversationRouter = express.Router();
 
 // conversation routes
-conversationRouter.post("/create-new-conversation", createConversation);
+conversationRouter.post(
+  "/create-new-conversation",
+  isAuthenticated,
+  createConversation
+);
 conversationRouter.put("/update-last-message/:id", updateLastMessage);
 
 conversationRouter.get(

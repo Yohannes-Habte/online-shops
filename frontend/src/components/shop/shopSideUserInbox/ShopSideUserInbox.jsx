@@ -5,30 +5,31 @@ import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { format } from "timeago.js";
 
 const ShopSideUserInbox = ({
-  scrollRef,
-  setOpen,
-  newMessage,
-  setNewMessage, 
-  sendMessageHandler,
-  messages,
+  setIsChatBoxOpen,
+  typedMessage,
+  setTypedMessage,
+  handleSendMessage,
+  chatMessages,
   userId,
-  userData,
-  handleImageUpload,
-  activeStatus
+  activeChatUser,
+  isUserOnline,
+  scrollRef,
 }) => {
-
-    
-
+  console.log("chatMessages", chatMessages);
   return (
     <div className="shop-inbox-wrapper">
       {/* Message sender header, which is the user*/}
       <article className="message-header-wrapper">
         <figure className="image-container">
-          <img src={userData?.image} alt={userData?.name} className="image" />
+          <img
+            src={activeChatUser?.image}
+            alt={activeChatUser?.name}
+            className="image"
+          />
           <aside className="user-name-and-status-wrapper">
-            <h3 className="user-name"> {userData?.name} </h3>
+            <h3 className="user-name"> {activeChatUser?.name} </h3>
             <p className="user-online-status">
-              {activeStatus ? "Online" : "Offline"}
+              {isUserOnline ? "Online" : "Offline"}
             </p>
           </aside>
         </figure>
@@ -36,25 +37,27 @@ const ShopSideUserInbox = ({
         <FaArrowAltCircleLeft
           className="shop-go-back-icon"
           title="Shop Message Lists"
-          onClick={() => setOpen(false)}
+          onClick={() => setIsChatBoxOpen(false)}
         />
       </article>
 
       {/* List of Messages */}
       <div className="message-wrapper">
-        {messages &&
-          messages.map((message) => {
+        {chatMessages &&
+          chatMessages.map((message) => {
             return (
               <section
                 key={message._id}
-                className={message.sender === userId ? "justify-end" : "justify-start"}
+                className={
+                  message.sender === userId ? "justify-end" : "justify-start"
+                }
                 ref={scrollRef}
               >
                 {message.sender !== userId && (
                   <figure className="image-container">
                     <img
-                      src={userData?.image}
-                      alt={userData?.name}
+                      src={activeChatUser?.image}
+                      alt={activeChatUser?.name}
                       className="image"
                     />
                   </figure>
@@ -67,7 +70,9 @@ const ShopSideUserInbox = ({
                 {message.textMessage !== "" && (
                   <article className="text-message-wrapper">
                     <div
-                      className={message.sender === userId ? "text-bg" : "passive-bg"}
+                      className={
+                        message.sender === userId ? "text-bg" : "passive-bg"
+                      }
                     />
                     <h5 className="createdAt">{format(message.createdAt)}</h5>
                     <p className="text">{message.textMessage}</p>
@@ -79,13 +84,12 @@ const ShopSideUserInbox = ({
       </div>
 
       {/* Sending message form */}
-      <form className="chat-form" onSubmit={sendMessageHandler}>
+      <form className="chat-form" onSubmit={handleSendMessage}>
         <div className="file-container">
           <input
             type="file"
             name="images"
             id="images"
-            onChange={handleImageUpload}
             className="upload-image"
           />
           <label htmlFor="images" className="file-label">
@@ -99,13 +103,13 @@ const ShopSideUserInbox = ({
             type="text"
             required
             placeholder="Enter your message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)} 
+            value={typedMessage}
+            onChange={(e) => setTypedMessage(e.target.value)}
             className="input-field"
           />
           <label htmlFor="newMessage" className="input-label">
             <AiOutlineSend
-              onClick={sendMessageHandler}
+              onClick={handleSendMessage}
               title="Send message"
               className="icon"
             />
@@ -118,5 +122,3 @@ const ShopSideUserInbox = ({
 };
 
 export default ShopSideUserInbox;
-
-

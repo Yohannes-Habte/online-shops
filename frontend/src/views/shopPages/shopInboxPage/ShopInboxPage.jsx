@@ -10,281 +10,223 @@ import ShopSideUserInbox from "../../../components/shop/shopSideUserInbox/ShopSi
 import socketIO from "socket.io-client";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+socketId.on("connect", () => {
+  console.log("Connected to socket: =>", socketId.id);
+});
 
 const ShopInboxPage = () => {
   const { currentSeller, loading } = useSelector((state) => state.seller);
 
-  const [conversations, setConversations] = useState([]);
-  const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [currentChat, setCurrentChat] = useState();
-  const [messages, setMessages] = useState([]);
-  const [userData, setUserData] = useState(null);
-  const [newMessage, setNewMessage] = useState("");
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [activeStatus, setActiveStatus] = useState(false);
-  // const [images, setImages] = useState();
-  const [open, setOpen] = useState(false);
+  // Local state variables
+  const [chatConversations, setChatConversations] = useState([]); // store all shop conversations
+  const [incomingMessage, setIncomingMessage] = useState(null); // store incoming message from user to seller (shop)
+  const [selectedChat, setSelectedChat] = useState(); // store selected chat conversation
+  const [chatMessages, setChatMessages] = useState([]); // store all messages for selected chat conversation
+  const [activeChatUser, setActiveChatUser] = useState(null); // store active chat user
+  const [typedMessage, setTypedMessage] = useState(""); // store typed message
+  const [connectedUsers, setConnectedUsers] = useState([]); // store all connected users
+  const [isUserOnline, setIsUserOnline] = useState(false); // store user online status
+  const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+
+  // scrollRef: store scroll reference
   const scrollRef = useRef(null);
 
-  // ============================================================================================
-  // socketId.on() is a method used in Socket.IO, a library for real-time, bidirectional communication between web clients and servers.
+  console.log("incomingMessage", incomingMessage);
+  console.log("selectedChat", selectedChat);
+  
 
-  //What does socketId.on(event, callback) do?
-  // * It listens for a specific event (event) emitted by the server.
-  // * When the event occurs, it executes the provided callback function.
-  // ============================================================================================
+  // =============================================================================
+  // Get all shop conversations
+  // =============================================================================
   useEffect(() => {
-    socketId.on("getMessage", (data) => {
-      setArrivalMessage({
+    const handleIncomingMessage = (data) => {
+      console.log("Message received:", data); // Debugging
+      setIncomingMessage({
         sender: data.senderId,
         text: data.text,
         createdAt: Date.now(),
       });
-    });
+    };
+
+    socketId.on("getMessage", handleIncomingMessage);
+
+    return () => {
+      socketId.off("getMessage", handleIncomingMessage);
+    };
   }, []);
 
-  // ============================================================================================
-  // Get all conversations for the current seller
-  // ============================================================================================
+  // =============================================================================
+  // Incoming chat message from user to seller (shop) and update chat messages
+  // =============================================================================
   useEffect(() => {
-    arrivalMessage &&
-      currentChat?.members.includes(arrivalMessage.sender) &&
-      setMessages((prev) => [...prev, arrivalMessage]);
-  }, [arrivalMessage, currentChat]);
+    if (incomingMessage && selectedChat) {
+      console.log("Incoming Message:", incomingMessage);
+      console.log("Selected Chat Members:", selectedChat.members);
 
-  // ============================================================================================
-  // Get all conversations for the current seller
-  // ============================================================================================
+      if (selectedChat.members.includes(incomingMessage.sender)) {
+        setChatMessages((prev) => [...prev, incomingMessage]);
+      }
+    }
+  }, [incomingMessage, selectedChat]);
+
+  // =============================================================================
+  // Get all shop conversations
+  // =============================================================================
   useEffect(() => {
-    const getConversation = async () => {
+    const fetchConversations = async () => {
       try {
         const response = await axios.get(
           `${API}/conversations/get-all-conversation-seller/${currentSeller?._id}`,
           { withCredentials: true }
         );
-        setConversations(response.data.conversations);
+        setChatConversations(response.data.conversations);
       } catch (error) {
         console.log(error);
       }
     };
-    getConversation();
-  }, [currentSeller, messages]);
+    fetchConversations();
+  }, [currentSeller, chatMessages]);
 
-  // ============================================================================================
-  // socketId.emit(event, data) is a Socket.IO method used to send (emit) an event with optional data from the client to the server (or vice versa).
-  // It is used for real-time communication in web applications.
-  // Get online users and add user to the list of online users.
-  // Ensures onlineUsers always updates when users join or leave.
-  // ============================================================================================
+  // =============================================================================
+  // Add user to socket
+  // =============================================================================
   useEffect(() => {
     if (currentSeller) {
-      const sellerId = currentSeller?._id;
-      socketId.emit("addUser", sellerId);
+      socketId.emit("addUser", currentSeller?._id);
 
-      // Listen for the updated list of online users
       socketId.on("getUsers", (users) => {
-        setOnlineUsers(users);
+        setConnectedUsers(users);
       });
     }
   }, [currentSeller]);
 
-  // ============================================================================================
+  // =============================================================================
   // Check if user is online
-  // ============================================================================================
-  const onlineCheck = (chat) => {
-    const chatMembers = chat.members.find(
+  // =============================================================================
+  const checkUserOnlineStatus = (chat) => {
+    const chatPartnerId = chat.members.find(
       (member) => member !== currentSeller?._id
     );
-    const online = onlineUsers.find((user) => user.userId === chatMembers);
-    console.log("online", online);
-    return online ? true : false;
+    return connectedUsers.some((user) => user.userId === chatPartnerId);
   };
 
-  // ============================================================================================
-  // Get all messages for the current chat
-  // ============================================================================================
+  // =============================================================================
+  // Get all messages for selected chat conversation
+  // =============================================================================
   useEffect(() => {
-    const getMessage = async () => {
+    const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `${API}/messages/get-all-messages/${currentChat?._id}`
+          `${API}/messages/get-all-messages/${selectedChat?._id}`
         );
-        setMessages(response.data.messages);
+        setChatMessages(response.data.messages);
       } catch (error) {
         console.log(error);
       }
     };
-    getMessage();
-  }, [currentChat]);
+    fetchMessages();
+  }, [selectedChat]);
 
-  // ============================================================================================
-  // sendMessageHandler() is a function that sends a message to the server and updates the last message in the conversation.
-  // ============================================================================================
-  const sendMessageHandler = async (e) => {
+  // =============================================================================
+  // Handle sending message to user
+  // =============================================================================
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    console.log("Sending message:", newMessage);
 
-    const message = {
+    const newMessage = {
       sender: currentSeller._id,
-      text: newMessage,
-      conversationId: currentChat._id,
+      text: typedMessage,
+      conversationId: selectedChat._id,
     };
 
-    const receiverId = currentChat.members.find(
+    const recipientId = selectedChat.members.find(
       (member) => member.id !== currentSeller._id
     );
 
     socketId.emit("sendMessage", {
       senderId: currentSeller._id,
-      receiverId,
-      text: newMessage,
+      receiverId: recipientId,
+      text: typedMessage,
     });
 
     try {
-      if (newMessage !== "") {
-        await axios
-          .post(`${API}/messages/create-new-message`, message)
-          .then((res) => {
-            setMessages([...messages, res.data.message]);
-            updateLastMessage();
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      if (typedMessage !== "") {
+        const res = await axios.post(
+          `${API}/messages/create-new-message`,
+          newMessage
+        );
+        setChatMessages([...chatMessages, res.data.message]);
+        updateLastMessage();
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  // ============================================================================================
-  // updateLastMessage() is a function that updates the last message in the conversation.
-  // ============================================================================================
+  // =============================================================================
+  // Update the last message
+  // =============================================================================
   const updateLastMessage = async () => {
     socketId.emit("updateLastMessage", {
-      lastMessage: newMessage,
+      lastMessage: typedMessage,
       lastMessageId: currentSeller._id,
     });
 
-    await axios
-      .put(`${API}/conversations/update-last-message/${currentChat._id}`, {
-        lastMessage: newMessage,
-        lastMessageId: currentSeller._id,
-      })
-      .then((res) => {
-        console.log(res);
-        setNewMessage("");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  // ============================================================================================
-  // handleImageUpload() is a function that reads the image file and sends it to the server.
-  // ============================================================================================
-  const handleImageUpload = async (e) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        // setImages(reader.result);
-        imageSendingHandler(reader.result);
-      }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
-
-  // ============================================================================================
-  // imageSendingHandler() is a function that sends an image to the server and updates the last message in the conversation.
-  // ============================================================================================
-  const imageSendingHandler = async (e) => {
-    const receiverId = currentChat.members.find(
-      (member) => member !== currentSeller._id
-    );
-
-    socketId.emit("sendMessage", {
-      senderId: currentSeller._id,
-      receiverId,
-      images: e,
-    });
-
     try {
-      await axios
-        .post(`${API}/messages/create-new-message`, {
-          images: e,
-          sender: currentSeller._id,
-          text: newMessage,
-          conversationId: currentChat._id,
-        })
-        .then((res) => {
-          // setImages();
-          setMessages([...messages, res.data.message]);
-          updateLastMessageForImage();
-        });
+      const updatedMessage = {
+        lastMessage: typedMessage,
+        lastMessageId: currentSeller._id,
+      };
+      await axios.put(
+        `${API}/conversations/update-last-message/${selectedChat._id}`,
+        updatedMessage
+      );
+
+      setTypedMessage("");
     } catch (error) {
-      console.log(error);
+      alert("Error updating last message");
     }
   };
 
-  // ============================================================================================
-  // updateLastMessageForImage() is a function that updates the last message in the conversation when an image is sent.
-  // ============================================================================================
-  const updateLastMessageForImage = async () => {
-    await axios.put(
-      `${API}/conversations/update-last-message/${currentChat._id}`,
-      {
-        lastMessage: "Photo",
-        lastMessageId: currentSeller._id,
-      }
-    );
-  };
-
-  // ============================================================================================
-  // Return the ShopInboxPage component
-  // ============================================================================================
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [chatMessages]);
 
   return (
     <div className="message-dashboard-modal">
-      {!open && (
+      {!isChatBoxOpen && (
         <section className="message-dashboard-wrapper">
           <h1 className="message-dashboard-title">All Messages</h1>
-          {conversations &&
-            conversations.map((item, index) => {
-              return (
-                <ShopSideMessageList
-                  data={item}
-                  key={index}
-                  setOpen={setOpen}
-                  setCurrentChat={setCurrentChat}
-                  me={currentSeller._id}
-                  setUserData={setUserData}
-                  userData={userData}
-                  online={onlineCheck(item)}
-                  setActiveStatus={setActiveStatus}
-                  loading={loading}
-                />
-              );
-            })}
+          {chatConversations &&
+            chatConversations.map((conversation) => (
+              <ShopSideMessageList
+                conversation={conversation}
+                key={conversation._id}
+                setIsChatBoxOpen={setIsChatBoxOpen}
+                setSelectedChat={setSelectedChat}
+                shopId={currentSeller._id}
+                setActiveChatUser={setActiveChatUser}
+                activeChatUser={activeChatUser}
+                online={checkUserOnlineStatus(conversation)}
+                setIsUserOnline={setIsUserOnline}
+                loading={loading}
+              />
+            ))}
         </section>
       )}
 
-      {open && (
+      {isChatBoxOpen && (
         <section className="message-box-wrapper">
           <ShopSideUserInbox
-            setOpen={setOpen}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            sendMessageHandler={sendMessageHandler}
-            messages={messages}
+            setIsChatBoxOpen={setIsChatBoxOpen}
+            typedMessage={typedMessage}
+            setTypedMessage={setTypedMessage}
+            handleSendMessage={handleSendMessage}
+            chatMessages={chatMessages}
             userId={currentSeller._id}
-            userData={userData}
-            activeStatus={activeStatus}
+            activeChatUser={activeChatUser}
+            isUserOnline={isUserOnline}
             scrollRef={scrollRef}
-            setMessages={setMessages}
-            handleImageUpload={handleImageUpload}
           />
         </section>
       )}

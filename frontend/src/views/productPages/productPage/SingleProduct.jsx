@@ -171,21 +171,42 @@ const SingleProduct = () => {
   // =========================================================
   // Handle conversation Submit Function
   // =========================================================
-  const handleMessageSubmit = async () => {
+  const handleConversationMSubmit = async () => {
     if (!currentUser) {
       return toast.error("Please login to create a conversation");
     }
 
+    if (!currentSeller) {
+      return toast.error("Seller not found!");
+    }
+
+    if (!selectedVariant) {
+      return toast.error(
+        "Please select a product color before starting a conversation."
+      );
+    }
+
+    if (!selectedSize) {
+      return toast.error(
+        "Please select a product size before starting a conversation."
+      );
+    }
+
     const newConversation = {
-      groupTitle: `${currentProduct._id}${currentUser._id}`,
+      groupTitle: `${currentUser._id}-${currentSeller._id}-${currentProduct._id}-${selectedVariant.productColor}-${selectedSize}`,
       userId: currentUser._id,
       sellerId: currentSeller._id,
+      productId: currentProduct._id,
+      variant: selectedVariant,
+      productColor: selectedVariant.productColor,
+      productSize: selectedSize,
     };
 
     try {
       const response = await axios.post(
         `${API}/conversations/create-new-conversation`,
-        newConversation
+        newConversation,
+        { withCredentials: true }
       );
 
       const conversationId = response?.data?.conversation?._id; // Ensure safe access
@@ -235,7 +256,7 @@ const SingleProduct = () => {
               currentProduct={currentProduct}
               selectedVariant={selectedVariant}
               handleToggle={handleToggle}
-              handleMessageSubmit={handleMessageSubmit}
+              handleConversationMSubmit={handleConversationMSubmit}
               addToWishlistHandler={addToWishlistHandler}
               removeFromWishlistHandler={removeFromWishlistHandler}
               clickWishlist={clickWishlist}
