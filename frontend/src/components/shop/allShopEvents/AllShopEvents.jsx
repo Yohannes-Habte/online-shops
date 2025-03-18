@@ -20,8 +20,11 @@ const AllShopEvents = () => {
 
   useEffect(() => {
     if (currentSeller) {
-      dispatch(clearEventErrorsAction());
       dispatch(fetchShopEvents());
+    }
+
+    if (error) {
+      dispatch(clearEventErrorsAction());
     }
 
     return () => {
@@ -29,7 +32,7 @@ const AllShopEvents = () => {
         dispatch(clearEventErrorsAction());
       }
     };
-  }, [dispatch, currentSeller, error]);
+  }, [dispatch]);
 
   // Handle event deletion
   const handleEventDelete = async (eventID) => {
@@ -142,27 +145,29 @@ const AllShopEvents = () => {
         <p>Loading events...</p>
       ) : error ? (
         <p className="error-message">Error fetching events: {error}</p>
+      ) : shopEvents?.length === 0 ? (
+        <p className="no-events-message">No events found.</p>
       ) : (
         <DataGrid
-        rows={rows}
-        columns={columns}
-        autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
-          },
-        }}
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        disableRowSelectionOnClick
-      />
+          rows={rows}
+          columns={columns}
+          autoHeight
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
       )}
     </section>
   );

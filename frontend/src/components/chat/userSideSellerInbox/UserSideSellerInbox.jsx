@@ -6,7 +6,6 @@ import { format } from "timeago.js";
 import { IoCall } from "react-icons/io5";
 import { LiaSearchSolid } from "react-icons/lia";
 import { IoMdVideocam } from "react-icons/io";
-import { useSelector } from "react-redux";
 
 const UserSideSellerInbox = ({
   setOpen,
@@ -16,11 +15,9 @@ const UserSideSellerInbox = ({
   messages,
   messageSenderId,
   sellerData,
+  activeStatus,
   scrollRef,
 }) => {
-  const { currentSeller } = useSelector((state) => state.seller);
-  const userStatus = !!currentSeller; // If a user is logged in, they are online.
-
   return (
     <div className="user-inbox-wrapper">
       {/* Message sender header */}
@@ -40,7 +37,9 @@ const UserSideSellerInbox = ({
           </figure>
           <aside className="user-name-and-status">
             <h3 className="user-name"> {sellerData?.name} </h3>
-            <p className="status">{userStatus ? "Online" : "Offline"}</p>
+            <p className="user-online-status">
+              {activeStatus ? "Online 🟢" : "Offline 🔴"}
+            </p>
           </aside>
         </div>
 

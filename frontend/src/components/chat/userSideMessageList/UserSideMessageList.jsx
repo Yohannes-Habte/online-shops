@@ -5,24 +5,23 @@ import "./UserSideMessageList.scss";
 
 const UserSideMessageList = ({
   data,
-  index,
   setOpen,
-  setCurrentChat,
+  setSelectedChat,
   me,
   setSellerData,
   online,
   setActiveStatus,
+  activeStatus,
   loading,
 }) => {
-  
   const [active, setActive] = useState(null);
   const [user, setUser] = useState([]);
 
   // Handle chat selection
   const handleClick = () => {
-    setActive(index);
+    setActive(data._id);
     setOpen(true);
-    setCurrentChat(data);
+    setSelectedChat(data);
     setSellerData(user);
     setActiveStatus(online);
   };
@@ -47,8 +46,6 @@ const UserSideMessageList = ({
     fetchShop();
   }, [me, data, online]);
 
-  console.log("User:", user);
-  console.log("Data:", data);
   return (
     <div
       onClick={handleClick}
@@ -65,7 +62,11 @@ const UserSideMessageList = ({
             alt={user?.name} // Ensure fallback for null seller name
             className="image"
           />
-          {online ? <div className="online" /> : <div className="offline" />}
+          {activeStatus ? (
+            <div className="online" />
+          ) : (
+            <div className="offline" />
+          )}
         </figure>
 
         <aside className="user-side-shop-info-message-wrapper">

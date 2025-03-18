@@ -3,17 +3,19 @@ import "./UserInboxPage.scss";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
-import socketIO from "socket.io-client";
 import UserSideMessageList from "../../../components/chat/userSideMessageList/UserSideMessageList";
 import UserSideSellerInbox from "../../../components/chat/userSideSellerInbox/UserSideSellerInbox";
+
+// Import and connect socket.io-client
+import socketIO from "socket.io-client";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+const userSocket = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const UserInboxPage = () => {
   const { currentUser, loading } = useSelector((state) => state.user);
   const [conversations, setConversations] = useState([]);
-  const [incomingMessage, setIncomingMessage] = useState(null); // Incoming message from seller to user
-  const [currentChat, setCurrentChat] = useState();
+  const [incomingMessage, setIncomingMessage] = useState(null);
+  const [selectedChat, setSelectedChat] = useState();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [sellerData, setSellerData] = useState(null);
@@ -22,11 +24,12 @@ const UserInboxPage = () => {
   const [open, setOpen] = useState(false);
   const scrollRef = useRef(null);
 
+
   // =============================================================================
   // Get all shop conversations
   // =============================================================================
   useEffect(() => {
-    socketId.on("getMessage", (data) => {
+    userSocket.on("getMessage", (data) => {
       setIncomingMessage({
         sender: data.senderId,
         text: data.text,
@@ -41,12 +44,11 @@ const UserInboxPage = () => {
   useEffect(() => {
     if (
       incomingMessage &&
-      currentChat?.members.includes(incomingMessage.sender)
+      selectedChat?.members.includes(incomingMessage.sender)
     ) {
       setMessages((prev) => [...prev, incomingMessage]);
     }
-  }, [incomingMessage, currentChat]);
-
+  }, [incomingMessage, selectedChat]);
 
   // =============================================================================
   // Get all user conversations
@@ -66,30 +68,70 @@ const UserInboxPage = () => {
     fetchConversations();
   }, [currentUser, messages]);
 
+  // =============================================================================
+  // Add customer and seller to socket
+  // =============================================================================
   useEffect(() => {
-    if (currentUser) {
-      const sellerId = currentUser?._id;
-      socketId.emit("addUser", sellerId);
-      socketId.on("getUsers", (data) => {
-        setOnlineUsers(data);
-      });
+    if (currentUser && selectedChat) {
+      userSocket.emit("addUser", currentUser._id);
+
+      const shopId = selectedChat.members.find(
+        (member) => member !== currentUser._id
+      );
+      if (shopId) {
+        userSocket.emit("addUser", shopId);
+      }
     }
-  }, [currentUser]);
 
-  const onlineCheck = (chat) => {
-    const chatMembers = chat.members.find(
-      (member) => member !== currentUser?._id
+    userSocket.on("connect", () => {
+      if (currentUser) {
+        userSocket.emit("addUser", currentUser._id);
+      }
+
+      if (selectedChat) {
+        const shopId = selectedChat.members.find(
+          (member) => member !== currentUser._id
+        );
+        if (shopId) {
+          userSocket.emit("addUser", shopId);
+        }
+      }
+    });
+
+    userSocket.on("getUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      userSocket.off("getUsers");
+      userSocket.off("connect");
+    };
+  }, [currentUser, selectedChat]);
+
+  // ==============================================================================
+  // Check online users
+  // ==============================================================================
+  const onlineUsersCheck = (chat) => {
+    if (!currentUser || !onlineUsers.length) return false;
+
+    const chattingPartnerId = chat.members.find(
+      (member) => member !== currentUser._id
     );
-    const online = onlineUsers.find((user) => user.userId === chatMembers);
 
-    return online ? true : false;
+    const isOnline = onlineUsers.some(
+      (user) => user.userId === chattingPartnerId
+    );
+
+    console.log(`Checking online status for ${chattingPartnerId} =`, isOnline);
+
+    return isOnline;
   };
 
   useEffect(() => {
     const getMessage = async () => {
       try {
         const response = await axios.get(
-          `${API}/messages/get-all-messages/${currentChat?._id}`
+          `${API}/messages/get-all-messages/${selectedChat?._id}`
         );
         setMessages(response.data.messages);
       } catch (error) {
@@ -97,7 +139,7 @@ const UserInboxPage = () => {
       }
     };
     getMessage();
-  }, [currentChat]);
+  }, [selectedChat]);
 
   const sendMessageHandler = async (e) => {
     e.preventDefault();
@@ -107,14 +149,14 @@ const UserInboxPage = () => {
     const message = {
       sender: currentUser._id,
       text: newMessage,
-      conversationId: currentChat._id,
+      conversationId: selectedChat._id,
     };
 
-    const receiverId = currentChat.members.find(
+    const receiverId = selectedChat.members.find(
       (member) => member !== currentUser?._id
     );
 
-    socketId.emit("sendMessage", {
+    userSocket.emit("sendMessage", {
       senderId: currentUser._id,
       receiverId,
       text: newMessage,
@@ -134,13 +176,13 @@ const UserInboxPage = () => {
   };
 
   const updateLastMessage = async () => {
-    socketId.emit("updateLastMessage", {
+    userSocket.emit("updateLastMessage", {
       lastMessage: newMessage,
       lastMessageId: currentUser._id,
     });
 
     await axios
-      .put(`${API}/conversations/update-last-message/${currentChat._id}`, {
+      .put(`${API}/conversations/update-last-message/${selectedChat._id}`, {
         lastMessage: newMessage,
         lastMessageId: currentUser._id,
       })
@@ -159,18 +201,18 @@ const UserInboxPage = () => {
         {!open && (
           <>
             <h1 className="user-inbox-title">All Messages</h1>
-            {conversations.map((item, index) => (
+            {conversations.map((conversation) => (
               <UserSideMessageList
-                data={item}
-                key={index}
-                index={index}
+                data={conversation}
+                key={conversation._id}
                 setOpen={setOpen}
-                setCurrentChat={setCurrentChat}
+                setSelectedChat={setSelectedChat}
                 me={currentUser?._id}
                 setSellerData={setSellerData}
                 sellerData={sellerData}
-                online={onlineCheck(item)}
+                online={onlineUsersCheck(conversation)}
                 setActiveStatus={setActiveStatus}
+                activeStatus={activeStatus}
                 loading={loading}
               />
             ))}

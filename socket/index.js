@@ -4,75 +4,63 @@ import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
-
-// =============================================================================
-// Create an HTTP server using Express
-// =============================================================================
 const server = http.createServer(app);
 
-// =============================================================================
-// Initialize Socket.io server and enable CORS with the client URL from .env
-// =============================================================================
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: "*",
   },
 });
 
-// Middleware to handle CORS and JSON request bodies
 app.use(cors());
 app.use(express.json());
 
-// Check if the server is running
-app.get("/server", (req, res) => {
-  res.send("Soket.IO Server is running.");
-});
-
-// Array to store connected users
-let users = [];
+let onlineUsers = [];
 
 /**
- * Adds a user to the list if they are not already present
+ * Adds a user to the online users list or updates their socket ID if they already exist.
  * @param {string} userId - The ID of the user
  * @param {string} socketId - The socket ID of the user
  */
 const addUser = (userId, socketId) => {
-  const existingUser = users.find((user) => user.userId === userId);
+  if (!userId || !socketId) {
+    console.log("❌ Missing userId or socketId in addUser");
+    return;
+  }
+
+  let existingUser = onlineUsers.find((user) => user.userId === userId);
 
   if (existingUser) {
-    // Update socket ID if user already exists
+    console.log(`🔄 Updating socketId for user: ${userId}`);
     existingUser.socketId = socketId;
   } else {
-    // Add new user
-    users.push({ userId, socketId });
+    console.log(`➕ Adding new user: ${userId}`);
+    onlineUsers.push({ userId, socketId });
   }
 };
 
 /**
- * Removes a user from the list when they disconnect
+ * Removes a user from the online users list when they disconnect.
  * @param {string} socketId - The socket ID of the user to remove
  */
 const removeUser = (socketId) => {
-  users = users.filter((user) => user.socketId !== socketId);
+  onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
 };
 
 /**
- * Retrieves a user by their userId
- * @param {string} receiverId - The ID of the receiver
+ * Retrieves a user by their userId.
+ * @param {string} userId - The ID of the user to find
  * @returns {object} - The user object if found
  */
-const getUser = (receiverId) => {
-  return users.find((user) => user.userId === receiverId);
-};
+const getUser = (userId) => onlineUsers.find((user) => user.userId === userId);
 
 /**
- * Creates a message object
+ * Creates a message object with the given details.
  * @param {object} messageData - The message details
- * @returns {object} - The message object
+ * @returns {object} - The formatted message object
  */
 const createMessage = ({ senderId, receiverId, text, images }) => ({
   senderId,
@@ -82,39 +70,57 @@ const createMessage = ({ senderId, receiverId, text, images }) => ({
   seen: false,
 });
 
-// =============================================================================
-// Handle socket.io connections
-// =============================================================================
 io.on("connection", (socket) => {
-  // When a user joins, add them to the users list
+  /**
+   * Handles adding users to the online list when they connect.
+   */
   socket.on("addUser", (userId) => {
+    if (!userId) {
+      console.log("⚠️ addUser called with invalid userId:", userId);
+      return;
+    }
+
     addUser(userId, socket.id);
-    io.emit("getUsers", users);
+    io.emit("getUsers", onlineUsers);
   });
 
-  // Store messages for temporary session (not persistent)
+  // Temporary storage for messages
   const messages = {};
 
   /**
-   * Handles sending messages between users
+   * Handles sending messages between users.
    */
   socket.on("sendMessage", ({ senderId, receiverId, text, images }) => {
-    const message = createMessage({ senderId, receiverId, text, images });
-    const user = getUser(receiverId);
+    console.log(
+      "✅ Final Online Users List:",
+      JSON.stringify(onlineUsers, null, 2)
+    );
 
-    // Store messages for the receiver
-    if (!messages[receiverId]) {
-      messages[receiverId] = [message];
-    } else {
-      messages[receiverId].push(message);
+    const message = createMessage({ senderId, receiverId, text, images });
+    const receiver = getUser(receiverId);
+    console.log("receiver:", receiver);
+
+    if (!receiver) {
+      console.log(`❌ Receiver (ID: ${receiverId}) not found.`);
+      return;
     }
 
-    // Send message to the receiver if they are online
-    io.to(user?.socketId).emit("getMessage", message);
+    console.log("🔍 Checking messages for receiverId:", receiverId);
+    console.log("Existing messages:", messages[receiverId]);
+
+    // Ensure messages object is initialized for the receiver
+    if (!messages[receiverId]) {
+      messages[receiverId] = [];
+    }
+
+    console.log("📩 Adding message to existing conversation.", message);
+    messages[receiverId].push(message);
+
+    io.to(receiver.socketId).emit("getMessage", message);
   });
 
   /**
-   * Marks a message as seen
+   * Marks a message as seen and notifies the sender.
    */
   socket.on("messageSeen", ({ senderId, receiverId, conversationId }) => {
     const user = getUser(senderId);
@@ -123,7 +129,7 @@ io.on("connection", (socket) => {
         (msg) => msg.receiverId === receiverId && msg.id === conversationId
       );
       if (message) {
-        message.seen = true; // Mark message as seen
+        message.seen = true;
         io.to(user?.socketId).emit("messageSeen", {
           senderId,
           receiverId,
@@ -134,25 +140,23 @@ io.on("connection", (socket) => {
   });
 
   /**
-   * Updates the last message for all users
+   * Updates the last message for all users.
    */
   socket.on("updateLastMessage", ({ lastMessage, lastMessagesId }) => {
     io.emit("getLastMessage", { lastMessage, lastMessagesId });
   });
 
   /**
-   * Handles user disconnection
+   * Handles user disconnection and removes them from the online users list.
    */
   socket.on("disconnect", () => {
-    removeUser(socket.id); // Remove user from active list
-    io.emit("getUsers", users); // Notify all clients about updated user list
+    removeUser(socket.id);
+    io.emit("getUsers", onlineUsers);
   });
 });
-
-// Start the server on the specified port or default to 3000
 
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server is running on port ${PORT}`);
 });

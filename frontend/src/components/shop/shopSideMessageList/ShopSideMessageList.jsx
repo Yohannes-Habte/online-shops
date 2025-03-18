@@ -12,10 +12,19 @@ const ShopSideMessageList = ({
   activeChatUser,
   online,
   setIsUserOnline,
+  isUserOnline,
   loading,
 }) => {
   const [user, setUser] = useState([]);
   const [active, setActive] = useState(0);
+
+  // Display user online status
+  useEffect(() => {
+    setIsUserOnline(online);
+  }, [online]);
+
+  console.log("conversation", conversation);
+  console.log("user online status:", isUserOnline);
 
   // Handle click
   const handleClick = () => {
@@ -28,6 +37,7 @@ const ShopSideMessageList = ({
 
   // Get user
   useEffect(() => {
+    setIsUserOnline(online);
     const userId = conversation.members.find((user) => user != shopId);
 
     const getUser = async () => {

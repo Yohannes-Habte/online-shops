@@ -1,0 +1,61 @@
+.chat-bot-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+  
+    &:focus-within {
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+    }
+  
+    .cht-bot-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 10px;
+      resize: none;
+      max-height: 50px;
+      min-height: 40px;
+      border-radius: 4px;
+      background: #f9f9f9;
+      color: #333;
+      transition: background 0.2s;
+  
+      &:focus {
+        background: #fff;
+      }
+    }
+  
+    .cht-bot-btn {
+      border: none;
+      background: #007bff;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+  
+      &:hover {
+        background: #0056b3;
+      }
+  
+      &:active {
+        background: #004494;
+      }
+  
+      .cht-bot-btn-icon {
+        font-size: 18px;
+      }
+    }
+  }
+  

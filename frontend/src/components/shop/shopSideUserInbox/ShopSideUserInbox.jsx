@@ -29,7 +29,7 @@ const ShopSideUserInbox = ({
           <aside className="user-name-and-status-wrapper">
             <h3 className="user-name"> {activeChatUser?.name} </h3>
             <p className="user-online-status">
-              {isUserOnline ? "Online" : "Offline"}
+            {isUserOnline ? "Online 🟢" : "Offline 🔴"}
             </p>
           </aside>
         </figure>

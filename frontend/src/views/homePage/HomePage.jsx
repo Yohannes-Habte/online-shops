@@ -7,6 +7,7 @@ import WomenProducts from "../../components/products/womenProducts/WomenProducts
 import MenProducts from "../../components/products/menProducts/MenProducts";
 import KidsProducts from "../../components/products/kidsProducts/KidsProducts";
 import Footer from "../../components/layouts/footer/Footer";
+import ChatbotLayout from "../../components/chatBot/chatbotLayout/ChatbotLayout";
 
 const HomePage = () => {
   return (
@@ -24,6 +25,8 @@ const HomePage = () => {
         <KidsProducts />
 
         <Events />
+
+        <ChatbotLayout />
 
       </section>
 

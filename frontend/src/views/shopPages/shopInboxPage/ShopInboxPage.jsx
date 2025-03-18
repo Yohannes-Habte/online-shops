@@ -9,10 +9,7 @@ import ShopSideUserInbox from "../../../components/shop/shopSideUserInbox/ShopSi
 // Import and connect socket.io-client
 import socketIO from "socket.io-client";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_SOCKET;
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
-socketId.on("connect", () => {
-  console.log("Connected to socket: =>", socketId.id);
-});
+const shopSocket = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const ShopInboxPage = () => {
   const { currentSeller, loading } = useSelector((state) => state.seller);
@@ -28,19 +25,18 @@ const ShopInboxPage = () => {
   const [isUserOnline, setIsUserOnline] = useState(false); // store user online status
   const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
 
+  console.log("selectedChat", selectedChat);
+
   // scrollRef: store scroll reference
   const scrollRef = useRef(null);
 
-  console.log("incomingMessage", incomingMessage);
-  console.log("selectedChat", selectedChat);
-  
+  // =============================================================================
+  // Listen for incoming messages
+  // =============================================================================
 
-  // =============================================================================
-  // Get all shop conversations
-  // =============================================================================
   useEffect(() => {
     const handleIncomingMessage = (data) => {
-      console.log("Message received:", data); // Debugging
+      console.log("Message received:", data);
       setIncomingMessage({
         sender: data.senderId,
         text: data.text,
@@ -48,22 +44,22 @@ const ShopInboxPage = () => {
       });
     };
 
-    socketId.on("getMessage", handleIncomingMessage);
+    shopSocket.on("receive-message", handleIncomingMessage);
 
     return () => {
-      socketId.off("getMessage", handleIncomingMessage);
+      shopSocket.off("receive-message", handleIncomingMessage);
     };
   }, []);
 
   // =============================================================================
-  // Incoming chat message from user to seller (shop) and update chat messages
+  // Update chat messages when a new message comes in
   // =============================================================================
   useEffect(() => {
     if (incomingMessage && selectedChat) {
       console.log("Incoming Message:", incomingMessage);
-      console.log("Selected Chat Members:", selectedChat.members);
+      console.log("Selected Chat Members:", selectedChat?.members);
 
-      if (selectedChat.members.includes(incomingMessage.sender)) {
+      if (selectedChat.members?.includes(incomingMessage.sender)) {
         setChatMessages((prev) => [...prev, incomingMessage]);
       }
     }
@@ -88,17 +84,44 @@ const ShopInboxPage = () => {
   }, [currentSeller, chatMessages]);
 
   // =============================================================================
-  // Add user to socket
+  // Add seller and customer to socket
   // =============================================================================
   useEffect(() => {
-    if (currentSeller) {
-      socketId.emit("addUser", currentSeller?._id);
+    if (currentSeller && selectedChat) {
+      shopSocket.emit("addUser", currentSeller._id);
 
-      socketId.on("getUsers", (users) => {
-        setConnectedUsers(users);
-      });
+      const customerId = selectedChat.members.find(
+        (member) => member !== currentSeller._id
+      );
+      if (customerId) {
+        shopSocket.emit("addUser", customerId);
+      }
     }
-  }, [currentSeller]);
+
+    shopSocket.on("connect", () => {
+      if (currentSeller) {
+        shopSocket.emit("addUser", currentSeller._id);
+      }
+
+      if (selectedChat) {
+        const customerId = selectedChat.members.find(
+          (member) => member !== currentSeller._id
+        );
+        if (customerId) {
+          shopSocket.emit("addUser", customerId);
+        }
+      }
+    });
+
+    shopSocket.on("getUsers", (users) => {
+      setConnectedUsers(users);
+    });
+
+    return () => {
+      shopSocket.off("getUsers");
+      shopSocket.off("connect");
+    };
+  }, [currentSeller, selectedChat]); // Depend on selectedChat as well
 
   // =============================================================================
   // Check if user is online
@@ -107,7 +130,10 @@ const ShopInboxPage = () => {
     const chatPartnerId = chat.members.find(
       (member) => member !== currentSeller?._id
     );
-    return connectedUsers.some((user) => user.userId === chatPartnerId);
+    console.log("Chat Partner ID:", chatPartnerId);
+    let users= connectedUsers.some((user) => user.userId === chatPartnerId);
+    console.log("Users:", users);
+    return users;
   };
 
   // =============================================================================
@@ -140,10 +166,10 @@ const ShopInboxPage = () => {
     };
 
     const recipientId = selectedChat.members.find(
-      (member) => member.id !== currentSeller._id
+      (member) => member !== currentSeller._id
     );
 
-    socketId.emit("sendMessage", {
+    shopSocket.emit("sendMessage", {
       senderId: currentSeller._id,
       receiverId: recipientId,
       text: typedMessage,
@@ -167,7 +193,7 @@ const ShopInboxPage = () => {
   // Update the last message
   // =============================================================================
   const updateLastMessage = async () => {
-    socketId.emit("updateLastMessage", {
+    shopSocket.emit("updateLastMessage", {
       lastMessage: typedMessage,
       lastMessageId: currentSeller._id,
     });
@@ -209,6 +235,7 @@ const ShopInboxPage = () => {
                 activeChatUser={activeChatUser}
                 online={checkUserOnlineStatus(conversation)}
                 setIsUserOnline={setIsUserOnline}
+                isUserOnline={isUserOnline}
                 loading={loading}
               />
             ))}

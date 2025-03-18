@@ -25,6 +25,8 @@ import categoryRouter from "./routes/categoryRoutes.js";
 import brandRouter from "./routes/brandRoutes.js";
 import supplierRouter from "./routes/supplierRoutes.js";
 import subcategoryRouter from "./routes/subcategoryRoutes.js";
+import openaiChatRouter from "./routes/openaiChatRoutes.js";
+import openaiImageRouter from "./routes/openaiImageRoutes.js";
 
 // Express app
 dotenv.config();
@@ -83,6 +85,10 @@ app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/data", rowDataRouter);
+
+//chatbotRoutes
+app.use("/api/v1/chat/completions", openaiChatRouter);
+app.use("/api/v1/images/generations", openaiImageRouter);
 
 // Global error handler
 app.use(globalErrorHandler);
