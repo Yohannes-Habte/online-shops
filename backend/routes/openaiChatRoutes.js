@@ -3,6 +3,6 @@ import { createOpenaiChat } from "../controllers/openaiChatBot.js";
 
 const openaiChatRouter = Router();
 
-openaiChatRouter.post("/completions", createOpenaiChat);
+openaiChatRouter.post("/", createOpenaiChat);
 
 export default openaiChatRouter;

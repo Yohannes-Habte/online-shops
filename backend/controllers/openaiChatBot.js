@@ -10,9 +10,15 @@ export const createOpenaiChat = asyncHandler(async (req, res) => {
 
   let openai;
 
-  mode === "production"
-    ? (openai = new OpenAI({ apiKey: process.env.OPEN_AI_APIKEY }))
-    : (openai = new OpenAIMock());
+  if (mode === process.env.OPEN_AI_MOCK) {
+    openai = new OpenAIMock();
+  } else if (mode === process.env.OPEN_AI_PRODUCTION) {
+    openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
+  }
+
+  // mode === "production"
+  //   ? (openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY }))
+  //   : (openai = new OpenAIMock());
 
   const completion = await openai.chat.completions.create({
     stream,

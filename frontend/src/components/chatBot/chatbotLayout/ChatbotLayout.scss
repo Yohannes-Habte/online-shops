@@ -1,55 +1,69 @@
-.chat-bot-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+// ChatbotLayout.scss
+
+.openai-chat-layout-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+
+  .chat-bot-messages-and-form-container {
+    width: 350px;
+    height: 500px;
+    padding: 0.5rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    z-index: 1000;
+    gap: 0.5rem;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out;
+
+    .chat-bot-messages-display-wrapper {
+      height: 83%;
+    }
+
+    .chat-bot-form-display-container {
+      height: 10%;
+    }
   }
-  
-  .chat-bot-icon-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .robot-chat-btn {
-    background: #007bff;
-    border: none;
-    color: white;
+
+  .chat-bot-icon-wrapper,
+  .chat-bot-close-icon-wrapper {
     width: 50px;
     height: 50px;
+    background: #0078ff;
+    color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s, transform 0.2s;
-  
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s;
+
     &:hover {
-      background: #0056b3;
-    }
-  
-    &:active {
-      transform: scale(0.95);
-    }
-  
-    .robot-chat-btn-icon {
-      font-size: 24px;
+      background: #005fcc;
     }
   }
-  
-  .messages-and-form-wrapper {
-    width: 320px;
-    max-height: 450px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  
+}
+
+@media (max-width: 400px) {
+  .openai-chat-layout-container {
+    .chat-bot-messages-and-form-wrapper {
+      width: 90%;
+      height: 450px;
+    }
+  }
+}

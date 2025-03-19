@@ -68,7 +68,7 @@ class ChatMock {
         );
 
       const text =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        "The AI Open API key will be provided soon, enabling seamless and efficient communication. Until then, you can utilize the mock API for testing and development purposes. This ensures uninterrupted workflow and a smooth transition once the official API access is available.";
       if (stream) {
         return new StreamMock(text.split(" "));
       } else {

@@ -34,7 +34,8 @@ const ChatBotForm = ({ setMessages, messages }) => {
       method: "POST",
       headers: {
         provider: "open-ai",
-        mode: "production",
+        // mode: "production",
+        mode: "mock", // Make sure we use the mock API in development
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -95,13 +96,13 @@ const ChatBotForm = ({ setMessages, messages }) => {
     }
   };
 
-    // Handle Enter key press
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault(); // Prevent new line in textarea
-        handleSubmit(e);
-      }
-    };
+  // Handle Enter key press
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line in textarea
+      handleSubmit(e);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} action="" className="chat-bot-form">
