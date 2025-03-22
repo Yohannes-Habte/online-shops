@@ -13,7 +13,22 @@ const shopSchema = new Schema(
     description: { type: String, required: true },
     shopAddress: { type: String, required: true },
     withdrawMethod: { type: Object },
-    availableBalance: { type: Number, default: 0 },
+
+    shopIncomeInfo: [
+      {
+        paymentDate: { type: Date, required: true },
+        currentAmount: { type: Number, required: true },
+      },
+    ],
+
+    shopRefundInfo: [
+      {
+        refundDate: { type: Date, required: true },
+        refundAmount: { type: Number, required: true },
+      },
+    ],
+
+    netShopIncome: { type: Number, default: 0 },
 
     role: { type: String, default: "seller", enum: ["seller", "admin"] },
 
@@ -74,6 +89,17 @@ shopSchema.pre("save", async function (next) {
     return next(err);
   }
 });
+
+// Pre save for netShopIncome calculated from the shopIncomeInfo
+// shopSchema.pre("save", function (next) {
+//   const calculateNetShopIncome = this.shopIncomeInfo.reduce(
+//     (total, income) => total + income.currentAmount,
+//     0
+//   );
+
+//   this.netShopIncome = calculateNetShopIncome;
+//   return next();
+// });
 
 // Pre save for rest forgot password
 shopSchema.methods.createResetpasswordToken = function () {

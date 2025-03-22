@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import asyncHandler from "../utils/asyncHandler.js";
 import OpenAIMock from "../utils/OpenAIMock.js";
 
+// ==========================================================================
+// Create OpenAI chat
+// ==========================================================================
 export const createOpenaiChat = asyncHandler(async (req, res) => {
   const {
     body: { stream, ...request },
@@ -39,4 +42,28 @@ export const createOpenaiChat = asyncHandler(async (req, res) => {
   } else {
     res.json(completion.choices[0]);
   }
+});
+
+// ==========================================================================
+// Create OpenAI image
+// ==========================================================================
+export const createOpenaiImage = asyncHandler(async (req, res) => {
+  const {
+    body: { ...request },
+    headers: { mode },
+  } = req;
+
+  let openai;
+
+  if (mode === process.env.OPEN_AI_MOCK) {
+    openai = new OpenAIMock();
+  } else if (mode === process.env.OPEN_AI_PRODUCTION) {
+    openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
+  }
+
+  const image = await openai.images.generate({
+    ...request,
+  });
+
+  res.json(image.data);
 });

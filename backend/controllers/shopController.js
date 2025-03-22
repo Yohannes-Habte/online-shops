@@ -472,7 +472,7 @@ export const deleteAllShops = async (req, res, next) => {
 
 /** 
 // ====================================================================
-// Delete the shopProducts field contents, but the shopProducts field. 
+// Delete the a field contents, but not the field. 
 // ====================================================================
 const clearShopProducts = async (shopId) => {
   
@@ -507,14 +507,16 @@ const clearAllShopProducts = async () => {
 
 //clearAllShopProducts();
 
+
+
 // ====================================================================
-// If You Need to Clear the soldProducts Field for All Shops:
+// If You Need to Clear a Field:
 // ====================================================================
-const clearShopProductsField = async () => {
+const clearSpecificField = async () => {
   try {
     const result = await Shop.updateMany(
       {}, // No filter: Applies to all documents
-      { $unset: { orders: "" } } // Removes the soldProducts field entirely
+      { $unset: { availableBalance: "" } } 
     );
     console.log(result);
   } catch (err) {
@@ -522,6 +524,6 @@ const clearShopProductsField = async () => {
   }
 };
 
-// clearShopProductsField();
+clearSpecificField();
 
 */

@@ -94,7 +94,6 @@ const ShopOrderDetails = () => {
       .toUpperCase()}`;
   };
 
-
   // =========================================================================
   // Update order status
   // =========================================================================
@@ -245,7 +244,6 @@ const ShopOrderDetails = () => {
           <p>{order.returnReason}</p>
         </section>
       )}
-      
 
       <SingleOrderRefund
         order={order}

@@ -30,7 +30,7 @@ const ChatBotForm = ({ setMessages, messages }) => {
 
     setMessages((prev) => [...prev, newMessage]);
 
-    const response = await fetch(`${API}/chat/completions`, {
+    const response = await fetch(`${API}/openai/chat/completions`, {
       method: "POST",
       headers: {
         provider: "open-ai",

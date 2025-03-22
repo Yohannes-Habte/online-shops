@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { AiOutlineHeart } from "react-icons/ai";
 import { BiUserCircle } from "react-icons/bi";
@@ -28,6 +28,12 @@ const Header = () => {
   const [openCart, setOpenCart] = useState(false);
   const [openWishList, setOpenWishList] = useState(false);
 
+  // ==========================================================================================
+  // Step 1: Ref to detect outside clicks
+  // ==========================================================================================
+  const dropdownRef = useRef(null);
+  const categoryDropdownRef = useRef(null);
+
   useEffect(() => {
     dispatch(fetchUser());
   }, [dispatch]);
@@ -36,6 +42,34 @@ const Header = () => {
   const handleLogout = async () => {
     await signOut();
   };
+
+  // ===========================================================================================
+  // Step 2: Event listener to detect outside clicks
+  // ===========================================================================================
+
+  useEffect(() => {
+    // Close dropdown if click is outside of dropdown area
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenUser(false);
+      }
+
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target)
+      ) {
+        setDropDown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup the event listener on component unmount
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="header">
@@ -62,7 +96,7 @@ const Header = () => {
       {/* Navbar */}
       <div className="navbar-cart-user-wrapper">
         {/* All categories */}
-        <div action="" className="categories">
+        <div action="" className="categories" ref={categoryDropdownRef}>
           <p className="select-category">Select Category</p>
           <MdKeyboardArrowDown
             onClick={() => setDropDown(!dropDown)}
@@ -100,7 +134,7 @@ const Header = () => {
           {/* Logged in user details */}
           <div className="logged-in-user">
             {currentUser ? (
-              <React.Fragment>
+              <div ref={dropdownRef}>
                 <figure className="user-image-container">
                   <img
                     className="image"
@@ -140,7 +174,7 @@ const Header = () => {
                     </li>
                   </ul>
                 )}
-              </React.Fragment>
+              </div>
             ) : (
               <Link to={"/login"} className="link">
                 <BiUserCircle className="icon" />

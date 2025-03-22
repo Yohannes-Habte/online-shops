@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { createOpenaiChat } from "../controllers/openaiChatBot.js";
+import { createOpenaiChat, createOpenaiImage } from "../controllers/openaiController.js";
 
-const openaiChatRouter = Router();
+const openaiRouter = Router();
 
-openaiChatRouter.post("/", createOpenaiChat);
+openaiRouter.post("/chat/completions", createOpenaiChat);
 
-export default openaiChatRouter;
+openaiRouter.post("/images/generations", createOpenaiImage);
+
+export default openaiRouter;

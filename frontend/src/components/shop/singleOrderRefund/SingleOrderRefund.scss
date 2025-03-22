@@ -1,11 +1,12 @@
 @import "../../../styles/mixins.scss";
 @import "../../../styles/Mixins.scss";
 
-.refund-order-processing-container {
+.shop-refund-order-processing-container {
   @include shadow1;
   background-color: #ffe5ec;
+  margin-top: 2rem;
 
-  .order-refund-form-wrapper {
+  .shop-order-refund-form-wrapper {
     .order-refund-form-title {
       @include subTitle;
     }
@@ -62,7 +63,14 @@
     }
   }
 
-  .order-refund-history-wrapper {
+  .shop-order-refund-history-wrapper {
+    background-color: #f3daad;
+    padding: 1rem;
+    transition: all 1s;
+
+    &:hover {
+      transform: scale(1.05);
+    }
     .order-refund-history-title {
       @include subTitle;
       display: flex;
@@ -80,8 +88,4 @@
       }
     }
   }
-}
-
-.no-refund-order-processing-container {
-  background-color: $white;
 }

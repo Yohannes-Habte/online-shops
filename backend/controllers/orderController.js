@@ -11,9 +11,30 @@ import User from "../models/userModel.js";
 export const createOrder = async (req, res, next) => {
   let { orderedItems, shippingAddress, customer, payment } = req.body;
 
+  const authUserId = req.user.id;
+
+  if (!authUserId) {
+    return next(
+      createError(401, "Unauthorized: Please login to place an order.")
+    );
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(authUserId)) {
+    return next(createError(400, "Invalid user ID format."));
+  }
+
   // Validate customer ID using mongoose
   if (!mongoose.Types.ObjectId.isValid(customer)) {
     return res.status(400).json({ message: "Invalid customer ID." });
+  }
+
+  if (customer !== authUserId) {
+    return next(
+      createError(
+        403,
+        "Unauthorized: You cannot place an order for another user."
+      )
+    );
   }
 
   // Start transaction
@@ -43,6 +64,7 @@ export const createOrder = async (req, res, next) => {
       }
     });
 
+    //
     if (productErrors.length > 0) {
       return res
         .status(400)
@@ -71,7 +93,6 @@ export const createOrder = async (req, res, next) => {
       const selectedVariant = product.variants.find(
         (variant) =>
           variant.productColor === item.variant.productColor &&
-          variant.productImage === item.variant.productImage &&
           variant.productSizes.some(
             (sizeObj) =>
               sizeObj.size === item.variant.size && sizeObj.stock >= item.qty
@@ -80,7 +101,7 @@ export const createOrder = async (req, res, next) => {
 
       if (!selectedVariant) {
         console.warn(
-          `Variant not found for product ID ${item._id}, Size: ${item.variant.size}, Color: ${item.variant.productColor}, Image: ${item.variant.productImage}`
+          `Variant not found for product ID ${item._id},  Color: ${item.variant.productColor} and Size: ${item.variant.size} }`
         );
         continue; // Skip items with invalid variant or insufficient stock
       }
@@ -89,6 +110,12 @@ export const createOrder = async (req, res, next) => {
       const sizeObj = selectedVariant.productSizes.find(
         (size) => size.size === item.variant.size
       );
+
+      if (!sizeObj) {
+        console.warn(`Size not found for product ${item._id}`);
+        continue; // Skip items with invalid size
+      }
+
       if (sizeObj && sizeObj.stock < item.qty) {
         console.warn(`Not enough stock for product ${item._id}`);
         continue; // Skip items with insufficient stock
@@ -103,7 +130,7 @@ export const createOrder = async (req, res, next) => {
       // Populate item with correct size
       populatedItems.push({
         ...item,
-        size: item.variant.size, // Ensure size is set correctly
+        size: item.variant.size, 
         product: product._id,
         title: product.title,
         category: product.category,
@@ -127,7 +154,6 @@ export const createOrder = async (req, res, next) => {
     const calculateTax = (subTotal) => subTotal * 0.02;
     const calculateShippingFee = (subTotal) =>
       subTotal <= 100 ? 50 : subTotal * 0.1;
-    const calculateServiceCharge = (subTotal) => subTotal * 0.01;
     const calculateDiscount = (subTotal) => {
       if (subTotal > 500) return subTotal * 0.1; // 10% discount
       if (subTotal > 200) return subTotal * 0.05; // 5% discount
@@ -159,23 +185,20 @@ export const createOrder = async (req, res, next) => {
 
     const savedOrder = await order.save({ session });
 
-    // Update associated shops using findByIdAndUpdate
-    const shopIds = [...new Set(populatedItems.map((item) => item.shop))];
-    await Promise.all(
-      shopIds.map(async (shopId) => {
-        const soldProducts = populatedItems
-          .filter((item) => item.shop.toString() === shopId.toString())
-          .map((item) => item.product);
+    // The order belongs only to one Shop. So, update the shop by pushing the order ID to the orders array of the shop
+    const shopId = populatedItems[0].shop;
+    await Shop.findByIdAndUpdate(
+      shopId,
+      { $push: { orders: savedOrder._id } },
+      { session }
+    );
 
-        await Shop.findByIdAndUpdate(
-          shopId,
-          {
-            $addToSet: { soldProducts: { $each: soldProducts } }, // Prevent duplicates
-            $push: { orders: savedOrder._id },
-          },
-          { session }
-        );
-      })
+    // Update shop soldProducts array with the ordered product IDs. This is for tracking the products sold by the shop. Hence, you need to find the products from the populatedItems array and push them to the soldProducts array of the shop.
+    const shopSoldProductsIds = populatedItems.map((item) => item.product);
+    await Shop.findByIdAndUpdate(
+      shopId,
+      { $addToSet: { soldProducts: { $each: shopSoldProductsIds } } },
+      { session }
     );
 
     // Find the user and update their orders
@@ -355,7 +378,7 @@ export const updateShopOrders = async (req, res, next) => {
     const seller = await Shop.findById(shopId).session(session);
     if (!seller) {
       await session.abortTransaction();
-      return next(createError(404, "No permission to update order status!"));
+      return next(createError(404, "Shop not found!"));
     }
 
     // 4. Fetch the order by ID and check its current status
@@ -388,7 +411,7 @@ export const updateShopOrders = async (req, res, next) => {
       return next(
         createError(
           400,
-          "Cannot modify the order status once it is returned or refunded!"
+          `Cannot modify the order status once it is returned or refunded!`
         )
       );
     }
@@ -415,21 +438,35 @@ export const updateShopOrders = async (req, res, next) => {
       addToStatusHistory(order, orderStatus);
     }
 
-    // 9. If the order status is "Delivered", update orderStatus, statusHistory, payment status, service fee, stock, soldOut, availableBalance, and deliverAt
+    // 9. If the order status is "Delivered", update orderStatus, statusHistory, payment status, service fee, stock, soldOut, shopIncomeInfo, and deliverAt
     if (orderStatus === "Delivered") {
       order.orderStatus = orderStatus;
       order.deliveredAt = Date.now();
       order.payment.paymentStatus = "completed";
 
-      // Calculate service fee, soldOut, availableBalance
+      // Calculate service fee, soldOut, shopIncomeInfo
       const grandTotal = order.grandTotal;
       const shopCommission = grandTotal * 0.01;
       const shopBalance = grandTotal - shopCommission;
       const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2));
 
-      // Update service fee, deliveredAt, soldOut, and availableBalance
+      // Update service fee, shopIncomeInfo, soldOut, and status history
       order.serviceFee = shopCommission;
-      order.availableBalance = shopNetOrderAmount;
+
+      if (!Array.isArray(seller.shopIncomeInfo)) {
+        seller.shopIncomeInfo = [];
+      }
+
+      seller.shopIncomeInfo.push({
+        paymentDate: new Date(),
+        currentAmount: shopNetOrderAmount,
+      });
+
+      seller.netShopIncome = (
+        seller.netShopIncome + shopNetOrderAmount
+      ).toFixed(2);
+
+      await seller.save({ validateBeforeSave: false, session });
 
       // Loop through the ordered items to update stock and soldOut in the product schema
       await Promise.all(
@@ -475,14 +512,8 @@ export const updateShopOrders = async (req, res, next) => {
         })
       );
 
-      // Add to status history
+      // Update order status history
       addToStatusHistory(order, orderStatus);
-
-      // Update shop balance
-      if (seller) {
-        seller.availableBalance += shopNetOrderAmount;
-        await seller.save({ session });
-      }
     }
 
     // 10. Handle the "Cancelled" status logic
@@ -886,15 +917,20 @@ export const orderRefundByShop = async (req, res, next) => {
       message: `Your order status changed to '${orderStatus}' on ${new Date().toLocaleString()}.`,
     });
 
-    // Deduct refund amount from shop's balance
-    if (shop.availableBalance < refundAmount) {
+    // Update shop refund info array
+    shop.shopRefundInfo.push({
+      refundDate: new Date(),
+      refundAmount: refundAmount,
+    });
+
+    if (shop.netShopIncome < refundAmount) {
       await session.abortTransaction();
       return next(
         createError(400, "Insufficient balance in shop account for refund.")
       );
     }
 
-    shop.availableBalance -= refundAmount;
+    shop.netShopIncome = (shop.netShopIncome - refundAmount).toFixed(2);
     await shop.save({ session });
 
     // Function to restore stock

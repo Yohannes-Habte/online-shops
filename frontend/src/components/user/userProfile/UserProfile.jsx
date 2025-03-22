@@ -7,7 +7,6 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   cloud_URL,
   cloud_name,
@@ -15,6 +14,7 @@ import {
 } from "../../../utils/security/secreteKey.js";
 import { updateUserProfile } from "../../../redux/actions/user.js";
 import { validPassword } from "../../../utils/validators/Validate.js";
+import Loader from "../../loader/Loader.jsx";
 
 const UserProfile = () => {
   const { currentUser, loading } = useSelector((state) => state.user);
@@ -245,7 +245,11 @@ const UserProfile = () => {
 
           {/* Submit Button */}
           <button type="submit" className="update-profile-btn">
-            {loading ? <ButtonLoader /> : "Update Profile"}
+            {loading ? (
+              <Loader isLoading={loading} message="" size={20} />
+            ) : (
+              "Update Profile"
+            )}
           </button>
         </form>
       </fieldset>

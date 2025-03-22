@@ -15,17 +15,10 @@ const SingleOrderRefund = ({
   console.log("order:", order);
 
   return (
-    <div
-      className={`${
-        order?.payment?.paymentStatus === "completed" &&
-        order?.orderStatus === "Refund Requested"
-          ? "refund-order-processing-container"
-          : "no-refund-order-processing-container"
-      }`}
-    >
+    <div className={"shop-refund-order-processing-container"}>
       {order?.payment?.paymentStatus === "completed" &&
         order?.orderStatus === "Refund Requested" && (
-          <section className="order-refund-form-wrapper">
+          <section className="shop-order-refund-form-wrapper">
             <h2 className="order-refund-form-title">Refund Order</h2>
             <form
               onSubmit={handleShopOrderRefund}
@@ -65,32 +58,36 @@ const SingleOrderRefund = ({
           </section>
         )}
 
-      {order?.payment?.refunds?.length > 0 && (
-        <section className="order-refund-history-wrapper">
-          <h2 className="order-refund-history-title">
-            <History size={22} /> Refund History
-          </h2>
-          <ul className="order-refund-history-list">
-            {order.payment.refunds.map((refund) => (
-              <li key={refund.refundId} className="order-refund-history-item">
-                <p className="refund-info">
-                  <strong>Refund ID:</strong> {refund.refundId}
-                </p>
-                <p className="refund-info">
-                  <strong>Amount:</strong> ${refund.amount.toFixed(2)}
-                </p>
-                <p className="refund-info">
-                  <strong>Reason:</strong> {refund.reason}
-                </p>
-                <p className="refund-info">
-                  <strong>Refunded On:</strong>{" "}
-                  {new Date(refund.createdAt).toLocaleDateString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {order.payment.paymentStatus === "refunded" &&
+        order?.payment?.refunds?.length > 0 && (
+          <section className="shop-order-refund-history-wrapper">
+            <h2 className="order-refund-history-title">
+              <History size={22} /> Refund History
+            </h2>
+            <div className="shop-order-refund-history-list">
+              {order.payment.refunds.map((refund) => (
+                <article
+                  key={refund.refundId}
+                  className="order-refund-history-item"
+                >
+                  <p className="refund-info">
+                    <strong>Refund ID:</strong> {refund.refundId}
+                  </p>
+                  <p className="refund-info">
+                    <strong>Amount:</strong> ${refund.amount.toFixed(2)}
+                  </p>
+                  <p className="refund-info">
+                    <strong>Reason:</strong> {refund.reason}
+                  </p>
+                  <p className="refund-info">
+                    <strong>Refunded On:</strong>{" "}
+                    {new Date(refund.createdAt).toLocaleDateString()}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
     </div>
   );
 };

@@ -47,6 +47,14 @@
     }
   }
 
+  .chat-bot-close-icon-wrapper {
+    background-color: orange;
+
+    &:hover {
+      background: tomato;
+    }
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;

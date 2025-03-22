@@ -17,7 +17,7 @@ const Shipping = ({ user, formData, handleInputChange, errors }) => {
           <FaUserTie className="icon" />
           <input
             type="text"
-            value={user && user.name}
+            value={user && user?.name}
             readOnly
             className="input-field"
           />
@@ -29,7 +29,7 @@ const Shipping = ({ user, formData, handleInputChange, errors }) => {
           <MdEmail className="icon" />
           <input
             type="email"
-            value={user && user.email}
+            value={user && user?.email}
             readOnly
             className="input-field"
           />

@@ -58,7 +58,7 @@ const DashboardOverview = () => {
     (order) => order.orderStatus === "Delivered"
   );
 
-  const totalShopIncome = shopDetails?.availableBalance?.toFixed(2) || "0";
+  const totalShopIncome = shopDetails?.netShopIncome?.toFixed(2) || "0";
 
   const rows = deliveredShopOrders.map((order) => ({
     id: order._id,

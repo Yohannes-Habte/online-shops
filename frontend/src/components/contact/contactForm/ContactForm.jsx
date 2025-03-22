@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import './ContactForm.scss';
-import { FaUserAlt } from 'react-icons/fa';
-import { BiSolidMessageDetail } from 'react-icons/bi';
-import axios from 'axios';
-import { API } from '../../../utils/security/secreteKey.js';
-import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import ButtonLoader from '../../../utils/loader/ButtonLoader.jsx';
+import { useEffect, useState } from "react";
+import "./ContactForm.scss";
+import { FaUserAlt } from "react-icons/fa";
+import { BiSolidMessageDetail } from "react-icons/bi";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey.js";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Loader from "../../loader/Loader.jsx";
 
 // Initial State
 const initialSate = {
-  firstName: '',
-  lastName: '',
-  message: '',
-  error: '',
+  firstName: "",
+  lastName: "",
+  message: "",
+  error: "",
 };
 const ContactForm = () => {
   const navigate = useNavigate();
@@ -30,9 +30,9 @@ const ContactForm = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate('/login');
+      navigate("/login");
     }
-  },[currentUser]);
+  }, [currentUser]);
 
   // Function that handle input change
   const handleInputChange = (event) => {
@@ -42,7 +42,7 @@ const ContactForm = () => {
 
   // reste the variables into initial state
   const resetToInitialState = () => {
-    setTestimonies({ firstName: '', lastName: '', message: '' });
+    setTestimonies({ firstName: "", lastName: "", message: "" });
   };
   // Submit user testimonial or comment
   const handleSubmit = async (e) => {
@@ -56,7 +56,7 @@ const ContactForm = () => {
         message: message,
       };
 
-      const { data } = await axios.post(
+      await axios.post(
         `${API}/comments/new-comment/${currentUser._id}`,
         newComment
       );
@@ -81,15 +81,15 @@ const ContactForm = () => {
             <input
               type="text"
               required
-              name={'firstName'}
-              id={'firstName'}
+              name={"firstName"}
+              id={"firstName"}
               value={firstName}
               onChange={handleInputChange}
               placeholder="First Name"
               className="input-field"
             />
 
-            <label htmlFor={'firstName'} className="input-label">
+            <label htmlFor={"firstName"} className="input-label">
               First Name
             </label>
             <span className="input-highlight"></span>
@@ -99,8 +99,8 @@ const ContactForm = () => {
             <FaUserAlt className="input-icon" />
             <input
               type="text"
-              name={'lastName'}
-              id={'lastName'}
+              name={"lastName"}
+              id={"lastName"}
               required
               value={lastName}
               onChange={handleInputChange}
@@ -108,7 +108,7 @@ const ContactForm = () => {
               className="input-field"
             />
 
-            <label htmlFor={'lastName'} className="input-label">
+            <label htmlFor={"lastName"} className="input-label">
               Last Name
             </label>
             <span className="input-highlight"></span>
@@ -127,18 +127,20 @@ const ContactForm = () => {
             className="text-area-input-field"
           />
 
-          <label htmlFor={'message'} className="input-label">
+          <label htmlFor={"message"} className="input-label">
             Text Message
           </label>
           <span className="input-highlight"></span>
         </div>
 
         <button disabled={loading} className="contact-form-btn">
-          {loading && <ButtonLoader />}
+          {loading && <Loader isLoading={loading} message="" size={20} />}
           {loading && <span> Loading...</span>}
           {!loading && <span>Submit</span>}
         </button>
       </form>
+
+      {error && <p className="error-message">{error}</p>}
     </article>
   );
 };

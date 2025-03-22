@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./ChatbotLayout.scss";
 import { FaRobot } from "react-icons/fa";
 import ChatBotMessages from "../chatBotMessages/ChatBotMessages";
@@ -16,19 +16,35 @@ const ChatbotLayout = () => {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  const openaiRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (openaiRef.current && !openaiRef.current.contains(e.target)) {
+        setIsChatOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
   const toggleChat = () => {
     setIsChatOpen((prev) => !prev);
   };
 
   return (
-    <div className="openai-chat-layout-container">
+    <div className="openai-chat-layout-container" ref={openaiRef}>
       {isChatOpen ? (
-        <div className="chat-bot-icon-wrapper" onClick={toggleChat}>
+        <div className="chat-bot-close-icon-wrapper" onClick={toggleChat}>
           {" "}
           <IoMdClose />
         </div>
       ) : (
-        <div className="chat-bot-close-icon-wrapper" onClick={toggleChat}>
+        <div className="chat-bot-icon-wrapper" onClick={toggleChat}>
           <FaRobot />
         </div>
       )}

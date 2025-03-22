@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { validEmail, validPassword } from "../../utils/validators/Validate";
 import { toast } from "react-toastify";
-import ButtonLoader from "../../utils/loader/ButtonLoader";
 import { API } from "../../utils/security/secreteKey";
 import Cookies from "js-cookie";
 import {
@@ -17,6 +16,7 @@ import {
   loginSuccess,
 } from "../../redux/reducers/userReducer";
 import GoogleSignupLogin from "../../components/layouts/googleRegisterLongin/GoogleSignupLogin";
+import Loader from "../../components/loader/Loader";
 
 const initialState = {
   email: "",
@@ -199,7 +199,7 @@ const Login = () => {
 
         {/* Button for log in form */}
         <button className="login-button" disabled={loading}>
-          {loading ? <ButtonLoader isLoading={loading} message="" /> : "Log In"}
+          {loading ? <Loader isLoading={loading} message="" size={20} /> : "Log In"}
         </button>
 
         <GoogleSignupLogin signup="login" />

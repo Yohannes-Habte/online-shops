@@ -7,7 +7,6 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { FaAddressCard, FaPhoneVolume, FaUserTie } from "react-icons/fa";
 import { MdEmail, MdDescription } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
-import ButtonLoader from "../../../utils/loader/ButtonLoader.jsx";
 import {
   validEmail,
   validPassword,
@@ -21,6 +20,7 @@ import {
   clearSellerErrors,
   createNewShop,
 } from "../../../redux/actions/seller.js";
+import Loader from "../../loader/Loader.jsx";
 
 const initialState = {
   name: "",
@@ -286,7 +286,11 @@ const ShopCreate = () => {
 
         <div className="shop-button-wrapper">
           <button type="submit" disabled={loading} className="create-shop-btn">
-            {loading ? <ButtonLoader /> : "Submit"}
+            {loading ? (
+              <Loader isLoading={loading} message="" size={20} />
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
 

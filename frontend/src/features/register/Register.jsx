@@ -18,8 +18,8 @@ import {
   userSignUpSuccess,
 } from "../../redux/reducers/userReducer.js";
 import { handleError } from "../../utils/errorHandler/ErrorMessage.jsx";
-import ButtonLoader from "../../utils/loader/ButtonLoader.jsx";
 import GoogleSignupLogin from "../../components/layouts/googleRegisterLongin/GoogleSignupLogin.jsx";
+import Loader from "../../components/loader/Loader.jsx";
 
 const initialState = {
   name: "",
@@ -232,7 +232,11 @@ const Register = () => {
 
       <div className="register-button-container">
         <button type="submit" disabled={loading} className="register-button">
-          {loading ? <ButtonLoader /> : "Sign Up"}
+          {loading ? (
+            <Loader isLoading={loading} message="" size={20} />
+          ) : (
+            "Sign Up"
+          )}
         </button>
       </div>
 

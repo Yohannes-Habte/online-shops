@@ -1,9 +1,9 @@
 
 import './OrderSuccess.scss';
 import { useSelector } from 'react-redux';
-import PageLoader from '../../../utils/loader/PageLoader';
 import Header from '../../../components/layouts/header/Header';
 import Footer from '../../../components/layouts/footer/Footer';
+import Loader from '../../../components/loader/Loader';
 
 const OrderSuccess = () => {
   // Global state variables
@@ -13,7 +13,7 @@ const OrderSuccess = () => {
     <main className="order-success-page">
       <Header />
       {loading ? (
-        <PageLoader />
+        <Loader isLoading={loading} message='' size={90} />
       ) : error ? (
         <p>{error} </p>
       ) : (

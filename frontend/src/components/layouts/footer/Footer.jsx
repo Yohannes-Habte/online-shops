@@ -10,9 +10,9 @@ import { FaPhoneSquare } from "react-icons/fa";
 import { MdOutlineMessage } from "react-icons/md";
 import { FaLocationDot } from "react-icons/fa6";
 import { API } from "../../../utils/security/secreteKey";
-import PageLoader from "../../../utils/loader/PageLoader";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Loader from "../../loader/Loader";
 
 const Footer = () => {
   // Local State variables
@@ -74,7 +74,7 @@ const Footer = () => {
       </section>
 
       {loading ? (
-        <PageLoader />
+        <Loader isLoading={loading} message="" size={90} />
       ) : error ? (
         <p className="error-message"> {error} </p>
       ) : (

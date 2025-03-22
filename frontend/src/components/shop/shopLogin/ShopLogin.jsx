@@ -5,11 +5,11 @@ import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { validEmail, validPassword } from "../../../utils/validators/Validate";
-import ButtonLoader from "../../../utils/loader/ButtonLoader";
 import {
   clearSellerErrors,
   loginShopOwner,
 } from "../../../redux/actions/seller";
+import Loader from "../../loader/Loader";
 
 // Initial form state
 const initialState = {
@@ -197,7 +197,7 @@ const ShopLogin = () => {
 
         {/* Submit Button */}
         <button type="submit" disabled={loading} className="shop-login-button">
-          {loading && <ButtonLoader />}
+          {loading && <Loader isLoading={loading} message="" size={20} />}
           {loading && <span>Logging in...</span>}
           {!loading && <span>Log In</span>}
         </button>
