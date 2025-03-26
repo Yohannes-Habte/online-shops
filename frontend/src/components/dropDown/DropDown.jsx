@@ -42,13 +42,13 @@ const DropDown = ({ setDropDown }) => {
   return (
     <dev className="categories-list-wrapper">
       {categories.length > 0 ? (
-        categories.map((category) => (
+        categories?.map((category) => (
           <p
             key={category._id}
-            onClick={() => handleCategoryClick(category.categoryName)}
-            className="category-item"
+            onClick={() => handleCategoryClick(category?.categoryName)}
+            className="category-name"
           >
-            {category.categoryName}
+            {category?.categoryName}
           </p>
         ))
       ) : (

@@ -36,7 +36,7 @@ const TrackOrderCard = ({ user, shop, order }) => {
       </div>
 
       <aside className="shipping-details">
-        <h3 className="subTitle"> Shopping address</h3>
+        <h3 className="subTitle"> Customer Delivery Address</h3>
         <p className="address"> {user?.name}, </p>
         <p className="address"> {order?.shippingAddress?.address}, </p>
         <p className="address">

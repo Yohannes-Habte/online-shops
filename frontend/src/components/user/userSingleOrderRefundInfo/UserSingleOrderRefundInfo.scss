@@ -1,58 +1,38 @@
-// Define variables for easy theme adjustments
-$primary-color: #2c3e50;
-$secondary-color: #34495e;
-$text-color: #555;
-$border-color: #ddd;
-$background-light: #f3bdbd;
-$shadow-color: rgba(0, 0, 0, 0.1);
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
 
-.user-refund-details-wrapper {
-  background: $background-light;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 6px $shadow-color;
-  margin: 20px auto;
+.user-order-refunded-history-wrapper {
+  @include shadow1;
+  background-color: #f8f7ff;
+  padding: 1rem 2rem;
+  transition: all 1s;
 
-  h2 {
-    color: $primary-color;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    text-align: center;
+  &:hover {
+    transform: scale(1.01);
+  }
+  .user-order-refunded-history-title {
+    @include subTitle;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
   }
 
-  .refund-item {
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-    transition: transform 0.2s ease-in-out;
-
-    &:hover {
-      transform: scale(1.02);
+  .user-order-refunded-info-wrapper {
+    .user-refund-reason-title {
+      @include subTitle;
+      padding: 0;
+    }
+    .user-refund-info {
+      font-size: 0.9rem;
+      color: #555;
     }
 
-    p {
-      margin: 8px 0;
-      color: $text-color;
-      font-size: 0.95rem;
-
-      strong {
-        color: $secondary-color;
-      }
+    .user-refund-reason-paragraph {
+      @include paragraph;
+      font-size: 1rem;
+      padding: 0;
     }
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .user-refund-details-wrapper {
-    padding: 15px;
-    max-width: 90%;
-  }
-
-  .refund-item {
-    padding: 12px;
   }
 }

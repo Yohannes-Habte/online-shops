@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "./SingleOrderStatusUpdate.scss";
 import {
   LucideCheckSquare,
@@ -14,6 +15,7 @@ const SingleOrderStatusUpdate = ({
   setTracking,
   handleChange,
   generateTrackingNumber,
+  getEstimatedDeliveryDate,
   cancellationReason,
   setCancellationReason,
   returnReason,
@@ -21,10 +23,32 @@ const SingleOrderStatusUpdate = ({
   order,
   processStatus,
 }) => {
+  const [showTrackingInfo, setShowTrackingInfo] = useState(false);
+  const [showCancellationReason, setShowCancellationReason] = useState(false);
+  const [showReturnReason, setShowReturnReason] = useState(false);
+
+  // Toggle fields based on status selection
+  useEffect(() => {
+    setShowTrackingInfo(status === "Processing");
+    setShowCancellationReason(status === "Cancelled");
+    setShowReturnReason(status === "Returned");
+  }, [status]);
+
+  // Close all fields after updating status
+  const handleOpenAndClose = () => {
+    setShowTrackingInfo(false);
+    setShowCancellationReason(false);
+    setShowReturnReason(false);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updateOrderStatus(e);
+    handleOpenAndClose(); // Close fields after updating
+  };
   return (
     <section className="order-update-processing-wrapper">
       <h2 className="order-status-update-title">Update Order Status</h2>
-      <form onSubmit={updateOrderStatus} className="order-status-update-form">
+      <form onSubmit={handleSubmit} className="order-status-update-form">
         {/* Order Status Dropdown */}
         <div className="input-container">
           <LucideCheckSquare className="input-icon" />
@@ -52,7 +76,7 @@ const SingleOrderStatusUpdate = ({
         </div>
 
         {/* Tracking Information (only for "Processing" status) */}
-        {status === "Processing" && (
+        {showTrackingInfo  && (
           <div className="tracking-information-wrapper">
             <div className="input-container">
               <LucideTruck className="input-icon" />
@@ -70,7 +94,7 @@ const SingleOrderStatusUpdate = ({
               </select>
             </div>
 
-            <div className="input-container">
+            <div className="input-container tracking-number-container">
               <LucidePackage className="input-icon" />
               <input
                 type="text"
@@ -79,7 +103,8 @@ const SingleOrderStatusUpdate = ({
                 value={tracking.trackingNumber}
                 onChange={handleChange}
                 readOnly
-                className="select-field"
+                className="select-field select-tracking-field"
+                disabled={tracking.carrier === ""}
               />
               <button
                 type="button"
@@ -91,7 +116,7 @@ const SingleOrderStatusUpdate = ({
                 }
                 className="generate-tracking-btn"
               >
-                GTN
+                Generate Tracking Number
               </button>
             </div>
 
@@ -101,21 +126,17 @@ const SingleOrderStatusUpdate = ({
                 type="date"
                 name="estimatedDeliveryDate"
                 value={
-                  tracking.estimatedDeliveryDate
-                    ? new Date(tracking.estimatedDeliveryDate)
-                        .toISOString()
-                        .split("T")[0]
-                    : ""
+                  tracking.estimatedDeliveryDate || getEstimatedDeliveryDate()
                 }
-                onChange={handleChange}
                 className="select-field"
+                readOnly
               />
             </div>
           </div>
         )}
 
         {/* Cancellation Reason Input */}
-        {status === "Cancelled" && (
+        {showCancellationReason  && (
           <div className="textarea-container">
             <LucideMessageCircle className="input-icon" />
             <textarea
@@ -131,7 +152,7 @@ const SingleOrderStatusUpdate = ({
         )}
 
         {/* Return Reason Input */}
-        {status === "Returned" && (
+        {showReturnReason && (
           <div className="textarea-container">
             <LucideMessageCircle className="input-icon" />
             <textarea
@@ -146,7 +167,11 @@ const SingleOrderStatusUpdate = ({
           </div>
         )}
 
-        <button type="submit" disabled={order?.orderStatus === "Refunded"}>
+        <button
+          type="submit"
+          className="update-status-btn"
+          disabled={order?.orderStatus === "Refunded"}
+        >
           {processStatus ? "Updating..." : "Update Status"}
         </button>
       </form>

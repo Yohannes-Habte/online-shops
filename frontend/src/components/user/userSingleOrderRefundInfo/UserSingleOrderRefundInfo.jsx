@@ -1,31 +1,34 @@
 import "./UserSingleOrderRefundInfo.scss";
+import { History } from "lucide-react";
 
-const UserSingleOrderRefundInfo = ({ orderInfos }) => {
+const UserSingleOrderRefundInfo = ({ order }) => {
   return (
-    <>
-      {orderInfos?.payment?.refunds?.length > 0 && (
-        <section className="user-refund-details-wrapper">
-          <h2>Refund Details</h2>
-          {orderInfos.payment.refunds.map((refund, index) => (
-            <div key={index} className="refund-item">
-              <p>
-                <strong>Refund ID:</strong> {refund.refundId}
-              </p>
-              <p>
-                <strong>Amount:</strong> ${refund.amount.toFixed(2)}
-              </p>
-              <p>
-                <strong>Reason:</strong> {refund.reason || "No reason provided"}
-              </p>
-              <p>
-                <strong>Refund Date:</strong>{" "}
-                {new Date(refund.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
-        </section>
-      )}
-    </>
+    <section className="user-order-refunded-history-wrapper">
+      <h2 className="user-order-refunded-history-title">
+        <History size={22} /> Refund Information
+      </h2>
+      {order.payment.refunds.map((refund) => (
+        <article
+          key={refund.refundId}
+          className="user-order-refunded-info-wrapper"
+        >
+          <p className="user-refund-info">
+            <strong>Refund ID:</strong> {refund.refundId}
+          </p>
+          <p className="user-refund-info">
+            <strong>Amount:</strong> ${refund.amount.toFixed(2)}
+          </p>
+          <h3 className="user-refund-reason-title"> Refund Reason </h3>
+          <p className="user-refund-info shop-refund-reason-paragraph">
+            {refund.reason}
+          </p>
+          <p className="user-refund-info">
+            <strong>Refunded On:</strong>{" "}
+            {new Date(refund.createdAt).toLocaleDateString()}
+          </p>
+        </article>
+      ))}
+    </section>
   );
 };
 

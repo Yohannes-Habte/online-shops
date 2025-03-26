@@ -1,64 +1,60 @@
 @import "../../../styles/mixins.scss";
 @import "../../../styles/Mixins.scss";
 
-.shop-order-details-container {
+.shop-order-details-information-container {
+  @include shadow1;
   max-width: 900px;
-  margin: 2rem auto;
-  padding: 2rem 0;
-  background: #fff;
-  border-radius: 12px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  background-color: #fff;
 
   // Header Section
-  .order-details-header-wrapper {
+  .shop-order-details-header-wrapper {
     text-align: center;
-    margin-bottom: 2rem;
 
-    .order-details-header-title {
-      @include title;
+    .shop-order-details-header-title {
+      @include subTitle;
     }
 
-    .order-details-header-date {
+    .shop-order-details-header-date {
       font-size: 1rem;
       color: #666;
       margin-top: 0.5rem;
     }
   }
 
-
   // Order Cancelled Section
-  .order-cancellation-reason-container {
-    margin-top: 1rem;
-    padding: 1rem;
+  .order-cancellation-reason-wrapper {
+    @include shadow1;
     background: #f8d7da;
-    border-radius: 8px;
 
     .order-cancellation-reason-title {
       @include subTitle;
-      color: #721c24;
+      padding: 0;
     }
 
-    .order-cancellation-reason-paragraph {
-      font-size: 0.9rem;
-      color: #721c24;
+    .order-cancellation-reason-message {
+      @include paragraph;
+      font-size: 1rem;
     }
   }
 
-
   // Order Return Section
-  .order-return-reason-container {
-    margin-top: 1rem;
-    padding: 1rem;
+  .order-return-reason-wrapper {
+    @include shadow1;
     background: #f8d7da;
-    border-radius: 8px;
 
     .order-return-reason-title {
       @include subTitle;
-      color: #721c24;
+      padding: 0;
     }
 
-    .order-return-reason-paragraph {
-      font-size: 0.9rem;
-      color: #721c24;
+    .order-return-reason-message {
+      @include paragraph;
+      font-size: 1rem;
     }
   }
 }

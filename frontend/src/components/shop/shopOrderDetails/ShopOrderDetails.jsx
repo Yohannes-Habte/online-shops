@@ -7,7 +7,9 @@ import { API } from "../../../utils/security/secreteKey";
 import SingleOrderSummary from "../singleOrderSummary/SingleOrderSummary";
 import SingleOrderItems from "../singleOrderItems/SingleOrderItems";
 import SingleOrderStatusUpdate from "../singleOrderStatusUpdate/SingleOrderStatusUpdate";
-import SingleOrderRefund from "../singleOrderRefund/SingleOrderRefund";
+import SingleOrderRefundForm from "../singleOrderRefundForm/SingleOrderRefundForm";
+import SingleOrderRefundRequest from "../singleOrderRefundRequest/SingleOrderRefundRequest";
+import SingleOrderRefunded from "../singleOrderRefunded/SingleOrderRefunded";
 
 const ShopOrderDetails = () => {
   const { id } = useParams();
@@ -16,17 +18,14 @@ const ShopOrderDetails = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("");
   const [processStatus, setProcessStatus] = useState(false);
-  const [processRefund, setProcessRefund] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [returnReason, setReturnReason] = useState("");
-  const [refundAmount, setRefundAmount] = useState("");
-  const [refundReason, setRefundReason] = useState("");
   const [tracking, setTracking] = useState({
     carrier: "",
     trackingNumber: "",
     estimatedDeliveryDate: null,
   });
-  console.log("order", order);
+
   // Allowed order status sequence
   const orderStatusSequence = [
     "Pending",
@@ -38,6 +37,32 @@ const ShopOrderDetails = () => {
     "Refunded",
   ];
 
+  // =============================================================================
+  // The estimated delivery date should be three working days excluding weekends
+  // =============================================================================
+  const getEstimatedDeliveryDate = () => {
+    let deliveryDate = new Date();
+    let addedDays = 0;
+
+    // If today is Saturday (6) or Sunday (0), move to the next day until a Monday–Friday is reached.
+    while (deliveryDate.getDay() === 0 || deliveryDate.getDay() === 6) {
+      deliveryDate.setDate(deliveryDate.getDate() + 1);
+    }
+
+    // Count three working days (excluding weekends)
+    while (addedDays < 3) {
+      deliveryDate.setDate(deliveryDate.getDate() + 1);
+      if (deliveryDate.getDay() !== 0 && deliveryDate.getDay() !== 6) {
+        addedDays++;
+      }
+    }
+
+    return deliveryDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+  };
+
+  // =========================================================================
+  // Check if the order status update is valid
+  // =========================================================================
   const isValidOrderStatusUpdate = (currentStatus, newStatus) => {
     if (newStatus === "Cancelled") return true; // Allow cancellation anytime
     const currentIndex = orderStatusSequence.indexOf(currentStatus);
@@ -86,7 +111,9 @@ const ShopOrderDetails = () => {
     }));
   };
 
+  // =========================================================================
   // Generate tracking number only when necessary
+  // =========================================================================
   const generateTrackingNumber = () => {
     return `TRK-${Date.now().toString(36).toUpperCase()}-${Math.random()
       .toString(36)
@@ -128,8 +155,8 @@ const ShopOrderDetails = () => {
     if (status === "Processing") {
       updateData.tracking = {
         carrier: tracking.carrier,
-        estimatedDeliveryDate: tracking.estimatedDeliveryDate,
         trackingNumber: tracking.trackingNumber || generateTrackingNumber(),
+        estimatedDeliveryDate: getEstimatedDeliveryDate(),
       };
     }
 
@@ -169,50 +196,23 @@ const ShopOrderDetails = () => {
     }
   };
 
-  // =========================================================================
-  // Handle refund request
-  // =========================================================================
-  const handleShopOrderRefund = async (e) => {
-    e.preventDefault();
-    if (!refundReason) return toast.error("Please provide refund amount.");
-
-    setProcessRefund(true);
-    try {
-      const newOrderRefund = {
-        orderStatus: "Refunded",
-        paymentStatus: "refunded",
-        refundAmount: order.grandTotal,
-        refundReason,
-      };
-      const { data } = await axios.put(
-        `${API}/orders/${id}/refund/completed`,
-        newOrderRefund,
-        {
-          withCredentials: true,
-        }
-      );
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Error processing refund request"
-      );
-    } finally {
-      setProcessRefund(false);
-    }
-  };
-
   if (loading) return <p>Loading order details...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
-    <section className="shop-order-details-container">
-      <header className="order-details-header-wrapper">
-        <h1 className="order-details-header-title">Order Details</h1>
-        <p>Order ID: #{order?._id?.slice(0, 8)}</p>
-        <p>Placed on: {order?.createdAt?.slice(0, 10)}</p>
+    <section className="shop-order-details-information-container">
+      <header className="shop-order-details-header-wrapper">
+        <h1 className="shop-order-details-header-title">Order Details</h1>
+        <p className="shop-order-details-header-date">
+          Order ID: #{order?._id?.slice(0, 8)}
+        </p>
+        <p className="shop-order-details-header-date">
+          Placed on: {order?.createdAt?.slice(0, 10)}
+        </p>
       </header>
 
       <SingleOrderItems order={order} />
+
       <SingleOrderSummary order={order} />
 
       <SingleOrderStatusUpdate
@@ -223,6 +223,7 @@ const ShopOrderDetails = () => {
         setTracking={setTracking}
         handleChange={handleChange}
         generateTrackingNumber={generateTrackingNumber}
+        getEstimatedDeliveryDate={getEstimatedDeliveryDate}
         cancellationReason={cancellationReason}
         setCancellationReason={setCancellationReason}
         returnReason={returnReason}
@@ -232,29 +233,34 @@ const ShopOrderDetails = () => {
       />
 
       {order?.orderStatus === "Cancelled" && order?.cancellationReason && (
-        <section>
-          <h2>Order Cancellation Reason</h2>
-          <p>{order.cancellationReason}</p>
+        <section className="order-cancellation-reason-wrapper">
+          <h2 className="order-cancellation-reason-title">
+            Order Cancellation Reason
+          </h2>
+          <p className="order-cancellation-reason-message">
+            {order.cancellationReason}
+          </p>
         </section>
       )}
 
       {order?.orderStatus === "Returned" && order?.returnReason && (
-        <section>
-          <h2>Order Return Reason</h2>
-          <p>{order.returnReason}</p>
+        <section className="order-return-reason-wrapper">
+          <h2 className="order-return-reason-title">Order Return Reason</h2>
+          <p className="order-return-reason-message">{order.returnReason}</p>
         </section>
       )}
 
-      <SingleOrderRefund
-        order={order}
-        handleShopOrderRefund={handleShopOrderRefund}
-        refundAmount={refundAmount}
-        setRefundAmount={setRefundAmount}
-        refundReason={refundReason}
-        setRefundReason={setRefundReason}
-        processRefund={processRefund}
-        status={status}
-      />
+      {(order.orderStatus === "Refund Requested" ||
+        order.payment.paymentStatus === "refunded") && (
+        <SingleOrderRefundRequest order={order} />
+      )}
+
+      <SingleOrderRefundForm order={order} status={status} />
+
+      {order.payment.paymentStatus === "refunded" &&
+        order?.payment?.refunds?.length > 0 && (
+          <SingleOrderRefunded order={order} />
+        )}
     </section>
   );
 };

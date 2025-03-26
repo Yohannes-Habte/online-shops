@@ -17,11 +17,10 @@ const orderItemSchema = new Schema({
   shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
   productColor: { type: String, required: true },
   productImage: { type: String, required: true },
-  size: { type: String, required: true },
+  size: { type: Schema.Types.Mixed, required: true },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true },
   total: { type: Number, required: true }, // Total price for this item (quantity * price)
-  error: { type: String, trim: true }, // Optional field for errors during processing
 });
 
 // Schema for shipping details
@@ -32,6 +31,20 @@ const shippingAddressSchema = new Schema({
   address: { type: String, required: true },
   zipCode: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+});
+
+// Schema for refund details
+const refundRequestSchema = new Schema({
+  refundId: { type: String, required: true },
+  title: { type: String, required: true },
+  color: { type: String, required: true },
+  size: { type: String, required: true },
+  quantity: { type: Number, required: true, min: 1 },
+  price: { type: Number, required: true },
+  amount: { type: Number, required: true },
+  reason: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  userRefundId: { type: String }, // userRefundId will be used by the shop for reference
 });
 
 // Schema for payment details
@@ -57,14 +70,7 @@ const paymentSchema = new Schema({
   },
   amountPaid: { type: Number, required: true },
   paymentDate: { type: Date, default: Date.now },
-  refunds: [
-    {
-      refundId: { type: String },
-      amount: { type: Number },
-      reason: { type: String }, // Reason for refund
-      createdAt: { type: Date, default: Date.now },
-    },
-  ],
+  refunds: { type: [refundRequestSchema] },
   metadata: { type: Object, default: {} }, // Additional payment-related data
   createdBy: { type: Schema.Types.ObjectId, ref: "User" }, // User who initiated payment
   updatedBy: { type: Schema.Types.ObjectId, ref: "User" }, // User who updated payment
@@ -123,11 +129,15 @@ const orderSchema = new Schema(
         message: { type: String, trim: true }, // Message for status change
       },
     ],
+
     tracking: {
       carrier: { type: String }, // Carrier used for shipping
       trackingNumber: { type: String }, // Tracking number for the shipment
       estimatedDeliveryDate: { type: Date }, // Estimated delivery date
     },
+
+    refundRequestInfo: { type: [refundRequestSchema] },
+
     cancellationReason: { type: String },
     returnReason: { type: String },
     deliveredAt: { type: Date },

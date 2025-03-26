@@ -1,10 +1,8 @@
 @import "../../../styles/mixins.scss";
 @import "../../../styles/Mixins.scss";
 
-
 .order-update-processing-wrapper {
   @include shadow1;
-  margin: 1rem 0;
   background-color: #bde0fe;
 
   .order-status-update-title {
@@ -69,9 +67,19 @@
           font-size: 1.2rem;
           color: #555;
         }
+      }
+
+      .tracking-number-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .select-tracking-field {
+          width: 70%;
+        }
 
         .generate-tracking-btn {
-          max-width: fit-content;
+          width: 35%;
           margin-left: 1rem;
           background: #007bff;
           color: white;

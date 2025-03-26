@@ -139,8 +139,13 @@
         cursor: pointer;
       }
 
-      .bottom-icon {
+      .categories-dropdown-icon {
         font-size: $aafs;
+        cursor: pointer;
+
+        &:hover {
+          color: $red;
+        }
       }
     }
 
@@ -381,7 +386,7 @@
           cursor: pointer;
         }
 
-        .bottom-icon {
+        .categories-dropdown-icon {
           font-size: $aafs;
         }
       }
@@ -621,10 +626,9 @@
           text-align: center;
           border: none;
           outline: none;
-          cursor: pointer;
         }
 
-        .bottom-icon {
+        .categories-dropdown-icon {
           font-size: $aafs;
         }
       }
@@ -689,7 +693,7 @@
             width: 220px;
             height: fit-content;
             background-color: $navbar-bg5;
-          
+
             border-radius: 0 0 0 $radius;
 
             .list-item {

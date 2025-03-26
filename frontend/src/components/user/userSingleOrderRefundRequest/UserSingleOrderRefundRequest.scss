@@ -1,0 +1,87 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
+
+.user-order-refund-request-container {
+  @include shadow1;
+  background-color: #e3f2fd;
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+
+  .user-order-refund-request-title {
+    @include subTitle;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  .user-order-refund-request-info-wrapper {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .user-order-refund-request-info {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding-bottom: 1rem;
+
+      aside:first-child {
+        flex: 1;
+        p {
+          margin: 0.5rem 0;
+          font-size: 1rem;
+          line-height: 1.5;
+        }
+      }
+
+      aside:last-child {
+        flex: 0.5;
+        p {
+          margin: 0.5rem 0;
+          font-size: 1rem;
+        }
+        h3 {
+          font-size: 1rem;
+          color: #2c6cff;
+        }
+      }
+    }
+
+    .user-order-refund-request-info-title {
+      @include subTitle;
+      margin-top: 1rem;
+    }
+
+    .user-order-refund-request-reason-paragraph {
+      @include paragraph;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333333;
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .user-order-refund-request-container {
+    padding: 1rem;
+  }
+
+  .user-order-refund-request-info-wrapper {
+    padding: 0.75rem;
+  }
+
+  .user-order-refund-request-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .user-order-refund-request-info-title {
+    font-size: 1.1rem;
+  }
+}

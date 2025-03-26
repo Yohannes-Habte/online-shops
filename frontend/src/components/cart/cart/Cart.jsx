@@ -90,6 +90,7 @@ const Cart = ({ setOpenCart }) => {
 
               {/* Cart items */}
               <div className="single-cart-wrapper">
+            
                 {cart &&
                   cart.map((product) => {
                     const isEvent =

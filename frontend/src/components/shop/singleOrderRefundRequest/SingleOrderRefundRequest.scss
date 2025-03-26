@@ -1,0 +1,63 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
+
+.shop-order-refund-request-wrapper {
+  @include shadow1;
+  background-color: #ffd6ff;
+  padding: 1rem 1.5rem;
+
+  .shop-order-refund-request-title {
+    @include subTitle;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shop-order-refund-request-info-wrapper {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fcf4fc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .shop-order-refund-request-info {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding-bottom: 1rem;
+
+      aside:first-child {
+        flex: 1;
+        p {
+          margin: 0.5rem 0;
+          font-size: 0.8rem;
+        }
+      }
+
+      aside:last-child {
+        flex: 0.5;
+        p {
+          margin: 0.5rem 0;
+          font-size: 0.8rem;
+        }
+        h3 {
+          font-size: 0.8rem;
+          color: #2c6cff;
+        }
+      }
+    }
+
+    .shop-order-refund-request-info-title {
+      @include subTitle;
+      margin-top: 1rem;
+    }
+
+    .shop-order-refund-request-reason-paragraph {
+      @include paragraph;
+      font-size: 0.8rem;
+      color: #333333;
+      margin-top: 0.5rem;
+    }
+  }
+}

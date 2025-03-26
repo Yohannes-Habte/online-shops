@@ -1,5 +1,5 @@
-@import '../../styles/Variables.scss';
-@import '../../styles/Mixins.scss';
+@import "../../styles/Variables.scss";
+@import "../../styles/Mixins.scss";
 
 .categories-list-wrapper {
   position: absolute;
@@ -13,10 +13,16 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 1rem;
-  cursor: pointer;
   z-index: 99;
+  transition: all 0.3s ease-in-out;
 
-  .category-item {
-   font-size: 1rem;
+  .category-name {
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      color: $red;
+    }
   }
 }

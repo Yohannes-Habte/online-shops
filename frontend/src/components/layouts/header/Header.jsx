@@ -100,7 +100,7 @@ const Header = () => {
           <p className="select-category">Select Category</p>
           <MdKeyboardArrowDown
             onClick={() => setDropDown(!dropDown)}
-            className="bottom-icon"
+            className="categories-dropdown-icon"
           />
           {dropDown ? <DropDown setDropDown={setDropDown} /> : null}
         </div>
