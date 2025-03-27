@@ -1,5 +1,4 @@
 
-import AllCoupons from "../allCoupons/AllCoupons";
 import AllSellerOrders from "../allOrders/AllSellerOrders";
 import AllShopEvents from "../allShopEvents/AllShopEvents";
 import AllShopProducts from "../allShopProducts/AllShopProducts";
@@ -35,8 +34,6 @@ const ShopContent = ({ isActive }) => {
       {isActive === 6 && <CreateEvent />}
 
       {isActive === 7 && <AllShopEvents />}
-
-      {isActive === 8 && <AllCoupons />}
 
       {isActive === 9 && <AllSellerOrders />}
 

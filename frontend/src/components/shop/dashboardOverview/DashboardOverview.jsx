@@ -15,6 +15,7 @@ import {
   clearSellerErrors,
   fetchSingleSeller,
 } from "../../../redux/actions/seller";
+import OrderChart from "../charts/order/OrderChart";
 
 const DashboardOverview = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,11 @@ const DashboardOverview = () => {
     error: shopError,
   } = useSelector((state) => state.seller);
 
-  const { data: orders = [], loading, error } = sellerOrders || {};
+  const {
+    data: { orders = [] },
+    loading,
+    error,
+  } = sellerOrders || {};
 
   useEffect(() => {
     dispatch(clearOrderErrors());
@@ -171,11 +176,15 @@ const DashboardOverview = () => {
               <FaProductHunt className="icon" />
               <h3 className="subTitle">All Products of {shopDetails?.name}</h3>
             </aside>
-            <h3 className="subTitle">{shopDetails ? shopDetails?.shopProducts?.length : "0"}</h3>
+            <h3 className="subTitle">
+              {shopDetails ? shopDetails?.shopProducts?.length : "0"}
+            </h3>
             <Link to="/dashboard-products">View Products</Link>
           </article>
         </div>
       )}
+
+      <OrderChart />
 
       <h3 className="latest-orders">Delivered Orders of {shopDetails?.name}</h3>
 

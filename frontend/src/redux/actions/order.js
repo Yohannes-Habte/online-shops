@@ -43,11 +43,20 @@ export const fetchSellerOrders = () => async (dispatch) => {
   try {
     dispatch(fetchSellerOrdersRequest());
 
-    const { data } = await axios.get(`${API}/orders/seller`, {
+    const response = await axios.get(`${API}/orders/seller`, {
       withCredentials: true,
     });
 
-    dispatch(fetchSellerOrdersSuccess(data.orders));
+    const { orders, monthlyOrderCount } = response.data;
+
+    dispatch(
+      fetchSellerOrdersSuccess({
+        orders,
+        monthlyOrderCount,
+      })
+    );
+
+    dispatch(fetchSellerOrdersSuccess({ orders, monthlyOrderCount }));
   } catch (error) {
     const { message } = handleError(error);
 
@@ -74,5 +83,3 @@ export const fetchCustomerOrders = () => async (dispatch) => {
     toast.error(message);
   }
 };
-
-

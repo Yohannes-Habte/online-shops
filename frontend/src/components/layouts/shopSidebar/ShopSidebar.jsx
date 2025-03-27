@@ -6,7 +6,6 @@ import { MdOutlineCategory } from "react-icons/md";
 import { SiBrandfolder } from "react-icons/si";
 import { FaProductHunt } from "react-icons/fa";
 import { MdEvent } from "react-icons/md";
-import { MdDiscount } from "react-icons/md";
 import { FaFirstOrderAlt } from "react-icons/fa";
 import { BiMoneyWithdraw } from "react-icons/bi";
 import { MdOutlineMessage } from "react-icons/md";
@@ -182,22 +181,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
             All Events
           </h4>
         </aside>
-
-        {/* Service Categories */}
-
-        <aside
-          onClick={() => setIsActive(8) || setOpenAdminDashboardMenu(false)}
-          className="shop-dashboard-sidebar-item"
-        >
-          <MdDiscount
-            title="Service Categories"
-            className={isActive === 8 ? "active-icon" : "passive-icon"}
-          />
-
-          <h4 className={isActive === 8 ? "active-text" : "passive-text"}>
-            Discount Codes
-          </h4>
-        </aside>
+     
 
         {/* Services */}
 

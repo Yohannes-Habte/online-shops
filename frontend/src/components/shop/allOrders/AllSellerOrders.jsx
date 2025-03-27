@@ -141,7 +141,7 @@ const AllSellerOrders = () => {
   ];
 
   return (
-    <div style={{ padding: "20px" }} className="shop-orders-container">
+    <section style={{ padding: "20px" }} className="shop-orders-container">
       <h2>Your Orders</h2>
       {loading ? (
         <div>Loading orders...</div>
@@ -171,7 +171,7 @@ const AllSellerOrders = () => {
           disableRowSelectionOnClick
         />
       )}
-    </div>
+    </section>
   );
 };
 

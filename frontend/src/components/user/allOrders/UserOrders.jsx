@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RxArrowRight } from "react-icons/rx";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { fetchCustomerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
@@ -130,9 +130,8 @@ const UserOrders = () => {
   ];
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Your Orders</h2>
-
+    <section style={{ padding: "20px" }} className="total-user-orders-container">
+      <h2 className="user-orders-title">Your Orders</h2>
       {loading ? (
         <div>Loading orders...</div>
       ) : error ? (
@@ -143,12 +142,25 @@ const UserOrders = () => {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
           autoHeight
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
         />
       )}
-    </div>
+    </section>
   );
 };
 

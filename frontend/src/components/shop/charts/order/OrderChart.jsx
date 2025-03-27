@@ -1,11 +1,193 @@
+import { useEffect, useMemo, useState } from "react";
 import "./OrderChart.scss";
+import { useDispatch, useSelector } from "react-redux";
+import Loader from "../../../loader/Loader";
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
+import { fetchSellerOrders } from "../../../../redux/actions/order";
+import { clearOrderErrors } from "../../../../redux/reducers/orderReducer";
+import { toast } from "react-toastify";
+
+// Map for months (for cleaner readability)
+const monthsMap = {
+  1: "Jan",
+  2: "Feb",
+  3: "Mar",
+  4: "Apr",
+  5: "May",
+  6: "Jun",
+  7: "Jul",
+  8: "Aug",
+  9: "Sep",
+  10: "Oct",
+  11: "Nov",
+  12: "Dec",
+};
 
 const OrderChart = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  const dispatch = useDispatch();
+  const { sellerOrders } = useSelector((state) => state.order);
+  const {
+    data: { monthlyOrderCount = [] },
+    loading,
+    error,
+  } = sellerOrders || {};
 
-export default OrderChart
+  // Local state variables
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const [year, setYear] = useState(currentYear);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchSellerOrders());
+    return () => {
+      dispatch(clearOrderErrors());
+    };
+  }, [dispatch]);
+
+  // Handle error messages
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  // Filter monthlyOrderCount data for the selected year
+  const monthlyData = monthlyOrderCount.filter((item) => item.year === year);
+
+  // Process the monthly data and include orderCount, totalItemsOrdered, and grandTotal
+  const row = useMemo(
+    () =>
+      monthlyData.map((item) => ({
+        monthName: monthsMap[item.month] || item.month, 
+        orderCount: item.orderCount,
+        totalItemsOrdered: item.totalItemsOrdered,
+        grandTotal: item.grandTotal / 500 || 0, 
+      })),
+    [monthlyData, year]
+  );
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const inputYear = e.target.elements.year.value.trim();
+
+    // Validate the year input
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    if (!inputYear || inputYear < 2022 || inputYear > currentYear) {
+      toast.error(`Please enter a valid year between 2022 and ${currentYear}`);
+      return;
+    }
+
+    setButtonLoading(true);
+    setYear(inputYear);
+    setButtonLoading(false);
+  };
+
+  return (
+    <section className="order-chart-container">
+      <h3 className="annual-report-chart-title">
+        Monthly Financial Report for the Year {year}
+      </h3>
+
+      <form
+        aria-label="Financial year selection"
+        onSubmit={handleSubmit}
+        className="financial-year-form"
+      >
+        <input
+          type="number"
+          id="year"
+          name="year"
+          defaultValue={year}
+          placeholder="Enter Year"
+          className="input-field"
+          aria-label="Year input field"
+        />
+        <button
+          className="year-form-btn"
+          aria-label="Search financial reports"
+          disabled={buttonLoading}
+        >
+          {buttonLoading ? (
+            <Loader isLoading={buttonLoading} message="" size={20} />
+          ) : (
+            "Search"
+          )}
+        </button>
+      </form>
+
+      {loading && (
+        <Loader isLoading={loading} message="Loading chart..." size={80} />
+      )}
+      {!loading && error && <p className="error-message">Error: {error}</p>}
+
+      {!loading && !error && row.length > 0 ? (
+        <ResponsiveContainer width="100%" aspect={2 / 1}>
+          <LineChart
+            width={730}
+            height={250}
+            data={row}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" className="chart-Grid" />
+            <XAxis dataKey="monthName" stroke="gray" />
+            <YAxis
+              domain={[0, "auto"]} // Start from 0, auto-scale to the maximum value
+              tickFormatter={(value) => Math.floor(value)} // Ensure ticks are whole numbers
+              tickCount={10} // Limit number of ticks on the Y-axis (adjust as needed)
+            />
+            <Tooltip />
+
+            {/* Legend to display the names of the lines */}
+            <Legend />
+
+            {/* Line for Order Count */}
+            <Line
+              type="monotone"
+              dataKey="orderCount"
+              stroke="#82ca9d"
+              activeDot={{ r: 8 }}
+              name="Order Count" // Label for the line
+            />
+
+            {/* Line for Total Items Ordered */}
+            <Line
+              type="monotone"
+              dataKey="totalItemsOrdered"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+              name="Total Items Ordered" // Label for the line
+            />
+
+            {/* Line for Grand Total */}
+            <Line
+              type="monotone"
+              dataKey="grandTotal"
+              stroke="#ff7300"
+              activeDot={{ r: 8 }}
+              name="Grand Total" // Label for the line
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        !loading && (
+          <h3 className="no-reports-message">
+            No orders found for the year {year}
+          </h3>
+        )
+      )}
+    </section>
+  );
+};
+
+export default OrderChart;

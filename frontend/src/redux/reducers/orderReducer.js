@@ -2,7 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   allOrders: { data: [], loading: false, error: null },
-  sellerOrders: { data: [], loading: false, error: null },
+  sellerOrders: {
+    data: { orders: [], monthlyOrderCount: [] },
+    loading: false,
+    error: null,
+  },
   customerOrders: { data: [], loading: false, error: null },
 };
 
@@ -13,7 +17,7 @@ const setLoadingState = (state, key) => {
 const setSuccessState = (state, action, key) => {
   state[key] = {
     ...state[key],
-    data: action.payload ?? [], // Ensures `data` is always an array
+    data: action.payload ?? { orders: [], monthlyOrderCount: [] }, // Ensures `orders` and `monthlyOrderCount` are always arrays
     loading: false,
     error: null,
   };
@@ -40,8 +44,17 @@ const orderReducer = createSlice({
 
     // Fetch orders for a specific seller
     fetchSellerOrdersRequest: (state) => setLoadingState(state, "sellerOrders"),
-    fetchSellerOrdersSuccess: (state, action) =>
-      setSuccessState(state, action, "sellerOrders"),
+    fetchSellerOrdersSuccess: (state, action) => {
+      state.sellerOrders = {
+        ...state.sellerOrders,
+        data: {
+          orders: action.payload.orders ?? [], // Ensure orders is always an array
+          monthlyOrderCount: action.payload.monthlyOrderCount ?? [], // Ensure monthlyOrderCount is always an array
+        },
+        loading: false,
+        error: null,
+      };
+    },
     fetchSellerOrdersFailure: (state, action) =>
       setFailureState(state, action, "sellerOrders"),
 

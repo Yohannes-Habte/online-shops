@@ -964,10 +964,12 @@ export const getAllUserOrders = async (req, res, next) => {
 //=========================================================================
 // Get all orders for a seller with populated fields
 //=========================================================================
+
 export const allShopOrders = async (req, res, next) => {
   try {
     const sellerId = req.shop.id;
 
+    // Validate sellerId
     if (!mongoose.Types.ObjectId.isValid(sellerId)) {
       return next(createError(400, "Invalid seller ID format"));
     }
@@ -978,7 +980,7 @@ export const allShopOrders = async (req, res, next) => {
       return next(createError(404, "Seller not found"));
     }
 
-    // Fetch orders for the shop and populate necessary fields
+    // Fetch orders for the shop
     const orders = await Order.find({ "orderedItems.shop": shop._id })
       .populate("orderedItems.product", "title price productImage")
       .populate("orderedItems.category", "categoryName")
@@ -990,13 +992,67 @@ export const allShopOrders = async (req, res, next) => {
       .populate("customer", "username email")
       .select(
         "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory"
-      );
+      )
+      .sort({ createdAt: -1 })
+      .lean(); // Optimize performance by returning plain objects
+
+    // Aggregation for Monthly Order Count & Total Items Ordered
+    const monthlyOrders = await Order.aggregate([
+      // Filter orders by shop ID
+      {
+        $match: {
+          "orderedItems.shop": new mongoose.Types.ObjectId(sellerId),
+        },
+      },
+
+      // Group orders by year and month using $year and $month aggregation operators from createdAt field
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          orderCount: { $sum: 1 },
+          totalItemsOrdered: { $sum: "$itemsQty" },
+          grandTotal: { $sum: "$grandTotal" },
+        },
+      },
+
+      // Sorts results in ascending order by year and month.
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 },
+      },
+
+      // Project the fields to display
+      {
+        $project: {
+          _id: 0, // Remove _id
+          year: "$_id.year",
+          month: "$_id.month",
+          orderCount: 1,
+          totalItemsOrdered: 1,
+          grandTotal: 1,
+        },
+      },
+    ]);
+
+    // Ensure data is structured correctly before sending response
+    const formattedMonthlyOrders = (monthlyOrders || []).map((item) => ({
+      year: item.year || null,
+      month: item.month || null,
+      orderCount: item.orderCount || 0,
+      totalItemsOrdered: item.totalItemsOrdered || 0,
+      grandTotal: item.grandTotal || 0,
+    }));
+
 
     res.status(200).json({
       success: true,
-      orders: orders,
+      orders,
+      monthlyOrderCount: formattedMonthlyOrders,
     });
   } catch (error) {
+    console.error("Error fetching shop orders:", error);
     next(createError(500, "Orders could not be accessed! Please try again!"));
   }
 };
