@@ -68,41 +68,42 @@ const OrderChart = () => {
   const row = useMemo(
     () =>
       monthlyData.map((item) => ({
-        monthName: monthsMap[item.month] || item.month, 
+        monthName: monthsMap[item.month] || item.month,
         orderCount: item.orderCount,
         totalItemsOrdered: item.totalItemsOrdered,
-        grandTotal: item.grandTotal / 500 || 0, 
+        grandTotal: item.grandTotal
+          ? (item.grandTotal / 500).toFixed(2)
+          : "0.00",
       })),
     [monthlyData, year]
   );
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const inputYear = e.target.elements.year.value.trim();
+    const inputYear = Number(e.target.elements.year.value.trim());
+    const selectedYear = Number(inputYear);
 
-    // Validate the year input
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    if (!inputYear || inputYear < 2022 || inputYear > currentYear) {
+    const currentYear = new Date().getFullYear();
+    if (selectedYear < 2022 || selectedYear > currentYear) {
       toast.error(`Please enter a valid year between 2022 and ${currentYear}`);
       return;
     }
 
     setButtonLoading(true);
-    setYear(inputYear);
+    setYear(selectedYear);
     setButtonLoading(false);
   };
 
   return (
     <section className="order-chart-container">
       <h3 className="annual-report-chart-title">
-        Monthly Financial Report for the Year {year}
+        Comprehensive Monthly Order and Net Income Report – {year}
       </h3>
 
       <form
-        aria-label="Financial year selection"
+        aria-label="Order year selection"
         onSubmit={handleSubmit}
-        className="financial-year-form"
+        className="order-year-form"
       >
         <input
           type="number"
@@ -110,11 +111,11 @@ const OrderChart = () => {
           name="year"
           defaultValue={year}
           placeholder="Enter Year"
-          className="input-field"
-          aria-label="Year input field"
+          className="order-input-field"
+          aria-label="Order input field"
         />
         <button
-          className="year-form-btn"
+          className="order-year-form-btn"
           aria-label="Search financial reports"
           disabled={buttonLoading}
         >
@@ -141,11 +142,7 @@ const OrderChart = () => {
           >
             <CartesianGrid strokeDasharray="3 3" className="chart-Grid" />
             <XAxis dataKey="monthName" stroke="gray" />
-            <YAxis
-              domain={[0, "auto"]} // Start from 0, auto-scale to the maximum value
-              tickFormatter={(value) => Math.floor(value)} // Ensure ticks are whole numbers
-              tickCount={10} // Limit number of ticks on the Y-axis (adjust as needed)
-            />
+            <YAxis />
             <Tooltip />
 
             {/* Legend to display the names of the lines */}
@@ -175,7 +172,7 @@ const OrderChart = () => {
               dataKey="grandTotal"
               stroke="#ff7300"
               activeDot={{ r: 8 }}
-              name="Grand Total" // Label for the line
+              name="Grand Total (Grand Total / 500)" // Label for the line
             />
           </LineChart>
         </ResponsiveContainer>

@@ -83,3 +83,22 @@ export const fetchCustomerOrders = () => async (dispatch) => {
     toast.error(message);
   }
 };
+
+//==============================================================================
+// Delete all orders for a specific seller/shop
+//==============================================================================
+export const deleteShopOrders = () => async (dispatch) => {
+  try {
+    dispatch(fetchSellerOrdersRequest());
+
+    const { data } = await axios.delete(`${API}/orders`, {
+      withCredentials: true,
+    });
+
+    dispatch(fetchSellerOrdersSuccess(data.message));
+  } catch (error) {
+    const { message } = handleError(error);
+    dispatch(fetchSellerOrdersFailure(message));
+    toast.error(message);
+  }
+};

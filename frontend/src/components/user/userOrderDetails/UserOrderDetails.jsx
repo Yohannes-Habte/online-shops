@@ -122,22 +122,17 @@ const UserOrderDetails = () => {
         orderInfos={orderInfos}
         currentUser={currentUser}
       />
+      <div id="refund-request-form-section">
+        <UserSingleOrderRefundForm
+          orderInfos={orderInfos}
+          setOrderInfos={setOrderInfos}
+          selectedProduct={selectedProduct}
+        />
+      </div>
 
-      <UserSingleOrderRefundForm
-        orderInfos={orderInfos}
-        setOrderInfos={setOrderInfos}
-      />
+      <UserSingleOrderRefundRequest order={orderInfos} />
 
-      {(orderInfos.orderStatus === "Refund Requested" ||
-        orderInfos.payment.paymentStatus === "refunded") && (
-        <UserSingleOrderRefundRequest order={orderInfos} />
-      )}
-
-      {orderInfos?.orderStatus === "Refunded" &&
-        orderInfos.payment.paymentStatus === "refunded" &&
-        orderInfos?.payment?.refunds?.length > 0 && (
-          <UserSingleOrderRefundInfo order={orderInfos} />
-        )}
+      <UserSingleOrderRefundInfo order={orderInfos} />
     </section>
   );
 };

@@ -1,0 +1,61 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/variables.scss";
+
+.user-order-item-card-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background-color: #fafafa;
+
+  .product-image {
+    .item-image {
+      width: 400px;
+      height: 400px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .refund-me {
+      @include button1;
+      background: #f0d486;
+      transition: 0.3s;
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+
+      &:hover {
+        background-color: #ffa600;
+      }
+    }
+  }
+
+  .product-info {
+    flex-grow: 1;
+
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #444;
+      margin: 0.2rem 0;
+    }
+
+    .review-product-btn {
+      @include button1;
+      transition: 0.3s;
+      margin-top: 1rem;
+
+      &:hover {
+        background: #dbe6f1;
+      }
+    }
+  }
+}

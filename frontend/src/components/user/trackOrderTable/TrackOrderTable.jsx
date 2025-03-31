@@ -1,4 +1,4 @@
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { RxArrowRight } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
@@ -110,19 +110,37 @@ const TrackOrderTable = () => {
     : [];
 
   return (
-    <div className="track-order-table">
-      {loading && <p>Loading orders...</p>}
-      {error && <p className="error-message">Error: {error}</p>}
-      {!loading && !error && (
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={10}
-          disableSelectionOnClick
-          autoHeight
-        />
-      )}
-    </div>
+    <section style={{ padding: "20px" }} className="shop-orders-container">
+    <h2>Your Orders Status </h2>
+    {loading ? (
+      <div>Loading orders...</div>
+    ) : error ? (
+      <div style={{ color: "red" }}>Error: {error}</div>
+    ) : orders.length === 0 ? (
+      <div>No orders found.</div>
+    ) : (
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 10 },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            quickFilterProps: { debounceMs: 500 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        disableRowSelectionOnClick
+      />
+    )}
+  </section>
   );
 };
 

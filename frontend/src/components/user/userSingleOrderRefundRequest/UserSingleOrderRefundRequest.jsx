@@ -2,6 +2,7 @@ import "./UserSingleOrderRefundRequest.scss";
 import { BadgeDollarSign } from "lucide-react";
 
 const UserSingleOrderRefundRequest = ({ order }) => {
+  console.log("Single item order =", order);
   return (
     <section className="user-order-refund-request-container">
       <h2 className="user-order-refund-request-title">
@@ -9,53 +10,69 @@ const UserSingleOrderRefundRequest = ({ order }) => {
       </h2>
       {order?.refundRequestInfo.map((refund) => (
         <article
-          key={refund.refundId}
+          key={refund.refundRequestId}
           className="user-order-refund-request-info-wrapper"
         >
-          <div className="user-order-refund-request-info">
-            <aside>
-              <p>
-                <strong>Product Name:</strong> {refund.title}
-              </p>
-              <p>
-                <strong>Refund ID:</strong> {refund.refundId}
-              </p>
-              <p>
+          <div className="user-order-refund-request-infos">
+            <aside className="user-order-refund-request-info-left">
+              <p className="refund-request-info-title">
                 <strong>Refund Request On:</strong>{" "}
-                {new Date(refund.createdAt).toLocaleDateString()}
+                <span className="request-on-for">
+                  {" "}
+                  {refund.requestedDate.slice(0, 10)}
+                </span>
               </p>
-              <p>
-                <strong>Product Color:</strong> {refund.color}
+              <p className="refund-request-info">
+                <strong>Product ID:</strong> {refund?.product._id}
+              </p>
+              <p className="refund-request-info">
+                <strong>Refund ID:</strong> {refund.refundRequestId}
+              </p>
+
+              <p className="refund-request-info">
+                <strong>Product Color:</strong> {refund.requestedItemColor}
               </p>
             </aside>
 
-            <aside>
-              <p>
+            <aside className="user-order-refund-request-info-right">
+              <p className="refund-request-info">
                 {" "}
-                <strong>Product Size:</strong> {refund.size}
-              </p>
-              <p>
-                <strong>Product Price:</strong> {refund.price}
+                <strong>Product Size:</strong> {refund.requestedItemSize}
               </p>
 
-              <p>
+              <p className="refund-request-info">
                 {" "}
-                <strong>Product Quantity:</strong> {refund.quantity}
+                <strong>Product Quantity:</strong>{" "}
+                {refund.requestedItemQuantity}
               </p>
-              <h3>
+
+              <p className="refund-request-info">
                 {" "}
-                <strong> Refund Amount:</strong> ${refund.amount.toFixed(2)}
+                <strong>Refund Reason:</strong> {refund.requestRefundReason}
+              </p>
+
+              <h3 className="refund-request-info-title">
+                {" "}
+                <strong> Requested Refund Amount:</strong>
+                <span className="request-on-for">
+                  {" "}
+                  ${refund.requestedRefundAmount.toFixed(2)}
+                </span>
               </h3>
             </aside>
           </div>
 
-          <h3 className="user-order-refund-request-info-title">
-            {" "}
-            Refund Request Reason for {refund.title}{" "}
-          </h3>
-          <p className="user-order-refund-request-reason-paragraph">
-            {refund.reason}
-          </p>
+          {refund.otherReason.length > 0 && (
+            <>
+              <h3 className="user-order-refund-request-info-title">
+                {" "}
+                Refund Request Reason
+              </h3>
+              <p className="user-order-refund-request-reason-paragraph">
+                {refund.requestRefundReason}
+              </p>
+            </>
+          )}
         </article>
       ))}
     </section>

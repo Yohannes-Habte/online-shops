@@ -1,7 +1,7 @@
 @import "../../../styles/mixins.scss";
 @import "../../../styles/Mixins.scss";
 
-.shop-order-refund-request-wrapper {
+.shop-order-refund-request-container {
   @include shadow1;
   background-color: #ffd6ff;
   padding: 1rem 1.5rem;
@@ -13,37 +13,32 @@
     gap: 0.5rem;
   }
 
-  .shop-order-refund-request-info-wrapper {
+  .shop-order-refund-request-details-wrapper {
     margin-top: 1.5rem;
     padding: 1rem;
     border-radius: 8px;
-    background-color: #fcf4fc;
+    background-color: #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
-    .shop-order-refund-request-info {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 1.5rem;
-      padding-bottom: 1rem;
+    .shop-order-refund-request-infos {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 1rem;
 
-      aside:first-child {
-        flex: 1;
-        p {
+      .shop-order-refund-request-info-left,
+      .shop-order-refund-request-info-right {
+        .refund-request-info {
+          .request-on-for {
+            font-weight: bold;
+            color: blue;
+          }
+        }
+
+        .refund-request-info {
           margin: 0.5rem 0;
           font-size: 0.8rem;
-        }
-      }
-
-      aside:last-child {
-        flex: 0.5;
-        p {
-          margin: 0.5rem 0;
-          font-size: 0.8rem;
-        }
-        h3 {
-          font-size: 0.8rem;
-          color: #2c6cff;
+          color: #333333;
+          line-height: 1.5;
         }
       }
     }
@@ -55,7 +50,8 @@
 
     .shop-order-refund-request-reason-paragraph {
       @include paragraph;
-      font-size: 0.8rem;
+      font-size: 1rem;
+      line-height: 1.6;
       color: #333333;
       margin-top: 0.5rem;
     }

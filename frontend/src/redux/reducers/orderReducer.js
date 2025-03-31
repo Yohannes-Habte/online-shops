@@ -66,6 +66,21 @@ const orderReducer = createSlice({
     fetchCustomerOrdersFailure: (state, action) =>
       setFailureState(state, action, "customerOrders"),
 
+    // Delete all shop orders
+    deleteShopOrdersRequest: (state) => setLoadingState(state, "sellerOrders"),
+    deleteShopOrdersSuccess: (state, action) => {
+      state.sellerOrders = {
+        ...state.sellerOrders,
+        data: {
+          orders: action.payload.orders ?? [],
+        },
+        loading: false,
+        error: null,
+      };
+    },
+    deleteShopOrdersFailure: (state, action) =>
+      setFailureState(state, action, "sellerOrders"),
+
     // Clear errors
     clearOrderErrors: (state) => {
       state.allOrders.error = null;
@@ -79,12 +94,18 @@ export const {
   fetchOrdersRequest,
   fetchOrdersSuccess,
   fetchOrdersFailure,
+
   fetchSellerOrdersRequest,
   fetchSellerOrdersSuccess,
   fetchSellerOrdersFailure,
+  
   fetchCustomerOrdersRequest,
   fetchCustomerOrdersSuccess,
   fetchCustomerOrdersFailure,
+
+  deleteShopOrdersRequest,
+  deleteShopOrdersSuccess,
+  deleteShopOrdersFailure,
   clearOrderErrors,
 } = orderReducer.actions;
 

@@ -1,0 +1,98 @@
+// OrderChart.scss
+
+.order-chart-container {
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  
+    .annual-report-chart-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  
+    .order-year-form {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+  
+      .order-input-field {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 120px;
+        text-align: center;
+        transition: all 0.3s ease;
+  
+        &:focus {
+          border-color: #007bff;
+          outline: none;
+          box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+      }
+  
+      .order-year-form-btn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+  
+        &:hover {
+          background-color: #0056b3;
+        }
+  
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+  
+    .error-message {
+      color: red;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  
+    .no-reports-message {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #666;
+      margin-top: 20px;
+    }
+  
+    .chart-Grid {
+      stroke: #ddd;
+    }
+  
+    @media (max-width: 768px) {
+      .financial-year-form {
+        flex-direction: column;
+        gap: 15px;
+      }
+  
+      .input-field {
+        width: 100%;
+      }
+  
+      .year-form-btn {
+        width: 100%;
+      }
+    }
+  }

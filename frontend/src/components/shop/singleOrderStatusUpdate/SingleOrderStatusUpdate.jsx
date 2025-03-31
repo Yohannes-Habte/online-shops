@@ -26,6 +26,20 @@ const SingleOrderStatusUpdate = ({
   const [showTrackingInfo, setShowTrackingInfo] = useState(false);
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [showReturnReason, setShowReturnReason] = useState(false);
+  const orderStatusArray = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+    "Refund Requested",
+    "Awaiting Item Return",
+    "Returned",
+    "Refund Processing",
+    "Refund Rejected",
+    "Refund Accepted",
+    "Refunded",
+  ];
 
   // Toggle fields based on status selection
   useEffect(() => {
@@ -58,16 +72,7 @@ const SingleOrderStatusUpdate = ({
             onChange={(e) => setStatus(e.target.value)}
             className="select-field"
           >
-            {[
-              "Pending",
-              "Processing",
-              "Shipped",
-              "Delivered",
-              "Cancelled",
-              "Refund Requested",
-              "Returned",
-              "Refunded",
-            ].map((selectStatus) => (
+            {orderStatusArray.map((selectStatus) => (
               <option key={selectStatus} value={selectStatus}>
                 {selectStatus}
               </option>
@@ -76,7 +81,7 @@ const SingleOrderStatusUpdate = ({
         </div>
 
         {/* Tracking Information (only for "Processing" status) */}
-        {showTrackingInfo  && (
+        {showTrackingInfo && (
           <div className="tracking-information-wrapper">
             <div className="input-container">
               <LucideTruck className="input-icon" />
@@ -136,7 +141,7 @@ const SingleOrderStatusUpdate = ({
         )}
 
         {/* Cancellation Reason Input */}
-        {showCancellationReason  && (
+        {showCancellationReason && (
           <div className="textarea-container">
             <LucideMessageCircle className="input-icon" />
             <textarea

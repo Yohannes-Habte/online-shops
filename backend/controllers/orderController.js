@@ -4,6 +4,7 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
 import User from "../models/userModel.js";
+import e from "express";
 
 //=========================================================================
 // Create an order
@@ -187,6 +188,7 @@ export const createOrder = async (req, res, next) => {
 
     // The order belongs only to one Shop. So, update the shop by pushing the order ID to the orders array of the shop
     const shopId = populatedItems[0].shop;
+
     await Shop.findByIdAndUpdate(
       shopId,
       { $push: { orders: savedOrder._id } },
@@ -235,36 +237,52 @@ export const getOrder = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(createError(400, "Invalid order ID format!"));
     }
-
     const order = await Order.findById(id)
-      .populate({
-        path: "customer",
-        select: "name email image",
-      })
-      .populate({
-        path: "orderedItems.product",
-        model: "Product",
-      })
-      .populate({
-        path: "orderedItems.category",
-        select: "categoryName",
-      })
-      .populate({
-        path: "orderedItems.subcategory",
-        select: "subcategoryName",
-      })
-      .populate({
-        path: "orderedItems.brand",
-        select: "brandName brandDescription",
-      })
-      .populate({
-        path: "orderedItems.supplier",
-        select: "supplierName supplierEmail, supplierPhone",
-      })
-      .populate({
-        path: "orderedItems.shop",
-        select: "name email,phoneNumber, shopAddress",
-      });
+      .populate([
+        {
+          path: "customer",
+          select: "name email image",
+        },
+        {
+          path: "orderedItems.product",
+          model: "Product",
+        },
+        {
+          path: "orderedItems.category",
+          select: "categoryName",
+        },
+        {
+          path: "orderedItems.subcategory",
+          select: "subcategoryName",
+        },
+        {
+          path: "orderedItems.brand",
+          select: "brandName brandDescription",
+        },
+        {
+          path: "orderedItems.supplier",
+          select: "supplierName supplierEmail supplierPhone",
+        },
+        {
+          path: "orderedItems.shop",
+          select: "name email phoneNumber shopAddress",
+        },
+        {
+          path: "refundRequestInfo.product",
+          model: "Product",
+          select: "title discountPrice productImage",
+        },
+        {
+          path: "returnedItems.refundRequestIdLinked",
+          select: "refundRequestInfo product",
+          populate: {
+            path: "refundRequestInfo.product",
+            model: "Product",
+            select: "title discountPrice productImage",
+          },
+        },
+      ])
+      .lean();
 
     if (!order) {
       return next(createError(404, "Order not found!"));
@@ -395,8 +413,8 @@ export const updateShopOrder = async (req, res, next) => {
         "Processing",
         "Shipped",
         "Delivered",
-        "Cancelled",
         "Refund Requested",
+        "Refund Processing",
         "Returned",
         "Refunded",
       ].includes(orderStatus)
@@ -405,8 +423,10 @@ export const updateShopOrder = async (req, res, next) => {
       return next(createError(400, "Invalid order status provided!"));
     }
 
-    // 6. Prevent modification if already "Refunded" or "Returned"
-    if (["Returned", "Refunded"].includes(order.orderStatus)) {
+    // 6. Prevent modification if already "Returned", "Refund Rejected" or "Refunded"
+    if (
+      ["Returned", "Refund Rejected", "Refunded"].includes(order.orderStatus)
+    ) {
       await session.abortTransaction();
       return next(
         createError(
@@ -560,17 +580,16 @@ export const updateShopOrder = async (req, res, next) => {
 //=========================================================================
 // User Refund request for an order placed
 //=========================================================================
-
 export const refundUserOrderRequest = async (req, res, next) => {
   const {
-    orderStatus,
-    productTitle,
+    productId,
     productColor,
     productSize,
     quantity,
-    productPrice,
+    requestedDate,
     refundReason,
-    refundAmount,
+    otherReason,
+    orderStatus,
   } = req.body;
 
   const orderId = req.params.id;
@@ -579,26 +598,47 @@ export const refundUserOrderRequest = async (req, res, next) => {
     return next(createError(400, "Invalid order ID format!"));
   }
 
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return next(createError(400, "Invalid product ID format!"));
+  }
+
+  const currentStatus = "Refund Requested";
+  if (orderStatus !== currentStatus) {
+    return next(
+      createError(400, `Invalid order status update: ${orderStatus}.`)
+    );
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const order = await Order.findById(orderId).session(session);
 
+    console.log("Order:", order);
+
     if (!order) {
       await session.abortTransaction();
       return next(createError(404, "Order not found!"));
     }
 
+    // Find the product
+    const product = await Product.findById(productId).session(session);
+    if (!product) {
+      await session.abortTransaction();
+      return next(createError(404, "Product not found!"));
+    }
+
+    const productPrice = product.discountPrice;
+
     // Find the ordered product in the order
     const orderedProduct = order.orderedItems.find(
       (item) =>
-        item.title.trim().toLowerCase() === productTitle.trim().toLowerCase() &&
+        String(item.product._id) === String(productId) &&
         item.productColor.trim().toLowerCase() ===
           productColor.trim().toLowerCase() &&
         String(item.size).toLowerCase() === String(productSize).toLowerCase() &&
-        Number(item.quantity) === Number(quantity) &&
-        Number(item.price) === Number(productPrice)
+        Number(item.quantity) === Number(quantity)
     );
 
     if (!orderedProduct) {
@@ -607,19 +647,20 @@ export const refundUserOrderRequest = async (req, res, next) => {
     }
 
     // Prevent duplicate refund requests
-    const existingRefund = order.refundRequestInfo.find(
+    const existingRefundRequest = order.refundRequestInfo?.find(
       (refund) =>
-        refund.title.trim().toLowerCase() ===
-          productTitle.trim().toLowerCase() &&
-        refund.color.trim().toLowerCase() ===
+        refund.product.toString() === productId.toString() &&
+        refund.requestedItemColor.trim().toLowerCase() ===
           productColor.trim().toLowerCase() &&
-        String(refund.size).toLowerCase() ===
+        String(refund.requestedItemSize || "").toLowerCase() ===
           String(productSize).toLowerCase() &&
-        Number(refund.quantity) === Number(quantity) &&
-        Number(refund.price) === Number(productPrice)
+        Number(new Date(refund.requestedDate).getTime()) ===
+          Number(new Date(requestedDate).getTime()) &&
+        Number(refund.requestedItemQuantity || 0) === Number(quantity)
     );
 
-    if (existingRefund) {
+    // If a refund request for this product already exists, prevent a duplicate request
+    if (existingRefundRequest) {
       await session.abortTransaction();
       return next(createError(400, "Refund already requested for this item!"));
     }
@@ -646,13 +687,6 @@ export const refundUserOrderRequest = async (req, res, next) => {
     // Calculate refund amount
     const subTotalProductPrice = productPrice * quantity;
 
-    if (Number(refundAmount) !== Number(subTotalProductPrice)) {
-      await session.abortTransaction();
-      return next(
-        createError(400, "Refund amount mismatch! Please try again.")
-      );
-    }
-
     // Refund calculation (tax is refundable, shipping & discounts are not)
     const calculateTax = (subTotal) => subTotal * 0.02;
     const calculateShippingFee = (subTotal) =>
@@ -675,20 +709,22 @@ export const refundUserOrderRequest = async (req, res, next) => {
     order.statusHistory.push({
       status: "Refund Requested",
       changedAt: new Date(),
-      message: `Your order is now Refund Requested at ${new Date().toLocaleString()}`,
+      message: `Your order, placed on ${new Date().toLocaleString()}, for the product ${
+        product.title
+      } with color ${productColor}, size ${productSize}, and quantity ${quantity}, has been successfully marked as Refund Requested. We are processing your request and will notify you once it is completed.`,
     });
 
     // Add refund request details
     order.refundRequestInfo.push({
-      refundId: new mongoose.Types.ObjectId(),
-      title: productTitle,
-      color: productColor,
-      size: productSize,
-      quantity: quantity,
-      price: productPrice,
-      amount: fixedNetRefundAmount,
-      reason: refundReason,
-      createdAt: new Date(),
+      refundRequestId: new mongoose.Types.ObjectId(),
+      product: productId,
+      requestedItemColor: productColor,
+      requestedItemSize: productSize,
+      requestedItemQuantity: quantity,
+      requestedDate: requestedDate,
+      requestRefundReason: refundReason,
+      otherReason: otherReason,
+      requestedRefundAmount: fixedNetRefundAmount,
     });
 
     await order.save({ session });
@@ -716,22 +752,31 @@ export const refundUserOrderRequest = async (req, res, next) => {
 //=========================================================================
 export const orderRefundByShop = async (req, res, next) => {
   const {
-    orderStatus,
-    productTitle,
-    productColor,
-    productSize,
-    quantity,
-    productPrice,
-    refundReason,
+    refundRequestIdLinked,
+    isProductReturned,
+    returnedDate,
+    condition,
+    comments,
     refundAmount,
-    userRefundId,
+    processedDate,
+    refundStatus,
+    processedBy,
   } = req.body;
-  const thisOrderStatus = "Refunded";
 
-  if (orderStatus !== thisOrderStatus) {
-    return next(
-      createError(400, `Invalid order status update: ${orderStatus}.`)
-    );
+  let orderStatus;
+
+  if (isProductReturned === true && refundStatus === "Rejected") {
+    orderStatus = "Refund Rejected";
+  } else if (
+    isProductReturned === true &&
+    condition === "New" &&
+    refundStatus === "Accepted"
+  ) {
+    orderStatus = "Refund Accepted";
+  } else if (isProductReturned === true && refundStatus === "Processing") {
+    orderStatus = "Refund Processing";
+  } else {
+    orderStatus = "Refund Processing";
   }
 
   const orderId = req.params.id;
@@ -743,6 +788,20 @@ export const orderRefundByShop = async (req, res, next) => {
 
   if (!mongoose.Types.ObjectId.isValid(shopId)) {
     return next(createError(400, "Invalid shop ID format."));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(refundRequestIdLinked)) {
+    return next(createError(400, "Invalid refund request ID format."));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(processedBy)) {
+    return next(createError(400, "Invalid processed by ID format."));
+  }
+
+  if (processedBy !== shopId) {
+    return next(
+      createError(403, "Unauthorized: You cannot process this refund.")
+    );
   }
 
   const session = await mongoose.startSession();
@@ -774,7 +833,7 @@ export const orderRefundByShop = async (req, res, next) => {
       );
     }
 
-    // If the order status is "Pending", "Processing", "Shipped", "Delivered", or "Cancelled", it cannot be refunded
+    //
     const validOrderStatuses = [
       "Pending",
       "Processing",
@@ -788,43 +847,28 @@ export const orderRefundByShop = async (req, res, next) => {
       return next(
         createError(
           400,
-          `We're sorry, but an order with the status "${order.orderStatus}" is not eligible for a refund. Refunds can only be processed for orders with a refund request status. Please contact our support team if you have any questions or need further assistance.`
+          `We're sorry, but an order with the status "${order.orderStatus}" is not eligible to accept a refund. Refunds can only be processed for orders with a "Refund Accepted" status. Please contact our support team if you have any questions or need further assistance.`
         )
       );
     }
 
-    // Find the ordered product in the order
-    const orderedProduct = order.orderedItems.find(
-      (item) =>
-        item.title.trim().toLowerCase() === productTitle.trim().toLowerCase() &&
-        item.productColor.trim().toLowerCase() ===
-          productColor.trim().toLowerCase() &&
-        String(item.size).toLowerCase() === String(productSize).toLowerCase() &&
-        Number(item.quantity) === Number(quantity) &&
-        Number(item.price) === Number(productPrice)
-    );
-
-    if (!orderedProduct) {
-      await session.abortTransaction();
-      return next(createError(400, "Product not found in the order!"));
-    }
-
-    // Find existing refund request by userRefundId
+    // Ensure the requested refund exists in the refundRequestInfo array
     const existingRefund = order.refundRequestInfo.find(
-      (refund) => String(refund.refundId) === userRefundId
+      (refund) => String(refund.refundRequestId) === refundRequestIdLinked
     );
     if (!existingRefund) {
       await session.abortTransaction();
       return next(createError(400, "Refund request not found!"));
     }
 
-    // Ensure the requested refund is not in the refunds array
-    const existingRefundId = order.payment.refunds.find(
-      (refund) => String(refund.userRefundId) === userRefundId
+    // Ensure the requested refund doses not exists in the returnedItems array
+    const existingReturnedRefund = order.returnedItems.find(
+      (refund) => String(refund.refundRequestIdLinked) === refundRequestIdLinked
     );
-    if (existingRefundId) {
+
+    if (existingReturnedRefund) {
       await session.abortTransaction();
-      return next(createError(400, "Refund already processed for this item!"));
+      return next(createError(400, "Refund request is processing!"));
     }
 
     // Ensure refund amount is valid
@@ -835,76 +879,92 @@ export const orderRefundByShop = async (req, res, next) => {
       );
     }
 
-    // Process refund
-    order.payment.paymentStatus = "refunded";
     order.orderStatus = orderStatus;
-    order.payment.refunds.push({
-      refundId: new mongoose.Types.ObjectId(),
-      title: productTitle,
-      color: productColor,
-      size: productSize,
-      quantity: quantity,
-      price: productPrice,
-      amount: refundAmount,
-      reason: refundReason,
-      createdAt: new Date(),
-      userRefundId: userRefundId,
-    });
+
+    // If the orderStatus is returned, the condition is new and refundStatus is Accepted, approve refund to the user and update product variant stock"
+    if (
+      (condition === "New" && refundStatus === "Accepted",
+      isProductReturned === true)
+    ) {
+      // Update returnedItems array with the refund details
+      order.returnedItems.push({
+        refundRequestIdLinked,
+        isProductReturned,
+        returnedDate,
+        condition,
+        comments,
+        refundAmount,
+        processedDate,
+        refundStatus,
+        processedBy,
+        returnedId: new mongoose.Types.ObjectId(),
+      });
+
+      // Update shop refund info array
+      shop.shopRefundInfo.push({
+        refundDate: new Date(),
+        refundAmount: refundAmount,
+      });
+
+      // Update shop net income
+      if (shop.netShopIncome < refundAmount) {
+        await session.abortTransaction();
+        return next(
+          createError(400, "Insufficient balance in shop account for refund.")
+        );
+      }
+
+      shop.netShopIncome = (shop.netShopIncome - refundAmount).toFixed(2);
+      await shop.save({ session });
+
+      // Function to restore stock
+      const restoreStock = async (productId, variantColor, size, quantity) => {
+        const product = await Product.findById(productId).session(session);
+        if (!product) return;
+
+        const variant = product.variants.find(
+          (v) => v.productColor === variantColor
+        );
+        if (!variant) return;
+
+        const sizeEntry = variant.productSizes.find((s) => s.size === size);
+        if (!sizeEntry) return;
+
+        sizeEntry.stock += quantity;
+        product.soldOut = Math.max(0, product.soldOut - quantity);
+
+        await product.save({ session, validateBeforeSave: false });
+      };
+
+      // Restore stock if fully refunded
+      if (orderStatus === "Refund Accepted") {
+        await Promise.all(
+          order.orderedItems.map((item) =>
+            restoreStock(
+              item.product._id,
+              item.productColor,
+              item.size,
+              item.quantity
+            )
+          )
+        );
+      }
+
+      // Update the shop's SoldProducts array by removing the product ID from soldProducts
+      // const productIdsToRemove = order.orderedItems.map(
+      //   (item) => item.product._id
+      // );
+
+      // shop.soldProducts = shop.soldProducts.filter(
+      //   (productId) => !productIdsToRemove.includes(productId.toString())
+      // );
+    }
 
     order.statusHistory.push({
       status: orderStatus,
       changedAt: new Date(),
       message: `Your order status changed to '${orderStatus}' on ${new Date().toLocaleString()}.`,
     });
-
-    // Update shop refund info array
-    shop.shopRefundInfo.push({
-      refundDate: new Date(),
-      refundAmount: refundAmount,
-    });
-
-    if (shop.netShopIncome < refundAmount) {
-      await session.abortTransaction();
-      return next(
-        createError(400, "Insufficient balance in shop account for refund.")
-      );
-    }
-
-    shop.netShopIncome = (shop.netShopIncome - refundAmount).toFixed(2);
-    await shop.save({ session });
-
-    // Function to restore stock
-    const restoreStock = async (productId, variantColor, size, quantity) => {
-      const product = await Product.findById(productId).session(session);
-      if (!product) return;
-
-      const variant = product.variants.find(
-        (v) => v.productColor === variantColor
-      );
-      if (!variant) return;
-
-      const sizeEntry = variant.productSizes.find((s) => s.size === size);
-      if (!sizeEntry) return;
-
-      sizeEntry.stock += quantity;
-      product.soldOut = Math.max(0, product.soldOut - quantity);
-
-      await product.save({ session, validateBeforeSave: false });
-    };
-
-    // Restore stock if fully refunded
-    if (orderStatus === "Refunded") {
-      await Promise.all(
-        order.orderedItems.map((item) =>
-          restoreStock(
-            item.product,
-            item.productColor,
-            item.size,
-            item.quantity
-          )
-        )
-      );
-    }
 
     // Save order update
     await order.save({ session });
@@ -990,13 +1050,28 @@ export const allShopOrders = async (req, res, next) => {
       .populate("payment.createdBy", "username email")
       .populate("payment.updatedBy", "username email")
       .populate("customer", "username email")
+      .populate({
+        path: "refundRequestInfo.product",
+        model: "Product",
+        select: "title discountPrice productImage",
+      })
+      .populate({
+        path: "returnedItems.refundRequestIdLinked",
+        model: "Order",
+        select: "refundRequestInfo",
+        populate: {
+          path: "refundRequestInfo.product",
+          model: "Product",
+          select: "title discountPrice productImage",
+        },
+      })
       .select(
-        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory"
+        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory refundRequestInfo returnedItems"
       )
       .sort({ createdAt: -1 })
-      .lean(); // Optimize performance by returning plain objects
+      .lean();
 
-    // Aggregation for Monthly Order Count & Total Items Ordered
+    // Aggregation for Monthly Order Count, Total Items Ordered & Net Income
     const monthlyOrders = await Order.aggregate([
       // Filter orders by shop ID
       {
@@ -1045,7 +1120,6 @@ export const allShopOrders = async (req, res, next) => {
       grandTotal: item.grandTotal || 0,
     }));
 
-
     res.status(200).json({
       success: true,
       orders,
@@ -1054,6 +1128,116 @@ export const allShopOrders = async (req, res, next) => {
   } catch (error) {
     console.error("Error fetching shop orders:", error);
     next(createError(500, "Orders could not be accessed! Please try again!"));
+  }
+};
+
+//=========================================================================
+// Get all refunded orders for a seller and other details
+//=========================================================================
+export const allShopRefundedOrders = async (req, res, next) => {
+  try {
+    const sellerId = req.shop.id;
+
+    // Validate sellerId
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      return next(createError(400, "Invalid seller ID format"));
+    }
+
+    const shop = await Shop.findById(sellerId).select("_id");
+
+    if (!shop) {
+      return next(createError(404, "Seller not found"));
+    }
+
+    // Fetch refunded orders for the shop
+    const refundedOrders = await Order.find({
+      "orderedItems.shop": shop._id,
+      "payment.paymentStatus": "refunded",
+    })
+      .populate("orderedItems.product", "title price productImage")
+      .populate("orderedItems.category", "categoryName")
+      .populate("orderedItems.subcategory", "subcategoryName")
+      .populate("orderedItems.brand", "brandName")
+      .populate("orderedItems.supplier", "supplierName")
+      .populate("payment.createdBy", "username email")
+      .populate("payment.updatedBy", "username email")
+      .populate("customer", "username email")
+      .select(
+        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory"
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Aggregation for Monthly Order Refunded Count, Total Items Refunded, and Total Refund Amount
+    const monthlyRefundedOrders = await Order.aggregate([
+      // Filter orders by shop ID and payment status
+      {
+        $match: {
+          "orderedItems.shop": new mongoose.Types.ObjectId(sellerId),
+          "payment.paymentStatus": "refunded",
+        },
+      },
+
+      // Group orders by year and month using $year and $month aggregation operators from createdAt field
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          orderCount: { $sum: 1 },
+          totalItemsRefunded: { $sum: "$itemsQty" },
+          totalRefundAmount: { $sum: "$grandTotal" },
+        },
+      },
+
+      // Sorts results in ascending order by year and month.
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 },
+      },
+
+      // Project the fields to display
+      {
+        $project: {
+          _id: 0, // Remove _id
+          year: "$_id.year",
+          month: "$_id.month",
+          orderCount: 1,
+          totalItemsRefunded: 1,
+          totalRefundAmount: 1,
+        },
+      },
+    ]);
+
+    // Ensure data is structured correctly before sending response
+    const formattedMonthlyRefundedOrders = (monthlyRefundedOrders || []).map(
+      (item) => ({
+        year: item.year || null,
+        month: item.month || null,
+        orderCount: item.orderCount || 0,
+        totalItemsRefunded: item.totalItemsRefunded || 0,
+        totalRefundAmount: item.totalRefundAmount || 0,
+      })
+    );
+
+    console.log(
+      "formattedMonthlyRefundedOrders",
+      formattedMonthlyRefundedOrders
+    );
+
+    res.status(200).json({
+      success: true,
+      refundedOrders,
+      monthlyRefundedOrderCount: formattedMonthlyRefundedOrders,
+    });
+  } catch (error) {
+    console.error("Error fetching refunded orders:", error);
+    next(
+      createError(
+        500,
+        "Refunded orders could not be accessed! Please try again!"
+      )
+    );
   }
 };
 
@@ -1074,8 +1258,31 @@ export const deleteOrder = async (req, res, next) => {
 //=========================================================================
 
 export const deleteOrders = async (req, res, next) => {
+  const shopId = req.shop?.id;
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID format"));
+  }
   try {
-    res.send("New order");
+    // Validate shop ID
+    const shop = await Shop.findById(shopId);
+    if (!shop) {
+      return next(createError(404, "Shop not found"));
+    }
+
+    if (!shopId) {
+      return next(
+        createError(403, "Unauthorized to delete orders for this shop")
+      );
+    }
+
+    // Delete all orders for the shop
+    await Order.deleteMany({ "orderedItems.shop": shop._id });
+
+    res.status(200).json({
+      success: true,
+      message: "All orders deleted successfully.",
+    });
   } catch (error) {
     next(createError(500, "Orders could not be deleted! Please try again!"));
   }

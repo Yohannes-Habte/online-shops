@@ -130,7 +130,10 @@ const UserOrders = () => {
   ];
 
   return (
-    <section style={{ padding: "20px" }} className="total-user-orders-container">
+    <section
+      style={{ padding: "20px" }}
+      className="total-user-orders-container"
+    >
       <h2 className="user-orders-title">Your Orders</h2>
       {loading ? (
         <div>Loading orders...</div>

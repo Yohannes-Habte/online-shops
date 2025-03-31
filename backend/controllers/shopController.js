@@ -6,6 +6,7 @@ import shopSendEmail from "../utils/shopSendEmail.js";
 import crypto from "crypto";
 import generateShopToken from "../middleware/shopToken.js";
 import mongoose from "mongoose";
+import User from "../models/userModel.js";
 
 //=========================================================================
 // Create a seller
@@ -509,14 +510,15 @@ const clearAllShopProducts = async () => {
 
 
 
+
 // ====================================================================
 // If You Need to Clear a Field:
 // ====================================================================
 const clearSpecificField = async () => {
   try {
-    const result = await Shop.updateMany(
+    const result = await User.updateMany(
       {}, // No filter: Applies to all documents
-      { $unset: { availableBalance: "" } } 
+      { $unset: { myOrders: "" } } 
     );
     console.log(result);
   } catch (err) {
@@ -524,6 +526,7 @@ const clearSpecificField = async () => {
   }
 };
 
-clearSpecificField();
+// clearSpecificField();
+
 
 */

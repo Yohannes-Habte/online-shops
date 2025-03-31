@@ -30,7 +30,11 @@ const statusColors = {
 const AllSellerOrders = () => {
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
-  const { data: orders = [], loading, error } = sellerOrders || {};
+  const {
+    data: { orders = [] },
+    loading,
+    error,
+  } = sellerOrders || {};
 
   useEffect(() => {
     dispatch(fetchSellerOrders());

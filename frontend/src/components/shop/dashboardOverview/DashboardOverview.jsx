@@ -6,7 +6,10 @@ import { RxArrowRight } from "react-icons/rx";
 import { MdPriceChange } from "react-icons/md";
 import { FaFirstOrderAlt } from "react-icons/fa6";
 import { FaProductHunt } from "react-icons/fa";
-import { fetchSellerOrders } from "../../../redux/actions/order";
+import {
+  deleteShopOrders,
+  fetchSellerOrders,
+} from "../../../redux/actions/order";
 import "./DashboardOverview.scss";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
@@ -17,7 +20,7 @@ import {
 } from "../../../redux/actions/seller";
 import OrderChart from "../charts/order/OrderChart";
 
-const DashboardOverview = () => {
+const DashboardOverview = ({ setIsActive }) => {
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
   const {
@@ -59,13 +62,57 @@ const DashboardOverview = () => {
     };
   }, [dispatch]);
 
-  const deliveredShopOrders = orders.filter(
-    (order) => order.orderStatus === "Delivered"
-  );
+  console.log("DashboardOverview orders", orders);
 
-  const totalShopIncome = shopDetails?.netShopIncome?.toFixed(2) || "0";
+  // Function to handle order deletion
+  const handleDeleteOrders = () => {
+    if (window.confirm("Are you sure you want to delete all orders?")) {
+      dispatch(deleteShopOrders());
+    }
+  };
 
-  const rows = deliveredShopOrders.map((order) => ({
+  // If order status is "Delivered" and there are no refunds or refund requests,  the order status is "Delivered"
+  // If order status is "Delivered" and there are refunds or refund requests, but the count of ordered items is greater than the count of refunds or refund requests, the order status is "Delivered"
+
+  const filteredOrders = orders
+    .filter(
+      (order) =>
+        order.orderStatus === "Delivered" ||
+        order.orderStatus === "Refund Requested" ||
+        order.orderStatus === "Refund Accepted"
+    )
+    .map((order) => {
+      const countOrderedItems = order.orderedItems?.length;
+      const countRefundRequests = order.refundRequestInfo?.length || 0;
+      const countRefundedItems = order.returnedItems?.length || 0;
+
+      if (
+        countOrderedItems > 0 &&
+        countRefundRequests === 0 &&
+        countRefundedItems === 0
+      ) {
+        const salesProductCount =
+          countOrderedItems > countRefundedItems &&
+          countOrderedItems - countRefundedItems;
+        return { ...order, orderStatus: `${salesProductCount} Delivered` };
+      }
+
+      if (
+        countOrderedItems >= countRefundRequests &&
+        countOrderedItems > countRefundedItems
+      ) {
+        const salesProductCount =
+          countOrderedItems > countRefundedItems &&
+          countOrderedItems - countRefundedItems;
+        return { ...order, orderStatus: `${salesProductCount} Delivered` };
+      }
+      return null; // Exclude orders that don't meet the criteria
+    })
+    .filter(Boolean); // Remove null values
+
+  console.log("filteredOrders", filteredOrders);
+
+  const rows = filteredOrders.map((order) => ({
     id: order._id,
     createdAt: order.createdAt,
     quantity:
@@ -73,7 +120,7 @@ const DashboardOverview = () => {
       0,
     method: order.payment?.method || "Unknown",
     grandTotal: order.grandTotal ?? 0,
-    orderStatus: order.orderStatus || "Unknown",
+    orderStatus: order.orderStatus,
   }));
 
   const columns = [
@@ -135,9 +182,24 @@ const DashboardOverview = () => {
     },
   ];
 
+  const totalShopIncome = shopDetails?.netShopIncome?.toFixed(2) || "0";
+
+  const handleClick = (index) => {
+    setIsActive(index);
+  };
+
   return (
     <section className="overview-dashboard-wrapper">
       <h2 className="overview-dashboard-title">Overview</h2>
+
+      <button
+        type="button"
+        onClick={handleDeleteOrders}
+        disabled={loading}
+        className="delete-orders-button"
+      >
+        {loading ? "Deleting..." : "Delete All Orders"}
+      </button>
 
       {shopLoading ? (
         <p>Loading shop details...</p>
@@ -148,12 +210,14 @@ const DashboardOverview = () => {
           <article className="article-box account-balance">
             <aside className="aside-box account-balance">
               <MdPriceChange className="icon" />
-              <h3 className="subTitle">
-                Account Balance of {shopDetails?.name}
-              </h3>
+              <h3 className="subTitle">{shopDetails?.name} Account Balance</h3>
             </aside>
             <h3 className="subTitle">${totalShopIncome}</h3>
-            <Link to="/dashboard-withdraw-money" className="link">
+            <Link
+              to="/shop/dashboard"
+              className="link"
+              onClick={() => handleClick(10)}
+            >
               Withdraw Money
             </Link>
           </article>
@@ -161,12 +225,19 @@ const DashboardOverview = () => {
           <article className="article-box orders-wrapper">
             <aside className="aside-box all-orders">
               <FaFirstOrderAlt className="icon" />
-              <h3 className="subTitle">All Orders from {shopDetails?.name}</h3>
+              <h3 className="subTitle">
+                {" "}
+                Comprehensive {shopDetails?.name} Order Report{" "}
+              </h3>
             </aside>
             <h3 className="subTitle">
-              {deliveredShopOrders ? deliveredShopOrders.length : "0"}
+              {filteredOrders ? filteredOrders.length : "0"}
             </h3>
-            <Link to="/dashboard-orders" className="link">
+            <Link
+              to="/shop/dashboard"
+              className="link"
+              onClick={() => handleClick(9)}
+            >
               View Orders
             </Link>
           </article>
@@ -174,12 +245,21 @@ const DashboardOverview = () => {
           <article className="article-box all-products-wrapper">
             <aside className="aside-box all-products">
               <FaProductHunt className="icon" />
-              <h3 className="subTitle">All Products of {shopDetails?.name}</h3>
+              <h3 className="subTitle">
+                {" "}
+                {shopDetails?.name} Total Product Inventory{" "}
+              </h3>
             </aside>
             <h3 className="subTitle">
               {shopDetails ? shopDetails?.shopProducts?.length : "0"}
             </h3>
-            <Link to="/dashboard-products">View Products</Link>
+            <Link
+              to="/shop/dashboard"
+              onClick={() => handleClick(5)}
+              className="link"
+            >
+              View Products
+            </Link>
           </article>
         </div>
       )}

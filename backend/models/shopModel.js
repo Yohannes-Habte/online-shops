@@ -14,6 +14,26 @@ const shopSchema = new Schema(
     shopAddress: { type: String, required: true },
     withdrawMethod: { type: Object },
 
+    role: { type: String, default: "seller", enum: ["seller", "admin"] },
+
+    LogoImage: { type: String, required: true },
+
+    agree: { type: Boolean, default: false, required: true },
+
+    categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+
+    subCategories: [{ type: Schema.Types.ObjectId, ref: "Subcategory" }],
+
+    brands: [{ type: Schema.Types.ObjectId, ref: "Brand" }],
+
+    shopProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+
+    suppliers: [{ type: Schema.Types.ObjectId, ref: "Supplier" }],
+
+    orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
+
+    soldProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+
     shopIncomeInfo: [
       {
         paymentDate: { type: Date, required: true },
@@ -29,26 +49,6 @@ const shopSchema = new Schema(
     ],
 
     netShopIncome: { type: Number, default: 0 },
-
-    role: { type: String, default: "seller", enum: ["seller", "admin"] },
-
-    LogoImage: { type: String, required: true },
-
-    agree: { type: Boolean, default: false, required: true },
-
-    categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
-
-    subCategories: [{ type: Schema.Types.ObjectId, ref: "Subcategory" }],
-
-    brands: [{ type: Schema.Types.ObjectId, ref: "Brand" }],
-
-    shopProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
-
-    soldProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
-
-    suppliers: [{ type: Schema.Types.ObjectId, ref: "Supplier" }],
-
-    orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
 
     transactions: [
       {

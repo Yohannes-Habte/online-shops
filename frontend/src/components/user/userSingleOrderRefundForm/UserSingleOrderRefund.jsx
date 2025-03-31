@@ -3,31 +3,60 @@ import {
   Palette,
   Ruler,
   Hash,
-  DollarSign,
+  Calendar,
   FileText,
+  MessageSquareText,
 } from "lucide-react";
+
 import "./UserSingleOrderRefundForm.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "../../../utils/security/secreteKey";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const refundRequestInitialState = {
-  productTitle: "",
-  productColor: "",
-  productSize: "",
+  item: "",
+  color: "",
+  size: "",
   quantity: "",
-  productPrice: "",
-  refundReason: "",
-  refundAmount: "",
+  requestedDate: new Date().toISOString().split("T")[0],
+  reason: "",
+  otherReason: "",
 };
 
-const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
-  const [refundForm, setRefundForm] = useState(refundRequestInitialState);
+const UserSingleOrderRefundForm = ({
+  orderInfos,
+  setOrderInfos,
+  selectedProduct,
+}) => {
+  const [refundForm, setRefundForm] = useState({
+    item: selectedProduct?._id || "",
+    color: selectedProduct?.productColor || "",
+    size: selectedProduct?.size || "",
+    quantity: selectedProduct?.quantity || "",
+    requestedDate: new Date().toISOString().split("T")[0],
+    reason: "",
+    otherReason: "",
+  });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Handle refund request change
+  // Use effect to update the form when a new product is selected
+  useEffect(() => {
+    if (selectedProduct) {
+      setRefundForm({
+        item: selectedProduct?._id || "",
+        color: selectedProduct?.productColor || "",
+        size: selectedProduct?.size || "",
+        quantity: selectedProduct?.quantity || "",
+        requestedDate: new Date().toISOString().split("T")[0],
+        reason: "",
+        otherReason: "",
+      });
+    }
+  }, [selectedProduct]);
+
   const handleRefundChange = (e) => {
     const { name, value } = e.target;
     setRefundForm((prev) => ({ ...prev, [name]: value }));
@@ -39,14 +68,9 @@ const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
   const validateRefundForm = () => {
     const refundFormErrors = {};
 
-    if (!refundForm.productTitle.trim())
-      refundFormErrors.productTitle = "Product title is required.";
-
-    if (!refundForm.productColor.trim())
-      refundFormErrors.productColor = "Product color is required.";
-
-    if (!refundForm.productSize.trim())
-      refundFormErrors.productSize = "Product size is required.";
+    if (!refundForm.item.trim()) refundFormErrors.item = "Product is required.";
+    if (!refundForm.color.trim()) refundFormErrors.color = "Color is required.";
+    if (!refundForm.size.trim()) refundFormErrors.size = "Size is required.";
 
     if (
       !refundForm.quantity ||
@@ -56,35 +80,21 @@ const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
       refundFormErrors.quantity = "Please provide a valid quantity.";
     }
 
-    if (
-      !refundForm.productPrice ||
-      isNaN(refundForm.productPrice) ||
-      refundForm.productPrice <= 0
-    ) {
-      refundFormErrors.productPrice = "Please provide a valid product price.";
-    }
+    if (!refundForm.requestedDate)
+      refundFormErrors.requestedDate = "Please provide a valid date.";
 
-    if (!refundForm.refundReason.trim())
-      refundFormErrors.refundReason = "Please provide a reason for the refund.";
-
-    if (
-      !refundForm.refundAmount ||
-      isNaN(refundForm.refundAmount) ||
-      refundForm.refundAmount <= 0
-    ) {
-      refundFormErrors.refundAmount = "Please provide a valid refund amount.";
+    if (!refundForm.reason) refundFormErrors.reason = "Please select a reason.";
+    if (refundForm.reason === "Other" && !refundForm.otherReason.trim()) {
+      refundFormErrors.otherReason = "Please provide other reason.";
     }
 
     setErrors(refundFormErrors);
-
     return Object.keys(refundFormErrors).length === 0;
   };
 
-  // ==================================================================
-  // Request refund handler
-  // ==================================================================
+  const refundRequestHandler = async (e) => {
+    e.preventDefault();
 
-  const refundHandler = async () => {
     if (!validateRefundForm()) {
       return toast.error("Please correct the errors in the form.");
     }
@@ -97,14 +107,14 @@ const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
     try {
       setLoading(true);
       const refundRequest = {
-        orderStatus: "Refund Requested",
-        productTitle: refundForm.productTitle,
-        productColor: refundForm.productColor,
-        productSize: refundForm.productSize,
+        productId: refundForm.item,
+        productColor: refundForm.color,
+        productSize: refundForm.size,
         quantity: refundForm.quantity,
-        productPrice: refundForm.productPrice,
-        refundReason: refundForm.refundReason,
-        refundAmount: refundForm.refundAmount,
+        requestedDate: refundForm.requestedDate,
+        refundReason: refundForm.reason,
+        otherReason: refundForm.otherReason,
+        orderStatus: "Refund Requested",
       };
 
       const { data } = await axios.put(
@@ -114,11 +124,7 @@ const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
       );
 
       toast.success(data.message);
-
-      setOrderInfos((prev) => ({
-        ...prev,
-        orderStatus: "Refund Requested",
-      }));
+      setOrderInfos((prev) => ({ ...prev, orderStatus: "Refund Requested" }));
       setRefundForm(refundRequestInitialState);
     } catch (error) {
       toast.error(
@@ -133,153 +139,149 @@ const UserSingleOrderRefundForm = ({ orderInfos, setOrderInfos }) => {
   return (
     <section className="user-order-refund-request-form-container">
       <h2 className="user-order-refund-request-form-title">Request Refund</h2>
-      <p className="user-order-refund-request-rules">
-        You may request a refund for a single product per submission. To ensure
-        a smooth process, provide accurate details, including the product title,
-        color, size, quantity, price, refund amount, and reason. Please note
-        that any discounts applied at the time of purchase will be deducted from
-        the refund amount, and transportation costs are non-refundable.
-        Double-check all information before submitting your request.
-      </p>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          refundHandler();
-        }}
+        onSubmit={refundRequestHandler}
         className="user-order-refund-request-form"
       >
         <div className="user-order-refund-request-form-inputs">
-          {/* Product Title */}
+          {/* Product */}
           <div className="input-container">
-            <label className="input-label">Product Title</label>
+            <label className="input-label">Product</label>
             <div className="input-with-icon">
               <Package className="input-icon" size={20} />
               <input
                 type="text"
-                name="productTitle"
-                value={refundForm.productTitle}
+                name="item"
+                value={refundForm.item}
                 onChange={handleRefundChange}
-                placeholder="Enter product title"
+                placeholder="Enter product"
                 className="input-field"
               />
             </div>
-            {errors.productTitle && (
-              <p className="error-msg">{errors.productTitle}</p>
-            )}
+            {errors.item && <p className="error-msg">{errors.item}</p>}
           </div>
 
           {/* Product Color */}
           <div className="input-container">
-            <label className="input-label">Product Color</label>
+            <label className="input-label">Color</label>
             <div className="input-with-icon">
               <Palette className="input-icon" size={20} />
               <input
                 type="text"
-                name="productColor"
-                value={refundForm.productColor}
+                name="color"
+                value={refundForm.color}
                 onChange={handleRefundChange}
-                placeholder="Enter product color"
+                placeholder="Enter color"
                 className="input-field"
               />
             </div>
-            {errors.productColor && (
-              <p className="error-msg">{errors.productColor}</p>
-            )}
+            {errors.color && <p className="error-msg">{errors.color}</p>}
           </div>
 
           {/* Product Size */}
           <div className="input-container">
-            <label className="input-label">Product Size</label>
+            <label className="input-label">Color</label>
             <div className="input-with-icon">
               <Ruler className="input-icon" size={20} />
               <input
                 type="text"
-                name="productSize"
-                value={refundForm.productSize}
+                name="size"
+                value={refundForm.size}
                 onChange={handleRefundChange}
-                placeholder="Enter product size"
+                placeholder="Enter Size"
                 className="input-field"
               />
             </div>
-            {errors.productSize && (
-              <p className="error-msg">{errors.productSize}</p>
-            )}
+            {errors.size && <p className="error-msg">{errors.size}</p>}
           </div>
 
-          {/* Quantity */}
+          {/* Product quantity */}
           <div className="input-container">
-            <label className="input-label">Quantity</label>
+            <label className="input-label">Color</label>
             <div className="input-with-icon">
               <Hash className="input-icon" size={20} />
               <input
-                type="number"
+                type="text"
                 name="quantity"
                 value={refundForm.quantity}
                 onChange={handleRefundChange}
-                placeholder="Enter quantity"
+                placeholder="Enter Quantity"
                 className="input-field"
               />
             </div>
             {errors.quantity && <p className="error-msg">{errors.quantity}</p>}
           </div>
 
-          {/* Product Price */}
+          {/* Requested Date */}
           <div className="input-container">
-            <label className="input-label">Product Price</label>
+            <label className="input-label">Color</label>
             <div className="input-with-icon">
-              <Hash className="input-icon" size={20} />
+              <Calendar className="input-icon" size={20} />
               <input
-                type="number"
-                name="productPrice"
-                value={refundForm.productPrice}
+                type="date"
+                name="requestedDate"
+                value={refundForm.requestedDate}
                 onChange={handleRefundChange}
-                placeholder="Enter Price"
+                placeholder="Enter Requested Date"
                 className="input-field"
               />
             </div>
-            {errors.productPrice && (
-              <p className="error-msg">{errors.productPrice}</p>
+            {errors.requestedDate && (
+              <p className="error-msg">{errors.requestedDate}</p>
             )}
           </div>
 
-          {/* Refund Amount */}
+          {/* Reason */}
           <div className="input-container">
-            <label className="input-label">Refund Amount ($)</label>
+            <label className="input-label">Reason for Refund</label>
             <div className="input-with-icon">
-              <DollarSign className="input-icon" size={20} />
-              <input
-                type="number"
-                name="refundAmount"
-                value={refundForm.refundAmount}
+              <FileText className="input-icon" size={20} />
+              <select
+                name="reason"
+                value={refundForm.reason}
                 onChange={handleRefundChange}
-                placeholder="Enter initial refund amount (Price * Quantity)"
                 className="input-field"
-              />
+              >
+                <option value="">Select Reason</option>
+                <option value="Damaged or Faulty Product">
+                  Damaged or Faulty Product
+                </option>
+                <option value="Incorrect Item Received">
+                  Incorrect Item Received
+                </option>
+                <option value="Size or Fit Issue">Size or Fit Issue</option>
+                <option value="Product Not as Described">
+                  Product Not as Described
+                </option>
+                <option value="Changed My Mind">Changed My Mind</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
-            {errors.refundAmount && (
-              <p className="error-msg">{errors.refundAmount}</p>
-            )}
+            {errors.reason && <p className="error-msg">{errors.reason}</p>}
           </div>
         </div>
 
-        {/* Refund Reason (textarea) */}
-        <div className="textarea-container">
-          <label className="input-label">Refund Reason</label>
-          <div className="textarea-input-with-icon">
-            <FileText className="input-icon" size={20} />
-            <textarea
-              name="refundReason"
-              rows={5}
-              value={refundForm.refundReason}
-              onChange={handleRefundChange}
-              placeholder="Please provide a detailed refund reason, including your order details for the specific product, such as Order ID, Order date, Product Name, Brand, Category, Subcategory, Color, Size, Quantity, Price, Total. Clearly explain the reason for your refund request to ensure smooth processing."
-              className="input-field"
-            />
+        {/* Other Reason */}
+        {refundForm.reason === "Other" && (
+          <div className="textarea-container">
+            <label className="input-label">Other Reason</label>
+            <div className="textarea-input-with-icon">
+              <MessageSquareText className="input-icon" size={20} />
+              <textarea
+                name="otherReason"
+                value={refundForm.otherReason}
+                rows={4}
+                cols={50}
+                onChange={handleRefundChange}
+                className="input-field"
+                placeholder="Describe the reason"
+              ></textarea>
+              {errors.otherReason && (
+                <p className="error-msg">{errors.otherReason}</p>
+              )}
+            </div>
           </div>
-          {errors.refundReason && (
-            <p className="error-msg">{errors.refundReason}</p>
-          )}
-        </div>
+        )}
 
         <button
           className="user-order-refund-request-form-btn"

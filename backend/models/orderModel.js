@@ -3,78 +3,158 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 // Schema for individual order items
-const orderItemSchema = new Schema({
-  product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-  title: { type: String, required: true },
-  category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-  subcategory: {
-    type: Schema.Types.ObjectId,
-    ref: "Subcategory",
-    required: true,
+const orderItemSchema = new Schema(
+  {
+    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    title: { type: String, required: true },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      required: true,
+    },
+    brand: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
+    supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
+    shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
+    productColor: { type: String, required: true },
+    productImage: { type: String, required: true },
+    size: { type: Schema.Types.Mixed, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true },
+    total: { type: Number, required: true }, // Total price for this item (quantity * price)
   },
-  brand: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
-  supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
-  shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
-  productColor: { type: String, required: true },
-  productImage: { type: String, required: true },
-  size: { type: Schema.Types.Mixed, required: true },
-  quantity: { type: Number, required: true, min: 1 },
-  price: { type: Number, required: true },
-  total: { type: Number, required: true }, // Total price for this item (quantity * price)
-});
+  { timestamps: true }
+);
 
 // Schema for shipping details
-const shippingAddressSchema = new Schema({
-  country: { type: String, required: true },
-  state: { type: String, required: true },
-  city: { type: String, required: true },
-  address: { type: String, required: true },
-  zipCode: { type: String, required: true },
-  phoneNumber: { type: String, required: true },
-});
-
-// Schema for refund details
-const refundRequestSchema = new Schema({
-  refundId: { type: String, required: true },
-  title: { type: String, required: true },
-  color: { type: String, required: true },
-  size: { type: String, required: true },
-  quantity: { type: Number, required: true, min: 1 },
-  price: { type: Number, required: true },
-  amount: { type: Number, required: true },
-  reason: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  userRefundId: { type: String }, // userRefundId will be used by the shop for reference
-});
+const shippingAddressSchema = new Schema(
+  {
+    country: { type: String, required: true },
+    state: { type: String, required: true },
+    city: { type: String, required: true },
+    address: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
 // Schema for payment details
-const paymentSchema = new Schema({
-  method: {
-    type: String,
-    required: true,
-    enum: ["Credit Card", "PayPal", "Cash On Delivery"],
+const paymentSchema = new Schema(
+  {
+    method: {
+      type: String,
+      required: true,
+      enum: ["Credit Card", "PayPal", "Cash On Delivery"],
+    },
+    provider: { type: String, enum: ["Stripe", "PayPal"] },
+    paymentStatus: {
+      type: String,
+      required: true,
+      enum: ["pending", "completed", "refunded", "cancelled"],
+      default: "pending",
+    },
+    transactionId: { type: String, unique: true, sparse: true }, // Transaction ID
+    currency: {
+      type: String,
+      required: true,
+      default: "USD",
+      enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
+    },
+    amountPaid: { type: Number, required: true },
+    paymentDate: { type: Date, default: Date.now },
+    refunds: [
+      {
+        returnedId: { type: Schema.Types.ObjectId, required: true }, // Links to returnedItems.returnedId
+        refundId: { type: String, required: true },
+        processedBy: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        refundAmount: { type: Number, required: true }, // Taken from returned item
+        refundMethod: {
+          type: String,
+          enum: [
+            "Original Payment Method",
+            "Store Credit",
+            "Bank Transfer",
+            "Digital Wallet",
+            "Cheque",
+          ],
+          required: true,
+        },
+
+        refundDate: { type: Date, default: Date.now },
+      },
+    ],
+
+    metadata: { type: Map, of: Schema.Types.Mixed, default: {} },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
-  provider: { type: String, enum: ["Stripe", "PayPal"] },
-  paymentStatus: {
-    type: String,
-    required: true,
-    enum: ["pending", "completed", "refunded", "cancelled"],
-    default: "pending",
+  { timestamps: true }
+);
+
+// Schema for user refund details
+const refundRequestSchema = new Schema(
+  {
+    refundRequestId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+    requestedItemColor: { type: String, required: true },
+    requestedItemSize: { type: String, required: true },
+    requestedItemQuantity: { type: Number, required: true },
+    requestedDate: { type: Date, required: true },
+    requestRefundReason: {
+      type: String,
+      enum: [
+        "Damaged or Faulty Product",
+        "Incorrect Item Received",
+        "Size or Fit Issue",
+        "Product Not as Described",
+        "Changed My Mind",
+        "Other",
+      ],
+      required: true,
+    },
+
+    otherReason: { type: String, trim: true }, // Only used if "Other" is selected
+    requestedRefundAmount: { type: Number, required: true },
   },
-  transactionId: { type: String, unique: true, sparse: true }, // Transaction ID
-  currency: {
-    type: String,
-    required: true,
-    default: "USD",
-    enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
+  { timestamps: true }
+);
+
+// Schema for returned items and approved by the shop manager
+const returnedItemSchema = new Schema(
+  {
+    refundRequestIdLinked: { type: Schema.Types.ObjectId, required: true }, // Links to refundRequestInfo.refundRequestId
+    returnedId: { type: Schema.Types.ObjectId, required: true },
+    isProductReturned: { type: Boolean, default: false },
+    returnedDate: { type: Date, default: Date.now }, // Only used if "Other" is isProductReturned is true
+    condition: {
+      type: String,
+      enum: ["New", "Used", "Damaged"],
+      default: "New",
+    },
+    comments: { type: String, required: true },
+    refundAmount: { type: Number, required: true },
+    processedDate: { type: Date, required: true, default: Date.now },
+    refundStatus: {
+      type: String,
+      enum: ["Pending", "Processing", "Accepted", "Rejected"],
+      default: "Pending",
+    },
+    processedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
-  amountPaid: { type: Number, required: true },
-  paymentDate: { type: Date, default: Date.now },
-  refunds: { type: [refundRequestSchema] },
-  metadata: { type: Object, default: {} }, // Additional payment-related data
-  createdBy: { type: Schema.Types.ObjectId, ref: "User" }, // User who initiated payment
-  updatedBy: { type: Schema.Types.ObjectId, ref: "User" }, // User who updated payment
-});
+  { timestamps: true }
+);
 
 // Main order schema
 const orderSchema = new Schema(
@@ -105,7 +185,11 @@ const orderSchema = new Schema(
         "Delivered",
         "Cancelled",
         "Refund Requested",
+        "Awaiting Item Return",
         "Returned",
+        "Refund Processing",
+        "Refund Rejected",
+        "Refund Accepted",
         "Refunded",
       ],
       default: "Pending",
@@ -121,9 +205,14 @@ const orderSchema = new Schema(
             "Delivered",
             "Cancelled",
             "Refund Requested",
+            "Awaiting Item Return",
             "Returned",
+            "Refund Processing",
+            "Refund Rejected",
+            "Refund Accepted",
             "Refunded",
           ],
+          default: "Pending",
         },
         changedAt: { type: Date, default: Date.now }, // Date of status change
         message: { type: String, trim: true }, // Message for status change
@@ -131,15 +220,16 @@ const orderSchema = new Schema(
     ],
 
     tracking: {
-      carrier: { type: String }, // Carrier used for shipping
-      trackingNumber: { type: String }, // Tracking number for the shipment
-      estimatedDeliveryDate: { type: Date }, // Estimated delivery date
+      carrier: { type: String, default: null },
+      trackingNumber: { type: String, default: null },
+      estimatedDeliveryDate: { type: Date, default: null },
     },
 
-    refundRequestInfo: { type: [refundRequestSchema] },
+    refundRequestInfo: { type: [refundRequestSchema], default: [] },
+    returnedItems: { type: [returnedItemSchema], default: [] },
 
-    cancellationReason: { type: String },
-    returnReason: { type: String },
+    cancellationReason: { type: String }, // Cancellation reason provided by the customer for an order
+
     deliveredAt: { type: Date },
     version: { type: Number, default: 1 },
   },

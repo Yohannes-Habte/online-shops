@@ -25,6 +25,7 @@ const ShopOrderDetails = () => {
     trackingNumber: "",
     estimatedDeliveryDate: null,
   });
+  const [selectedRefundRequestId, setSelectedRefundRequestId] = useState(null);
 
   // Allowed order status sequence
   const orderStatusSequence = [
@@ -33,7 +34,10 @@ const ShopOrderDetails = () => {
     "Shipped",
     "Delivered",
     "Refund Requested",
+    "Awaiting Item Return",
     "Returned",
+    "Refund Processing",
+    "Refund Accepted",
     "Refunded",
   ];
 
@@ -77,7 +81,7 @@ const ShopOrderDetails = () => {
     const fetchOrderDetails = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${API}/orders/${id}/shop/order`, {
+        const { data } = await axios.get(`${API}/orders/${id}`, {
           withCredentials: true,
         });
 
@@ -204,7 +208,7 @@ const ShopOrderDetails = () => {
       <header className="shop-order-details-header-wrapper">
         <h1 className="shop-order-details-header-title">Order Details</h1>
         <p className="shop-order-details-header-date">
-          Order ID: #{order?._id?.slice(0, 8)}
+          Order ID: #{order?._id}
         </p>
         <p className="shop-order-details-header-date">
           Placed on: {order?.createdAt?.slice(0, 10)}
@@ -250,17 +254,18 @@ const ShopOrderDetails = () => {
         </section>
       )}
 
-      {(order.orderStatus === "Refund Requested" ||
-        order.payment.paymentStatus === "refunded") && (
-        <SingleOrderRefundRequest order={order} />
-      )}
+      <SingleOrderRefundRequest
+        order={order}
+        setSelectedRefundRequestId={setSelectedRefundRequestId}
+      />
 
-      <SingleOrderRefundForm order={order} status={status} />
+      <SingleOrderRefundForm
+        order={order}
+        status={status}
+        selectedRefundRequestId={selectedRefundRequestId}
+      />
 
-      {order.payment.paymentStatus === "refunded" &&
-        order?.payment?.refunds?.length > 0 && (
-          <SingleOrderRefunded order={order} />
-        )}
+      <SingleOrderRefunded order={order} />
     </section>
   );
 };

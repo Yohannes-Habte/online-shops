@@ -115,16 +115,8 @@
     }
 
     .user-order-refund-request-form-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      text-align: center;
+     @include button3;
+      margin-top: 1rem;
 
       &:hover {
         background: #0056b3;

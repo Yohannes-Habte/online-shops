@@ -1,4 +1,3 @@
-
 import AllSellerOrders from "../allOrders/AllSellerOrders";
 import AllShopEvents from "../allShopEvents/AllShopEvents";
 import AllShopProducts from "../allShopProducts/AllShopProducts";
@@ -15,11 +14,10 @@ import Subcategory from "../subcategory/Subcategory";
 import DashboardOverview from "../dashboardOverview/DashboardOverview";
 import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage";
 
-
-const ShopContent = ({ isActive }) => {
+const ShopContent = ({ isActive, setIsActive }) => {
   return (
     <article className="admin-dashboard-right-box-wrapper">
-      {isActive === 1 && <DashboardOverview />}
+      {isActive === 1 && <DashboardOverview setIsActive={setIsActive} />}
 
       {isActive === 2 && <ProductCategory />}
 

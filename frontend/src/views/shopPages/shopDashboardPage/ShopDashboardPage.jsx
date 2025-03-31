@@ -14,7 +14,7 @@ const ShopDashboardPage = () => {
       <ShopHeader isActive={isActive} setIsActive={setIsActive} />
       <section className="shop-dashboard-page-container">
         <h1 className="shop-dashboard-page-title">
-          {currentSeller.name} Dashboard{" "}
+          {currentSeller?.name} Dashboard{" "}
         </h1>
         <div className="shop-dashboard-sections-wrapper">
           <ShopSidebar isActive={isActive} setIsActive={setIsActive} />
