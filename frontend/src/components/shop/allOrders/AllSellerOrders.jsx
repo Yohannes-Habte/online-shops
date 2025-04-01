@@ -1,12 +1,17 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { RxArrowRight } from "react-icons/rx";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import moment from "moment";
 import "./AllSellerOrders.scss";
+import { API } from "../../../utils/security/secreteKey";
+import axios from "axios";
+import { handleError } from "../../../utils/errorHandler/ErrorMessage";
+import { toast } from "react-toastify";
+import { FaTrash } from "react-icons/fa6";
+import { AiOutlineEye } from "react-icons/ai";
 
 const statusColors = {
   paymentStatus: {
@@ -42,6 +47,34 @@ const AllSellerOrders = () => {
       dispatch(clearOrderErrors());
     };
   }, [dispatch]);
+
+  // Delete a single order
+  const handleDeleteOrder = async (orderId) => {
+    if (!orderId) {
+      toast.error("Invalid order ID.");
+      return;
+    }
+
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this order? This action is irreversible."
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      const { data } = await axios.delete(`${API}/orders/${orderId}`, {
+        withCredentials: true,
+      });
+
+      toast.success(data.message);
+
+      // Update the order list in Redux state
+      dispatch(fetchSellerOrders());
+    } catch (error) {
+      const { errorMessage } = handleError(error);
+      toast.error(errorMessage);
+    }
+  };
 
   const rows = orders.map((order) => ({
     id: order._id,
@@ -131,16 +164,22 @@ const AllSellerOrders = () => {
     },
     {
       field: "action",
-      headerName: "Details",
+      headerName: "Action",
       minWidth: 150,
       flex: 0.7,
       sortable: false,
       renderCell: (params) => (
-        <Link to={`/shop/order/${params.id}`}>
-          <RxArrowRight className="icon-cell-arrow" size={20} />
-        </Link>
+        <div className="order-action-table-icon-wrapper">
+          <Link to={`/shop/order/${params.id}`}>
+            <AiOutlineEye className="display-order-icon" size={20} />
+          </Link>
+
+          <FaTrash
+            onClick={() => handleDeleteOrder(params.row.id)}
+            className="order-delete-icon"
+          />
+        </div>
       ),
-      cellClassName: "middle-center",
     },
   ];
 

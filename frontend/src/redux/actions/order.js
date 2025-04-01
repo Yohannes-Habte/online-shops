@@ -11,7 +11,6 @@ import {
   fetchCustomerOrdersFailure,
 } from "../reducers/orderReducer";
 import { API } from "../../utils/security/secreteKey";
-import { toast } from "react-toastify";
 import { handleError } from "../../utils/errorHandler/ErrorMessage";
 
 //==============================================================================
@@ -32,7 +31,6 @@ export const fetchAllOrders = () => async (dispatch) => {
     const { message } = handleError(error);
 
     dispatch(fetchOrdersFailure(message));
-    toast.error(message);
   }
 };
 
@@ -61,7 +59,6 @@ export const fetchSellerOrders = () => async (dispatch) => {
     const { message } = handleError(error);
 
     dispatch(fetchSellerOrdersFailure(message));
-    toast.error(message);
   }
 };
 
@@ -80,7 +77,6 @@ export const fetchCustomerOrders = () => async (dispatch) => {
   } catch (error) {
     const { message } = handleError(error);
     dispatch(fetchCustomerOrdersFailure(message));
-    toast.error(message);
   }
 };
 
@@ -99,6 +95,5 @@ export const deleteShopOrders = () => async (dispatch) => {
   } catch (error) {
     const { message } = handleError(error);
     dispatch(fetchSellerOrdersFailure(message));
-    toast.error(message);
   }
 };

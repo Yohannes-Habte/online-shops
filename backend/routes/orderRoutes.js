@@ -27,9 +27,8 @@ orderRouter.put("/:id/update/status", isSellerAuthenticated, updateShopOrder);
 orderRouter.put("/:id/refund/request", isAuthenticated, refundUserOrderRequest);
 orderRouter.put("/:id/refund/completed", isSellerAuthenticated, orderRefundByShop);
 orderRouter.get("/:id/shop/refunds", isSellerAuthenticated, allShopRefundedOrders);
-// orderRouter.get("/:id/shop/order", isSellerAuthenticated, shopOrder);
 orderRouter.get("/:id", isSellerAuthenticated, getOrder);
-orderRouter.delete("/:id", isAuthenticated, deleteOrder);
+orderRouter.delete("/:id", isSellerAuthenticated, deleteOrder);
 orderRouter.delete("/", isSellerAuthenticated, deleteOrders);
 
 // Export order Router

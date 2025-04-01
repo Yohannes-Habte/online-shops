@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import colors from "colors";
 import cookieParser from "cookie-parser";
+import connectDB from "./database/config.js";
+
 
 // Routes
 import authRouter from "./routes/authRoutes.js";
@@ -28,7 +29,9 @@ import subcategoryRouter from "./routes/subcategoryRoutes.js";
 import openaiRouter from "./routes/openaiChatRoutes.js";
 
 // Express app
+
 dotenv.config();
+
 const app = express();
 
 const corsConfig =
@@ -42,28 +45,12 @@ const corsConfig =
         credentials: true,
       };
 
+app.options("*", cors(corsConfig)); // Preflight requests
 app.use(cors(corsConfig));
-
-// Middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-app.use("/", express.static("uploads")); // image upload using multer
-
-dotenv.config();
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Database successfully connected!".blue.bold);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
+app.use("/", express.static("uploads")); // image uploads
 app.use(morgan("tiny"));
 
 // End points

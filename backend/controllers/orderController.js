@@ -1242,48 +1242,173 @@ export const allShopRefundedOrders = async (req, res, next) => {
 };
 
 //=========================================================================
-// Delete an order
+// Delete an order for a shop
 //=========================================================================
-
 export const deleteOrder = async (req, res, next) => {
+  const { id: orderId } = req.params;
+  const shopId = req.shop?.id;
+
+  if (!shopId) {
+    return next(createError(401, "Unauthorized: To delete an order"));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    return next(createError(400, "Invalid order ID format"));
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid shop ID format"));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    res.send("New order");
+    const shop = await Shop.findById(shopId).session(session);
+
+    if (!shop) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(createError(404, "Shop not found"));
+    }
+
+    const order = await Order.findById(orderId).session(session);
+    if (!order) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(createError(404, "Order not found"));
+    }
+    if (!shop.orders.includes(orderId))
+      throw createError(403, "Unauthorized order deletion");
+
+    // Extract relevant details
+    const productIdsToRemove = order.orderedItems.map(
+      (item) => item.product._id
+    );
+
+    const totalOrderIncome = order.payment.amountPaid;
+
+    // Remove order from shop records
+   
+    await Shop.updateOne(
+      { _id: shopId },
+      {
+        $pull: {
+          orders: { _id: orderId },
+          soldProducts: { _id: { $in: productIdsToRemove } },
+          shopIncomeInfo: {
+            _id: { $in: shop.shopIncomeInfo.map((info) => info._id) },
+          },
+          shopRefundInfo: {
+            _id: { $in: shop.shopRefundInfo.map((info) => info._id) },
+          },
+        },
+        $inc: { netShopIncome: -totalOrderIncome },
+      },
+      { session }
+    );
+
+    // Remove order from user's myOrders
+    await User.updateOne(
+      { myOrders: orderId },
+      { $pull: { myOrders: orderId } },
+      { session }
+    );
+
+    // Delete order
+    await Order.findByIdAndDelete(orderId).session(session);
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: "Order deleted successfully.",
+    });
   } catch (error) {
-    next(createError(500, "Order could not be deleted! Please try again!"));
+    console.error("Error deleting order:", error);
+    await session.abortTransaction();
+    session.endSession();
+    next(
+      createError(
+        error.status || 500,
+        error.message || "Order could not be deleted! Please try again!"
+      )
+    );
   }
 };
 
 //=========================================================================
-// Delete all orders
+// Delete all orders for a shop
 //=========================================================================
-
 export const deleteOrders = async (req, res, next) => {
   const shopId = req.shop?.id;
 
   if (!mongoose.Types.ObjectId.isValid(shopId)) {
     return next(createError(400, "Invalid shop ID format"));
   }
+
+  // Start transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    // Validate shop ID
-    const shop = await Shop.findById(shopId);
+    // Find the shop and validate
+    const shop = await Shop.findById(shopId).session(session);
     if (!shop) {
+      await session.abortTransaction();
+      session.endSession();
       return next(createError(404, "Shop not found"));
     }
 
-    if (!shopId) {
-      return next(
-        createError(403, "Unauthorized to delete orders for this shop")
-      );
+    if (shop.orders.length === 0) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(createError(400, "No orders found to delete for this shop"));
     }
 
-    // Delete all orders for the shop
-    await Order.deleteMany({ "orderedItems.shop": shop._id });
+    // Remove all orders-related data
+    await Shop.findByIdAndUpdate(
+      shopId,
+      {
+        $unset: {
+          orders: [],
+          soldProducts: [],
+          transactions: [],
+          shopIncomeInfo: [],
+          shopRefundInfo: [],
+          netShopIncome: 0,
+        },
+      },
+      { session }
+    );
+
+    // Remove all customer orders from this particular shop
+    await User.updateMany(
+      { myOrders: { $in: shop.orders } },
+      { $pull: { myOrders: { $in: shop.orders } } },
+      { session }
+    );
+
+    // Delete all orders associated with the shop
+    await Order.deleteMany({ "orderedItems.shop": shopId }).session(session);
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json({
       success: true,
       message: "All orders deleted successfully.",
     });
   } catch (error) {
+    console.error("Error deleting orders:", error);
+
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+
     next(createError(500, "Orders could not be deleted! Please try again!"));
   }
 };

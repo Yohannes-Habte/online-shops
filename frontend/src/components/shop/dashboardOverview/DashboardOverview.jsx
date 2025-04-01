@@ -67,7 +67,13 @@ const DashboardOverview = ({ setIsActive }) => {
   // Function to handle order deletion
   const handleDeleteOrders = () => {
     if (window.confirm("Are you sure you want to delete all orders?")) {
-      dispatch(deleteShopOrders());
+      if (
+        window.confirm(
+          "This action is irreversible. Are you sure you want to delete all orders?"
+        )
+      ) {
+        dispatch(deleteShopOrders());
+      }
     }
   };
 
@@ -94,7 +100,10 @@ const DashboardOverview = ({ setIsActive }) => {
         const salesProductCount =
           countOrderedItems > countRefundedItems &&
           countOrderedItems - countRefundedItems;
-        return { ...order, orderStatus: `${salesProductCount} Delivered` };
+        return {
+          ...order,
+          orderStatus: `${salesProductCount}/${countOrderedItems} Delivered`,
+        };
       }
 
       if (
@@ -104,8 +113,13 @@ const DashboardOverview = ({ setIsActive }) => {
         const salesProductCount =
           countOrderedItems > countRefundedItems &&
           countOrderedItems - countRefundedItems;
-        return { ...order, orderStatus: `${salesProductCount} Delivered` };
+
+        return {
+          ...order,
+          orderStatus: `${salesProductCount}/${countOrderedItems} Delivered`,
+        };
       }
+
       return null; // Exclude orders that don't meet the criteria
     })
     .filter(Boolean); // Remove null values
@@ -147,20 +161,19 @@ const DashboardOverview = ({ setIsActive }) => {
     {
       field: "grandTotal",
       headerName: "Total Amount",
-      type: "number",
       minWidth: 150,
       flex: 0.8,
       renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
     },
     {
       field: "orderStatus",
-      headerName: "Order Status",
+      headerName: "Delivered Status",
       minWidth: 140,
       flex: 0.7,
       renderCell: (params) => (
         <span
           style={{
-            color: params.value === "Pending" ? "orange" : "green",
+            color: "green",
             fontWeight: "bold",
           }}
         >
@@ -168,6 +181,7 @@ const DashboardOverview = ({ setIsActive }) => {
         </span>
       ),
     },
+
     {
       field: "action",
       headerName: "Details",
