@@ -116,7 +116,6 @@ const Login = () => {
       const errorMessage =
         err.response?.data?.message || "An error occurred. Please try again.";
       dispatch(loginFailure(errorMessage));
-      toast.error(errorMessage);
     }
   };
 
@@ -199,7 +198,11 @@ const Login = () => {
 
         {/* Button for log in form */}
         <button className="login-button" disabled={loading}>
-          {loading ? <Loader isLoading={loading} message="" size={20} /> : "Log In"}
+          {loading ? (
+            <Loader isLoading={loading} message="" size={20} />
+          ) : (
+            "Log In"
+          )}
         </button>
 
         <GoogleSignupLogin signup="login" />

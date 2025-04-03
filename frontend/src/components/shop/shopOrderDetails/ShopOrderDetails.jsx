@@ -211,7 +211,12 @@ const ShopOrderDetails = () => {
           Order ID: #{order?._id}
         </p>
         <p className="shop-order-details-header-date">
-          Placed on: {order?.createdAt?.slice(0, 10)}
+          Placed on:{" "}
+          {new Date(order?.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
         </p>
       </header>
 

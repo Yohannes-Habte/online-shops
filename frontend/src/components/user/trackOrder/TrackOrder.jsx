@@ -12,7 +12,6 @@ const TrackOrder = () => {
 
   // Global state variables
   const { currentUser } = useSelector((state) => state.user);
-  const { currentSeller } = useSelector((state) => state.seller);
   const { customerOrders } = useSelector((state) => state.order);
 
   const { data: orders = [], loading, error } = customerOrders || {};
@@ -52,8 +51,16 @@ const TrackOrder = () => {
         return "Cancelled";
       case "Refund Requested":
         return "Refund Requested";
+      case "Awaiting Item Return":
+        return "Awaiting Item Return";
       case "Returned":
         return "Returned";
+      case "Refund Processing":
+        return "Refund Processing";
+      case "Refund Rejected":
+        return "Refund Rejected";
+      case "Refund Accepted":
+        return "Refund Accepted";
       case "Refunded":
         return "Refunded";
       default:
@@ -102,7 +109,6 @@ const TrackOrder = () => {
           {/* Render TrackOrderCard with relevant data */}
           <TrackOrderCard
             user={currentUser}
-            shop={currentSeller}
             order={orderData}
           />
         </>

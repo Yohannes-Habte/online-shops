@@ -48,8 +48,8 @@ const SingleCart = ({ data, setOpenCart }) => {
 
   // Decrement quantity
   const decrement = () => {
-    if (isEvent) {
-      if (data.qty > 1) {
+    if (data.qty > 1) {
+      if (isEvent) {
         dispatch(
           addEventToCart({
             ...data,
@@ -57,15 +57,15 @@ const SingleCart = ({ data, setOpenCart }) => {
           })
         );
       } else {
-        if (data.qty > 1) {
-          dispatch(
-            addToCart({
-              ...data,
-              qty: data.qty - 1,
-            })
-          );
-        }
+        dispatch(
+          addToCart({
+            ...data,
+            qty: data.qty - 1,
+          })
+        );
       }
+    } else {
+      toast.error("Minimum quantity is 1!");
     }
   };
 

@@ -57,15 +57,57 @@ const Checkout = () => {
   const calculateSubTotal = () =>
     cart.reduce((acc, item) => acc + item.qty * item.discountPrice, 0);
 
-  const calculateShippingFee = (subTotal) =>
-    subTotal <= 100 ? 50 : subTotal * 0.1;
+  const calculateShippingFee = (subTotal) => {
+    if (typeof subTotal !== "number" || subTotal < 0) return 0;
+
+    return subTotal <= 100
+      ? 50
+      : subTotal < 500
+      ? subTotal * 0.1
+      : subTotal < 1000
+      ? subTotal * 0.05
+      : subTotal < 2000
+      ? subTotal * 0.04
+      : subTotal * 0.04;
+  };
 
   const calculateTax = (subTotal) => subTotal * 0.02;
 
   const calculateDiscount = (subTotal) => {
-    if (subTotal > 500) return subTotal * 0.1; // 10% discount
-    if (subTotal > 200) return subTotal * 0.05; // 5% discount
-    return 0; // No discount
+    if (typeof subTotal !== "number" || subTotal < 0) return 0;
+
+    // Discount tiers (threshold and discount values)
+    const discountTiers = [
+      { threshold: 10000, discount: 0.05 },
+      { threshold: 4000, discount: 0.04 },
+      { threshold: 2000, discount: 0.03 },
+      { threshold: 1000, discount: 0.02 },
+      { threshold: 500, discount: 0.01 },
+      { threshold: 250, discount: 0.005 },
+    ];
+
+    // Loop through the discount tiers to find the appropriate discount
+    for (const { threshold, discount } of discountTiers) {
+      if (subTotal >= threshold) {
+        return subTotal * discount;
+      }
+    }
+
+    // No discount if subTotal is below the first threshold
+    return 0;
+  };
+
+  const calculateGrandTotal = (subtotal, tax, shippingFee, discount) => {
+    if (
+      typeof subtotal !== "number" ||
+      typeof tax !== "number" ||
+      typeof shippingFee !== "number" ||
+      typeof discount !== "number"
+    ) {
+      throw new Error("Invalid input: All inputs must be numbers.");
+    }
+
+    return subtotal + tax + shippingFee - discount;
   };
 
   const proceedToPayment = async () => {
@@ -81,7 +123,12 @@ const Checkout = () => {
       const shippingFee = calculateShippingFee(subTotal);
       const tax = calculateTax(subTotal);
       const discount = calculateDiscount(subTotal);
-      const grandTotal = subTotal + shippingFee + tax - discount;
+      const grandTotal = calculateGrandTotal(
+        subTotal,
+        tax,
+        shippingFee,
+        discount
+      );
 
       const orderData = {
         currentUser,

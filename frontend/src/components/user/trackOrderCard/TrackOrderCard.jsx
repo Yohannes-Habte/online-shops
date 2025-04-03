@@ -1,6 +1,11 @@
 import "./TrackOrderCard.scss";
 
-const TrackOrderCard = ({ user, shop, order }) => {
+const TrackOrderCard = ({ user, order }) => {
+  const shop = order.orderedItems[0].shop;
+
+  console.log("Shop traking", shop);
+
+  console.log("Tracking an order", order);
   return (
     <section className="track-order-card">
       <h3 className="tracking-order-title">
@@ -13,8 +18,8 @@ const TrackOrderCard = ({ user, shop, order }) => {
         you for shopping with{" "}
         <span className="tracking-shop-info">{shop?.name}</span>. Your order is
         currently{" "}
-        <strong className="tracking-order-info">{order?.orderStatus}</strong>. At{" "}
-        <span className="tracking-shop-info">{shop?.name}</span>, we value
+        <strong className="tracking-order-info">{order?.orderStatus}</strong>.
+        At <span className="tracking-shop-info">{shop?.name}</span>, we value
         transparency and appreciate your trust in us. Your loyalty means a lot,
         and we are committed to providing you with the best shopping experience.
         We look forward to serving you again!

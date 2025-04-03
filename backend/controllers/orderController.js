@@ -4,7 +4,89 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
 import User from "../models/userModel.js";
-import e from "express";
+
+//=========================================================================
+// Helper functions for order calculations and status history updates
+//=========================================================================
+
+// 1. Helper function to calculate shop commission
+const calculateShopCommission = (grandTotal) =>
+  parseFloat((grandTotal * 0.01).toFixed(2));
+
+// 2. Helper function to  const calculateTax = (subTotal) => subTotal * 0.02;
+const calculateTaxAmount = (subTotal) =>
+  parseFloat((subTotal * 0.02).toFixed(2));
+
+// 3. Helper function to calculate shipping fee
+const calculateShippingFee = (subTotal) => {
+  if (typeof subTotal !== "number" || subTotal < 0) return 0;
+
+  return subTotal <= 100
+    ? 50
+    : subTotal < 500
+    ? parseFloat((subTotal * 0.1).toFixed(2))
+    : subTotal < 1000
+    ? parseFloat((subTotal * 0.05).toFixed(2))
+    : subTotal < 2000
+    ? parseFloat((subTotal * 0.04).toFixed(2))
+    : parseFloat((subTotal * 0.04).toFixed(2));
+};
+
+// 4. Helper function for discount calculation
+const calculateDiscount = (subTotal) => {
+  if (typeof subTotal !== "number" || subTotal < 0) return 0;
+
+  // Validate input: Ensure subTotal is a positive number or can be converted into a valid number
+  const parsedSubTotal = parseFloat(subTotal);
+
+  if (isNaN(parsedSubTotal) || parsedSubTotal < 0) {
+    throw new Error("Invalid subTotal. Please provide a positive number.");
+  }
+
+  // Discount tiers (threshold and discount values)
+  const discountTiers = [
+    { threshold: 10000, discount: 0.05 },
+    { threshold: 4000, discount: 0.04 },
+    { threshold: 2000, discount: 0.03 },
+    { threshold: 1000, discount: 0.02 },
+    { threshold: 500, discount: 0.01 },
+    { threshold: 250, discount: 0.005 },
+  ];
+
+  // Loop through the discount tiers to find the appropriate discount
+  for (const { threshold, discount } of discountTiers) {
+    if (parsedSubTotal >= threshold) {
+      const discountAmount = parsedSubTotal * discount;
+      return parseFloat(discountAmount.toFixed(2)); // Round to 2 decimal places
+    }
+  }
+
+  // No discount if subTotal is below the first threshold
+  return 0;
+};
+
+// 5. Helper function to calculate the grand total
+const calculateGrandTotal = (subtotal, tax, shippingFee, discount) => {
+  if (
+    typeof subtotal !== "number" ||
+    typeof tax !== "number" ||
+    typeof shippingFee !== "number" ||
+    typeof discount !== "number"
+  ) {
+    throw new Error("Invalid input: All inputs must be numbers.");
+  }
+
+  return parseFloat((subtotal + tax + shippingFee - discount).toFixed(2));
+};
+
+// 6. Helper function to push status history for update shop orders
+const addToStatusHistory = (order, status) => {
+  order.statusHistory.push({
+    status,
+    changedAt: new Date(),
+    message: `Your order is ${status} at ${new Date().toLocaleString()}`,
+  });
+};
 
 //=========================================================================
 // Create an order
@@ -151,24 +233,16 @@ export const createOrder = async (req, res, next) => {
       await product.save({ session });
     }
 
-    // Calculate tax, shipping fee, service fee, and discount
-    const calculateTax = (subTotal) => subTotal * 0.02;
-    const calculateShippingFee = (subTotal) =>
-      subTotal <= 100 ? 50 : subTotal * 0.1;
-    const calculateDiscount = (subTotal) => {
-      if (subTotal > 500) return subTotal * 0.1; // 10% discount
-      if (subTotal > 200) return subTotal * 0.05; // 5% discount
-      return 0;
-    };
-
-    const taxAmount = calculateTax(subtotalPrice);
+    const taxAmount = calculateTaxAmount(subtotalPrice);
     const shippingFeeAmount = calculateShippingFee(subtotalPrice);
     const discountAmount = calculateDiscount(subtotalPrice);
 
-    const calculatedGrandTotal =
-      subtotalPrice + taxAmount + shippingFeeAmount - discountAmount;
-
-    const fixedGrandTotal = parseFloat(calculatedGrandTotal.toFixed(2));
+    const grandTotal = calculateGrandTotal(
+      subtotalPrice,
+      taxAmount,
+      shippingFeeAmount,
+      discountAmount
+    );
 
     // Create the order
     const order = new Order({
@@ -179,7 +253,7 @@ export const createOrder = async (req, res, next) => {
       subtotal: subtotalPrice,
       shippingFee: shippingFeeAmount,
       tax: taxAmount,
-      grandTotal: fixedGrandTotal,
+      grandTotal: grandTotal,
       orderStatus: "Pending",
       statusHistory: [{ status: "Pending", changedAt: new Date() }], // History
     });
@@ -237,6 +311,7 @@ export const getOrder = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return next(createError(400, "Invalid order ID format!"));
     }
+
     const order = await Order.findById(id)
       .populate([
         {
@@ -360,17 +435,6 @@ export const shopOrder = async (req, res, next) => {
 };
 
 //=========================================================================
-// Helper function to push status history for update shop orders
-//=========================================================================
-const addToStatusHistory = (order, status) => {
-  order.statusHistory.push({
-    status,
-    changedAt: new Date(),
-    message: `Your order is ${status} at ${new Date().toLocaleString()}`,
-  });
-};
-
-//=========================================================================
 // Update order status for a shop
 //=========================================================================
 export const updateShopOrder = async (req, res, next) => {
@@ -466,7 +530,7 @@ export const updateShopOrder = async (req, res, next) => {
 
       // Calculate service fee, soldOut, shopIncomeInfo
       const grandTotal = order.grandTotal;
-      const shopCommission = grandTotal * 0.01;
+      const shopCommission = calculateShopCommission(grandTotal); // None refundable
       const shopBalance = grandTotal - shopCommission;
       const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2));
 
@@ -615,8 +679,6 @@ export const refundUserOrderRequest = async (req, res, next) => {
   try {
     const order = await Order.findById(orderId).session(session);
 
-    console.log("Order:", order);
-
     if (!order) {
       await session.abortTransaction();
       return next(createError(404, "Order not found!"));
@@ -687,20 +749,16 @@ export const refundUserOrderRequest = async (req, res, next) => {
     // Calculate refund amount
     const subTotalProductPrice = productPrice * quantity;
 
-    // Refund calculation (tax is refundable, shipping & discounts are not)
-    const calculateTax = (subTotal) => subTotal * 0.02;
-    const calculateShippingFee = (subTotal) =>
-      subTotal <= 100 ? 50 : subTotal * 0.1;
-    const calculateDiscount = (subTotal) =>
-      subTotal > 500 ? subTotal * 0.1 : subTotal > 200 ? subTotal * 0.05 : 0;
-
-    const taxAmount = calculateTax(subTotalProductPrice);
+    const taxAmount = calculateTaxAmount(subTotalProductPrice);
     const shippingFeeAmount = calculateShippingFee(subTotalProductPrice);
     const discountAmount = calculateDiscount(subTotalProductPrice);
 
-    const netRefundAmount =
-      subTotalProductPrice + taxAmount + shippingFeeAmount - discountAmount;
-    const fixedNetRefundAmount = parseFloat(netRefundAmount.toFixed(2));
+    const netRefundAmount = calculateGrandTotal(
+      subTotalProductPrice,
+      taxAmount,
+      shippingFeeAmount,
+      discountAmount
+    );
 
     // Update order status
     order.orderStatus = orderStatus;
@@ -724,7 +782,7 @@ export const refundUserOrderRequest = async (req, res, next) => {
       requestedDate: requestedDate,
       requestRefundReason: refundReason,
       otherReason: otherReason,
-      requestedRefundAmount: fixedNetRefundAmount,
+      requestedRefundAmount: netRefundAmount,
     });
 
     await order.save({ session });
@@ -1002,7 +1060,19 @@ export const getAllUserOrders = async (req, res, next) => {
       return next(createError(400, "Invalid user ID format"));
     }
 
-    const user = await User.findById(userId).populate("myOrders").lean();
+    const user = await User.findById(userId)
+      .populate({
+        path: "myOrders",
+        model: "Order",
+        populate: {
+          path: "orderedItems.shop",
+          model: "Shop",
+          select: "name",
+        },
+      })
+      .lean();
+
+    console.log(user);
 
     if (!user) {
       return next(createError(404, "User not found"));
@@ -1220,11 +1290,6 @@ export const allShopRefundedOrders = async (req, res, next) => {
       })
     );
 
-    console.log(
-      "formattedMonthlyRefundedOrders",
-      formattedMonthlyRefundedOrders
-    );
-
     res.status(200).json({
       success: true,
       refundedOrders,
@@ -1289,7 +1354,7 @@ export const deleteOrder = async (req, res, next) => {
     const totalOrderIncome = order.payment.amountPaid;
 
     // Remove order from shop records
-   
+
     await Shop.updateOne(
       { _id: shopId },
       {
@@ -1330,12 +1395,7 @@ export const deleteOrder = async (req, res, next) => {
     console.error("Error deleting order:", error);
     await session.abortTransaction();
     session.endSession();
-    next(
-      createError(
-        error.status || 500,
-        error.message || "Order could not be deleted! Please try again!"
-      )
-    );
+    next(createError(500, "Order could not be deleted! Please try again!"));
   }
 };
 

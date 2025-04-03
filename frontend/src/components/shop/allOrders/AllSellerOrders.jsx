@@ -11,7 +11,7 @@ import axios from "axios";
 import { handleError } from "../../../utils/errorHandler/ErrorMessage";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa6";
-import { AiOutlineEye } from "react-icons/ai";
+import { FaEdit } from "react-icons/fa";
 
 const statusColors = {
   paymentStatus: {
@@ -76,18 +76,24 @@ const AllSellerOrders = () => {
     }
   };
 
-  const rows = orders.map((order) => ({
-    id: order._id,
-    createdAt: order.createdAt,
-    quantity:
-      order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
-      0,
-    provider: order.payment?.provider || "Unknown",
-    method: order.payment?.method || "Unknown",
-    paymentStatus: order.payment?.paymentStatus || "Unknown",
-    grandTotal: order.grandTotal ?? 0,
-    orderStatus: order.orderStatus || "Unknown",
-  }));
+  const rows = orders.map((order) => {
+    const formattedDate = order.createdAt
+      ? new Date(order.createdAt).toLocaleDateString("en-GB")
+      : "Unknown";
+
+    return {
+      id: order._id,
+      createdAt: formattedDate,
+      quantity:
+        order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
+        0,
+      provider: order.payment?.provider || "Unknown",
+      method: order.payment?.method || "Unknown",
+      paymentStatus: order.payment?.paymentStatus || "Unknown",
+      grandTotal: order.grandTotal ?? 0,
+      orderStatus: order.orderStatus || "Unknown",
+    };
+  });
 
   const columns = [
     {
@@ -101,7 +107,7 @@ const AllSellerOrders = () => {
     {
       field: "quantity",
       headerName: "Total Items",
-      minWidth: 50,
+      minWidth: 150,
       flex: 0.6,
       cellClassName: "left-center",
     },
@@ -171,7 +177,7 @@ const AllSellerOrders = () => {
       renderCell: (params) => (
         <div className="order-action-table-icon-wrapper">
           <Link to={`/shop/order/${params.id}`}>
-            <AiOutlineEye className="display-order-icon" size={20} />
+            <FaEdit className="display-order-icon" size={20} />
           </Link>
 
           <FaTrash
