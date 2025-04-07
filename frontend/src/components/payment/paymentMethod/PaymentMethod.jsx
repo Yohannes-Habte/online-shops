@@ -23,6 +23,19 @@ const PaymentMethod = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [orderData, setOrderData] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("");
+
+  const currencyOptions = ["USD", "EUR", "GBP", "INR", "JPY", "AUD"];
+
+  const paymentMethodConfig = {
+    "Credit Card": { provider: "Stripe", status: "completed" },
+    "Debit Card": { provider: "Stripe", status: "completed" },
+    PayPal: { provider: "PayPal", status: "completed" },
+    "Cash On Delivery": { provider: undefined, status: "pending" },
+  };
+
+  const methodOptions = Object.keys(paymentMethodConfig);
 
   // =========================================================================
   // Load Order Data
@@ -53,6 +66,33 @@ const PaymentMethod = () => {
     toast.success("Order placed successfully!");
   };
 
+  // ================================================================================
+  // Create Order Object
+  // ================================================================================
+  const createOrderObject = (paymentId, method, provider, status) => ({
+    orderedItems: orderData?.cart,
+    shippingAddress: orderData?.shippingAddress,
+    subTotal: orderData?.subTotal,
+    shippingFee: orderData?.shippingFee,
+    tax: orderData?.tax,
+    grandTotal: orderData?.grandTotal,
+    customer: currentUser?._id,
+    payment: {
+      method,
+      provider: method === "Cash On Delivery" ? undefined : provider,
+      paymentStatus: status,
+      transactionId: paymentId || undefined,
+      currency: selectedCurrency || "USD",
+      amountPaid: orderData?.grandTotal,
+      metadata: {
+        orderId: orderData?.orderId,
+        userId: currentUser?._id,
+      },
+      createdBy: currentUser?._id,
+    },
+    orderStatus: "Pending",
+  });
+
   // ===============================================================================
   // Stripe Payment Handler
   // ===============================================================================
@@ -60,9 +100,14 @@ const PaymentMethod = () => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
+    if (!selectedCurrency) {
+      toast.error("Please select a currency.");
+      return;
+    }
+
     const paymentData = {
       amount: Math.round(orderData?.grandTotal * 100),
-      currency: "USD",
+      currency: selectedCurrency,
     };
 
     setIsProcessing(true);
@@ -83,11 +128,12 @@ const PaymentMethod = () => {
       if (result.error) {
         toast.error(result.error.message);
       } else if (result.paymentIntent.status === "succeeded") {
+        const config = paymentMethodConfig[selectedPaymentMethod] || {};
         const order = createOrderObject(
           result.paymentIntent.id,
-          "Credit Card",
-          "Stripe",
-          "completed"
+          selectedPaymentMethod,
+          config.provider,
+          config.status
         );
         await submitOrder(order);
       }
@@ -103,13 +149,17 @@ const PaymentMethod = () => {
   // =================================================================================
 
   const createOrder = async (data, actions) => {
+    if (!selectedCurrency) {
+      toast.error("Please select a currency.");
+      return;
+    }
     return actions.order
       .create({
         purchase_units: [
           {
             description: "Lisa Online Shopping Products",
             amount: {
-              currency_code: "USD",
+              currency_code: selectedCurrency,
               value: orderData?.grandTotal.toFixed(2), // Ensure proper decimal format
             },
           },
@@ -128,11 +178,12 @@ const PaymentMethod = () => {
       const paymentInfo = details?.purchase_units[0]?.payments?.captures[0];
 
       if (paymentInfo) {
+        const config = paymentMethodConfig[selectedPaymentMethod] || {};
         const order = createOrderObject(
           paymentInfo.id, // Use PayPal capture ID
-          "PayPal",
-          "PayPal",
-          "completed"
+          selectedPaymentMethod,
+          config.provider,
+          config.status
         );
         await submitOrder(order); // Submit order
       } else {
@@ -150,48 +201,36 @@ const PaymentMethod = () => {
   const cashOnDeliveryHandler = async (e) => {
     e.preventDefault();
 
+    if (!selectedCurrency) {
+      toast.error("Please select a currency.");
+      return;
+    }
+
     // Generate a random transaction ID
     const generateTransactionId = () => {
-      const timestamp = Date.now().toString(36); // Base-36 representation of current timestamp
-      const randomString = Math.random().toString(36).substring(2, 8);
-      return `${timestamp}-${randomString}`;
+      const timestamp = Date.now().toString();
+      const randomBytes = new Uint8Array(16);
+      window.crypto.getRandomValues(randomBytes);
+
+      const randomHex = Array.from(randomBytes)
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+
+      return `txn-${timestamp}-${randomHex.slice(0, 32)}`;
     };
+
+    const config = paymentMethodConfig[selectedPaymentMethod] || {};
 
     const transactionId = generateTransactionId();
     const order = createOrderObject(
       transactionId,
-      "Cash On Delivery",
-      "pending"
+      selectedPaymentMethod,
+      config.provider,
+      config.status
     );
 
     await submitOrder(order);
   };
-
-  // ================================================================================
-  // Create Order Object
-  // ================================================================================
-  const createOrderObject = (paymentId, method, provider, status) => ({
-    orderedItems: orderData?.cart,
-    shippingAddress: orderData?.shippingAddress,
-    subTotal: orderData?.subTotal,
-    shippingFee: orderData?.shippingFee,
-    tax: orderData?.tax,
-    grandTotal: orderData?.grandTotal,
-    customer: currentUser?._id,
-    payment: {
-      method,
-      provider: method === "Cash On Delivery" ? undefined : provider,
-      paymentStatus: status,
-      transactionId: paymentId || undefined,
-      amountPaid: orderData?.grandTotal,
-      currency: "USD",
-      metadata: {
-        orderId: orderData?.orderId,
-        userId: currentUser?._id,
-      },
-    },
-    orderStatus: "Pending",
-  });
 
   // ================================================================================
   // Submit Order
@@ -219,7 +258,14 @@ const PaymentMethod = () => {
           isProcessing={isProcessing}
           setIsProcessing={setIsProcessing}
           handleAPIError={handleAPIError}
+          currencyOptions={currencyOptions}
+          selectedCurrency={selectedCurrency}
+          setSelectedCurrency={setSelectedCurrency}
+          selectedPaymentMethod={selectedPaymentMethod}
+          setSelectedPaymentMethod={setSelectedPaymentMethod}
+          methodOptions={methodOptions}
         />
+
         <CartData orderData={orderData} />
       </div>
     </section>

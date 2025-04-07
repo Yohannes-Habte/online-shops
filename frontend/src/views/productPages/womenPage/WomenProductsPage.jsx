@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./WomenProductsPage.scss";
 import { useEffect } from "react";
-import { fetchCustomerCategoryProducts } from "../../redux/actions/product";
-import { clearProductErrors } from "../../redux/reducers/productReducer";
-import ProductCard from "../../components/products/productCard/ProductCard";
-import Header from "../../components/layouts/header/Header";
-import Footer from "../../components/layouts/footer/Footer";
+import { fetchCustomerCategoryProducts } from "../../../redux/actions/product";
+import { clearProductErrors } from "../../../redux/reducers/productReducer";
+import ProductCard from "../../../components/products/productCard/ProductCard";
+import Header from "../../../components/layouts/header/Header";
+import Footer from "../../../components/layouts/footer/Footer";
 
 const WomenProductsPage = () => {
   const dispatch = useDispatch();

@@ -1,124 +1,161 @@
-import { useEffect } from 'react';
-import './ShopRefunds.scss';
-import { DataGrid } from '@mui/x-data-grid';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { AiOutlineArrowRight } from 'react-icons/ai';
-import { fetchSellerOrders } from '../../../redux/actions/order';
-import { clearOrderErrors } from '../../../redux/reducers/orderReducer';
+import { useEffect } from "react";
+import moment from "moment";
+import "./ShopRefunds.scss";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSellerOrders } from "../../../redux/actions/order";
+import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
+import { FaTrash } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
 
-const ShopRefunds = () => {
+const ShopRefunds = ({ setIsActive }) => {
   // Global variables
-  const { currentSeller } = useSelector((state) => state.seller);
-  const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
+  const { sellerOrders } = useSelector((state) => state.order);
+  const {
+    data: { orders = [] },
+    loading,
+    error,
+  } = sellerOrders || {};
 
-    // Get all orders of the admin
-    useEffect(() => {
-      dispatch(fetchSellerOrders());
-  
-      return () => {
-        dispatch(clearOrderErrors());
-      };
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchSellerOrders());
+    return () => {
+      dispatch(clearOrderErrors());
+    };
+  }, [dispatch]);
 
-  // // Display all of a seller
-  // useEffect(() => {
-  //   const sellerOrders = async () => {
-  //     try {
-  //       dispatch(sellerOrdersRequest());
+  // When I click on the <FaEdit className="display-order-icon" size={20} /> icon, it should redirect to the withdraw money page
+  const handleEditClick = () => {
+    setIsActive(10);
+  };
 
-  //       const { data } = await axios.get(
-  //         `${API}/orders/shop/${currentSeller._id}`
-  //       );
-
-  //       dispatch(sellerOrdersSuccess(data.orders));
-  //     } catch (error) {
-  //       dispatch(sellerOrdersFail(error.response.data.message));
-  //     }
-  //   };
-  //   sellerOrders();
-  // }, []);
-
-  // Filter all 'Processing refund' or 'Successfully refunded'
-  const refundOrders =
-    orders &&
-    orders.filter(
-      (order) =>
-        order.status === 'Processing refund' ||
-        order.status === 'Successfully refunded'
-    );
-
-  // Columns for 'Processing refund' or/and 'Successfully refunded' orders
   const columns = [
-    { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },
-
     {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 130,
-      flex: 0.7,
-      // cellClassName: (params) => {
-      //   return params.getValue(params.id, 'status') === 'Delivered'
-      //     ? 'greenColor'
-      //     : 'redColor';
-      // },
-    },
-    {
-      field: 'quantity',
-      headerName: 'Quantity',
-      type: 'number',
-      minWidth: 130,
-      flex: 0.7,
-    },
-
-    {
-      field: 'total',
-      headerName: 'Total',
-      type: 'number',
-      minWidth: 130,
+      field: "createdAt",
+      headerName: "Ordered Date",
+      minWidth: 180,
       flex: 0.8,
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
+      cellClassName: "left-center",
+    },
+    {
+      field: "quantity",
+      headerName: "Total Items",
+      minWidth: 150,
+      flex: 0.6,
+      cellClassName: "left-center",
+    },
+    {
+      field: "grandTotal",
+      headerName: "Total Amount",
+      minWidth: 150,
+      flex: 0.8,
+      renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
+      cellClassName: "left-center",
+    },
+    {
+      field: "provider",
+      headerName: "Payment Provider",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "method",
+      headerName: "Payment Method",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "paymentStatus",
+      headerName: "Payment Status",
+      minWidth: 150,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "orderStatus",
+      headerName: "Order Status",
+      minWidth: 140,
+      flex: 0.7,
+      cellClassName: "left-center",
     },
 
     {
-      field: ' ',
-      flex: 1,
+      field: "action",
+      headerName: "Action",
       minWidth: 150,
-      headerName: '',
-      type: 'number',
+      flex: 0.7,
       sortable: false,
-      renderCell: (params) => {
-        return (
-          <Link to={`/shop/order/${params.id}`}>
-            <AiOutlineArrowRight size={20} />
-          </Link>
-        );
-      },
+      renderCell: () => (
+        <div className="order-action-table-icon-wrapper">
+          <FaEdit
+            onClick={handleEditClick}
+            className="display-order-icon"
+            size={20}
+          />
+
+          <FaTrash className="order-delete-icon" />
+        </div>
+      ),
     },
   ];
 
-  // Rows for 'Processing refund' or/and 'Successfully refunded' orders
-  const row = [];
+  // Filter orders based on Refund Accepted status for a specific seller
+  const refundAcceptedOrders =
+    orders && orders.filter((order) => order.orderStatus === "Refund Accepted");
 
-  refundOrders &&
-    refundOrders.forEach((order) => {
-      row.push({
-        id: order._id,
-        quantity: order.cart.length,
-        total: '$ ' + order.totalPrice,
-        status: order.status,
-      });
-    });
+  const rows = refundAcceptedOrders.map((order) => {
+    const formattedDate = order.createdAt
+      ? new Date(order.createdAt).toLocaleDateString("en-GB")
+      : "Unknown";
+
+    return {
+      id: order._id,
+      createdAt: formattedDate,
+      quantity:
+        order.orderedItems?.reduce((total, item) => total + item.quantity, 0) ||
+        0,
+      provider: order.payment?.provider || "Unknown",
+      method: order.payment?.method || "Unknown",
+      paymentStatus: order.payment?.paymentStatus || "Unknown",
+      grandTotal: order.grandTotal ?? 0,
+      orderStatus: order.orderStatus || "Unknown",
+    };
+  });
   return (
-    <section className="shop-refunds-container">
-      <h1 className="shop-refunds-title"> Shop Refunds</h1>
-      <DataGrid
-        rows={row}
-        columns={columns}
-        pageSize={10}
-        disableSelectionOnClick
-        autoHeight
-      />
+    <section style={{ padding: "20px" }} className="shop-orders-container">
+      <h2>Your Orders</h2>
+      {loading ? (
+        <div>Loading orders...</div>
+      ) : error ? (
+        <div style={{ color: "red" }}>Error: {error}</div>
+      ) : orders.length === 0 ? (
+        <div>No orders found.</div>
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          autoHeight
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
+      )}
     </section>
   );
 };

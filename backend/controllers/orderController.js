@@ -477,9 +477,13 @@ export const updateShopOrder = async (req, res, next) => {
         "Processing",
         "Shipped",
         "Delivered",
+        "Cancelled",
         "Refund Requested",
-        "Refund Processing",
+        "Awaiting Item Return",
         "Returned",
+        "Refund Processing",
+        "Refund Rejected",
+        "Refund Accepted",
         "Refunded",
       ].includes(orderStatus)
     ) {
@@ -488,9 +492,7 @@ export const updateShopOrder = async (req, res, next) => {
     }
 
     // 6. Prevent modification if already "Returned", "Refund Rejected" or "Refunded"
-    if (
-      ["Returned", "Refund Rejected", "Refunded"].includes(order.orderStatus)
-    ) {
+    if (["Refund Rejected", "Refunded"].includes(order.orderStatus)) {
       await session.abortTransaction();
       return next(
         createError(

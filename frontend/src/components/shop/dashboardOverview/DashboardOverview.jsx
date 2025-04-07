@@ -36,7 +36,6 @@ const DashboardOverview = ({ setIsActive }) => {
   } = sellerOrders || {};
 
   useEffect(() => {
-    dispatch(clearOrderErrors());
     dispatch(fetchSellerOrders());
 
     return () => {
@@ -45,7 +44,6 @@ const DashboardOverview = ({ setIsActive }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(clearOrderErrors());
     dispatch(fetchSellerOrders());
 
     return () => {
@@ -54,7 +52,6 @@ const DashboardOverview = ({ setIsActive }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(clearSellerErrors());
     dispatch(fetchSingleSeller());
 
     return () => {
@@ -62,7 +59,6 @@ const DashboardOverview = ({ setIsActive }) => {
     };
   }, [dispatch]);
 
-  console.log("DashboardOverview orders", orders);
 
   // Function to handle order deletion
   const handleDeleteOrders = () => {
@@ -123,8 +119,6 @@ const DashboardOverview = ({ setIsActive }) => {
       return null; // Exclude orders that don't meet the criteria
     })
     .filter(Boolean); // Remove null values
-
-  console.log("filteredOrders", filteredOrders);
 
   const rows = filteredOrders.map((order) => ({
     id: order._id,

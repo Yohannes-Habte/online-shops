@@ -3,44 +3,87 @@
 
 // Mobile screen size
 .payment-info-wrapper {
+  @include shadow3;
   width: 100%;
   flex: 2;
-  @include shadow3;
+
+  .payment-method-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .payment-method-input-wrapper {
+      @include inputContainer;
+      padding: 0 2rem;
+      margin: 1rem 0;
+
+      .payment-method-label {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+      }
+
+      .payment-method-field {
+        @include inputField;
+      }
+
+      .payment-method-options {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .payment-option {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+
+          .payment-option-radio-field {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            border: 2px solid $green;
+          }
+
+          .payment-method-field[type="radio"] {
+            accent-color: #0d9912;
+          }
+
+          .payment-option-label {
+            font-size: 0.8rem;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
 
   //pay with card
   .card-payment-container {
     width: 100%;
+    padding: 0 2rem;
 
-    .title-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+    .card-payment-title {
+      @include subTitle;
 
-      .selected-wrapper {
-        width: $afs;
-        height: $afs;
-        border-radius: 50%;
-        border: 2px solid $green;
-        cursor: pointer;
-        @include flexCenter;
+      .credit-card {
+        color: $green;
+      }
 
-        .selected {
-          width: $sfs;
-          height: $sfs;
-          border-radius: 50%;
-          background-color: $blue;
-        }
+      .debit-card {
+        color: $blue;
       }
     }
 
-    .subTitle {
-      @include subTitle;
-    }
-
     .payment-form {
+      border: 1px solid $green;
+      border-radius: $radius;
+      padding: 1rem;
+
       .wrapper {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         gap: 1rem;
         margin-top: 1rem;
@@ -79,45 +122,25 @@
   // paypal payment
   .paypal-payment-container {
     margin-bottom: 1rem;
-    .title-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+    padding: 0 2rem;
 
-      .selected-wrapper {
-        width: $afs;
-        height: $afs;
-        border-radius: 50%;
-        border: 2px solid $green;
-        cursor: pointer;
-        @include flexCenter;
-
-        .selected {
-          width: $sfs;
-          height: $sfs;
-          border-radius: 50%;
-          background-color: $blue;
-        }
-      }
-
-      .subTitle {
-        @include subTitle;
-        margin-bottom: 0%;
-      }
+    .paypal-payment-title {
+      @include subTitle;
+      padding-left: 0;
     }
+
     .pay-using-paypal-wrapper {
       .pay-now-btn {
         @include button1;
-        width: fit-content;
       }
 
       .paypal-btn {
         position: fixed;
-        top: 10%;
+        top: 50%;
         left: 50%;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 700px;
+        max-width: 900px;
         min-width: 350px;
         background-color: $paypal-popup-bg;
         padding: 3rem;
@@ -143,382 +166,15 @@
 
   // cash on delivery
   .cash-on-deliver-container {
-    .title-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-
-      .selected-wrapper {
-        width: $afs;
-        height: $afs;
-        border-radius: 50%;
-        border: 2px solid $green;
-        cursor: pointer;
-        @include flexCenter;
-
-        .selected {
-          width: $sfs;
-          height: $sfs;
-          border-radius: 50%;
-          background-color: $blue;
-        }
-      }
-
-      .subTitle {
-        @include subTitle;
-        margin-top: 0;
-      }
+    padding: 0 2rem;
+    .cash-on-delivery-title {
+      @include subTitle;
+      padding-left: 0;
     }
 
     .cash-on-deliver-form {
       .cash-on-delivery-btn {
         @include button1;
-      }
-    }
-  }
-}
-
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .payment-info-wrapper {
-    width: 100%;
-    flex: 2;
-    @include shadow3;
-
-    //pay with card
-    .card-payment-container {
-      width: 100%;
-
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-      }
-
-      .subTitle {
-        @include subTitle;
-      }
-
-      .payment-form {
-        .wrapper {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          gap: 1rem;
-
-          .input-container {
-            position: relative;
-            width: 100%;
-            .label {
-              font-size: $afs;
-              font-weight: $afw;
-            }
-
-            .input-field {
-              @include inputField;
-            }
-
-            .cart-element {
-              @include inputField;
-            }
-
-            .icon {
-              position: absolute;
-              top: 50%;
-              left: 0.5rem;
-              color: $green;
-            }
-          }
-        }
-
-        .submit-payment-btn {
-          @include button1;
-        }
-      }
-    }
-
-    // paypal payment
-    .paypal-payment-container {
-      margin-bottom: 1rem;
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-
-        .subTitle {
-          @include subTitle;
-          margin-bottom: 0%;
-        }
-      }
-      .pay-using-paypal-wrapper {
-        .pay-now-btn {
-          @include button1;
-          width: fit-content;
-        }
-
-        .paypal-btn {
-          position: fixed;
-          top: 5rem;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 50%;
-          margin: auto;
-          background-color: $paypal-popup-bg;
-          padding: 1rem 2rem;
-          @include shadow3;
-
-          .paypal-close-btn-icon {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: -1rem;
-            cursor: pointer;
-
-            &:hover {
-              color: $red;
-            }
-          }
-        }
-      }
-    }
-
-    // cash on delivery
-    .cash-on-deliver-container {
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-
-        .subTitle {
-          @include subTitle;
-          margin-top: 0;
-        }
-      }
-
-      .cash-on-deliver-form {
-        .cash-on-delivery-btn {
-          @include button1;
-        }
-      }
-    }
-  }
-}
-
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {
-  .payment-info-wrapper {
-    width: 100%;
-    flex: 2;
-    @include shadow3;
-
-    //pay with card
-    .card-payment-container {
-      width: 100%;
-
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-      }
-
-      .subTitle {
-        @include subTitle;
-      }
-
-      .payment-form {
-        .wrapper {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          gap: 1rem;
-
-          .input-container {
-            position: relative;
-            width: 100%;
-            .label {
-              font-size: $afs;
-              font-weight: $afw;
-            }
-
-            .input-field {
-              @include inputField;
-            }
-
-            .cart-element {
-              @include inputField;
-            }
-
-            .icon {
-              position: absolute;
-              top: 50%;
-              left: 0.5rem;
-              color: $green;
-            }
-          }
-        }
-
-        .submit-payment-btn {
-          @include button1;
-        }
-      }
-    }
-
-    // paypal payment
-    .paypal-payment-container {
-      margin-bottom: 1rem;
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-
-        .subTitle {
-          @include subTitle;
-          margin-bottom: 0%;
-        }
-      }
-      .pay-using-paypal-wrapper {
-        .pay-now-btn {
-          @include button1;
-          width: fit-content;
-        }
-
-        .paypal-btn {
-          position: fixed;
-          top: 5rem;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 50%;
-          margin: auto;
-          background-color: $paypal-popup-bg;
-          padding: 1rem 2rem;
-          @include shadow3;
-
-          .paypal-close-btn-icon {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: -1rem;
-            cursor: pointer;
-
-            &:hover {
-              color: $red;
-            }
-          }
-        }
-      }
-    }
-
-    // cash on delivery
-    .cash-on-deliver-container {
-      .title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-
-        .selected-wrapper {
-          width: $afs;
-          height: $afs;
-          border-radius: 50%;
-          border: 2px solid $green;
-          cursor: pointer;
-          @include flexCenter;
-
-          .selected {
-            width: $sfs;
-            height: $sfs;
-            border-radius: 50%;
-            background-color: $blue;
-          }
-        }
-
-        .subTitle {
-          @include subTitle;
-          margin-top: 0;
-        }
-      }
-
-      .cash-on-deliver-form {
-        .cash-on-delivery-btn {
-          @include button1;
-        }
       }
     }
   }

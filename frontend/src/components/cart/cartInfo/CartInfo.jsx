@@ -25,7 +25,7 @@ const CartInfo = ({ subTotal, shippingFee, tax, totalPrice, discount }) => {
       {/* Discount */}
       <article className="info-container">
         <h3 className="subTitle">Discount Price:</h3>
-        <p className="outcome"> ${discount ? discount.toFixed(2) : 1} </p>
+        <p className="outcome"> ${discount ? discount.toFixed(2) : 0} </p>
       </article>
 
       {/* Total Price */}

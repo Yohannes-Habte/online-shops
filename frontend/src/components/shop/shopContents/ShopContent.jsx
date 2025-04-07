@@ -39,7 +39,7 @@ const ShopContent = ({ isActive, setIsActive }) => {
 
       {isActive === 11 && <ShopInboxPage />}
 
-      {isActive === 12 && <ShopRefunds />}
+      {isActive === 12 && <ShopRefunds setIsActive={setIsActive} />}
 
       {isActive === 13 && <Supplier />}
 

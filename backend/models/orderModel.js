@@ -45,9 +45,59 @@ const paymentSchema = new Schema(
     method: {
       type: String,
       required: true,
-      enum: ["Credit Card", "PayPal", "Cash On Delivery"],
+      enum: [
+        // Traditional Payment Methods
+        "Credit Card",
+        "Debit Card",
+        "Bank Transfer",
+        "Direct Debit",
+        "Cash On Delivery",
+
+        // Digital & Online Payment Systems
+        "PayPal",
+        "Google Pay",
+        "Apple Pay",
+        "Amazon Pay",
+        "Samsung Pay",
+        "Alipay",
+        "WeChat Pay",
+
+        // Buy Now, Pay Later (BNPL)
+        "Klarna",
+        "Afterpay",
+        "Zip",
+        "Affirm",
+
+        // Cryptocurrency Payments
+        "Bitcoin",
+        "Ethereum",
+        "USDT",
+        "Other Cryptocurrency",
+
+        // Store & Gift Card Payments
+        "Store Credit",
+        "Gift Card",
+
+        // Other Methods
+        "Cheque",
+        "Money Order",
+      ],
     },
-    provider: { type: String, enum: ["Stripe", "PayPal"] },
+
+    provider: {
+      type: String,
+      enum: [
+        "Stripe",
+        "PayPal",
+        "Bank Transfer",
+        "Square",
+        "Authorize.Net",
+        "Razorpay",
+        "Google Pay",
+        "Apple Pay",
+      ],
+    },
+
     paymentStatus: {
       type: String,
       required: true,
@@ -60,6 +110,8 @@ const paymentSchema = new Schema(
       required: true,
       default: "USD",
       enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
+      uppercase: true,
+      required: true,
     },
     amountPaid: { type: Number, required: true },
     paymentDate: { type: Date, default: Date.now },

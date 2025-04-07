@@ -26,7 +26,7 @@ const CartData = ({ orderData }) => {
       <article className="box discount-price">
         <h3 className="cart-data-subTitle">Discount:</h3>
         <p className="cart-data-paragraph">
-          ${orderData ? orderData?.discount?.toFixed(2) : 1}
+          ${orderData ? orderData?.discount?.toFixed(2) : 0}
         </p>
       </article>
       <hr />

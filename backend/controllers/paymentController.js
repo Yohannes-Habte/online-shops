@@ -1,26 +1,47 @@
-import Stripe from 'stripe';
-import createError from 'http-errors';
+import Stripe from "stripe";
+import createError from "http-errors";
 
 //==========================================================================================
 // Stripe payment
 //==========================================================================================
+
+const allowedCurrencies = ["USD", "EUR", "GBP", "INR", "JPY", "AUD"];
+
 export const postStripe = async (req, res, next) => {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const { amount, currency } = req.body;
+    if (!amount || amount <= 0 || isNaN(amount)) {
+      return next(createError(400, "Invalid payment amount."));
+    }
 
-    const myPayment = await stripe.paymentIntents.create({
-      amount: req.body.amount,
-      currency: 'USD',
+    if (!currency || !allowedCurrencies.includes(currency.toUpperCase())) {
+      return next(createError(400, "Invalid or unsupported currency."));
+    }
+
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return next(createError(500, "Stripe Secret Key is not set."));
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: currency.toUpperCase(),
       metadata: {
-        company: 'LisaConsult',
+        company: "LisaConsult",
       },
     });
+
     res.status(200).json({
       success: true,
-      client_secret: myPayment.client_secret,
+      client_secret: paymentIntent.client_secret,
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  } catch (error) {
+    console.error("Stripe Payment Error:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while processing the payment." });
   }
 };
 
@@ -29,14 +50,14 @@ export const postStripe = async (req, res, next) => {
 //==========================================================================================
 export const getStripe = async (req, res, next) => {
   try {
-    const stripeApikey = process.env.STRIPE_API_KEY;
-    if (!stripeApikey) {
-      return next(createError(400, 'Stripe API Key not found!'));
+    const stripeApiKey = process.env.STRIPE_API_KEY;
+    if (!stripeApiKey) {
+      return next(createError(400, "Stripe API Key not found!"));
     }
-    res.status(200).json({ stripeApikey: stripeApikey });
+
+    res.status(200).json({ stripeApiKey });
   } catch (error) {
-    next(
-      createError(500, 'Feedback could not be accessed from stripe payment')
-    );
+    console.error("Error retrieving Stripe API Key:", error.message);
+    next(createError(500, "Unable to access feedback from Stripe payment."));
   }
 };

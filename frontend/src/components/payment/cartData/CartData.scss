@@ -4,6 +4,9 @@
 .cart-data-wrapper {
   flex: 1;
   @include shadow3;
+  padding: 2rem;
+ max-height: fit-content;
+ background-color: #f3f3fdef;
 
   .box {
     display: flex;

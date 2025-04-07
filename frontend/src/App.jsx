@@ -16,9 +16,6 @@ import { useDispatch } from "react-redux";
 import { API } from "./utils/security/secreteKey";
 import { fetchUser } from "./redux/actions/user";
 import { fetchSingleSeller } from "./redux/actions/seller";
-import WomenProductsPage from "./views/womenPage/WomenProductsPage";
-import MenProductsPage from "./views/menPage/MenProductsPage";
-import KidsProductsPage from "./views/kidsPage/KidsProductsPage";
 
 import {
   RegisterPage,
@@ -56,6 +53,9 @@ import {
 import SupplierPage from "./views/supplierPage/SupplierPage";
 import UpdateProductPage from "./views/productPages/updateProductPage/UpdateProductPage";
 import HomePage from "./views/homePage/HomePage";
+import WomenProductsPage from "./views/productPages/womenPage/WomenProductsPage";
+import MenProductsPage from "./views/productPages/menPage/MenProductsPage";
+import KidsProductsPage from "./views/productPages/kidsPage/KidsProductsPage";
 
 const App = () => {
   const dispatch = useDispatch();

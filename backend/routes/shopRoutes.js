@@ -51,7 +51,7 @@ shopRouter.get("/shop/products", isSellerAuthenticated, getShopProducts);
 shopRouter.get("/get-shop-info/:id", isSellerAuthenticated, getShopInfo);
 shopRouter.post("/forgotPassword", shopForgotPassword);
 shopRouter.patch("/shop-reset-password/:token", resetForgotShopPassword);
-shopRouter.put("/update-payment-methods", updatePaymentMethods);
+shopRouter.put("/update/payment", isSellerAuthenticated, updatePaymentMethods);
 
 
 shopRouter.delete("/delete-all-shops", deleteAllShops);

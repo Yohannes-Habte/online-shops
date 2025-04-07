@@ -6,7 +6,6 @@ import shopSendEmail from "../utils/shopSendEmail.js";
 import crypto from "crypto";
 import generateShopToken from "../middleware/shopToken.js";
 import mongoose from "mongoose";
-import User from "../models/userModel.js";
 
 //=========================================================================
 // Create a seller
@@ -388,10 +387,17 @@ export const getShopProducts = async (req, res, next) => {
 // Update seller/shop withdraw methods
 //====================================================================
 export const updatePaymentMethods = async (req, res, next) => {
-  try {
-    const { withdrawMethod } = req.body;
+  const { withdrawMethod } = req.body;
+  const shopId = req.shop?.id;
 
-    const shop = await Shop.findByIdAndUpdate(req.shop._id, { withdrawMethod });
+  console.log("shopId", shopId);
+  console.log("withdrawMethod", withdrawMethod);
+
+  if (!shopId || !mongoose.Types.ObjectId.isValid(shopId)) {
+    return next(createError(400, "Invalid Shop ID provided."));
+  }
+  try {
+    const shop = await Shop.findByIdAndUpdate(shopId, { withdrawMethod });
 
     // Save changes to a shop
     shop.save();

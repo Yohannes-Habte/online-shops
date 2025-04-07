@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import './WithDrawMoney.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { RxCross1 } from 'react-icons/rx';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { AiOutlineDelete } from 'react-icons/ai';
-import { FaUser } from 'react-icons/fa';
-import { BsBank2 } from 'react-icons/bs';
-import { FaRegCreditCard } from 'react-icons/fa6';
-import { FaLocationDot } from 'react-icons/fa6';
-import { FaSwift } from 'react-icons/fa';
-import { FaAddressCard } from 'react-icons/fa';
-import * as Action from '../../../redux/reducers/sellerReducer';
-import { API } from '../../../utils/security/secreteKey';
+import { useEffect, useState } from "react";
+import "./WithDrawMoney.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { RxCross1 } from "react-icons/rx";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { AiOutlineDelete } from "react-icons/ai";
+import { FaUser } from "react-icons/fa";
+import { BsBank2 } from "react-icons/bs";
+import { FaRegCreditCard } from "react-icons/fa6";
+import { FaLocationDot } from "react-icons/fa6";
+import { FaSwift } from "react-icons/fa";
+import { FaAddressCard } from "react-icons/fa";
+import * as Action from "../../../redux/reducers/sellerReducer";
+import { API } from "../../../utils/security/secreteKey";
+import BankAccountInfo from "../../bank/BankAccountInfo";
+import {
+  clearSellerErrors,
+  fetchSingleSeller,
+} from "../../../redux/actions/seller";
 
 // Initial values
 const initialState = {
-  bankHolderName: '',
-  bankName: '',
-  bankCountry: '',
+  bankHolderName: "",
+  bankName: "",
+  bankCountry: "",
   bankSwiftCode: null,
   bankAccountNumber: null,
-  bankAddress: '',
+  bankAddress: "",
 };
 
 const WithdrawMoney = () => {
@@ -30,43 +35,19 @@ const WithdrawMoney = () => {
   const { currentSeller } = useSelector((state) => state.seller);
 
   // Local state variables
+  const [bankInfo, setBankInfo] = useState(initialState);
   const [open, setOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(50);
-  const [bankInfo, setBankInfo] = useState(initialState);
-  const [shopOrders, setShopOrders] = useState([]);
 
   // Get seller details
   useEffect(() => {
-    const shopInfo = async () => {
-      try {
-        dispatch(Action.getSellerStart());
-        const { data } = await axios.get(
-          `${API}/shops/shop/${currentSeller._id}`
-        );
-        dispatch(Action.getSellerSuccess(data.shop));
-      } catch (error) {
-        dispatch(Action.getSellerFailer(error.response.data.message));
-      }
-    };
-    shopInfo();
-  }, []);
+    dispatch(fetchSingleSeller());
 
-  // Display all orders of a shop
-  useEffect(() => {
-    const fetchAllShopOrders = async () => {
-      try {
-        const { data } = await axios.get(
-          `${API}/orders/shop/${currentSeller._id}`
-        );
-
-        setShopOrders(data.orders);
-      } catch (error) {
-        toast.error(error.response.data.message);
-      }
+    return () => {
+      dispatch(clearSellerErrors());
     };
-    fetchAllShopOrders();
-  }, []);
+  }, [dispatch]);
 
   // Destructure bankInfo variables
   const {
@@ -81,18 +62,21 @@ const WithdrawMoney = () => {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBankInfo({ ...bankInfo, [name]: value });
+    setBankInfo((prev) => ({
+      ...prev,
+      [name]: value.trimStart(),
+    }));
   };
 
   // Reset the variables to their initial value or state
   const reset = () => {
     setBankInfo({
-      bankHolderName: '',
+      bankHolderName: "",
       bankAccountNumber: null,
-      bankName: '',
-      bankCountry: '',
+      bankName: "",
+      bankCountry: "",
       bankSwiftCode: null,
-      bankAddress: '',
+      bankAddress: "",
     });
   };
 
@@ -101,7 +85,6 @@ const WithdrawMoney = () => {
     e.preventDefault();
 
     try {
-      dispatch(Action.updateSellerStart());
       const withdrawMethod = {
         bankHolderName: bankHolderName,
         bankAccountNumber: bankAccountNumber,
@@ -111,18 +94,21 @@ const WithdrawMoney = () => {
         bankAddress: bankAddress,
       };
 
-      const { data } = await axios.put(`${API}/shops/update-payment-methods`, {
+      const { data } = await axios.put(
+        `${API}/shops/update-payment-methods`,
         withdrawMethod,
-      });
+        {
+          withCredentials: true,
+        }
+      );
       setPaymentMethod(false);
 
-      toast.success('Withdraw method added successfully!');
-
-      dispatch(Action.updateSellerSuccess(data.shop));
+      toast.success(data.message);
 
       reset();
     } catch (error) {
-      dispatch(Action.updateSellerFilure(error.response.data.message));
+      const errorMessage = error?.response?.data?.message || "Error occurred";
+      toast.error(errorMessage);
     }
   };
 
@@ -132,10 +118,10 @@ const WithdrawMoney = () => {
       dispatch(Action.deletePaymentMethodRequest());
       const { data } = await axios.delete(`${API}/shops/delete-payment-method`);
 
-      toast.success('Withdraw method deleted successfully!');
+      toast.success("Withdraw method deleted successfully!");
       dispatch(Action.deletePaymentMethodSuccess(data));
     } catch (error) {
-      toast.error('You not have enough balance to withdraw!');
+      toast.error("You not have enough balance to withdraw!");
     }
   };
 
@@ -148,7 +134,7 @@ const WithdrawMoney = () => {
       if (withdrawAmount < 50) {
         toast.error("Sorry, you can't withdraw less than 50.00€!");
       } else if (withdrawAmount > availableBalance) {
-        toast.error('Sorry, available balance is less than withdraw amount!');
+        toast.error("Sorry, available balance is less than withdraw amount!");
       } else {
         const newWithdraw = {
           amount: withdrawAmount,
@@ -159,7 +145,7 @@ const WithdrawMoney = () => {
           newWithdraw
         );
 
-        toast.success('Withdraw money request is successful!');
+        toast.success(data.message);
       }
     } catch (error) {
       console.log(error);
@@ -167,7 +153,7 @@ const WithdrawMoney = () => {
   };
 
   // Shop available total balance
-  const availableBalance = currentSeller?.availableBalance;
+  const availableBalance = currentSeller?.netShopIncome;
 
   return (
     <section className="withdraw-money-container">
@@ -184,10 +170,12 @@ const WithdrawMoney = () => {
         </p>
       </article>
 
+      <BankAccountInfo />
+
       {/* When open is true, you can see: available withdraw methods and add new */}
       {open && (
         <article
-          className={paymentMethod ? 'withdraw-methods' : 'no-withdraw-methods'}
+          className={paymentMethod ? "withdraw-methods" : "no-withdraw-methods"}
         >
           <h3>
             <RxCross1
@@ -338,8 +326,8 @@ const WithdrawMoney = () => {
                   <article className="bank-details-container">
                     <aside className="bank-info-wrapper">
                       <h5 className="acount-number">
-                        Account Number:{' '}
-                        {'*'.repeat(
+                        Account Number:{" "}
+                        {"*".repeat(
                           currentSeller?.withdrawMethod?.bankAccountNumber
                             ?.length - 3
                         ) +
