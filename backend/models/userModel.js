@@ -34,7 +34,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       default: "customer",
-      enum: ["customer", "seller", "admin"],
+      enum: ["customer", "seller", "admin",],
     },
 
     myOrders: [{ type: Schema.Types.ObjectId, ref: "Order" }],

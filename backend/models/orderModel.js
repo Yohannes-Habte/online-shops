@@ -46,41 +46,14 @@ const paymentSchema = new Schema(
       type: String,
       required: true,
       enum: [
-        // Traditional Payment Methods
         "Credit Card",
         "Debit Card",
         "Bank Transfer",
         "Direct Debit",
         "Cash On Delivery",
-
-        // Digital & Online Payment Systems
         "PayPal",
-        "Google Pay",
-        "Apple Pay",
-        "Amazon Pay",
-        "Samsung Pay",
-        "Alipay",
-        "WeChat Pay",
-
-        // Buy Now, Pay Later (BNPL)
-        "Klarna",
-        "Afterpay",
-        "Zip",
-        "Affirm",
-
-        // Cryptocurrency Payments
-        "Bitcoin",
-        "Ethereum",
-        "USDT",
-        "Other Cryptocurrency",
-
-        // Store & Gift Card Payments
-        "Store Credit",
-        "Gift Card",
-
-        // Other Methods
-        "Cheque",
-        "Money Order",
+        "Stripe",
+        "Crypto",
       ],
     },
 
