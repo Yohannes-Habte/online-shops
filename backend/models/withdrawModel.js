@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const shoWithdrawSchema = new Schema(
   {
-    shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
+    withdrawId: { type: String, unique: true, required: true },
 
     withdrawalPurpose: {
       type: String,
@@ -30,69 +30,28 @@ const shoWithdrawSchema = new Schema(
     },
 
     // Show me supplier if and Only if "Product Procurement" is selected
-    supplier: { type: Schema.Types.ObjectId, ref: "Supplier" },
+    supplier: { type: String },
 
-    // Show me order, product and transactionId if and Only if "Customer Reimbursement" is selected
-    order: { type: Schema.Types.ObjectId, ref: "Order" },
-    product: { type: Schema.Types.ObjectId, ref: "Product" },   
-    refundTransactionId: { type: String },// Links to returnedItems.returnedId in the Order model
+    // If "Customer Reimbursement" is selected, show me the RefundRequest and returnRequest IDs
+    refundRequest: { type: Schema.Types.ObjectId, ref: "RefundRequest" },
+    returnRequest: { type: Schema.Types.ObjectId, ref: "ReturnRequest" },
 
     amount: { type: Number, required: true },
 
-    currency: {
-      type: String,
-      required: true,
-      enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
-      default: "USD",
-      uppercase: true,
-    },
+    currency: { type: String, required: true },
 
-    refundType: { type: String, enum: ["Full", "Partial"], required: true },
+    method: { type: String, required: true },
 
-    status: {
-      type: String,
-      enum: ["Pending", "Completed", "Cancelled"],
-      default: "Pending",
-    },
+    notes: { type: String, required: true },
 
-    refundFailureReason: { type: String, default: null },
+    processedDate: { type: Date, required: true },
 
-    method: {
-      type: String,
-      enum: ["Bank Transfer", "PayPal", "Stripe", "Crypto", "Cheque"],
-      required: true,
-    },
-
-    // Show me bank details if and Only if "Bank Transfer" is selected
-    accountHolderName: { type: String },
-    bankName: { type: String },
-    bankCountry: { type: String },
-    bankAddress: { type: String },
-    bankSwiftCode: { type: String },
-    accountNumber: { type: String },
-    routingNumber: { type: String },
-
-    // Show me email if and Only if "PayPal or Stripe" is selected
-    email: { type: String }, // for PayPal / Stripe
-
-    // Show me Crypto details if and Only if "Crypto" is selected
-    cryptoWalletAddress: { type: String },
-    cryptoCurrency: {
-      type: String,
-      enum: ["Bitcoin", "Ethereum", "USDT", "Other"],
-    },
-
-    // Show me chequeRecipient if and Only if "Cheque" is selected
-    chequeRecipient: { type: String },
-
-    withdrawalReason: { type: String, required: true },
-    refundDate: { type: Date, required: true },
-    createdBy: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
+    processedBy: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
   },
 
   { timestamps: true }
 );
 
 // Withdraw Model
-const Withdraw = mongoose.model("Withdraw", shoWithdrawSchema);
-export default Withdraw;
+const Withdrawal = mongoose.model("Withdrawal", shoWithdrawSchema);
+export default Withdrawal;

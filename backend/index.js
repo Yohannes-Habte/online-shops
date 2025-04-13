@@ -64,7 +64,7 @@ app.use("/api/v1/suppliers", supplierRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/coupons", couponRouter);
 app.use("/api/v1/orders", orderRouter);
-app.use("/api/v1/withdraws", withdrawRouter);
+app.use("/api/v1/withdrawals", withdrawRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/events", eventRouter);

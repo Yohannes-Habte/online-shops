@@ -7,7 +7,6 @@ import { SiBrandfolder } from "react-icons/si";
 import { FaProductHunt } from "react-icons/fa";
 import { MdEvent } from "react-icons/md";
 import { FaFirstOrderAlt } from "react-icons/fa";
-import { BiMoneyWithdraw } from "react-icons/bi";
 import { MdOutlineMessage } from "react-icons/md";
 import { RiRefundFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
@@ -89,8 +88,8 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-          {/* Subcategories */}
-          <aside
+        {/* Subcategories */}
+        <aside
           onClick={() => setIsActive(17) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
@@ -104,13 +103,13 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-        {/* Committees */}
+        {/* Brands */}
         <aside
           onClick={() => setIsActive(3) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <SiBrandfolder
-            title="Committee"
+            title="Brands"
             className={isActive === 3 ? "active-icon" : "passive-icon"}
           />
 
@@ -119,13 +118,13 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-        {/* Specific Committee */}
+        {/*  New Product */}
         <aside
           onClick={() => setIsActive(4) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <FaProductHunt
-            title="Committee"
+            title="New Product"
             className={isActive === 4 ? "active-icon" : "passive-icon"}
           />
 
@@ -134,30 +133,30 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-        {/* Masses */}
+        {/* Products */}
 
         <aside
           onClick={() => setIsActive(5) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <FaProductHunt
-            title="Mass Schedule"
+            title="Products"
             className={isActive === 5 ? "active-icon" : "passive-icon"}
           />
 
           <h4 className={isActive === 5 ? "active-text" : "passive-text"}>
-            All Products
+            Products
           </h4>
         </aside>
 
-        {/* Delegations */}
+        {/*  New Event */}
 
         <aside
           onClick={() => setIsActive(6) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <MdEvent
-            title="Delegation"
+            title="New Event"
             className={isActive === 6 ? "active-icon" : "passive-icon"}
           />
 
@@ -178,43 +177,43 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           />
 
           <h4 className={isActive === 7 ? "active-text" : "passive-text"}>
-            All Events
+            Events
           </h4>
         </aside>
-     
 
-        {/* Services */}
+        {/* Orders */}
 
         <aside
           onClick={() => setIsActive(9) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <FaFirstOrderAlt
-            title="Services"
+            title="Orders"
             className={isActive === 9 ? "active-icon" : "passive-icon"}
           />
 
           <h4 className={isActive === 9 ? "active-text" : "passive-text"}>
-            All Orders
+            Orders
           </h4>
         </aside>
 
-        {/* Notifications */}
+        {/* Transactions */}
+
         <aside
           onClick={() => setIsActive(10) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
-          <BiMoneyWithdraw
-            title="Notifications"
+          <FaFirstOrderAlt
+            title="Transactions"
             className={isActive === 10 ? "active-icon" : "passive-icon"}
           />
 
           <h4 className={isActive === 10 ? "active-text" : "passive-text"}>
-            Withdraw Money
+            Transactions
           </h4>
         </aside>
 
-        {/* Upload Video Form */}
+        {/*  Shop Inbox*/}
         <aside
           onClick={() => setIsActive(11) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
@@ -229,13 +228,13 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-        {/* All user comments */}
+        {/* Refunds */}
         <aside
           onClick={() => setIsActive(12) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
-            title="All Comments"
+            title="Refunds"
             className={isActive === 12 ? "active-icon" : "passive-icon"}
           />
 
@@ -250,7 +249,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
-            title="All Comments"
+            title="Suppliers"
             className={isActive === 13 ? "active-icon" : "passive-icon"}
           />
 
@@ -265,7 +264,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           className="shop-dashboard-sidebar-item"
         >
           <RiRefundFill
-            title="All Comments"
+            title="Update Shop"
             className={isActive === 14 ? "active-icon" : "passive-icon"}
           />
 
@@ -281,7 +280,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           className="shop-dashboard-sidebar-item"
         >
           <IoSettings
-            title="Settings"
+            title="Shop Profile"
             className={isActive === 15 ? "active-icon" : "passive-icon"}
           />
 

@@ -90,7 +90,7 @@ const paymentSchema = new Schema(
     paymentDate: { type: Date, default: Date.now },
     refunds: [
       {
-        returnedId: { type: Schema.Types.ObjectId, required: true }, // Links to returnedItems.returnedId
+        returnedId: { type: Schema.Types.ObjectId, required: true }, // Links to returnedItems.returnRequestId
         refundId: { type: String, required: true },
         processedBy: {
           type: Schema.Types.ObjectId,
@@ -117,66 +117,6 @@ const paymentSchema = new Schema(
     metadata: { type: Map, of: Schema.Types.Mixed, default: {} },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  { timestamps: true }
-);
-
-// Schema for user refund details
-const refundRequestSchema = new Schema(
-  {
-    refundRequestId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-    },
-
-    product: {
-      type: Schema.Types.ObjectId,
-      ref: "Product",
-    },
-    requestedItemColor: { type: String, required: true },
-    requestedItemSize: { type: String, required: true },
-    requestedItemQuantity: { type: Number, required: true },
-    requestedDate: { type: Date, required: true },
-    requestRefundReason: {
-      type: String,
-      enum: [
-        "Damaged or Faulty Product",
-        "Incorrect Item Received",
-        "Size or Fit Issue",
-        "Product Not as Described",
-        "Changed My Mind",
-        "Other",
-      ],
-      required: true,
-    },
-
-    otherReason: { type: String, trim: true }, // Only used if "Other" is selected
-    requestedRefundAmount: { type: Number, required: true },
-  },
-  { timestamps: true }
-);
-
-// Schema for returned items and approved by the shop manager
-const returnedItemSchema = new Schema(
-  {
-    refundRequestIdLinked: { type: Schema.Types.ObjectId, required: true }, // Links to refundRequestInfo.refundRequestId
-    returnedId: { type: Schema.Types.ObjectId, required: true },
-    isProductReturned: { type: Boolean, default: false },
-    returnedDate: { type: Date, default: Date.now }, // Only used if "Other" is isProductReturned is true
-    condition: {
-      type: String,
-      enum: ["New", "Used", "Damaged"],
-      default: "New",
-    },
-    comments: { type: String, required: true },
-    refundAmount: { type: Number, required: true },
-    processedDate: { type: Date, required: true, default: Date.now },
-    refundStatus: {
-      type: String,
-      enum: ["Pending", "Processing", "Accepted", "Rejected"],
-      default: "Pending",
-    },
-    processedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
@@ -250,10 +190,13 @@ const orderSchema = new Schema(
       estimatedDeliveryDate: { type: Date, default: null },
     },
 
-    refundRequestInfo: { type: [refundRequestSchema], default: [] },
-    returnedItems: { type: [returnedItemSchema], default: [] },
+    refundRequests: [{ type: Schema.Types.ObjectId, ref: "RefundRequest" }],
 
-    cancellationReason: { type: String }, // Cancellation reason provided by the customer for an order
+    returnedItems: [{ type: Schema.Types.ObjectId, ref: "ReturnRequest" }],
+
+    cancellationReason: { type: String }, // Cancellation reason provided by the customer if the entire order is cancelled
+
+    cancellationDate: { type: Date }, // Date when the order was cancelled
 
     deliveredAt: { type: Date },
     version: { type: Number, default: 1 },

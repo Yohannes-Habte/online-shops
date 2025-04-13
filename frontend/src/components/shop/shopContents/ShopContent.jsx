@@ -7,12 +7,12 @@ import ProductBrand from "../brand/ProductBrand";
 import CreateEvent from "../createEvent/CreateEvent";
 import CreateProduct from "../createProduct/CreateProduct";
 import ShopSettings from "../shopSettings/ShopSettings";
-import WithdrawMoney from "../withdrawMoney/WithDrawMoney";
 import "./ShopContent.scss";
 import Supplier from "../supplier/Supplier";
 import Subcategory from "../subcategory/Subcategory";
 import DashboardOverview from "../dashboardOverview/DashboardOverview";
 import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage";
+import Transactions from "../transactions/Transactions";
 
 const ShopContent = ({ isActive, setIsActive }) => {
   return (
@@ -35,7 +35,7 @@ const ShopContent = ({ isActive, setIsActive }) => {
 
       {isActive === 9 && <AllSellerOrders />}
 
-      {isActive === 10 && <WithdrawMoney />}
+      {isActive === 10 && <Transactions />}
 
       {isActive === 11 && <ShopInboxPage />}
 

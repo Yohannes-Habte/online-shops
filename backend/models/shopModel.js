@@ -35,9 +35,13 @@ const shopSchema = new Schema(
 
     soldProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
 
-    transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
+    refundRequests: [{ type: Schema.Types.ObjectId, ref: "RefundRequest" }],
 
-    withdrawals: [{ type: Schema.Types.ObjectId, ref: "Withdraw" }],
+    returnedItems: [{ type: Schema.Types.ObjectId, ref: "ReturnRequest" }],
+
+    withdrawals: [{ type: Schema.Types.ObjectId, ref: "Withdrawal" }],
+
+    transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
 
     netShopIncome: { type: Number, default: 0 },
 

@@ -1,8 +1,12 @@
 import "./SingleOrderRefunded.scss";
 import { History } from "lucide-react";
 
-const SingleOrderRefunded = ({ order }) => {
+const SingleOrderRefunded = ({ order, setRefundTransactionId }) => {
   console.log("order:", order);
+
+  const handleRefundTransactionId = (refundTransactionId) => {
+    setRefundTransactionId(refundTransactionId);
+  };
 
   return (
     <section className="shop-order-refunded-history-container">
@@ -17,9 +21,10 @@ const SingleOrderRefunded = ({ order }) => {
           <div className="shop-order-refunded-info">
             <aside>
               <p>
-                <strong>Refund Request Id:</strong> {refund.refundRequestIdLinked}
+                <strong>Refund Request Id:</strong>{" "}
+                {refund.refundRequestIdLinked}
               </p>
-              <p>
+              <p onClick={() => handleRefundTransactionId(refund.returnedId)}>
                 <strong>Refund ID:</strong> {refund.returnedId}
               </p>
               <p>

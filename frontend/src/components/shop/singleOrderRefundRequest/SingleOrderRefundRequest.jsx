@@ -1,11 +1,19 @@
 import "./SingleOrderRefundRequest.scss";
 import { BadgeDollarSign } from "lucide-react";
 
-const SingleOrderRefundRequest = ({ order, setSelectedRefundRequestId }) => {
+const SingleOrderRefundRequest = ({
+  order,
+  setSelectedRefundRequestId,
+  setProductId,
+}) => {
   // When user click on refundRequestId, it should populate the order refund request id and amount in the refund form
 
   const handleRefundRequestId = (refundRequestId) => {
     setSelectedRefundRequestId(refundRequestId);
+  };
+
+  const handleProductId = (productId) => {
+    setProductId(productId);
   };
 
   return (
@@ -27,7 +35,10 @@ const SingleOrderRefundRequest = ({ order, setSelectedRefundRequestId }) => {
                   {refund.requestedDate.slice(0, 10)}
                 </span>
               </p>
-              <p className="refund-request-info">
+              <p
+                className="refund-request-info"
+                onClick={() => handleProductId(refund.product._id)}
+              >
                 <strong>Product ID:</strong> {refund?.product._id}
               </p>
               <p

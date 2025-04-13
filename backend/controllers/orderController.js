@@ -524,28 +524,32 @@ export const updateShopOrder = async (req, res, next) => {
       addToStatusHistory(order, orderStatus);
     }
 
-    // 9. If the order status is "Delivered", update orderStatus, statusHistory, payment status, service fee, stock, soldOut, shopIncomeInfo, and deliverAt
+    // 9. If the order status is "Delivered", update orderStatus, statusHistory, payment status, service fee, stock, soldOut, transactions, and deliverAt
     if (orderStatus === "Delivered") {
       order.orderStatus = orderStatus;
       order.deliveredAt = Date.now();
       order.payment.paymentStatus = "completed";
 
-      // Calculate service fee, soldOut, shopIncomeInfo
+      // Calculate service fee, soldOut, transactions
       const grandTotal = order.grandTotal;
       const shopCommission = calculateShopCommission(grandTotal); // None refundable
       const shopBalance = grandTotal - shopCommission;
       const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2));
 
-      // Update service fee, shopIncomeInfo, soldOut, and status history
+      // Update service fee, transactions, soldOut, and status history
       order.serviceFee = shopCommission.toFixed(2);
 
-      if (!Array.isArray(seller.shopIncomeInfo)) {
-        seller.shopIncomeInfo = [];
+      if (!Array.isArray(seller.transactions)) {
+        seller.transactions = [];
       }
 
-      seller.shopIncomeInfo.push({
-        paymentDate: new Date(),
-        currentAmount: shopNetOrderAmount,
+      seller.transactions.push({
+        transactionId: new mongoose.Types.ObjectId(),
+        shop: seller._id,
+        order: order._id,
+        amount: shopNetOrderAmount,
+        currency: "USD",
+        method: "Bank Transfer",
       });
 
       seller.netShopIncome = (

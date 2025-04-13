@@ -8,7 +8,7 @@ import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import { FaTrash } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 
-const ShopRefunds = ({ setIsActive }) => {
+const ShopRefunds = () => {
   // Global variables
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
@@ -24,11 +24,6 @@ const ShopRefunds = ({ setIsActive }) => {
       dispatch(clearOrderErrors());
     };
   }, [dispatch]);
-
-  // When I click on the <FaEdit className="display-order-icon" size={20} /> icon, it should redirect to the withdraw money page
-  const handleEditClick = () => {
-    setIsActive(10);
-  };
 
   const columns = [
     {
@@ -91,11 +86,7 @@ const ShopRefunds = ({ setIsActive }) => {
       sortable: false,
       renderCell: () => (
         <div className="order-action-table-icon-wrapper">
-          <FaEdit
-            onClick={handleEditClick}
-            className="display-order-icon"
-            size={20}
-          />
+          <FaEdit className="display-order-icon" size={20} />
 
           <FaTrash className="order-delete-icon" />
         </div>
@@ -156,6 +147,8 @@ const ShopRefunds = ({ setIsActive }) => {
           disableRowSelectionOnClick
         />
       )}
+
+    
     </section>
   );
 };

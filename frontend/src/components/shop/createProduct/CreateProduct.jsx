@@ -52,7 +52,6 @@ const CreateProduct = () => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  console.log("Product Image File:", formData.variants[0].productImage);
 
   // Fetch required data on mount
   useEffect(() => {
