@@ -3,9 +3,10 @@
 
 // Mobile screen size
 .payment-info-wrapper {
-  @include shadow3;
-  width: 100%;
-  flex: 2;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 2rem 1rem;
 
   .payment-method-container {
     display: flex;
@@ -25,6 +26,10 @@
 
       .payment-method-field {
         @include inputField;
+
+        &:hover {
+          outline: 1px solid $green;
+        }
       }
 
       .payment-method-options {
@@ -55,6 +60,19 @@
             cursor: pointer;
           }
         }
+      }
+    }
+
+    .currency-input-error {
+      select {
+        border-color: #e74c3c;
+        background-color: #fff6f6;
+      }
+
+      .error-message {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
       }
     }
   }

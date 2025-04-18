@@ -21,7 +21,7 @@ const SingleOrderRefundRequest = ({
       <h2 className="shop-order-refund-request-title">
         <BadgeDollarSign size={22} /> Refund Request
       </h2>
-      {order?.refundRequestInfo.map((refund) => (
+      {order?.refundRequests.map((refund) => (
         <article
           key={refund.refundRequestId}
           className="shop-order-refund-request-details-wrapper"

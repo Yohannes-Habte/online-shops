@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./PaymentInfo.scss";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import {

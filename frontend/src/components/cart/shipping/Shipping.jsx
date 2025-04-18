@@ -4,14 +4,21 @@ import { FaAddressCard, FaPhoneSquareAlt, FaUserTie } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiFileZipFill } from "react-icons/ri";
 
-const Shipping = ({ user, formData, handleInputChange, errors }) => {
+const Shipping = ({
+  user,
+  formData,
+  handleInputChange,
+  errors,
+  proceedToPayment,
+  loading,
+}) => {
   const { address, zipCode, country, state, city, phoneNumber } = formData;
 
   return (
-    <section className="shipping-wrapper">
-      <h3 className="subTitle">Shipping Address</h3>
+    <section className="shipping-address-wrapper">
+      <h3 className="shopping-address-title">Shipping Address</h3>
 
-      <form className="shipping-form">
+      <form className="shipping-address-form">
         {/* Name */}
         <div className="input-container">
           <FaUserTie className="icon" />
@@ -132,6 +139,13 @@ const Shipping = ({ user, formData, handleInputChange, errors }) => {
           {errors.city && <small>{errors.city}</small>}
         </div>
       </form>
+      <button
+        onClick={proceedToPayment}
+        className="proceed-payment-btn"
+        disabled={loading} // Disable button if loading
+      >
+        {loading ? "Processing..." : "Proceed to Payment"}
+      </button>
     </section>
   );
 };

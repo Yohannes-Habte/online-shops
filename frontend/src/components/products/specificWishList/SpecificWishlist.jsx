@@ -12,7 +12,7 @@ const SpecificWishlist = ({
   return (
     <section className="product-wishlist-wrapper">
       <h4 className="product-wishlist-aside-title">
-        Do you like this product?
+        Add this product to your wishlist
       </h4>
 
       <form className="single-product-size-selection-form">
@@ -23,6 +23,9 @@ const SpecificWishlist = ({
           onChange={(e) => setSelectedSize(e.target.value)} // Only update state
           className="select-size-field"
         >
+          <option value="" disabled>
+            Select Size
+          </option>
           {selectedVariant?.productSizes?.map((sizeObj, index) => (
             <option
               key={index}

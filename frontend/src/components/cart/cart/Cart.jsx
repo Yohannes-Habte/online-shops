@@ -1,6 +1,7 @@
 import "./Cart.scss";
 import { RxCross1 } from "react-icons/rx";
-import { IoBagHandleOutline } from "react-icons/io5";
+import { FaCartPlus } from "react-icons/fa";
+import { BsCartCheckFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SingleCart from "../singleCart/SingleCart";
@@ -61,16 +62,26 @@ const Cart = ({ setOpenCart }) => {
     dispatch(addToCart({ productId, productColor: color, size, qty }));
   };
 
+  // total quantity calculation
+  const totalCounts = cart?.reduce((acc, item) => acc + item.qty, 0);
+
   return (
-    <main className="cart">
-      <article className="cart-container">
+    <main className="cart-page">
+      <article className="cart-page-container">
         {cart && cart.length === 0 ? (
           <section className="empty-cart-wrapper">
             <RxCross1
               className="close-icon"
               onClick={() => setOpenCart(false)}
             />
-            <h2 className="empty-cart">Cart Items is empty!</h2>
+            <FaCartPlus className="shopping-cart-icon" />
+            <h2 className="empty-cart-text">
+              Your cart is currently empty. Start adding items to see them here!
+            </h2>
+
+            <Link to="/products">
+              <button className="empty-cart-btn">Shop Now</button>
+            </Link>
           </section>
         ) : (
           <>
@@ -80,17 +91,30 @@ const Cart = ({ setOpenCart }) => {
                 onClick={() => setOpenCart(false)}
               />
 
-              {/* Item count */}
-              <IoBagHandleOutline className="icon" />
-              <h5 className="subTitle">
-                {cart.length === 1
-                  ? `There is ${cart.length} item in the shopping cart`
-                  : `There are ${cart.length} items in the shopping cart`}
+              <BsCartCheckFill className="shopping-cart-icon" />
+
+              <h5 className="cart-item-count-wrapper">
+                {cart.length === 1 ? (
+                  <span className="cart-item-count">
+                    There is
+                    <strong className="total-count"> {cart.length} </strong>
+                    item with{" "}
+                    {totalCounts > 1
+                      ? ` ${totalCounts} quantities`
+                      : `${totalCounts} quantity`}{" "}
+                    in the shopping cart.
+                  </span>
+                ) : (
+                  <span className="cart-item-count">
+                    There are
+                    <strong className="total-count"> {cart.length} </strong>
+                    items and {totalCounts} quantities in the shopping cart.
+                  </span>
+                )}
               </h5>
 
               {/* Cart items */}
               <div className="single-cart-wrapper">
-            
                 {cart &&
                   cart.map((product) => {
                     const isEvent =

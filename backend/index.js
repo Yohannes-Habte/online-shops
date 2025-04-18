@@ -27,6 +27,7 @@ import brandRouter from "./routes/brandRoutes.js";
 import supplierRouter from "./routes/supplierRoutes.js";
 import subcategoryRouter from "./routes/subcategoryRoutes.js";
 import openaiRouter from "./routes/openaiChatRoutes.js";
+import transactionRouter from "./routes/transactionRoutes.js";
 
 // Express app
 
@@ -70,6 +71,7 @@ app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/transactions", transactionRouter);
 app.use("/api/v1/data", rowDataRouter);
 app.use("/api/v1/openai", openaiRouter);
 

@@ -342,81 +342,8 @@ export const getOrder = async (req, res, next) => {
           path: "orderedItems.shop",
           select: "name email phoneNumber shopAddress",
         },
-        {
-          path: "refundRequestInfo.product",
-          model: "Product",
-          select: "title discountPrice productImage",
-        },
-        {
-          path: "returnedItems.refundRequestIdLinked",
-          select: "refundRequestInfo product",
-          populate: {
-            path: "refundRequestInfo.product",
-            model: "Product",
-            select: "title discountPrice productImage",
-          },
-        },
       ])
       .lean();
-
-    if (!order) {
-      return next(createError(404, "Order not found!"));
-    }
-
-    res.status(200).json({
-      success: true,
-      order,
-    });
-  } catch (error) {
-    console.error(`Error fetching order: ${error.message}`);
-    next(
-      createError(500, "An unexpected error occurred. Please try again later.")
-    );
-  }
-};
-
-//=========================================================================
-// Get an order
-//=========================================================================
-
-export const shopOrder = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    // Validate ID format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(createError(400, "Invalid order ID format!"));
-    }
-
-    const order = await Order.findById(id)
-      .populate({
-        path: "customer",
-        select: "name email image",
-      })
-      .populate({
-        path: "orderedItems.product",
-        model: "Product",
-      })
-      .populate({
-        path: "orderedItems.category",
-        select: "categoryName",
-      })
-      .populate({
-        path: "orderedItems.subcategory",
-        select: "subcategoryName",
-      })
-      .populate({
-        path: "orderedItems.brand",
-        select: "brandName brandDescription",
-      })
-      .populate({
-        path: "orderedItems.supplier",
-        select: "supplierName supplierEmail, supplierPhone",
-      })
-      .populate({
-        path: "orderedItems.shop",
-        select: "name email,phoneNumber, shopAddress",
-      });
 
     if (!order) {
       return next(createError(404, "Order not found!"));
@@ -438,7 +365,7 @@ export const shopOrder = async (req, res, next) => {
 // Update order status for a shop
 //=========================================================================
 export const updateShopOrder = async (req, res, next) => {
-  const { orderStatus, tracking, cancellationReason, returnReason } = req.body;
+  const { orderStatus, tracking, cancellationReason } = req.body;
   const { id } = req.params;
   const shopId = req.shop.id;
 
@@ -532,7 +459,7 @@ export const updateShopOrder = async (req, res, next) => {
 
       // Calculate service fee, soldOut, transactions
       const grandTotal = order.grandTotal;
-      const shopCommission = calculateShopCommission(grandTotal); // None refundable
+      const shopCommission = calculateShopCommission(grandTotal); // Not refundable
       const shopBalance = grandTotal - shopCommission;
       const shopNetOrderAmount = parseFloat(shopBalance.toFixed(2));
 
@@ -543,14 +470,9 @@ export const updateShopOrder = async (req, res, next) => {
         seller.transactions = [];
       }
 
-      seller.transactions.push({
-        transactionId: new mongoose.Types.ObjectId(),
-        shop: seller._id,
-        order: order._id,
-        amount: shopNetOrderAmount,
-        currency: "USD",
-        method: "Bank Transfer",
-      });
+      // Add the transaction to the seller's transactions array
+
+      seller.transactions.push(order.transaction);
 
       seller.netShopIncome = (
         seller.netShopIncome + shopNetOrderAmount
@@ -618,16 +540,7 @@ export const updateShopOrder = async (req, res, next) => {
       }
     }
 
-    // 11. Handle the "Returned" status logic
-    if (orderStatus === "Returned") {
-      if (returnReason) {
-        order.returnReason = returnReason;
-      }
-      order.orderStatus = orderStatus;
-      addToStatusHistory(order, orderStatus);
-    }
-
-    // 12. Save the updated order and commit the transaction
+    // 11. Save the updated order and commit the transaction
     await order.save({ validateBeforeSave: false, session });
     await session.commitTransaction();
 
@@ -1126,23 +1039,8 @@ export const allShopOrders = async (req, res, next) => {
       .populate("payment.createdBy", "username email")
       .populate("payment.updatedBy", "username email")
       .populate("customer", "username email")
-      .populate({
-        path: "refundRequestInfo.product",
-        model: "Product",
-        select: "title discountPrice productImage",
-      })
-      .populate({
-        path: "returnedItems.refundRequestIdLinked",
-        model: "Order",
-        select: "refundRequestInfo",
-        populate: {
-          path: "refundRequestInfo.product",
-          model: "Product",
-          select: "title discountPrice productImage",
-        },
-      })
       .select(
-        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory refundRequestInfo returnedItems"
+        "orderedItems orderStatus shippingAddress subtotal grandTotal payment createdAt tracking statusHistory refundRequests returnedItems"
       )
       .sort({ createdAt: -1 })
       .lean();

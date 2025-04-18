@@ -1,63 +1,13 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
-// Mobile screen size
 .cart-checkout-wrapper {
-  width: 100%;
-  min-height: 100vh;
-
-  .shipping-and-cart-info-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-
-  .proceed-payment {
-    @include button3;
-    width: fit-content;
-    margin-top: 1rem;
-  }
-}
-
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .cart-checkout-wrapper {
-    width: 100%;
-    min-height: 100vh;
-
-    .shipping-and-cart-info-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 2rem;
-    }
-
-    .proceed-payment {
-      @include button3;
-      width: fit-content;
-      margin-top: 2rem;
-    }
-  }
-}
-
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {
-  .cart-checkout-wrapper {
-    width: 100%;
-    min-height: 100vh;
-
-    .shipping-and-cart-info-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 2rem;
-    }
-
-    .proceed-payment {
-      @include button3;
-      width: fit-content;
-      margin-top: 2rem;
-    }
-  }
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 16px;
 }

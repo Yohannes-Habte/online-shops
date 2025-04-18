@@ -516,15 +516,14 @@ const clearAllShopProducts = async () => {
 
 
 
-
 // ====================================================================
 // If You Need to Clear a Field:
 // ====================================================================
 const clearSpecificField = async () => {
   try {
-    const result = await User.updateMany(
+    const result = await Shop.updateMany(
       {}, // No filter: Applies to all documents
-      { $unset: { myOrders: "" } } 
+      { $unset: { netShopIncome: "" } }
     );
     console.log(result);
   } catch (err) {
@@ -533,6 +532,4 @@ const clearSpecificField = async () => {
 };
 
 // clearSpecificField();
-
-
 */

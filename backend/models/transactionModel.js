@@ -6,7 +6,7 @@ const shopTransactionSchema = new Schema(
   {
     transactionId: { type: String, unique: true, required: true },
 
-    shop: { type: String, required: true },
+    shop: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
 
     transactionType: {
       type: String,
@@ -19,7 +19,10 @@ const shopTransactionSchema = new Schema(
 
     platformFees: { type: Number, default: 0 },
 
-    // If "Refund or Withdrawal" is selected, show me withdrawal
+    // If "Refund" is selected, show me the refundRequest and withdrawal
+    refundRequest: { type: Schema.Types.ObjectId, ref: "RefundRequest" },
+
+    // If "Withdrawal" is selected, show me withdrawal
     withdrawal: { type: Schema.Types.ObjectId, ref: "Withdrawal" },
 
     // If "Adjustment" is selected, show me the adjustmentReason reason and adjustmentNotes
@@ -52,9 +55,11 @@ const shopTransactionSchema = new Schema(
 
     cancelledReason: { type: String, default: null },
 
+    processedDate: { type: Date, required: true },
+
     processedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-    processedAt: { type: Date, required: true },
+   
   },
   { timestamps: true }
 );

@@ -1,23 +1,77 @@
-@import '../../../styles/Variables.scss';
-@import '../../../styles/Mixins.scss';
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
 
 .order-success-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9f9f9;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
   .order-success-page-container {
-    width: $laptop;
-    margin: 1rem auto;
-    min-height: 100vh;
+    flex-grow: 1;
+    padding: 3rem 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+    max-height: fit-content;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    animation: fadeIn 0.6s ease-in-out;
+  }
 
-    .success-title {
-      @include title;
-    }
+  .order-success-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2e7d32;
+    margin-bottom: 1.5rem;
+  }
 
-    .welcome-back {
-      @include paragraph;
+  .welcome-back-message {
+    font-size: 1.125rem;
+    color: #444;
+    line-height: 1.8;
+    padding: 0 1rem;
+    text-align: justify;
+
+    .user-name {
+      color: #1976d2; // a calm blue
+      font-weight: 600;
     }
   }
-}
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {}
 
-/* Labtop screen size */
-@media screen and (min-width: 1024px) {}
+  .error-message {
+    margin: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .order-success-page-container {
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .order-success-title {
+    font-size: 2rem;
+  }
+
+  .welcome-back-message {
+    font-size: 1rem;
+  }
+}

@@ -18,6 +18,9 @@ const SingleProductAddToCart = ({
           onChange={(e) => setSelectedSize(e.target.value)} // Only update state
           className="select-size-field"
         >
+          <option value="" disabled>
+            Select Size
+          </option>
           {selectedVariant?.productSizes?.map((sizeObj, index) => (
             <option
               key={index}

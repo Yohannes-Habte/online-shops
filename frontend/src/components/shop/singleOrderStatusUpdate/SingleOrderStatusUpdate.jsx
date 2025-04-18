@@ -6,6 +6,7 @@ import {
   LucideTruck,
   LucidePackage,
 } from "lucide-react";
+import TransactionForm from "../../forms/transaction/TransactionForm";
 
 const SingleOrderStatusUpdate = ({
   updateOrderStatus,
@@ -26,6 +27,7 @@ const SingleOrderStatusUpdate = ({
   const [showTrackingInfo, setShowTrackingInfo] = useState(false);
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [showReturnReason, setShowReturnReason] = useState(false);
+  const [openTransaction, setOpenTransaction] = useState(false);
   const orderStatusArray = [
     "Pending",
     "Processing",
@@ -54,6 +56,10 @@ const SingleOrderStatusUpdate = ({
     setShowCancellationReason(false);
     setShowReturnReason(false);
   };
+
+
+
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     updateOrderStatus(e);
@@ -69,7 +75,17 @@ const SingleOrderStatusUpdate = ({
           <select
             name="status"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => {
+              const newStatus = e.target.value;
+              setStatus(newStatus);
+
+              // Trigger Transaction Form popup when "Delivered" is selected
+              if (newStatus === "Delivered") {
+                setOpenTransaction(true);
+              } else {
+                setOpenTransaction(false);
+              }
+            }}
             className="select-field"
           >
             {orderStatusArray.map((selectStatus) => (
@@ -180,6 +196,10 @@ const SingleOrderStatusUpdate = ({
           {processStatus ? "Updating..." : "Update Status"}
         </button>
       </form>
+
+      {openTransaction && status === "Delivered" && (
+        <TransactionForm setOpenTransaction={setOpenTransaction} order={order} />
+      )}
     </section>
   );
 };

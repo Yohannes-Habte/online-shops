@@ -67,9 +67,7 @@ const SingleProduct = () => {
       setSelectedImage(defaultVariant.productImage); // Set the default image
 
       // Set the first available size for the selected variant
-      if (defaultVariant.productSizes?.length > 0) {
-        setSelectedSize(defaultVariant.productSizes[0].size); // Set default size
-      }
+      setSelectedSize("");
 
       // Initialize variantToggles state to match the number of variants
       setVariantToggles(new Array(currentProduct.variants.length).fill(false));
@@ -151,6 +149,10 @@ const SingleProduct = () => {
         qty: 1,
         variant: { ...selectedVariant, size: selectedSize },
       };
+      if (!selectedSize) {
+        toast.error("Please select a size before adding to cart.");
+        return;
+      }
       dispatch(addToCart(cartData));
       toast.success("Item added to cart successfully!");
     }

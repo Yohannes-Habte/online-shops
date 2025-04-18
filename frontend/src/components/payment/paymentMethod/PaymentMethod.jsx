@@ -30,7 +30,7 @@ const PaymentMethod = () => {
 
   const paymentMethodConfig = {
     "Credit Card": { provider: "Stripe", status: "completed" },
-    "Debit Card": { provider: "Stripe", status: "completed" },
+    "Debit Card": { provider: "Bank Transfer", status: "completed" },
     PayPal: { provider: "PayPal", status: "completed" },
     "Cash On Delivery": { provider: undefined, status: "pending" },
   };
@@ -83,10 +83,13 @@ const PaymentMethod = () => {
       paymentStatus: status,
       transactionId: paymentId || undefined,
       currency: selectedCurrency || "USD",
-      amountPaid: orderData?.grandTotal,
+      amountPaid: orderData?.grandTotal?.toFixed(2),
       metadata: {
-        orderId: orderData?.orderId,
         userId: currentUser?._id,
+        orderDate: new Date().toISOString(),
+        shippingFee: orderData?.shippingFee,
+        tax: orderData?.tax,
+        discount: orderData?.discount,
       },
       createdBy: currentUser?._id,
     },
@@ -247,28 +250,26 @@ const PaymentMethod = () => {
   };
 
   return (
-    <section className="payment-methods-wrapper">
-      <div className="paymentInfo-cardData-wrapper">
-        <PaymentInfo
-          user={currentUser}
-          onApprove={onApprove}
-          createOrder={createOrder}
-          stripePaymentHandler={stripePaymentHandler}
-          cashOnDeliveryHandler={cashOnDeliveryHandler}
-          isProcessing={isProcessing}
-          setIsProcessing={setIsProcessing}
-          handleAPIError={handleAPIError}
-          currencyOptions={currencyOptions}
-          selectedCurrency={selectedCurrency}
-          setSelectedCurrency={setSelectedCurrency}
-          selectedPaymentMethod={selectedPaymentMethod}
-          setSelectedPaymentMethod={setSelectedPaymentMethod}
-          methodOptions={methodOptions}
-        />
+    <div className="payment-methods-wrapper">
+      <PaymentInfo
+        user={currentUser}
+        onApprove={onApprove}
+        createOrder={createOrder}
+        stripePaymentHandler={stripePaymentHandler}
+        cashOnDeliveryHandler={cashOnDeliveryHandler}
+        isProcessing={isProcessing}
+        setIsProcessing={setIsProcessing}
+        handleAPIError={handleAPIError}
+        currencyOptions={currencyOptions}
+        selectedCurrency={selectedCurrency}
+        setSelectedCurrency={setSelectedCurrency}
+        selectedPaymentMethod={selectedPaymentMethod}
+        setSelectedPaymentMethod={setSelectedPaymentMethod}
+        methodOptions={methodOptions}
+      />
 
-        <CartData orderData={orderData} />
-      </div>
-    </section>
+      <CartData orderData={orderData} />
+    </div>
   );
 };
 

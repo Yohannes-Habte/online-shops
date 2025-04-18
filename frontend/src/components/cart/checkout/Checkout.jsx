@@ -164,33 +164,25 @@ const Checkout = () => {
   const totalPrice = subTotal + shippingFee + tax - discount;
 
   return (
-    <section className="cart-checkout-wrapper">
-      <div className="shipping-and-cart-info-container">
-        <CartInfo
-          subTotal={subTotal}
-          shippingFee={shippingFee}
-          tax={tax}
-          discount={discount}
-          totalPrice={totalPrice}
-        />
+    <div className="cart-checkout-wrapper">
+      <Shipping
+        user={currentUser}
+        formData={formData}
+        setFormData={setFormData}
+        handleInputChange={handleInputChange}
+        errors={errors}
+        proceedToPayment={proceedToPayment}
+        loading={loading}
+      />
 
-        <Shipping
-          user={currentUser}
-          formData={formData}
-          setFormData={setFormData}
-          handleInputChange={handleInputChange}
-          errors={errors} // Pass validation errors to the Shipping component
-        />
-      </div>
-
-      <button
-        onClick={proceedToPayment}
-        className="proceed-payment"
-        disabled={loading} // Disable button if loading
-      >
-        {loading ? "Processing..." : "Proceed to Payment"}
-      </button>
-    </section>
+      <CartInfo
+        subTotal={subTotal}
+        shippingFee={shippingFee}
+        tax={tax}
+        discount={discount}
+        totalPrice={totalPrice}
+      />
+    </div>
   );
 };
 

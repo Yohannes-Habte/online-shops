@@ -77,7 +77,9 @@ const paymentSchema = new Schema(
       enum: ["pending", "completed", "refunded", "cancelled"],
       default: "pending",
     },
+
     transactionId: { type: String, unique: true, sparse: true }, // Transaction ID
+
     currency: {
       type: String,
       required: true,
@@ -86,8 +88,11 @@ const paymentSchema = new Schema(
       uppercase: true,
       required: true,
     },
+
     amountPaid: { type: Number, required: true },
+
     paymentDate: { type: Date, default: Date.now },
+
     refunds: [
       {
         returnedId: { type: Schema.Types.ObjectId, required: true }, // Links to returnedItems.returnRequestId
@@ -189,6 +194,8 @@ const orderSchema = new Schema(
       trackingNumber: { type: String, default: null },
       estimatedDeliveryDate: { type: Date, default: null },
     },
+
+    transaction: { type: Schema.Types.ObjectId, ref: "Transaction" },
 
     refundRequests: [{ type: Schema.Types.ObjectId, ref: "RefundRequest" }],
 

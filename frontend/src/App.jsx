@@ -68,25 +68,25 @@ const App = () => {
     dispatch(fetchSingleSeller());
   }, [dispatch]);
 
-  const [stripeApikey, setStripeApiKey] = useState("");
+  const [stripeApiKey, setStripeApiKey] = useState("");
 
-  const getStripeApikey = async () => {
+  const fetchStripeApiKey = async () => {
     try {
-      const { data } = await axios.get(`${API}/payment/stripeapikey`);
-      setStripeApiKey(data.stripeApikey);
+      const { data } = await axios.get(`${API}/payment/stripeApiKey`);
+      setStripeApiKey(data.stripeApiKey);
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
 
   useEffect(() => {
-    getStripeApikey();
+    fetchStripeApiKey();
   });
 
   return (
     <div>
-      {stripeApikey && (
-        <Elements stripe={loadStripe(stripeApikey)}>
+      {stripeApiKey && (
+        <Elements stripe={loadStripe(stripeApiKey)}>
           <Routes>
             <Route
               path="/payment"

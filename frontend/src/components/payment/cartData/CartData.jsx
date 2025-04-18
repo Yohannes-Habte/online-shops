@@ -2,7 +2,7 @@ import "./CartData.scss";
 
 const CartData = ({ orderData }) => {
   return (
-    <section className="cart-data-wrapper">
+    <aide className="cart-data-wrapper">
       <article className="box subtotal-price">
         <h3 className="cart-data-subTitle">Total Items Price:</h3>
         <p className="cart-data-paragraph">
@@ -29,11 +29,11 @@ const CartData = ({ orderData }) => {
           ${orderData ? orderData?.discount?.toFixed(2) : 0}
         </p>
       </article>
-      <hr />
+      <hr className="horizontal-line" />
       <h2 className="cart-data-total-price">
         ${orderData?.grandTotal?.toFixed(2)}
       </h2>
-    </section>
+    </aide>
   );
 };
 

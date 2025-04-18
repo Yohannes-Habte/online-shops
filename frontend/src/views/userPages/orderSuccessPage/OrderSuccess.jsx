@@ -1,9 +1,7 @@
-
-import './OrderSuccess.scss';
-import { useSelector } from 'react-redux';
-import Header from '../../../components/layouts/header/Header';
-import Footer from '../../../components/layouts/footer/Footer';
-import Loader from '../../../components/loader/Loader';
+import "./OrderSuccess.scss";
+import { useSelector } from "react-redux";
+import Header from "../../../components/layouts/header/Header";
+import Loader from "../../../components/loader/Loader";
 
 const OrderSuccess = () => {
   // Global state variables
@@ -13,22 +11,22 @@ const OrderSuccess = () => {
     <main className="order-success-page">
       <Header />
       {loading ? (
-        <Loader isLoading={loading} message='' size={90} />
+        <Loader isLoading={loading} message="" size={90} />
       ) : error ? (
-        <p>{error} </p>
+        <p className="error-message">{error} </p>
       ) : (
         <section className="order-success-page-container">
-          <h2 className="success-title">Successful Order 😍</h2>
-          <p className="welcome-back">
-            Hello <strong>{currentUser.name}</strong> your order is successful.
-            We will inform you in good time about the delivery of your order.
-            You are always welcome to Lisa Shopping! We are always ready to
-            serve you according to your wishes, wish fulfils your desire.
+          <h2 className="order-success-title">Successful Order 😍</h2>
+          <p className="welcome-back-message">
+            Hello <strong className="user-name">{currentUser.name}</strong>,
+            your order has been successfully placed. We will notify you promptly
+            with updates regarding your delivery. Thank you for shopping with
+            Lisa Shopping — we are always here to serve you and ensure your
+            experience is seamless and satisfying.
           </p>
         </section>
       )}
 
-      <Footer />
     </main>
   );
 };

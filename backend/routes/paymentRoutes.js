@@ -7,7 +7,7 @@ const paymentRouter = express.Router();
 
 // Payment routes
 paymentRouter.post("/stripe", isAuthenticated, postStripe);
-paymentRouter.get("/stripeapikey", getStripe);
+paymentRouter.get("/stripeApiKey", getStripe);
 paymentRouter.post("/cash-on-delivery");
 
 // Export payment router
