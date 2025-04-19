@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-// Subschema for bank transfer details
+// Sub schema for bank transfer details
 const bankDetailsSchema = new Schema(
   {
     accountHolderName: { type: String, required: true },
@@ -10,13 +10,12 @@ const bankDetailsSchema = new Schema(
     bankName: { type: String, required: true },
     bankBranch: { type: String, required: true },
     bankAddress: { type: String, required: true },
+    bankZipCode: { type: String, required: true },
     bankCity: { type: String, required: true },
     bankState: { type: String, required: true },
-    bankZipCode: { type: String, required: true },
     bankCountry: { type: String, required: true },
 
-    swiftCode: { type: String }, // International (required for most cross-border wires)
-    BIC: { type: String }, // Optional alternative to SWIFT (sometimes interchangeable)
+    swiftCode: { type: String }, // SWIFT/BIC code for international transfers
     IBAN: { type: String }, // Europe, Middle East, parts of Asia & Latin America
 
     // Flexible region-specific codes
@@ -29,34 +28,12 @@ const bankDetailsSchema = new Schema(
   { _id: false }
 );
 
-// Crypto refund details
+// Sub Schema for Crypto refund details
 const cryptoDetailsSchema = new Schema(
   {
-    network: {
-      type: String,
-      required: true,
-      enum: [
-        "Bitcoin",
-        "Ethereum",
-        "Polygon",
-        "Solana",
-        "Binance Smart Chain",
-        "Other",
-      ],
-    },
-    token: {
-      type: String,
-      required: true,
-      description: "Token symbol like BTC, ETH, USDT, etc.",
-    },
-    walletAddress: {
-      type: String,
-      required: true,
-    },
-    tagOrMemo: {
-      type: String,
-      description: "Optional tag/memo for networks like XRP or BNB",
-    },
+    network: { type: String, required: true },
+    token: { type: String, required: true },
+    walletAddress: { type: String, required: true },
   },
   { _id: false }
 );
@@ -89,13 +66,7 @@ const refundRequestSchema = new Schema(
     // Internal use only
     requestedRefundAmount: { type: Number, required: true },
 
-    currency: {
-      type: String,
-      required: true,
-      enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
-      default: "USD",
-      uppercase: true,
-    },
+    currency: { type: String, required: true },
 
     method: {
       type: String,
@@ -109,10 +80,10 @@ const refundRequestSchema = new Schema(
     // Show me email if and Only if "PayPal or Stripe" is selected
     email: { type: String }, // for PayPal / Stripe
 
-    cryptoDetails: { type: cryptoDetailsSchema }, // for Crypto
-
     // Show me chequeRecipient if and Only if "Cheque" is selected
     chequeRecipient: { type: String },
+
+    cryptoDetails: { type: cryptoDetailsSchema }, // for Crypto
 
     notes: { type: String, required: true },
 

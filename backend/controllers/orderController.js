@@ -628,7 +628,7 @@ export const refundUserOrderRequest = async (req, res, next) => {
     }
 
     // Prevent duplicate refund requests
-    const existingRefundRequest = order.refundRequestInfo?.find(
+    const existingRefundRequest = order.refundRequests?.find(
       (refund) =>
         refund.product.toString() === productId.toString() &&
         refund.requestedItemColor.trim().toLowerCase() ===
@@ -692,7 +692,7 @@ export const refundUserOrderRequest = async (req, res, next) => {
     });
 
     // Add refund request details
-    order.refundRequestInfo.push({
+    order.refundRequests.push({
       refundRequestId: new mongoose.Types.ObjectId(),
       product: productId,
       requestedItemColor: productColor,

@@ -1,0 +1,137 @@
+// FormFields.scss
+
+$form-color: #333;
+$form-error-color: #e74c3c;
+$form-border: #ccc;
+$form-focus-border: #3498db;
+$form-label-color: #777;
+$form-placeholder-color: #aaa;
+$form-background: #fff;
+$form-icon-color: #3b2cc4;
+$form-border-radius: 6px;
+
+@mixin transition($props...) {
+  transition: $props;
+  -webkit-transition: $props;
+  -moz-transition: $props;
+  -o-transition: $props;
+}
+
+.form-input-container,
+.form-select-container,
+.form-textarea-container,
+.form-checkbox-container,
+.form-date-container,
+.form-password-input-container,
+.form-file-upload-container,
+.form-radio-container,
+.form-radio-group-container {
+  position: relative;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.form-input-label {
+  font-size: 0.95rem;
+  color: $form-label-color;
+  background: $form-background;
+  padding: 0 5px;
+  pointer-events: none;
+  @include transition(all 0.3s ease);
+  z-index: 1;
+}
+
+.input-with-icon-wrapper,
+.select-with-icon-wrapper,
+.password-input-with-icon-wrapper,
+.file-upload-with-icon-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.textarea-with-icon-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.form-input-icon {
+  color: $form-icon-color;
+  pointer-events: none;
+  padding: 18px 14px;
+  background-color: rgb(201, 187, 187);
+  border-radius: $form-border-radius 0 0 $form-border-radius;
+}
+
+.form-input-icon,
+.form-textarea-icon {
+  color: $form-icon-color;
+  pointer-events: none;
+  padding: 18px 14px;
+  background-color: rgb(201, 187, 187);
+  border-radius: $form-border-radius 0 0 $form-border-radius;
+}
+
+.form-input-field,
+.form-select-field,
+.form-textarea-input-field,
+.form-file-upload-input-field {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 1px solid $form-border;
+  border-radius: 0 $form-border-radius $form-border-radius 0;
+  background-color: $form-background;
+  color: $form-color;
+  outline: none;
+  @include transition(all 0.2s ease);
+}
+
+.form-error-message {
+  font-size: 0.8rem;
+  color: $form-error-color;
+  margin-top: 5px;
+}
+
+.checkbox-wrapper,
+.radio-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-input,
+.form-radio-input-field {
+  cursor: pointer;
+}
+
+.form-checkbox-label,
+.form-radio-label {
+  cursor: pointer;
+}
+
+.password-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $form-icon-color;
+  padding: 0 10px;
+  font-size: 0.9rem;
+}
+
+.file-upload-placeholder {
+  margin-left: 10px;
+  font-size: 0.85rem;
+  color: $form-placeholder-color;
+}
+
+.radio-group-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

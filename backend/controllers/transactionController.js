@@ -4,9 +4,6 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import Order from "../models/orderModel.js";
 
-const calculateShopCommission = (grandTotal) =>
-  parseFloat((grandTotal * 0.01).toFixed(2));
-
 export const createTransaction = async (req, res, next) => {
   const {
     shop,
@@ -90,24 +87,8 @@ export const createTransaction = async (req, res, next) => {
     };
 
     if (transactionType === "Payout") {
-      // Calculate commission
-      const orderDetails = await Order.findById(order).session(session);
-      if (!orderDetails) {
-        await session.abortTransaction();
-        return next(createError(404, "Order not found"));
-      }
-      const grandTotal = orderDetails.grandTotal;
-      const commission = calculateShopCommission(grandTotal);
-
-      if (!commission !== platformFees) {
-        await session.abortTransaction();
-        return next(
-          createError(400, "Platform fees do not match the commission")
-        );
-      }
-
       transactionObject.order = order;
-      transactionObject.platformFees = commission;
+      transactionObject.platformFees = platformFees;
     } else if (transactionType === "Refund") {
       transactionObject.refundRequest = refundRequest;
       transactionObject.withdrawal = withdrawal;

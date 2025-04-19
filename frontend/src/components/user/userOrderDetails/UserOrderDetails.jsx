@@ -9,8 +9,7 @@ import UserSingleOrderItems from "../userSingleOrderItems/UserSingleOrderItems";
 import UserSingleOrderItemReview from "../userSingleOrderItemReview/UserSingleOrderItemReview";
 import UserSingleOrderSummary from "../userSingleOrderSummary/UserSingleOrderSummary";
 import UserSingleOrderRefundInfo from "../userSingleOrderRefundInfo/UserSingleOrderRefundInfo";
-import UserSingleOrderRefundRequest from "../userSingleOrderRefundRequest/UserSingleOrderRefundRequest";
-import UserSingleOrderRefundForm from "../userSingleOrderRefundForm/UserSingleOrderRefund";
+import RefundRequestForm from "../../forms/refund/RefundRequestForm";
 
 const initialState = {
   comment: "",
@@ -20,7 +19,6 @@ const initialState = {
 const UserOrderDetails = () => {
   const { id } = useParams();
   const { currentUser } = useSelector((state) => state.user);
-
   const [orderInfos, setOrderInfos] = useState(null);
   const [ratings, setRatings] = useState(initialState);
   const [open, setOpen] = useState(false);
@@ -123,14 +121,14 @@ const UserOrderDetails = () => {
         currentUser={currentUser}
       />
       <div id="refund-request-form-section">
-        <UserSingleOrderRefundForm
+        <RefundRequestForm
           orderInfos={orderInfos}
           setOrderInfos={setOrderInfos}
           selectedProduct={selectedProduct}
         />
       </div>
 
-      <UserSingleOrderRefundRequest order={orderInfos} />
+    
 
       <UserSingleOrderRefundInfo order={orderInfos} />
     </section>
