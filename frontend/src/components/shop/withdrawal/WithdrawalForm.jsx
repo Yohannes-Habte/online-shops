@@ -130,7 +130,7 @@ const WithdrawalForm = ({ order, productId, refundTransactionId }) => {
       ...prev,
       product: productId,
       refundTransactionId: refundTransactionId,
-      order: order._id,
+      order: order?._id,
     }));
   }, [productId, refundTransactionId]);
 

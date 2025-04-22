@@ -8,6 +8,8 @@ const refundRequestSchema = new Schema(
     // This was returnedId in the original code
     returnRequestId: { type: String, unique: true, required: true },
 
+    order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
+
     // This was refundRequestIdLinked in the original code
     refundRequest: {
       type: Schema.Types.ObjectId,
@@ -27,18 +29,20 @@ const refundRequestSchema = new Schema(
       required: true,
     },
 
-    comments: { type: String, required: true },
+    refundStatus: {
+      type: String,
+      enum: ["Accepted", "Rejected"],
+      required: true,
+    },
 
     refundAmount: { type: Number, required: true },
 
+    comments: { type: String, required: true },
+
     processedDate: { type: Date, required: true, required: true },
 
-    refundStatus: {
-      type: String,
-      enum: ["Pending", "Processing", "Accepted", "Rejected"],
-      default: "Pending",
-      required: true,
-    },
+    rejectedReason: { type: String, default: null },
+
     processedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }

@@ -7,7 +7,6 @@ import { API } from "../../../utils/security/secreteKey";
 import SingleOrderSummary from "../singleOrderSummary/SingleOrderSummary";
 import SingleOrderItems from "../singleOrderItems/SingleOrderItems";
 import SingleOrderStatusUpdate from "../singleOrderStatusUpdate/SingleOrderStatusUpdate";
-import SingleOrderRefundForm from "../singleOrderRefundForm/SingleOrderRefundForm";
 import SingleOrderRefundRequest from "../singleOrderRefundRequest/SingleOrderRefundRequest";
 import SingleOrderRefunded from "../singleOrderRefunded/SingleOrderRefunded";
 import WithdrawalForm from "../withdrawal/WithdrawalForm";
@@ -26,7 +25,7 @@ const ShopOrderDetails = () => {
     trackingNumber: "",
     estimatedDeliveryDate: null,
   });
-  const [selectedRefundRequestId, setSelectedRefundRequestId] = useState(null);
+ 
   const [productId, setProductId] = useState(null);
   const [refundTransactionId, setRefundTransactionId] = useState(null);
 
@@ -205,6 +204,7 @@ const ShopOrderDetails = () => {
 
   if (loading) return <p>Loading order details...</p>;
   if (error) return <p className="error">{error}</p>;
+  
 
   return (
     <section className="shop-order-details-information-container">
@@ -264,14 +264,7 @@ const ShopOrderDetails = () => {
 
       <SingleOrderRefundRequest
         order={order}
-        setSelectedRefundRequestId={setSelectedRefundRequestId}
         setProductId={setProductId}
-      />
-
-      <SingleOrderRefundForm
-        order={order}
-        status={status}
-        selectedRefundRequestId={selectedRefundRequestId}
       />
 
       <SingleOrderRefunded

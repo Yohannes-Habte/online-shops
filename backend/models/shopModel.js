@@ -43,8 +43,6 @@ const shopSchema = new Schema(
 
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
 
-    availableBalance: [],
-
     netShopIncome: { type: Number, default: 0 },
 
     passwordResetToken: { type: String },

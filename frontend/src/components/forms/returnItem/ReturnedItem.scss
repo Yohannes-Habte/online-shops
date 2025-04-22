@@ -1,0 +1,118 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.returned-item-form-modal-wrapper {
+  @include modal;
+}
+
+.returned-item-form-container {
+  @include popupBox;
+  padding: 2rem;
+
+  .close-return-item-form-modal {
+    @include closeModal;
+  }
+}
+
+.returned-item-form-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.returned-item-form-success {
+  background-color: #e6f9ec;
+  color: #2e7d32;
+  border: 1px solid #c2e4c9;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.form-error-message {
+  color: #d32f2f;
+  background-color: #fdecea;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.returned-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-radio-group-container {
+  display: flex;
+  flex-direction: column;
+
+  .form-radio-title {
+    font-weight: 500;
+    color: #555;
+    margin-left: 0.3rem;
+  }
+  .form-radio-group-options-with-icon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .return-form-radio-icon {
+      color: #3b2cc4;
+      pointer-events: none;
+      padding: 18px 14px;
+      background-color: #e2e8f0;
+      border-radius: 6px 0 0 6px;
+    }
+  }
+
+  .form-radio-group-options {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0 6px 6px 0;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+  }
+}
+
+.returned-item-form-fields-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.return-item-form-btn {
+  padding: 0.85rem 1.5rem;
+  background-color: #0077cc;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  align-self: flex-start;
+
+  &:hover:not(:disabled) {
+    background-color: #005fa3;
+  }
+
+  &:disabled {
+    background-color: #b3d4f3;
+    cursor: not-allowed;
+  }
+}

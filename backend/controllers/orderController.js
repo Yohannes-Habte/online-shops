@@ -342,6 +342,10 @@ export const getOrder = async (req, res, next) => {
           path: "orderedItems.shop",
           select: "name email phoneNumber shopAddress",
         },
+        {
+          path: "refundRequests",
+          model: "RefundRequest",
+        }
       ])
       .lean();
 
@@ -810,7 +814,7 @@ export const orderRefundByShop = async (req, res, next) => {
       );
     }
 
-    //
+    
     const validOrderStatuses = [
       "Pending",
       "Processing",
@@ -830,7 +834,7 @@ export const orderRefundByShop = async (req, res, next) => {
     }
 
     // Ensure the requested refund exists in the refundRequestInfo array
-    const existingRefund = order.refundRequestInfo.find(
+    const existingRefund = order.refundRequests.find(
       (refund) => String(refund.refundRequestId) === refundRequestIdLinked
     );
     if (!existingRefund) {

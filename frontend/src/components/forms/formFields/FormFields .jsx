@@ -329,8 +329,10 @@ export const RadioField = ({
   checked,
   onChange,
   errors,
+  icon = null,
 }) => (
   <div className="form-radio-container">
+    {icon && <span className="form-input-icon">{icon}</span>}
     <div className="radio-wrapper">
       <input
         type="radio"
@@ -339,7 +341,9 @@ export const RadioField = ({
         value={value}
         checked={checked}
         onChange={onChange}
-        className={`form-radio-input-field  ${errors[name] ? "form-input-error" : ""}`} // Conditionally add error class
+        className={`form-radio-input-field  ${
+          errors[name] ? "form-input-error" : ""
+        }`} // Conditionally add error class
         aria-labelledby={`${name}-${value}-label`} // Associate the radio button with the label
         aria-describedby={`${name}-error`} // Link to error message (if any)
       />
@@ -385,7 +389,9 @@ export const RadioGroupField = ({
             value={option.value}
             checked={value === option.value}
             onChange={onChange}
-            className={`form-radio-input-field ${errors[name] ? "input-error" : ""}`}
+            className={`form-radio-input-field ${
+              errors[name] ? "input-error" : ""
+            }`}
             aria-labelledby={`${name}-label`}
             aria-describedby={`${name}-${option.value}-error`} // Link error message
           />

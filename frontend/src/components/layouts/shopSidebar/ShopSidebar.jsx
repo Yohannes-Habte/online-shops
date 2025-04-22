@@ -213,18 +213,33 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
-        {/*  Shop Inbox*/}
+        {/* Refund Requests */}
         <aside
-          onClick={() => setIsActive(11) || setOpenAdminDashboardMenu(false)}
+          onClick={() => setIsActive(18) || setOpenAdminDashboardMenu(false)}
           className="shop-dashboard-sidebar-item"
         >
           <MdOutlineMessage
-            title="Add Video"
-            className={isActive === 11 ? "active-icon" : "passive-icon"}
+            title="Refund Requests"
+            className={isActive === 18 ? "active-icon" : "passive-icon"}
           />
 
-          <h4 className={isActive === 11 ? "active-text" : "passive-text"}>
-            Shop Inbox
+          <h4 className={isActive === 18 ? "active-text" : "passive-text"}>
+            Refund Requests
+          </h4>
+        </aside>
+
+        {/*  Returned Items */}
+        <aside
+          onClick={() => setIsActive(21) || setOpenAdminDashboardMenu(false)}
+          className="shop-dashboard-sidebar-item"
+        >
+          <MdOutlineMessage
+            title="Returned Items"
+            className={isActive === 21 ? "active-icon" : "passive-icon"}
+          />
+
+          <h4 className={isActive === 21 ? "active-text" : "passive-text"}>
+            Returned Items
           </h4>
         </aside>
 
@@ -240,6 +255,21 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
 
           <h4 className={isActive === 12 ? "active-text" : "passive-text"}>
             Refunds
+          </h4>
+        </aside>
+
+        {/*  Shop Inbox*/}
+        <aside
+          onClick={() => setIsActive(11) || setOpenAdminDashboardMenu(false)}
+          className="shop-dashboard-sidebar-item"
+        >
+          <MdOutlineMessage
+            title="Add Video"
+            className={isActive === 11 ? "active-icon" : "passive-icon"}
+          />
+
+          <h4 className={isActive === 11 ? "active-text" : "passive-text"}>
+            Shop Inbox
           </h4>
         </aside>
 

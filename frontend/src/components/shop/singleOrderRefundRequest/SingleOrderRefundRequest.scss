@@ -2,58 +2,138 @@
 @import "../../../styles/Mixins.scss";
 
 .shop-order-refund-request-container {
-  @include shadow1;
-  background-color: #ffd6ff;
-  padding: 1rem 1.5rem;
+  padding: 2rem;
+  background-color: #fafafa;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
-  .shop-order-refund-request-title {
-    @include subTitle;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.shop-order-refund-request-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  color: #1f2937; // dark gray
+  margin-bottom: 1.5rem;
+}
+
+.shop-order-refund-request-details-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.shop-order-refund-request-infos {
+  position: relative;;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.return-single-refund-btn {
+  position: absolute;
+  bottom: -2rem;
+  right: 2rem;
+  background-color: #f3a5ed;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #ec54d8;
+    cursor: pointer;
+  }
+}
+
+.shop-order-refund-request-info-left,
+.shop-order-refund-request-info-right {
+  flex: 1;
+  min-width: 250px;
+}
+
+.refund-request-info {
+  margin-bottom: 0.75rem;
+  color: #374151; // slate
+  font-size: 0.95rem;
+
+  strong {
+    color: #111827; // black-ish
+    font-weight: 600;
   }
 
-  .shop-order-refund-request-details-wrapper {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  &:hover {
+    cursor: pointer;
+    color: #2563eb; // blue-600
+  }
+}
 
-    .shop-order-refund-request-infos {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: 1rem;
+.user-order-refund-request-info-title {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  color: #111827;
+  font-weight: 600;
+}
 
-      .shop-order-refund-request-info-left,
-      .shop-order-refund-request-info-right {
-        .refund-request-info {
-          .request-on-for {
-            font-weight: bold;
-            color: blue;
-          }
-        }
+.user-order-refund-request-reason-paragraph {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-left: 4px solid #60a5fa; // blue-400
+  border-radius: 0.5rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+  color: #374151;
+}
 
-        .refund-request-info {
-          margin: 0.5rem 0;
-          font-size: 0.8rem;
-          color: #333333;
-          line-height: 1.5;
-        }
-      }
+.bank-transfer-details {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f1f5f9;
+  border-left: 4px solid #22c55e; // green-500
+  border-radius: 0.75rem;
+}
+
+.bank-details-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #065f46; // green-900
+  margin-bottom: 1rem;
+}
+
+.bank-details-list {
+  list-style: none;
+  padding: 0;
+
+  .bank-details-list-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #1e293b; // dark slate
+
+    .list-item-strong {
+      font-weight: 600;
+      color: gray;
     }
+  }
+}
 
-    .shop-order-refund-request-info-title {
-      @include subTitle;
-      margin-top: 1rem;
-    }
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .shop-order-refund-request-infos {
+    flex-direction: column;
+  }
 
-    .shop-order-refund-request-reason-paragraph {
-      @include paragraph;
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #333333;
-      margin-top: 0.5rem;
-    }
+  .shop-order-refund-request-info-left,
+  .shop-order-refund-request-info-right {
+    width: 100%;
   }
 }

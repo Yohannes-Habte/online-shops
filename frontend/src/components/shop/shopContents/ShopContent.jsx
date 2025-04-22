@@ -13,6 +13,7 @@ import Subcategory from "../subcategory/Subcategory";
 import DashboardOverview from "../dashboardOverview/DashboardOverview";
 import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage";
 import Transactions from "../transactions/Transactions";
+import ReturnItems from "../returnItems/ReturnItems";
 
 const ShopContent = ({ isActive, setIsActive }) => {
   return (
@@ -37,9 +38,11 @@ const ShopContent = ({ isActive, setIsActive }) => {
 
       {isActive === 10 && <Transactions />}
 
-      {isActive === 11 && <ShopInboxPage />}
+      {isActive === 21 && <ReturnItems />}
 
       {isActive === 12 && <ShopRefunds setIsActive={setIsActive} />}
+      
+      {isActive === 11 && <ShopInboxPage />}
 
       {isActive === 13 && <Supplier />}
 

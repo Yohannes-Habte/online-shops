@@ -9,6 +9,7 @@ $form-placeholder-color: #aaa;
 $form-background: #fff;
 $form-icon-color: #3b2cc4;
 $form-border-radius: 6px;
+$form-icon-bg-color: #e2e8f0;
 
 @mixin transition($props...) {
   transition: $props;
@@ -58,7 +59,7 @@ $form-border-radius: 6px;
   color: $form-icon-color;
   pointer-events: none;
   padding: 18px 14px;
-  background-color: rgb(201, 187, 187);
+  background-color: $form-icon-bg-color;
   border-radius: $form-border-radius 0 0 $form-border-radius;
 }
 
@@ -67,7 +68,7 @@ $form-border-radius: 6px;
   color: $form-icon-color;
   pointer-events: none;
   padding: 18px 14px;
-  background-color: rgb(201, 187, 187);
+  background-color: $form-icon-bg-color;
   border-radius: $form-border-radius 0 0 $form-border-radius;
 }
 
@@ -102,6 +103,8 @@ $form-border-radius: 6px;
 .checkbox-input,
 .form-radio-input-field {
   cursor: pointer;
+  width: 20px;
+  height: 20px;
 }
 
 .form-checkbox-label,

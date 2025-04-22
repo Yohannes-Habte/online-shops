@@ -29,6 +29,7 @@ import subcategoryRouter from "./routes/subcategoryRoutes.js";
 import openaiRouter from "./routes/openaiChatRoutes.js";
 import transactionRouter from "./routes/transactionRoutes.js";
 import refundRequestRouter from "./routes/refundRequestRoutes.js";
+import returnedItemsRouter from "./routes/returnedItemRoutes.js";
 
 // Express app
 
@@ -67,6 +68,7 @@ app.use("/api/v1/products", productRouter);
 app.use("/api/v1/coupons", couponRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/refunds", refundRequestRouter);
+app.use("/api/v1/returns", returnedItemsRouter);
 app.use("/api/v1/withdrawals", withdrawRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/messages", messageRouter);
