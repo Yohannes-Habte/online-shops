@@ -35,6 +35,8 @@ const shopSchema = new Schema(
 
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
 
+    shippings: [{ type: Schema.Types.ObjectId, ref: "Shipping" }],
+
     refundRequests: [{ type: Schema.Types.ObjectId, ref: "RefundRequest" }],
 
     returnedItems: [{ type: Schema.Types.ObjectId, ref: "ReturnRequest" }],

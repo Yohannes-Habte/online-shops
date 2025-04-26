@@ -258,6 +258,21 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           </h4>
         </aside>
 
+         {/* Withdrawal */}
+         <aside
+          onClick={() => setIsActive(22) || setOpenAdminDashboardMenu(false)}
+          className="shop-dashboard-sidebar-item"
+        >
+          <RiRefundFill
+            title="Withdrawals"
+            className={isActive === 22 ? "active-icon" : "passive-icon"}
+          />
+
+          <h4 className={isActive === 22 ? "active-text" : "passive-text"}>
+            Withdrawals
+          </h4>
+        </aside>
+
         {/*  Shop Inbox*/}
         <aside
           onClick={() => setIsActive(11) || setOpenAdminDashboardMenu(false)}

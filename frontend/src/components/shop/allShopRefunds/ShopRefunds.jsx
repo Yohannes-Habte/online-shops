@@ -27,54 +27,64 @@ const ShopRefunds = () => {
 
   const columns = [
     {
-      field: "createdAt",
-      headerName: "Ordered Date",
+      field: "processedDate",
+      headerName: "Processed Date",
       minWidth: 180,
       flex: 0.8,
       valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
       cellClassName: "left-center",
     },
     {
-      field: "quantity",
-      headerName: "Total Items",
+      field: "withdrawalPurpose",
+      headerName: "Withdrawal Purpose",
       minWidth: 150,
       flex: 0.6,
       cellClassName: "left-center",
     },
     {
-      field: "grandTotal",
-      headerName: "Total Amount",
+      field: "supplier",
+      headerName: "Supplier",
       minWidth: 150,
       flex: 0.8,
-      renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
       cellClassName: "left-center",
     },
     {
-      field: "provider",
-      headerName: "Payment Provider",
+      field: "refundRequest",
+      headerName: "Refund Request",
       minWidth: 180,
       flex: 0.8,
       cellClassName: "left-center",
     },
+
+    {
+      field: "returnRequest",
+      headerName: "Return Status",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+
+    {
+      field: "amount",
+      headerName: "Amount",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+
+    {
+      field: "currency",
+      headerName: "",
+      minWidth: 70,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+
     {
       field: "method",
       headerName: "Payment Method",
       minWidth: 180,
       flex: 0.8,
-      cellClassName: "left-center",
-    },
-    {
-      field: "paymentStatus",
-      headerName: "Payment Status",
-      minWidth: 150,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
-    {
-      field: "orderStatus",
-      headerName: "Order Status",
-      minWidth: 140,
-      flex: 0.7,
       cellClassName: "left-center",
     },
 
@@ -147,8 +157,6 @@ const ShopRefunds = () => {
           disableRowSelectionOnClick
         />
       )}
-
-    
     </section>
   );
 };

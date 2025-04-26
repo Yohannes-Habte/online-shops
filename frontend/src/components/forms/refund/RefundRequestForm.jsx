@@ -9,7 +9,7 @@ import {
   InputField,
   SelectField,
   TextAreaField,
-} from "../formFields/FormFields ";
+} from "../formFields/FormFields";
 import {
   FaRegBuilding,
   FaCreditCard,

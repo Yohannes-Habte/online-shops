@@ -138,6 +138,9 @@ const orderSchema = new Schema(
         return this.orderedItems.reduce((sum, item) => sum + item.quantity, 0);
       },
     },
+
+    shipping: { type: mongoose.Schema.Types.ObjectId, ref: "Shipment" },
+
     shippingAddress: { type: shippingAddressSchema, required: true },
     payment: { type: paymentSchema },
     subtotal: { type: Number, required: true, min: 0 }, // Total price of ordered items before tax, shipping, and service fees

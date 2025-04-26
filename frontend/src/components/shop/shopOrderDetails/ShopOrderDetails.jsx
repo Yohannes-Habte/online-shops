@@ -8,8 +8,8 @@ import SingleOrderSummary from "../singleOrderSummary/SingleOrderSummary";
 import SingleOrderItems from "../singleOrderItems/SingleOrderItems";
 import SingleOrderStatusUpdate from "../singleOrderStatusUpdate/SingleOrderStatusUpdate";
 import SingleOrderRefundRequest from "../singleOrderRefundRequest/SingleOrderRefundRequest";
-import SingleOrderRefunded from "../singleOrderRefunded/SingleOrderRefunded";
 import WithdrawalForm from "../withdrawal/WithdrawalForm";
+import SingleOrderReturnInfo from "../singleOrderRefunded/SingleOrderReturnInfo";
 
 const ShopOrderDetails = () => {
   const { id } = useParams();
@@ -120,7 +120,7 @@ const ShopOrderDetails = () => {
   // =========================================================================
   // Generate tracking number only when necessary
   // =========================================================================
-  const generateTrackingNumber = () => {
+  const generateProcessingCode = () => {
     return `TRK-${Date.now().toString(36).toUpperCase()}-${Math.random()
       .toString(36)
       .substring(2, 8)
@@ -161,7 +161,7 @@ const ShopOrderDetails = () => {
     if (status === "Processing") {
       updateData.tracking = {
         carrier: tracking.carrier,
-        trackingNumber: tracking.trackingNumber || generateTrackingNumber(),
+        trackingNumber: tracking.trackingNumber || generateProcessingCode(),
         estimatedDeliveryDate: getEstimatedDeliveryDate(),
       };
     }
@@ -234,7 +234,7 @@ const ShopOrderDetails = () => {
         tracking={tracking}
         setTracking={setTracking}
         handleChange={handleChange}
-        generateTrackingNumber={generateTrackingNumber}
+        generateProcessingCode={generateProcessingCode}
         getEstimatedDeliveryDate={getEstimatedDeliveryDate}
         cancellationReason={cancellationReason}
         setCancellationReason={setCancellationReason}
@@ -267,7 +267,7 @@ const ShopOrderDetails = () => {
         setProductId={setProductId}
       />
 
-      <SingleOrderRefunded
+      <SingleOrderReturnInfo
         order={order}
         setRefundTransactionId={setRefundTransactionId}
       />

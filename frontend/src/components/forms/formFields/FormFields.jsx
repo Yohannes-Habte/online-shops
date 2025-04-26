@@ -73,7 +73,9 @@ export const SelectField = ({
           id={name}
           value={value}
           onChange={onChange}
-          className={`form-select-field ${errors[name] ? "is-invalid" : ""}`}
+          className={classNames("form-input-field", {
+            "form-input-error": errors[name],
+          })}
           aria-labelledby={name}
           aria-describedby={errors[name] ? `${name}-error` : undefined} // Linking the error message
           aria-label={ariaLabel || label} // Provides fallback accessible name if ariaLabel is provided
@@ -89,7 +91,7 @@ export const SelectField = ({
         </select>
       </div>
       {errors[name] && (
-        <p id={`${name}-error`} className="form-error">
+        <p id={`${name}-error`} className="form-error-message">
           {errors[name]}
         </p>
       )}

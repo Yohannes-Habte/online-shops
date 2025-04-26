@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 // Refund Request schema
-const refundRequestSchema = new Schema(
+const returnRequestSchema = new Schema(
   {
     // This was returnedId in the original code
     returnRequestId: { type: String, unique: true, required: true },
@@ -49,6 +49,6 @@ const refundRequestSchema = new Schema(
 );
 
 // Return Request Model
-const ReturnRequest = mongoose.model("ReturnRequest", refundRequestSchema);
+const ReturnRequest = mongoose.model("ReturnRequest", returnRequestSchema);
 
 export default ReturnRequest;

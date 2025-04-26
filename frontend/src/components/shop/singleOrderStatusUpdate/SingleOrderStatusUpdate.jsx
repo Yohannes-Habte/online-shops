@@ -7,6 +7,56 @@ import {
   LucidePackage,
 } from "lucide-react";
 import TransactionForm from "../../forms/transaction/TransactionForm";
+import ShipmentForm from "../../forms/deliveryAddress/ShipmentForm";
+
+const providers = [
+  "UPS",
+  "FEDEX",
+  "DHL",
+  "USPS",
+  "ROYAL_MAIL",
+  "DPD",
+  "GLS",
+  "TNT",
+  "ARAMEX",
+  "CANADA_POST",
+  "AUSTRALIA_POST",
+  "JAPAN_POST",
+  "SF_EXPRESS",
+  "YAMATO",
+  "POSTNL",
+  "CORREIOS",
+  "CHINA_POST",
+  "LA_POSTE",
+  "DEUTSCHE_POST",
+  "EMS",
+  "BLUE_DART",
+  "J&T_EXPRESS",
+  "NINJA_VAN",
+  "LALAMOVE",
+  "GRABEXPRESS",
+  "GOJEK",
+  "ZTO",
+  "XPRESSBEES",
+  "DELHIVERY",
+  "SHIPROCKET",
+  "CAINIAO",
+];
+
+const orderStatusArray = [
+  "Pending",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+  "Refund Requested",
+  "Awaiting Item Return",
+  "Returned",
+  "Refund Processing",
+  "Refund Rejected",
+  "Refund Accepted",
+  "Refunded",
+];
 
 const SingleOrderStatusUpdate = ({
   updateOrderStatus,
@@ -15,7 +65,7 @@ const SingleOrderStatusUpdate = ({
   tracking,
   setTracking,
   handleChange,
-  generateTrackingNumber,
+  generateProcessingCode,
   getEstimatedDeliveryDate,
   cancellationReason,
   setCancellationReason,
@@ -28,20 +78,25 @@ const SingleOrderStatusUpdate = ({
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [showReturnReason, setShowReturnReason] = useState(false);
   const [openTransaction, setOpenTransaction] = useState(false);
-  const orderStatusArray = [
-    "Pending",
-    "Processing",
-    "Shipped",
-    "Delivered",
-    "Cancelled",
-    "Refund Requested",
-    "Awaiting Item Return",
-    "Returned",
-    "Refund Processing",
-    "Refund Rejected",
-    "Refund Accepted",
-    "Refunded",
-  ];
+  const [openShippedStatus, setOpenShippedStatus] = useState(false);
+
+  const statusHandler = (e) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+
+    // Trigger Transaction Form popup when "Delivered" is selected
+    if (newStatus === "Delivered") {
+      setOpenTransaction(true);
+    } else {
+      setOpenTransaction(false);
+    }
+
+    if (newStatus === "Shipped") {
+      setOpenShippedStatus(true);
+    } else {
+      setOpenShippedStatus(false);
+    }
+  };
 
   // Toggle fields based on status selection
   useEffect(() => {
@@ -56,8 +111,6 @@ const SingleOrderStatusUpdate = ({
     setShowCancellationReason(false);
     setShowReturnReason(false);
   };
-
-
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -75,17 +128,7 @@ const SingleOrderStatusUpdate = ({
           <select
             name="status"
             value={status}
-            onChange={(e) => {
-              const newStatus = e.target.value;
-              setStatus(newStatus);
-
-              // Trigger Transaction Form popup when "Delivered" is selected
-              if (newStatus === "Delivered") {
-                setOpenTransaction(true);
-              } else {
-                setOpenTransaction(false);
-              }
-            }}
+            onChange={statusHandler}
             className="select-field"
           >
             {orderStatusArray.map((selectStatus) => (
@@ -107,11 +150,14 @@ const SingleOrderStatusUpdate = ({
                 onChange={handleChange}
                 className="select-field"
               >
-                <option value="">Select Carrier</option>
-                <option value="FedEx">FedEx</option>
-                <option value="UPS">UPS</option>
-                <option value="USPS">USPS</option>
-                <option value="DHL">DHL</option>
+                <option value="" disabled>
+                  Select Carrier
+                </option>
+                {providers.map((provider) => (
+                  <option key={provider} value={provider}>
+                    {provider}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -119,9 +165,9 @@ const SingleOrderStatusUpdate = ({
               <LucidePackage className="input-icon" />
               <input
                 type="text"
-                name="trackingNumber"
-                placeholder="Tracking Number"
-                value={tracking.trackingNumber}
+                name="processingCode"
+                placeholder="Processing Code"
+                value={tracking.processingCode}
                 onChange={handleChange}
                 readOnly
                 className="select-field select-tracking-field"
@@ -132,12 +178,12 @@ const SingleOrderStatusUpdate = ({
                 onClick={() =>
                   setTracking((prev) => ({
                     ...prev,
-                    trackingNumber: generateTrackingNumber(),
+                    processingCode: generateProcessingCode(),
                   }))
                 }
                 className="generate-tracking-btn"
               >
-                Generate Tracking Number
+                Processing Code
               </button>
             </div>
 
@@ -197,8 +243,18 @@ const SingleOrderStatusUpdate = ({
         </button>
       </form>
 
+      {openShippedStatus && (
+        <ShipmentForm
+          setOpenShippedStatus={setOpenShippedStatus}
+          order={order}
+        />
+      )}
+
       {openTransaction && status === "Delivered" && (
-        <TransactionForm setOpenTransaction={setOpenTransaction} order={order} />
+        <TransactionForm
+          setOpenTransaction={setOpenTransaction}
+          order={order}
+        />
       )}
     </section>
   );

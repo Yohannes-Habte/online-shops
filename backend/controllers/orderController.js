@@ -4,6 +4,7 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
 import User from "../models/userModel.js";
+import path from "path";
 
 //=========================================================================
 // Helper functions for order calculations and status history updates
@@ -345,7 +346,11 @@ export const getOrder = async (req, res, next) => {
         {
           path: "refundRequests",
           model: "RefundRequest",
-        }
+        },
+        {
+          path: "returnedItems",
+          model: "ReturnRequest",
+        },
       ])
       .lean();
 
@@ -814,7 +819,6 @@ export const orderRefundByShop = async (req, res, next) => {
       );
     }
 
-    
     const validOrderStatuses = [
       "Pending",
       "Processing",

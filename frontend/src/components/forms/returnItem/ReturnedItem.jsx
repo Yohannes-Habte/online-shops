@@ -6,14 +6,13 @@ import { FiCalendar, FiTag, FiDollarSign, FiRepeat } from "react-icons/fi";
 import { FaRegCommentDots } from "react-icons/fa";
 import { MdAssignmentReturn } from "react-icons/md";
 import { Ban } from "lucide-react";
-
 import {
   DateField,
   InputField,
   RadioField,
   SelectField,
   TextAreaField,
-} from "../formFields/FormFields ";
+} from "../formFields/FormFields";
 
 const productConditionOptions = ["New", "Used", "Damaged"];
 const refundStatusOptions = ["Accepted", "Rejected"];

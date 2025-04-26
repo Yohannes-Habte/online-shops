@@ -11,7 +11,7 @@ import {
   FaWarehouse,
 } from "react-icons/fa";
 import "./BankInfo.scss";
-import { InputField } from "../formFields/FormFields ";
+import { InputField } from "../formFields/FormFields";
 
 const BankInfo = ({
   accountHolderName,

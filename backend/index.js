@@ -30,6 +30,7 @@ import openaiRouter from "./routes/openaiChatRoutes.js";
 import transactionRouter from "./routes/transactionRoutes.js";
 import refundRequestRouter from "./routes/refundRequestRoutes.js";
 import returnedItemsRouter from "./routes/returnedItemRoutes.js";
+import shippingRouter from "./routes/shippingRoutes.js";
 
 // Express app
 
@@ -76,6 +77,7 @@ app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/transactions", transactionRouter);
+app.use("/api/v1/shippings", shippingRouter);
 app.use("/api/v1/data", rowDataRouter);
 app.use("/api/v1/openai", openaiRouter);
 

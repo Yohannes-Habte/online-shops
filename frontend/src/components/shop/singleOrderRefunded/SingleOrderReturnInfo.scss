@@ -1,0 +1,83 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/Mixins.scss";
+
+/* SingleOrderRefunded.scss */
+
+.shop-order-return-history-container {
+  padding: 2rem;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 2rem 0;
+}
+
+.shop-order-return-history-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+}
+
+.shop-order-returned-info-wrapper {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.shop-order-returned-infos-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.shop-order-refunded-info-left,
+.shop-order-returned-info-right {
+  flex: 1;
+  min-width: 250px;
+}
+
+.returned-item-p {
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  color: #555;
+
+  strong {
+    color: #222;
+  }
+
+  &:hover {
+    cursor: pointer;
+    color: #0070f3;
+    text-decoration: underline;
+  }
+}
+
+.shop-order-return-reason-title,
+.shop-order-refund-request-rejection-reason-title {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.shop-order-refunded-reason-paragraph,
+.shop-order-return-reason-paragraph {
+  background-color: #f2f2f2;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #444;
+  white-space: pre-line;
+}
