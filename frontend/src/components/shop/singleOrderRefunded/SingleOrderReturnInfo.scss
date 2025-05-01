@@ -47,6 +47,28 @@
   min-width: 250px;
 }
 
+.shop-order-returned-info-right {
+  position: relative;
+}
+
+.withdrawal-request-btn {
+  position: absolute;
+  bottom: 1rem;
+  right:  1rem;
+  background-color: #61a3ee;
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #005bb5;
+  }
+}
+
 .returned-item-p {
   font-size: 1rem;
   margin-bottom: 0.8rem;

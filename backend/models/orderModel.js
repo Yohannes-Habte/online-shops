@@ -37,6 +37,7 @@ export const paymentProviderEnum = [
   "Razorpay",
   "Google Pay",
   "Apple Pay",
+  "Cash On Delivery",
 ];
 
 export const paymentStatusEnum = [
@@ -125,7 +126,7 @@ const paymentSchema = new Schema(
 const orderStatusHistorySchema = new Schema(
   {
     status: { type: String, enum: orderStatusEnum, default: "Pending" },
-    changedAt: { type: Date, default: Date.now }, // Date of status change
+    changedAt: { type: Date }, // Date of status change
     message: { type: String, trim: true }, // Message for status change
   },
   { timestamps: false }
@@ -168,9 +169,12 @@ const orderSchema = new Schema(
 
     returnedItems: [{ type: Schema.Types.ObjectId, ref: "ReturnRequest" }],
 
-    cancellationReason: { type: String }, // Cancellation reason provided by the customer if the entire order is cancelled
+    withdrawalRequests: [{ type: Schema.Types.ObjectId, ref: "Withdrawal" }],
 
-    cancellationDate: { type: Date }, // Date when the order was cancelled
+    cancellationReason: {
+      reason: { type: String, default: null },
+      cancellationDate: { type: Date, default: new Date() },
+    },
 
     deliveredAt: { type: Date },
     version: { type: Number, default: 1 },

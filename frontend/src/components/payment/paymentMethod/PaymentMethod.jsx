@@ -32,7 +32,7 @@ const PaymentMethod = () => {
     "Credit Card": { provider: "Stripe", status: "completed" },
     "Debit Card": { provider: "Bank Transfer", status: "completed" },
     PayPal: { provider: "PayPal", status: "completed" },
-    "Cash On Delivery": { provider: undefined, status: "pending" },
+    "Cash On Delivery": { provider: "Cash On Delivery", status: "pending" },
   };
 
   const methodOptions = Object.keys(paymentMethodConfig);
@@ -79,7 +79,7 @@ const PaymentMethod = () => {
     customer: currentUser?._id,
     payment: {
       method,
-      provider: method === "Cash On Delivery" ? undefined : provider,
+      provider: provider,
       paymentStatus: status,
       transactionId: paymentId || undefined,
       currency: selectedCurrency || "USD",

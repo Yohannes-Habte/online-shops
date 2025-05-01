@@ -1,16 +1,15 @@
-import { useEffect } from "react";
-import moment from "moment";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import "./RefundRequests.scss";
+import { useEffect } from "react";
 import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
-import { FaTrash } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import moment from "moment";
 import SingleOrderDelete from "../../../utils/globalFunctions/SingleOrderDelete";
-import "./Transactions.scss";
 
-const Transactions = () => {
+const RefundRequests = () => {
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
   const {
@@ -31,14 +30,12 @@ const Transactions = () => {
     SingleOrderDelete(orderId, dispatch);
   };
 
-  // Filter returned order items
-  const returnedOrder = orders.filter(
-    (order) =>
-      order.orderStatus === "Delivered" &&
-      order.payment?.paymentStatus === "completed"
+  // Filter order only for refund requests
+  const refundOrders = orders.filter(
+    (order) => order.orderStatus === "Refund Requested"
   );
 
-  const rows = returnedOrder.map((order) => {
+  const rows = refundOrders.map((order) => {
     const formattedDate = order.createdAt
       ? new Date(order.createdAt).toLocaleDateString("en-GB")
       : "Unknown";
@@ -130,8 +127,11 @@ const Transactions = () => {
     },
   ];
   return (
-    <section style={{ padding: "20px" }} className="transactions-container">
-      <h1 className="transaction-title">Transactions</h1>
+    <section
+      style={{ padding: "20px" }}
+      className="shop-refund-requests-container"
+    >
+      <h2 className="shop-refund-requests-title">Refund Requests</h2>
       {loading ? (
         <div>Loading orders...</div>
       ) : error ? (
@@ -164,4 +164,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default RefundRequests;

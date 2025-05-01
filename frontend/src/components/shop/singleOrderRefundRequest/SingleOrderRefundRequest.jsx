@@ -3,18 +3,8 @@ import ReturnedItemForm from "../../forms/returnItem/ReturnedItem";
 import "./SingleOrderRefundRequest.scss";
 import { BadgeDollarSign } from "lucide-react";
 
-const SingleOrderRefundRequest = ({
-  order,
-
-  setProductId,
-}) => {
+const SingleOrderRefundRequest = ({ order }) => {
   const [openRefundForm, setOpenRefundForm] = useState(false);
-
-  console.log("order for request refund;", order);
-
-  const handleProductId = (productId) => {
-    setProductId(productId);
-  };
 
   return (
     <section className="shop-order-refund-request-container">
@@ -35,10 +25,7 @@ const SingleOrderRefundRequest = ({
                 </span>
               </p>
 
-              <p
-                className="refund-request-info"
-                onClick={() => handleProductId(refund?.product)}
-              >
+              <p className="refund-request-info">
                 <strong>Product ID:</strong> {refund?.product}
               </p>
 
@@ -87,7 +74,7 @@ const SingleOrderRefundRequest = ({
                 className="return-single-refund-btn"
                 onClick={() => setOpenRefundForm(true)}
               >
-                Refund User
+                Update Return Status
               </button>
             </aside>
             {openRefundForm && (

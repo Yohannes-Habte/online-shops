@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 
 const shoWithdrawSchema = new Schema(
   {
+    withdrawalCode: { type: String, unique: true, required: true },
+    
     withdrawId: { type: String, unique: true, required: true },
 
     withdrawalPurpose: {

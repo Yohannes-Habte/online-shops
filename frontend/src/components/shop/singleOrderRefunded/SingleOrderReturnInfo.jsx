@@ -1,8 +1,10 @@
+import { useState } from "react";
 import "./SingleOrderReturnInfo.scss";
 import { History } from "lucide-react";
+import WithdrawalForm from "../../forms/withdrawal/WithdrawalForm";
 
 const SingleOrderReturnInfo = ({ order }) => {
-  console.log("order for return item:", order);
+  const [openWithdrawalForm, setOpenWithdrawalForm] = useState(false);
 
   return (
     <section className="shop-order-return-history-container">
@@ -60,8 +62,25 @@ const SingleOrderReturnInfo = ({ order }) => {
                 <strong>Refund Processed By:</strong>{" "}
                 {returnRequest.processedBy ? "Seller" : "N/A"}
               </h3>
+
+              <button
+                className="withdrawal-request-btn"
+                onClick={() => setOpenWithdrawalForm(true)}
+              >
+                Request for Withdrawal
+              </button>
             </aside>
           </div>
+
+          {openWithdrawalForm && (
+            <WithdrawalForm
+              setOpenWithdrawalForm={setOpenWithdrawalForm}
+              order={order}
+              refundRequest={returnRequest._id}
+              returnRequest={returnRequest.refundRequest}
+              amount={returnRequest.refundAmount}
+            />
+          )}
 
           <h3 className="shop-order-return-reason-title">Refund Reason</h3>
           <p className="shop-order-refunded-reason-paragraph">

@@ -38,7 +38,7 @@ const shopTransactionSchema = new Schema(
     withdrawal: { type: Schema.Types.ObjectId, ref: "Withdrawal" },
 
     // If "Adjustment" is selected, show me the adjustmentReason reason and adjustmentNotes
-    adjustmentReason: { type: String, enum: adjustmentEnum, default: null },
+    adjustmentReason: { type: String, enum: adjustmentEnum, required: false },
 
     adjustmentNotes: { type: String },
 

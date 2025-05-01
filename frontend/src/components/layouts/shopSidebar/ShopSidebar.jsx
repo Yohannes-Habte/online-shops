@@ -254,7 +254,7 @@ const ShopSidebar = ({ isActive, setIsActive }) => {
           />
 
           <h4 className={isActive === 12 ? "active-text" : "passive-text"}>
-            Refunds
+            Ready for Refunds
           </h4>
         </aside>
 

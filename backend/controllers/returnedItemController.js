@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
+import { addToStatusHistory } from "../utils/orderHelperFunctions.js";
 
 export const createReturnedItem = async (req, res, next) => {
   const {
@@ -198,12 +199,8 @@ export const createReturnedItem = async (req, res, next) => {
     }
 
     // Update order status history
-    orderDetails.statusHistory.push({
-      status: orderStatus,
-      changedAt: new Date(),
-      message: `Your order status changed to '${orderStatus}' on ${new Date().toLocaleString()}.`,
-    });
-
+    addToStatusHistory(orderDetails, orderStatus);
+    
     // Persist all updates
     await Promise.all([
       newReturnRequest.save({ session }),

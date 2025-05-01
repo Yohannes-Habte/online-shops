@@ -7,9 +7,10 @@ import { fetchSellerOrders } from "../../../redux/actions/order";
 import { clearOrderErrors } from "../../../redux/reducers/orderReducer";
 import { FaTrash } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import SingleOrderDelete from "../../../utils/globalFunctions/SingleOrderDelete";
 
 const ShopRefunds = () => {
-  // Global variables
   const dispatch = useDispatch();
   const { sellerOrders } = useSelector((state) => state.order);
   const {
@@ -25,90 +26,17 @@ const ShopRefunds = () => {
     };
   }, [dispatch]);
 
-  const columns = [
-    {
-      field: "processedDate",
-      headerName: "Processed Date",
-      minWidth: 180,
-      flex: 0.8,
-      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
-      cellClassName: "left-center",
-    },
-    {
-      field: "withdrawalPurpose",
-      headerName: "Withdrawal Purpose",
-      minWidth: 150,
-      flex: 0.6,
-      cellClassName: "left-center",
-    },
-    {
-      field: "supplier",
-      headerName: "Supplier",
-      minWidth: 150,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
-    {
-      field: "refundRequest",
-      headerName: "Refund Request",
-      minWidth: 180,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
+  // Delete a single order
+  const handleDeleteOrder = (orderId) => {
+    SingleOrderDelete(orderId, dispatch);
+  };
 
-    {
-      field: "returnRequest",
-      headerName: "Return Status",
-      minWidth: 180,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
+  // Filter returned order items
+  const returnedOrder = orders.filter(
+    (order) => order.orderStatus === "Refund Accepted"
+  );
 
-    {
-      field: "amount",
-      headerName: "Amount",
-      minWidth: 180,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
-
-    {
-      field: "currency",
-      headerName: "",
-      minWidth: 70,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
-
-    {
-      field: "method",
-      headerName: "Payment Method",
-      minWidth: 180,
-      flex: 0.8,
-      cellClassName: "left-center",
-    },
-
-    {
-      field: "action",
-      headerName: "Action",
-      minWidth: 150,
-      flex: 0.7,
-      sortable: false,
-      renderCell: () => (
-        <div className="order-action-table-icon-wrapper">
-          <FaEdit className="display-order-icon" size={20} />
-
-          <FaTrash className="order-delete-icon" />
-        </div>
-      ),
-    },
-  ];
-
-  // Filter orders based on Refund Accepted status for a specific seller
-  const refundAcceptedOrders =
-    orders && orders.filter((order) => order.orderStatus === "Refund Accepted");
-
-  const rows = refundAcceptedOrders.map((order) => {
+  const rows = returnedOrder.map((order) => {
     const formattedDate = order.createdAt
       ? new Date(order.createdAt).toLocaleDateString("en-GB")
       : "Unknown";
@@ -126,6 +54,79 @@ const ShopRefunds = () => {
       orderStatus: order.orderStatus || "Unknown",
     };
   });
+
+  const columns = [
+    {
+      field: "createdAt",
+      headerName: "Ordered Date",
+      minWidth: 180,
+      flex: 0.8,
+      valueFormatter: (params) => moment(params?.value).format("DD-MM-YYYY"),
+      cellClassName: "left-center",
+    },
+    {
+      field: "quantity",
+      headerName: "Total Items",
+      minWidth: 150,
+      flex: 0.6,
+      cellClassName: "left-center",
+    },
+    {
+      field: "grandTotal",
+      headerName: "Total Amount",
+      minWidth: 150,
+      flex: 0.8,
+      renderCell: (params) => `$${(params.row.grandTotal ?? 0).toFixed(2)}`,
+      cellClassName: "left-center",
+    },
+    {
+      field: "provider",
+      headerName: "Payment Provider",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "method",
+      headerName: "Payment Method",
+      minWidth: 180,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "paymentStatus",
+      headerName: "Payment Status",
+      minWidth: 150,
+      flex: 0.8,
+      cellClassName: "left-center",
+    },
+    {
+      field: "orderStatus",
+      headerName: "Order Status",
+      minWidth: 140,
+      flex: 0.7,
+      cellClassName: "left-center",
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      minWidth: 150,
+      flex: 0.7,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="order-action-table-icon-wrapper">
+          <Link to={`/shop/order/${params.id}`}>
+            <FaEdit className="display-order-icon" size={20} />
+          </Link>
+
+          <FaTrash
+            onClick={() => handleDeleteOrder(params.row.id)}
+            className="order-delete-icon"
+          />
+        </div>
+      ),
+    },
+  ];
   return (
     <section style={{ padding: "20px" }} className="shop-orders-container">
       <h2>Your Orders</h2>

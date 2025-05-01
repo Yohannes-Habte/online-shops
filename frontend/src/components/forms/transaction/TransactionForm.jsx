@@ -40,7 +40,7 @@ const initialState = {
   processedBy: "",
 };
 
-const TransactionForm = ({ setIsTransactionFormOpen, order }) => {
+const TransactionForm = ({ setOpenTransaction, order }) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
   console.log("Transaction Form order", order);
@@ -170,7 +170,7 @@ const TransactionForm = ({ setIsTransactionFormOpen, order }) => {
         toast.success("Transaction successfully created!");
         setFormData(initialState);
       }
-      setIsTransactionFormOpen(false);
+      setOpenTransaction(false);
     } catch (error) {
       toast.error("Error: " + error?.response?.data?.message || error.message);
     }
@@ -180,7 +180,7 @@ const TransactionForm = ({ setIsTransactionFormOpen, order }) => {
     <div className="shop-transaction-form-modal">
       <section className="shop-transaction-form-container">
         <span
-          onClick={() => setIsTransactionFormOpen(false)}
+          onClick={() => setOpenTransaction(false)}
           className="close-transaction-form-modal"
         >
           X

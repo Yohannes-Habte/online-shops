@@ -8,7 +8,6 @@ import SingleOrderSummary from "../singleOrderSummary/SingleOrderSummary";
 import SingleOrderItems from "../singleOrderItems/SingleOrderItems";
 import SingleOrderStatusUpdate from "../singleOrderStatusUpdate/SingleOrderStatusUpdate";
 import SingleOrderRefundRequest from "../singleOrderRefundRequest/SingleOrderRefundRequest";
-import WithdrawalForm from "../withdrawal/WithdrawalForm";
 import SingleOrderReturnInfo from "../singleOrderRefunded/SingleOrderReturnInfo";
 
 const ShopOrderDetails = () => {
@@ -25,9 +24,6 @@ const ShopOrderDetails = () => {
     trackingNumber: "",
     estimatedDeliveryDate: null,
   });
- 
-  const [productId, setProductId] = useState(null);
-  const [refundTransactionId, setRefundTransactionId] = useState(null);
 
   // Allowed order status sequence
   const orderStatusSequence = [
@@ -204,7 +200,6 @@ const ShopOrderDetails = () => {
 
   if (loading) return <p>Loading order details...</p>;
   if (error) return <p className="error">{error}</p>;
-  
 
   return (
     <section className="shop-order-details-information-container">
@@ -262,21 +257,9 @@ const ShopOrderDetails = () => {
         </section>
       )}
 
-      <SingleOrderRefundRequest
-        order={order}
-        setProductId={setProductId}
-      />
+      <SingleOrderRefundRequest order={order} />
 
-      <SingleOrderReturnInfo
-        order={order}
-        setRefundTransactionId={setRefundTransactionId}
-      />
-
-      <WithdrawalForm
-        order={order}
-        productId={productId}
-        refundTransactionId={refundTransactionId}
-      />
+      <SingleOrderReturnInfo order={order} />
     </section>
   );
 };

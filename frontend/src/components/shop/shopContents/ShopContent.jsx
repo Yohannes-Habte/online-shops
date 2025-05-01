@@ -15,6 +15,7 @@ import ShopInboxPage from "../../../views/shopPages/shopInboxPage/ShopInboxPage"
 import Transactions from "../transactions/Transactions";
 import ReturnItems from "../returnItems/ReturnItems";
 import Withdrawals from "../allWIthdrawals/Withdrawals";
+import RefundRequests from "../refundRequests/RefundRequests";
 
 const ShopContent = ({ isActive, setIsActive }) => {
   return (
@@ -48,6 +49,8 @@ const ShopContent = ({ isActive, setIsActive }) => {
       {isActive === 11 && <ShopInboxPage />}
 
       {isActive === 13 && <Supplier />}
+
+      {isActive === 18 && <RefundRequests />}
 
       {isActive === 14 && <ShopSettings />}
     </article>
