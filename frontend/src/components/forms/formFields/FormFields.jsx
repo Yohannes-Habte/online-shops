@@ -181,6 +181,7 @@ export const DateField = ({
   onChange,
   errors,
   placeholder = "",
+  readOnly = false,
   icon,
   customClass = "",
   onFocus = () => {},
@@ -199,6 +200,7 @@ export const DateField = ({
         id={name}
         value={value}
         onChange={onChange}
+        readOnly={readOnly}
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}

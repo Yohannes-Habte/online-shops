@@ -2,6 +2,52 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
+export const orderStatusEnum = [
+  "Pending",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+  "Refund Requested",
+  "Awaiting Item Return",
+  "Returned",
+  "Refund Processing",
+  "Refund Rejected",
+  "Refund Accepted",
+  "Refunded",
+];
+
+export const paymentMethodEnum = [
+  "Credit Card",
+  "Debit Card",
+  "Bank Transfer",
+  "Direct Debit",
+  "Cash On Delivery",
+  "PayPal",
+  "Stripe",
+  "Crypto",
+];
+
+export const paymentProviderEnum = [
+  "Stripe",
+  "PayPal",
+  "Bank Transfer",
+  "Square",
+  "Authorize.Net",
+  "Razorpay",
+  "Google Pay",
+  "Apple Pay",
+];
+
+export const paymentStatusEnum = [
+  "pending",
+  "completed",
+  "refunded",
+  "cancelled",
+];
+
+export const currencyEnum = ["USD", "EUR", "GBP", "INR", "JPY", "AUD"];
+
 // Schema for individual order items
 const orderItemSchema = new Schema(
   {
@@ -39,91 +85,50 @@ const shippingAddressSchema = new Schema(
   { timestamps: true }
 );
 
+// Schema for refund details
+const refundDetailsSchema = new Schema({
+  refundId: { type: String, required: true },
+  refundRequestId: { type: Schema.Types.ObjectId, ref: "RefundRequest" },
+  returnedId: { type: Schema.Types.ObjectId, ref: "ReturnRequest" },
+  withdrawalId: { type: Schema.Types.ObjectId, ref: "Withdrawal" },
+  transactionId: {
+    type: Schema.Types.ObjectId,
+    ref: "Transaction",
+    required: true,
+  },
+  refundAmount: { type: Number, required: true },
+  currency: { type: String, required: true },
+  refundMethod: { type: String, required: true },
+  refundDate: { type: Date, required: true },
+  refundedBy: { type: Schema.Types.ObjectId, ref: "Shop", required: true },
+});
+
 // Schema for payment details
 const paymentSchema = new Schema(
   {
-    method: {
-      type: String,
-      required: true,
-      enum: [
-        "Credit Card",
-        "Debit Card",
-        "Bank Transfer",
-        "Direct Debit",
-        "Cash On Delivery",
-        "PayPal",
-        "Stripe",
-        "Crypto",
-      ],
-    },
-
-    provider: {
-      type: String,
-      enum: [
-        "Stripe",
-        "PayPal",
-        "Bank Transfer",
-        "Square",
-        "Authorize.Net",
-        "Razorpay",
-        "Google Pay",
-        "Apple Pay",
-      ],
-    },
-
-    paymentStatus: {
-      type: String,
-      required: true,
-      enum: ["pending", "completed", "refunded", "cancelled"],
-      default: "pending",
-    },
-
-    transactionId: { type: String, unique: true, sparse: true }, // Transaction ID
-
-    currency: {
-      type: String,
-      required: true,
-      default: "USD",
-      enum: ["USD", "EUR", "GBP", "INR", "JPY", "AUD"],
-      uppercase: true,
-      required: true,
-    },
-
+    method: { type: String, enum: paymentMethodEnum, required: true },
+    provider: { type: String, enum: paymentProviderEnum, required: true },
+    paymentStatus: { type: String, required: true, enum: paymentStatusEnum },
+    transactionId: { type: String, unique: true, sparse: true },
+    currency: { type: String, enum: currencyEnum, required: true },
     amountPaid: { type: Number, required: true },
-
-    paymentDate: { type: Date, default: Date.now },
-
-    refunds: [
-      {
-        returnedId: { type: Schema.Types.ObjectId, required: true }, // Links to returnedItems.returnRequestId
-        refundId: { type: String, required: true },
-        processedBy: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        refundAmount: { type: Number, required: true }, // Taken from returned item
-        refundMethod: {
-          type: String,
-          enum: [
-            "Original Payment Method",
-            "Store Credit",
-            "Bank Transfer",
-            "Digital Wallet",
-            "Cheque",
-          ],
-          required: true,
-        },
-
-        refundDate: { type: Date, default: Date.now },
-      },
-    ],
-
+    paymentDate: { type: Date },
+    refunds: [refundDetailsSchema],
     metadata: { type: Map, of: Schema.Types.Mixed, default: {} },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
+);
+
+// Order Status history details
+const orderStatusHistorySchema = new Schema(
+  {
+    status: { type: String, enum: orderStatusEnum, default: "Pending" },
+    changedAt: { type: Date, default: Date.now }, // Date of status change
+    message: { type: String, trim: true }, // Message for status change
+  },
+  { timestamps: false }
 );
 
 // Main order schema
@@ -145,52 +150,11 @@ const orderSchema = new Schema(
     payment: { type: paymentSchema },
     subtotal: { type: Number, required: true, min: 0 }, // Total price of ordered items before tax, shipping, and service fees
     shippingFee: { type: Number, default: 0 },
-    tax: { type: Number, default: 0 }, // Calculated tax amount
+    tax: { type: Number, default: 0 },
     serviceFee: { type: Number, default: 0 }, // Service charges for the app or platform
     grandTotal: { type: Number, required: true, min: 0 }, // subtotal + tax + shipping + service fees
-    orderStatus: {
-      type: String,
-      required: true,
-      enum: [
-        "Pending",
-        "Processing",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-        "Refund Requested",
-        "Awaiting Item Return",
-        "Returned",
-        "Refund Processing",
-        "Refund Rejected",
-        "Refund Accepted",
-        "Refunded",
-      ],
-      default: "Pending",
-    },
-    statusHistory: [
-      {
-        status: {
-          type: String,
-          enum: [
-            "Pending",
-            "Processing",
-            "Shipped",
-            "Delivered",
-            "Cancelled",
-            "Refund Requested",
-            "Awaiting Item Return",
-            "Returned",
-            "Refund Processing",
-            "Refund Rejected",
-            "Refund Accepted",
-            "Refunded",
-          ],
-          default: "Pending",
-        },
-        changedAt: { type: Date, default: Date.now }, // Date of status change
-        message: { type: String, trim: true }, // Message for status change
-      },
-    ],
+    orderStatus: { type: String, enum: orderStatusEnum, default: "Pending" },
+    statusHistory: [orderStatusHistorySchema],
 
     tracking: {
       carrier: { type: String, default: null },

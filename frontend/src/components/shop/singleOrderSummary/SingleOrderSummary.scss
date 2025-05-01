@@ -18,6 +18,14 @@
       font-size: 0.9rem;
       color: #555;
     }
+
+    .transact-now-btn {
+      @include button2;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
   }
 
   .shipping-address-wrapper {

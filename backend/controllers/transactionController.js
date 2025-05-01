@@ -1,8 +1,13 @@
 import Transaction from "../models/transactionModel.js";
 import createError from "http-errors";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import Order from "../models/orderModel.js";
+import Shop from "../models/shopModel.js";
+import RefundRequest from "../models/refundRequestModel.js";
+import ReturnRequest from "../models/ReturnRequestModel.js";
+import Withdrawal from "../models/withdrawModel.js";
+import { addToStatusHistory } from "../utils/orderHelperFunctions.js";
 
 export const createTransaction = async (req, res, next) => {
   const {
@@ -11,6 +16,7 @@ export const createTransaction = async (req, res, next) => {
     order,
     platformFees,
     refundRequest,
+    returnedItem,
     withdrawal,
     adjustmentReason,
     adjustmentNotes,
@@ -25,6 +31,12 @@ export const createTransaction = async (req, res, next) => {
   } = req.body;
 
   const authShopId = req.shop.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to create a transaction.")
+    );
+  }
 
   // Validate the shop ID
   if (!mongoose.isValidObjectId(authShopId)) {
@@ -91,6 +103,7 @@ export const createTransaction = async (req, res, next) => {
       transactionObject.platformFees = platformFees;
     } else if (transactionType === "Refund") {
       transactionObject.refundRequest = refundRequest;
+      transactionObject.returnedItem = returnedItem;
       transactionObject.withdrawal = withdrawal;
     } else if (transactionType === "Withdrawal") {
       transactionObject.withdrawal = withdrawal;
@@ -107,14 +120,107 @@ export const createTransaction = async (req, res, next) => {
 
     await newTransaction.save({ session });
 
+    const shopDetails = await Shop.findById(authShopId).session(session);
+    if (!shopDetails) {
+      await session.abortTransaction();
+      return next(createError(404, "Shop not found"));
+    } 
+    const foundOrder = await Order.findById(order).session(session);
+    if (!foundOrder) {
+      await session.abortTransaction();
+      return next(createError(404, "Order not found"));
+    }
+
     if (transactionType === "Payout" && order) {
-      const foundOrder = await Order.findById(order).session(session);
-      if (!foundOrder) {
-        await session.abortTransaction();
-        return next(createError(404, "Order not found"));
-      }
       foundOrder.transaction = newTransaction._id;
       await foundOrder.save({ session });
+    }
+
+    if (transactionType === "Payout") {
+      shopDetails.transactions.push(newTransaction._id);
+      if (transactionStatus === "Completed") {
+        shopDetails.netShopIncome += amount;
+      }
+    } 
+
+
+    if (
+      transactionType === "Refund" &&
+      refundRequest &&
+      returnedItem &&
+      order &&
+      withdrawal &&
+      transactionStatus == "Completed"
+    ) {
+      const foundRefundRequest = await RefundRequest.findById(
+        refundRequest
+      ).session(session);
+      if (!foundRefundRequest) {
+        await session.abortTransaction();
+        return next(createError(404, "Refund request not found"));
+      }
+
+      const foundReturnedItem = await ReturnRequest.findById(
+        returnedItem
+      ).session(session);
+      if (!foundReturnedItem) {
+        await session.abortTransaction();
+        return next(createError(404, "Returned item not found"));
+      }
+
+      const foundWithdrawal = await Withdrawal.findById(withdrawal).session(
+        session
+      );
+      if (!foundWithdrawal) {
+        await session.abortTransaction();
+        return next(createError(404, "Withdrawal not found"));
+      }
+
+      const updatedOrderStatus = "Refunded";
+      foundOrder.orderStatus = updatedOrderStatus;
+      addToStatusHistory(orderDetails, updatedOrderStatus);
+      foundOrder.payment.paymentStatus = "refunded";
+      foundOrder.payment.refunds.push({
+        refundId: uuidv4(),
+        refundRequestId: foundRefundRequest._id,
+        returnedId: foundReturnedItem._id,
+        withdrawalId: foundWithdrawal._id,
+        transactionId: newTransaction._id,
+        refundAmount: amount,
+        currency: currency,
+        refundMethod: method,
+        refundDate: processedDate,
+        refundedBy: processedBy,
+      });
+      await foundOrder.save({ session });
+    }
+
+  
+
+   
+
+    if (transactionType === "Refund") {
+      shopDetails.transactions.push(newTransaction._id);
+
+      if (transactionStatus === "Completed") {
+        shopDetails.netShopIncome -= amount;
+      }
+    }
+
+    if (transactionType === "Withdrawal") {
+      shopDetails.transactions.push(newTransaction._id);
+
+      if (transactionStatus === "Completed") {
+        shopDetails.netShopIncome -= amount;
+      }
+    }
+
+    if (transactionType === "Adjustment") {
+      shopDetails.transactions.push(newTransaction._id);
+
+      if (transactionStatus === "Completed") {
+        shopDetails.netShopIncome += amount;
+      }
     }
 
     // Commit transaction if everything is successful

@@ -3,6 +3,7 @@
 The processes that have to be followed to create an online shop are as follows:
 
 ## A seller creates an Online Shop account
+
 Any user can create a shop.
 To create an account, you need to consider the following attributes:
 name
@@ -36,6 +37,7 @@ categoryDescription
 shop
 
 ## A seller creates an a Supplier
+
 The supplier have relationship with the shop only
 Consider the following attributes:
 supplierName
@@ -61,6 +63,7 @@ category
 subcategory
 
 ## A seller can create a product for his shop
+
 The shop owner has the mandate to create, update and delete his own products only
 The product has relationship with the shop, supplier, category, subcategory and brand
 Consider the following attributes:
@@ -80,6 +83,7 @@ reviews
 variants
 
 ## A seller can create an event for his shop
+
 The shop owner has the mandate to create, update and delete his own events only
 The event has relationship with the shop, category, subcategory and brand.
 Consider the following attributes:
@@ -100,7 +104,9 @@ images
 soldOut
 
 ### Shop Relationship
+
 The shop has the following relationships with:
+
 1. categories
 2. subCategories
 3. brands
@@ -108,15 +114,19 @@ The shop has the following relationships with:
 5. soldProducts
 6. suppliers
 7. orders
-When one of the above items will be deleted, it has to be deleted from shop as well
+   When one of the above items will be deleted, it has to be deleted from shop as well
+
 ### User Relationship
+
 The user has the following relationships with:
+
 1. myOrders
 2. comments
 
 When an order or a comment will be deleted, it has to be deleted user collection as well
 
 ### Product Variant and Review
+
 1. When a product variant, such as productColor, productImage and ProductSizes are updated, it has to update the product
 2. When a product variant, such as ProductSizes' size or/and stock are updated, it has to update the product
 3. When a product variant will be deleted, it has to update the product
@@ -147,5 +157,14 @@ Update Shop
 Shop Profile
 Log Out
 
- 
+## Create New Transaction
 
+1. Validate the various Ids and then apply session for the transaction. A session is required for transactions in MongoDB because it's the mechanism that groups multiple operations into a single, atomic unit of work—meaning either all operations succeed, or none do.
+
+2. Make sure the transaction does not exist in the database. If it exists, the error message will be "Transaction with this ID already exists".
+
+3. Create transaction object and a new Mongoose model instance called newTransaction using the Transaction model and populating it with data from transactionObject. 
+
+4. Find the order using the order id from the frontend
+
+5. If the transactionType is "Payout" and an order exists, then update the order's transaction field with the ID of the new transaction, and save the order within the current session (to maintain atomicity).
