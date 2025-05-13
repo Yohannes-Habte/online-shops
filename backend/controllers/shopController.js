@@ -6,6 +6,7 @@ import shopSendEmail from "../utils/shopSendEmail.js";
 import crypto from "crypto";
 import generateShopToken from "../middleware/shopToken.js";
 import mongoose from "mongoose";
+import User from "../models/userModel.js";
 
 //=========================================================================
 // Create a seller
@@ -390,9 +391,6 @@ export const updatePaymentMethods = async (req, res, next) => {
   const { withdrawMethod } = req.body;
   const shopId = req.shop?.id;
 
-  console.log("shopId", shopId);
-  console.log("withdrawMethod", withdrawMethod);
-
   if (!shopId || !mongoose.Types.ObjectId.isValid(shopId)) {
     return next(createError(400, "Invalid Shop ID provided."));
   }
@@ -523,7 +521,7 @@ const clearSpecificField = async () => {
   try {
     const result = await Shop.updateMany(
       {}, // No filter: Applies to all documents
-      { $unset: { netShopIncome: "" } }
+      { $unset: { cancelledOrders: "" } }
     );
     console.log(result);
   } catch (err) {

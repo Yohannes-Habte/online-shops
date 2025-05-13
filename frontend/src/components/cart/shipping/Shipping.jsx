@@ -1,18 +1,45 @@
 import "./Shipping.scss";
 import { Country, State, City } from "country-state-city";
-import { FaAddressCard, FaPhoneSquareAlt, FaUserTie } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import { RiFileZipFill } from "react-icons/ri";
+import {
+  InputField,
+  LabeledSelectField,
+  SelectField,
+} from "../../forms/formFields/FormFields";
+
+import {
+  UserIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  MapIcon,
+  HomeIcon,
+  HashtagIcon,
+  GlobeAltIcon,
+  MapPinIcon,
+  BuildingOfficeIcon,
+  BriefcaseIcon,
+} from "@heroicons/react/24/outline";
+
+
 
 const Shipping = ({
   user,
+  serviceEnum,
   formData,
   handleInputChange,
   errors,
   proceedToPayment,
   loading,
 }) => {
-  const { address, zipCode, country, state, city, phoneNumber } = formData;
+  const {
+    streetName,
+    houseNumber,
+    service,
+    zipCode,
+    country,
+    state,
+    city,
+    phoneNumber,
+  } = formData;
 
   return (
     <section className="shipping-address-wrapper">
@@ -20,124 +47,128 @@ const Shipping = ({
 
       <form className="shipping-address-form">
         {/* Name */}
-        <div className="input-container">
-          <FaUserTie className="icon" />
-          <input
-            type="text"
-            value={user && user?.name}
-            readOnly
-            className="input-field"
-          />
-          <label className="input-label">Full Name</label>
-        </div>
+
+        <InputField
+          name="name"
+          value={user && user?.name}
+          readOnly
+          label="Full Name"
+          placeholder="Full Name"
+          errors={errors}
+          icon={<UserIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* Email */}
-        <div className="input-container">
-          <MdEmail className="icon" />
-          <input
-            type="email"
-            value={user && user?.email}
-            readOnly
-            className="input-field"
-          />
-          <label className="input-label">Email Address</label>
-        </div>
+        <InputField
+          name="email"
+          value={user && user?.email}
+          readOnly
+          label="Email Address"
+          placeholder="Email Address"
+          errors={errors}
+          icon={<EnvelopeIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* Phone */}
-        <div className={`input-container ${errors.phoneNumber && "error"}`}>
-          <FaPhoneSquareAlt className="icon" />
-          <input
-            type="number"
-            name="phoneNumber"
-            value={phoneNumber}
-            onChange={handleInputChange}
-            placeholder="Enter Phone Number"
-            className="input-field"
-          />
-          {errors.phoneNumber && <small>{errors.phoneNumber}</small>}
-        </div>
+        <InputField
+          name="phoneNumber"
+          value={phoneNumber}
+          onChange={handleInputChange}
+          label="Phone Number"
+          placeholder="Phone Number"
+          errors={errors}
+          icon={<PhoneIcon className="h-4 w-4 text-gray-500" />}
+        />
+
+        {/* Street Name */}
+        <InputField
+          name="streetName"
+          value={streetName}
+          onChange={handleInputChange}
+          label="Street Name"
+          placeholder="Street Name"
+          errors={errors}
+          icon={<MapIcon className="h-4 w-4 text-gray-500" />}
+        />
+
+        {/* House Number */}
+        <InputField
+          name="houseNumber"
+          value={houseNumber}
+          onChange={handleInputChange}
+          label="House Number"
+          placeholder="House Number"
+          errors={errors}
+          icon={<HomeIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* Zip Code */}
-        <div className={`input-container ${errors.zipCode && "error"}`}>
-          <RiFileZipFill className="icon" />
-          <input
-            type="number"
-            name="zipCode"
-            value={zipCode}
-            onChange={handleInputChange}
-            placeholder="Enter Zip Code"
-            className="input-field"
-          />
-          {errors.zipCode && <small>{errors.zipCode}</small>}
-        </div>
-
-        {/* Address */}
-        <div className={`input-container ${errors.address && "error"}`}>
-          <FaAddressCard className="icon" />
-          <input
-            type="text"
-            name="address"
-            value={address}
-            onChange={handleInputChange}
-            placeholder="Address"
-            className="input-field"
-          />
-          {errors.address && <small>{errors.address}</small>}
-        </div>
+        <InputField
+          name="zipCode"
+          value={zipCode}
+          onChange={handleInputChange}
+          label="Zip Code"
+          placeholder="Zip Code"
+          errors={errors}
+          icon={<HashtagIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* Country */}
-        <div className="select-container">
-          <select
-            name="country"
-            value={country}
-            onChange={handleInputChange}
-            className="select-options"
-          >
-            <option value="">Choose your country</option>
-            {Country.getAllCountries().map((c) => (
-              <option key={c.isoCode} value={c.isoCode}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.country && <small>{errors.country}</small>}
-        </div>
+        <LabeledSelectField
+          name="country"
+          value={country}
+          onChange={handleInputChange}
+          label="Country"
+          placeholder="Choose your country"
+          errors={errors}
+          options={Country.getAllCountries().map((c) => ({
+            value: c.isoCode,
+            label: c.name,
+          }))}
+          icon={<GlobeAltIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* State */}
-        <div className="select-container">
-          <select
-            name="state"
-            value={state}
-            onChange={handleInputChange}
-            className="select-options"
-          >
-            <option value="">Choose your state</option>
-            {State.getStatesOfCountry(country).map((s) => (
-              <option key={s.isoCode} value={s.isoCode}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          {errors.state && <small>{errors.state}</small>}
-        </div>
+        <LabeledSelectField
+          name="state"
+          value={state}
+          onChange={handleInputChange}
+          label="State"
+          placeholder="Choose your state"
+          errors={errors}
+          options={State.getStatesOfCountry(country).map((s) => ({
+            value: s.isoCode,
+            label: s.name,
+          }))}
+          icon={<MapPinIcon className="h-4 w-4 text-gray-500" />}
+        />
 
         {/* City */}
-        <div className="select-container">
-          <select
-            name="city"
-            value={city}
-            onChange={handleInputChange}
-            className="select-options"
-          >
-            <option value="">Choose your city</option>
-            {City.getCitiesOfCountry(country).map((ci) => (
-              <option key={ci.isoCode} value={ci.name}>
-                {ci.name}
-              </option>
-            ))}
-          </select>
-          {errors.city && <small>{errors.city}</small>}
-        </div>
+        <LabeledSelectField
+          name="city"
+          value={city}
+          onChange={handleInputChange}
+          label="City"
+          placeholder="Choose your city"
+          errors={errors}
+          options={City.getCitiesOfState(country, state).map((c) => ({
+            value: c.isoCode,
+            label: c.name,
+          }))}
+          icon={<BuildingOfficeIcon className="h-4 w-4 text-gray-500" />}
+        />
+
+        {/* Service type */}
+        <SelectField
+          name="service"
+          value={service}
+          onChange={handleInputChange}
+          label="Service Type"
+          placeholder="Choose your service type"
+          errors={errors}
+          options={serviceEnum}
+          icon={<BriefcaseIcon className="h-4 w-4 text-gray-500" />}
+        />
       </form>
       <button
         onClick={proceedToPayment}

@@ -4,7 +4,14 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
 import User from "../models/userModel.js";
-import { addToStatusHistory, calculateDiscount, calculateGrandTotal, calculateShippingFee, calculateShopCommission, calculateTaxAmount } from "../utils/orderHelperFunctions.js";
+import {
+  addToStatusHistory,
+  calculateDiscount,
+  calculateGrandTotal,
+  calculateShopCommission,
+  calculateTaxAmount,
+} from "../utils/orderHelperFunctions.js";
+import { calculatedShippingPrice } from "../utils/shipmentPricing.js";
 
 //=========================================================================
 // Create an order
@@ -60,7 +67,7 @@ export const createOrder = async (req, res, next) => {
       }
       if (!item.qty || item.qty <= 0) {
         productErrors.push(
-          `Invalid or missing quantity for product ${item._id}`
+          `Product with ${item._id} ID is out of stock or invalid quantity.`
         );
       }
     });
@@ -150,9 +157,16 @@ export const createOrder = async (req, res, next) => {
       // Save product updates
       await product.save({ session });
     }
-
+    // Weight based on the number of items in the order
+    const weight = populatedItems.length;
+    const serviceType = shippingAddress.service;
+    const shippingFeeAmount = calculatedShippingPrice(
+      subtotalPrice,
+      weight,
+      serviceType
+    );
     const taxAmount = calculateTaxAmount(subtotalPrice);
-    const shippingFeeAmount = calculateShippingFee(subtotalPrice);
+
     const discountAmount = calculateDiscount(subtotalPrice);
 
     const grandTotal = calculateGrandTotal(
@@ -261,12 +275,28 @@ export const getOrder = async (req, res, next) => {
           select: "name email phoneNumber shopAddress",
         },
         {
+          path: "shipping",
+          model: "Shipment",
+        },
+        {
           path: "refundRequests",
           model: "RefundRequest",
         },
         {
           path: "returnedItems",
           model: "ReturnRequest",
+        },
+        {
+          path: "withdrawalRequests",
+          model: "Withdrawal",
+        },
+        {
+          path: "cancelledOrder",
+          model: "OrderCancellation",
+        },
+        {
+          path: "transaction",
+          model: "Transaction",
         },
       ])
       .lean();
@@ -280,7 +310,7 @@ export const getOrder = async (req, res, next) => {
       order,
     });
   } catch (error) {
-    console.error(`Error fetching order: ${error.message}`);
+    console.error(`Error fetching order: ${error}`);
     next(
       createError(500, "An unexpected error occurred. Please try again later.")
     );
@@ -593,9 +623,18 @@ export const refundUserOrderRequest = async (req, res, next) => {
 
     // Calculate refund amount
     const subTotalProductPrice = productPrice * quantity;
-
     const taxAmount = calculateTaxAmount(subTotalProductPrice);
-    const shippingFeeAmount = calculateShippingFee(subTotalProductPrice);
+    const weight = order.orderedItems.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    );
+    const serviceType = shippingAddress.service;
+    const shippingFeeAmount = calculatedShippingPrice(
+      subTotalProductPrice,
+      weight,
+      serviceType
+    );
+
     const discountAmount = calculateDiscount(subTotalProductPrice);
 
     const netRefundAmount = calculateGrandTotal(

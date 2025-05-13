@@ -348,9 +348,7 @@ export const deleteSubcategory = async (req, res, next) => {
     await transaction.commitTransaction();
     transaction.endSession();
 
-    console.log(
-      `Subcategory ${id} deleted successfully by shop ${requestingShopId}`
-    );
+   
 
     res.status(200).json({
       success: true,

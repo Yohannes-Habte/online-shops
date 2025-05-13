@@ -10,6 +10,24 @@ import {
   TextAreaField,
 } from "../formFields/FormFields";
 
+import {
+  FaExchangeAlt,
+  FaShoppingCart,
+  FaMoneyCheckAlt,
+  FaUndo,
+  FaBoxOpen,
+  FaPiggyBank,
+  FaBalanceScale,
+  FaStickyNote,
+  FaDollarSign,
+  FaCreditCard,
+  FaBuilding,
+  FaCalendarAlt,
+  FaUserCheck,
+  FaFlag,
+  FaTimesCircle,
+} from "react-icons/fa";
+
 const transactionOptions = ["Payout", "Refund", "Withdrawal", "Adjustment"];
 
 const transactionStatusOptions = ["Processing", "Completed", "Cancelled"];
@@ -196,6 +214,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
             onChange={handleChange}
             errors={errors}
             ariaLabel={"Transaction Type"}
+            icon={<FaExchangeAlt />}
           />
 
           {formData.transactionType === "Withdrawal" && (
@@ -207,6 +226,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               placeholder="Withdrawal ID"
               readOnly={true}
+              icon={<FaPiggyBank />}
             />
           )}
 
@@ -222,6 +242,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   placeholder="Order ID"
                   readOnly={true}
+                  icon={<FaShoppingCart />}
                 />
                 <InputField
                   label="Platform Fees"
@@ -232,6 +253,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   placeholder="Platform Fees"
                   readOnly={true}
+                  icon={<FaMoneyCheckAlt />}
                 />
               </>
             )}
@@ -246,6 +268,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   placeholder="Refund Request ID"
                   readOnly={true}
+                  icon={<FaUndo />}
                 />
 
                 <InputField
@@ -256,6 +279,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   placeholder="Returned Item ID"
                   readOnly={true}
+                  icon={<FaBoxOpen />}
                 />
 
                 <InputField
@@ -266,6 +290,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   placeholder="Withdrawal ID"
                   readOnly={true}
+                  icon={<FaPiggyBank />}
                 />
               </>
             )}
@@ -280,6 +305,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   onChange={handleChange}
                   errors={errors}
                   ariaLabel={"Adjustment Reason"}
+                  icon={<FaBalanceScale />}
                 />
 
                 <InputField
@@ -289,6 +315,8 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
                   errors={errors}
                   onChange={handleChange}
                   placeholder="Adjustment Notes"
+                  ariaLabel={"Adjustment Notes"}
+                  icon={<FaStickyNote />}
                 />
               </>
             )}
@@ -302,6 +330,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               onChange={handleChange}
               placeholder="Transaction Amount"
+              icon={<FaDollarSign />}
             />
             <InputField
               label="Currency"
@@ -310,6 +339,8 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               onChange={handleChange}
               errors={errors}
               placeholder="Currency"
+              readOnly={true}
+              icon={<FaDollarSign />}
             />
             <InputField
               label="Payment Method"
@@ -319,6 +350,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               placeholder="Payment Method"
               readOnly={true}
+              icon={<FaCreditCard />}
             />
             <InputField
               label="Payment Provider"
@@ -328,6 +360,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               placeholder="Payment Provider"
               readOnly={true}
+              icon={<FaBuilding />}
             />
 
             <DateField
@@ -338,6 +371,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               ariaLabel={"Processed Date"}
               readOnly={true}
+              icon={<FaCalendarAlt />}
             />
 
             <InputField
@@ -348,6 +382,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               errors={errors}
               placeholder="Processed By (User ID)"
               readOnly={true}
+              icon={<FaUserCheck />}
             />
           </div>
 
@@ -360,6 +395,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
             onChange={handleChange}
             errors={errors}
             ariaLabel={"Transaction Status"}
+            icon={<FaFlag />}
           />
 
           {formData.transactionStatus === "Cancelled" && (
@@ -371,11 +407,12 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
               onChange={handleChange}
               placeholder="Cancellation Reason"
               ariaLabel={"Cancellation Reason"}
+              icon={<FaTimesCircle />}
             />
           )}
 
-          <button type="submit" className="submit-btn">
-            Submit Transaction
+          <button type="submit" className="confirm-payment-submit-btn">
+            Confirm Payment
           </button>
         </form>
       </section>

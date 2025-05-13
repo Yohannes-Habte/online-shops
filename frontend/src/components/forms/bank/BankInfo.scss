@@ -1,0 +1,18 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.refund-request-bank-info-fieldset-container {
+  @include shadow2;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  margin-bottom: 1.5rem;
+  border: 1px solid $green;
+
+  .bank-info-subtitle {
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+  }
+}

@@ -5,18 +5,30 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Shipping from "../shipping/Shipping";
 import CartInfo from "../cartInfo/CartInfo";
+import CalculatedShippingPrice from "../../../utils/shippingPrice/ShippingPrice";
+
+const serviceEnum = [
+  "Standard",
+  "Express",
+  "Overnight",
+  "TwoDay",
+  "SameDay",
+  "Economy",
+  "Freight",
+  "International",
+  "NextDay",
+  "Scheduled",
+];
 
 const initialState = {
   country: "",
   state: "",
   city: "",
-  address: "",
+  streetName: "",
+  houseNumber: "",
   zipCode: "",
   phoneNumber: "",
-  couponCode: "",
-  couponCodeData: null,
-  discountPrice: null,
-  userInfo: false,
+  service: "",
 };
 
 const Checkout = () => {
@@ -42,9 +54,20 @@ const Checkout = () => {
   };
 
   const validateForm = () => {
-    const { address, zipCode, country, state, city, phoneNumber } = formData;
+    const {
+      streetName,
+      houseNumber,
+      service,
+      zipCode,
+      country,
+      state,
+      city,
+      phoneNumber,
+    } = formData;
     const newErrors = {};
-    if (!address) newErrors.address = "Address is required.";
+    if (!streetName) newErrors.streetName = "Street name is required.";
+    if (!houseNumber) newErrors.houseNumber = "House number is required.";
+    if (!service) newErrors.service = "Service type is required.";
     if (!zipCode) newErrors.zipCode = "Zip code is required.";
     if (!country) newErrors.country = "Country is required.";
     if (!state) newErrors.state = "State is required.";
@@ -57,19 +80,12 @@ const Checkout = () => {
   const calculateSubTotal = () =>
     cart.reduce((acc, item) => acc + item.qty * item.discountPrice, 0);
 
-  const calculateShippingFee = (subTotal) => {
-    if (typeof subTotal !== "number" || subTotal < 0) return 0;
+  const subTotal = calculateSubTotal();
 
-    return subTotal <= 100
-      ? 50
-      : subTotal < 500
-      ? subTotal * 0.1
-      : subTotal < 1000
-      ? subTotal * 0.05
-      : subTotal < 2000
-      ? subTotal * 0.04
-      : subTotal * 0.04;
-  };
+  const totalItems = cart?.reduce((acc, item) => acc + item.qty, 0);
+
+  const totalShippingFee = CalculatedShippingPrice(subTotal, totalItems, formData.service || serviceEnum[0]);
+
 
   const calculateTax = (subTotal) => subTotal * 0.02;
 
@@ -118,15 +134,24 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      const { address, zipCode, country, state, city, phoneNumber } = formData;
+      const {
+        streetName,
+        houseNumber,
+        service,
+        zipCode,
+        country,
+        state,
+        city,
+        phoneNumber,
+      } = formData;
       const subTotal = calculateSubTotal();
-      const shippingFee = calculateShippingFee(subTotal);
+      const shippingFee = totalShippingFee;
       const tax = calculateTax(subTotal);
       const discount = calculateDiscount(subTotal);
       const grandTotal = calculateGrandTotal(
         subTotal,
         tax,
-        shippingFee,
+        totalShippingFee,
         discount
       );
 
@@ -134,12 +159,14 @@ const Checkout = () => {
         currentUser,
         cart,
         shippingAddress: {
-          address,
+          streetName,
+          houseNumber,
           zipCode,
           country,
           state,
           city,
           phoneNumber,
+          service,
         },
         subTotal,
         shippingFee,
@@ -157,16 +184,17 @@ const Checkout = () => {
     }
   };
 
-  const subTotal = calculateSubTotal();
-  const shippingFee = calculateShippingFee(subTotal);
+ 
+ 
   const tax = calculateTax(subTotal);
   const discount = calculateDiscount(subTotal);
-  const totalPrice = subTotal + shippingFee + tax - discount;
+  const totalPrice = subTotal + totalShippingFee + tax - discount;
 
   return (
     <div className="cart-checkout-wrapper">
       <Shipping
         user={currentUser}
+        serviceEnum={serviceEnum}
         formData={formData}
         setFormData={setFormData}
         handleInputChange={handleInputChange}
@@ -177,7 +205,7 @@ const Checkout = () => {
 
       <CartInfo
         subTotal={subTotal}
-        shippingFee={shippingFee}
+        shippingFee={totalShippingFee}
         tax={tax}
         discount={discount}
         totalPrice={totalPrice}

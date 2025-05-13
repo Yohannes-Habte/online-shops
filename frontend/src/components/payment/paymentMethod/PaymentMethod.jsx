@@ -29,8 +29,8 @@ const PaymentMethod = () => {
   const currencyOptions = ["USD", "EUR", "GBP", "INR", "JPY", "AUD"];
 
   const paymentMethodConfig = {
-    "Credit Card": { provider: "Stripe", status: "completed" },
-    "Debit Card": { provider: "Bank Transfer", status: "completed" },
+    "Credit Card": { provider: "Stripe", status: "pending" },
+    "Debit Card": { provider: "Bank Transfer", status: "pending" },
     PayPal: { provider: "PayPal", status: "completed" },
     "Cash On Delivery": { provider: "Cash On Delivery", status: "pending" },
   };

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import "./UserSingleOrderSummary.scss";
+import OrderCancellation from "../../forms/orderCancellation/OrderCancellation";
 
 const UserSingleOrderSummary = ({ orderInfos, currentUser }) => {
+  const [showCancellationReason, setShowCancellationReason] = useState(false);
   return (
     <div className="order-summary">
       <div className="summary-details">
@@ -20,6 +23,20 @@ const UserSingleOrderSummary = ({ orderInfos, currentUser }) => {
         <h3>
           Grand Total: <strong>${orderInfos?.grandTotal.toFixed(2)}</strong>
         </h3>
+
+        <button
+          onClick={() => setShowCancellationReason(true)}
+          className="user-cancel-order-btn"
+        >
+          Cancel Order
+        </button>
+
+        {showCancellationReason && (
+          <OrderCancellation
+            setShowCancellationReason={setShowCancellationReason}
+            order={orderInfos}
+          />
+        )}
       </div>
 
       {/* Shipping Address */}

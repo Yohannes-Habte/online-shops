@@ -92,7 +92,7 @@ export const googleRegisterLogin = async (req, res, next) => {
         password: hashedPassword,
         agree: req.body.agree,
       });
-      console.log("new User", newUser);
+    
 
       try {
         await newUser.save();

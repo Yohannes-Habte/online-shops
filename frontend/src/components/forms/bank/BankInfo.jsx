@@ -118,7 +118,7 @@ const BankInfo = ({
   ];
 
   return (
-    <section className="refund-request-fieldset">
+    <section className="refund-request-bank-info-fieldset-container">
       <h4 className="bank-info-subtitle">Bank Details</h4>
       <div className="refund-request-form-group-wrapper">
         {fields.map(({ label, name, value, icon, placeholder }) => (

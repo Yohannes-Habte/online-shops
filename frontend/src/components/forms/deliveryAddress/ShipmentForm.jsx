@@ -23,6 +23,8 @@ import {
   FiFileText,
 } from "react-icons/fi";
 
+
+
 const providerTrackingTemplates = {
   UPS: "https://www.ups.com/track?loc=en_US&tracknum={{trackingNumber}}",
   FEDEX: "https://www.fedex.com/fedextrack/?tracknumbers={{trackingNumber}}",
@@ -149,6 +151,11 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
   const [shippingLoading, setShippingLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const orderWeight = order?.orderedItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   const {
     provider,
     serviceType,
@@ -165,6 +172,16 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
     actualDeliveryDate,
     notes,
   } = formData;
+
+  useEffect(() => {
+    if (order) {
+      setFormData((prevData) => ({
+        ...prevData,
+        weightKg: orderWeight,
+        serviceType: order.shippingAddress.service,
+      }));
+    }
+  }, [order]);
 
   const getEstimatedDeliveryDate = () => {
     let deliveryDate = new Date();
@@ -195,8 +212,6 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
       }));
     }
   }, []);
-
-  
 
   // Build final tracking URL
   const buildTrackingUrl = (template, trackingNum) => {
@@ -301,7 +316,7 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
         order: order._id,
         provider,
         serviceType,
-        weightKg: parseFloat(weightKg),
+        weightKg: orderWeight,
         insuranceSupported,
         additionalFees: parseFloat(additionalFees),
         trackingNumber: usedTrackingNumber,
@@ -379,6 +394,7 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
               onChange={handleChange}
               options={services}
               errors={errors}
+              readOnly
               icon={<FiLayers />}
             />
             <InputField
@@ -388,6 +404,7 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
               value={weightKg}
               onChange={handleChange}
               errors={errors}
+              readOnly
               icon={<FiPackage />}
               placeholder="Weight in kg"
             />

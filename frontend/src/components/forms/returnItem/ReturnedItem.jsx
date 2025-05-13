@@ -20,10 +20,10 @@ const refundStatusOptions = ["Accepted", "Rejected"];
 const initialState = {
   isProductReturned: "",
   condition: "",
-  comments: "",
-  refundAmount: "",
-  processedDate: "",
   refundStatus: "",
+  refundAmount: "",
+  comments: "",
+  processedDate: "",
   rejectedReason: "",
 };
 

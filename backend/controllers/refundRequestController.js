@@ -5,79 +5,16 @@ import { v4 as uuidv4 } from "uuid";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import Shop from "../models/shopModel.js";
-
-//=========================================================================
-// Helper functions for order calculations and status history updates
-//=========================================================================
-
-// 2. Helper function to  const calculateTax = (subTotal) => subTotal * 0.02;
-const calculateTaxAmount = (subTotal) =>
-  parseFloat((subTotal * 0.02).toFixed(2));
-
-// 3. Helper function to calculate shipping fee
-const calculateShippingFee = (subTotal) => {
-  if (typeof subTotal !== "number" || subTotal < 0) return 0;
-
-  return subTotal <= 100
-    ? 50
-    : subTotal < 500
-    ? parseFloat((subTotal * 0.1).toFixed(2))
-    : subTotal < 1000
-    ? parseFloat((subTotal * 0.05).toFixed(2))
-    : subTotal < 2000
-    ? parseFloat((subTotal * 0.04).toFixed(2))
-    : parseFloat((subTotal * 0.04).toFixed(2));
-};
-
-// 4. Helper function for discount calculation
-const calculateDiscount = (subTotal) => {
-  if (typeof subTotal !== "number" || subTotal < 0) return 0;
-
-  // Validate input: Ensure subTotal is a positive number or can be converted into a valid number
-  const parsedSubTotal = parseFloat(subTotal);
-
-  if (isNaN(parsedSubTotal) || parsedSubTotal < 0) {
-    throw new Error("Invalid subTotal. Please provide a positive number.");
-  }
-
-  // Discount tiers (threshold and discount values)
-  const discountTiers = [
-    { threshold: 10000, discount: 0.05 },
-    { threshold: 4000, discount: 0.04 },
-    { threshold: 2000, discount: 0.03 },
-    { threshold: 1000, discount: 0.02 },
-    { threshold: 500, discount: 0.01 },
-    { threshold: 250, discount: 0.005 },
-  ];
-
-  // Loop through the discount tiers to find the appropriate discount
-  for (const { threshold, discount } of discountTiers) {
-    if (parsedSubTotal >= threshold) {
-      const discountAmount = parsedSubTotal * discount;
-      return parseFloat(discountAmount.toFixed(2)); // Round to 2 decimal places
-    }
-  }
-
-  // No discount if subTotal is below the first threshold
-  return 0;
-};
-
-// 5. Helper function to calculate the grand total
-const calculateGrandTotal = (subtotal, tax, shippingFee, discount) => {
-  if (
-    typeof subtotal !== "number" ||
-    typeof tax !== "number" ||
-    typeof shippingFee !== "number" ||
-    typeof discount !== "number"
-  ) {
-    throw new Error("Invalid input: All inputs must be numbers.");
-  }
-
-  return parseFloat((subtotal + tax + shippingFee - discount).toFixed(2));
-};
+import {
+  calculateDiscount,
+  calculateGrandTotal,
+  calculateTaxAmount,
+} from "../utils/orderHelperFunctions.js";
+import User from "../models/userModel.js";
+import { calculatedShippingPrice } from "../utils/shipmentPricing.js";
 
 // ==========================================================================
-// Create a new refund request
+// Create a new refund request by a user
 // ==========================================================================
 export const createRefundRequest = async (req, res, next) => {
   const {
@@ -99,7 +36,7 @@ export const createRefundRequest = async (req, res, next) => {
     processedBy,
   } = req.body;
 
-  const authShopId = req.shop.id;
+  const authUserId = req.user.id;
 
   // Validate the shop ID
   if (!mongoose.isValidObjectId(order)) {
@@ -110,8 +47,8 @@ export const createRefundRequest = async (req, res, next) => {
     return next(createError(400, "Invalid product ID provided."));
   }
 
-  if (!mongoose.isValidObjectId(authShopId)) {
-    return next(createError(400, "Invalid shop ID provided."));
+  if (!mongoose.isValidObjectId(authUserId)) {
+    return next(createError(400, "Invalid user ID."));
   }
 
   if (!mongoose.isValidObjectId(processedBy)) {
@@ -122,11 +59,16 @@ export const createRefundRequest = async (req, res, next) => {
   session.startTransaction();
 
   try {
-    // Find shop
-    const foundShop = await Shop.findById(authShopId).session(session);
-    if (!foundShop) {
+    // Find the authenticated user
+    const authUser = await User.findById(authUserId).session(session);
+    if (!authUser) {
       await session.abortTransaction();
-      return next(createError(404, "Shop not found!"));
+      return next(
+        createError(
+          403,
+          "Forbidden: Unauthorized to create a refund request for this order!"
+        )
+      );
     }
 
     // Find the order
@@ -136,15 +78,34 @@ export const createRefundRequest = async (req, res, next) => {
       return next(createError(404, "Order not found"));
     }
 
-    // Check if the order belongs to the authenticated shop
-    if (
-      orderDetails.orderedItems[0].shop.toString() !== authShopId.toString()
-    ) {
+    // Find shop
+    const shopID = orderDetails.orderedItems[0].shop._id;
+    const foundShop = await Shop.findById(shopID).session(session);
+    if (!foundShop) {
+      await session.abortTransaction();
+      return next(createError(404, "Shop not found!"));
+    }
+
+    const currentOrderStatus = [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Cancelled",
+      "Refund Requested",
+      "Awaiting Item Return",
+      "Returned",
+      "Refund Processing",
+      "Refund Rejected",
+      "Refund Accepted",
+      "Refunded",
+    ];
+
+    if (currentOrderStatus.includes(orderDetails.orderStatus)) {
       await session.abortTransaction();
       return next(
         createError(
-          403,
-          "You are not authorized to create a refund request for this order"
+          400,
+          `Refund request not allowed for orders with status ${orderDetails.orderStatus}`
         )
       );
     }
@@ -155,28 +116,6 @@ export const createRefundRequest = async (req, res, next) => {
         createError(
           400,
           "Refund request can only be created for delivered orders"
-        )
-      );
-    }
-
-    // If order status is "Returned", "Refund Processing", "Refund Rejected", "Refund Accepted", or  "Refunded", you cannot create a refund request
-
-    const restrictedStatuses = [
-      "Returned",
-      "Refund Processing",
-      "Refund Rejected",
-      "Refund Accepted",
-      "Refunded",
-    ];
-
-    const orderStatus = orderDetails.orderStatus;
-
-    if (restrictedStatuses.includes(orderStatus)) {
-      await session.abortTransaction();
-      return next(
-        createError(
-          400,
-          "Refund request cannot be created for this order status"
         )
       );
     }
@@ -207,19 +146,19 @@ export const createRefundRequest = async (req, res, next) => {
 
     // Prevent duplicate refund requests. refundRequests is an array of refund requests in the order
     // Check if a refund request for this product already exists in the order
-    const existingRefundRequestInRefundRequests =
-      orderDetails.refundRequests.find(
-        (refundRequest) =>
-          String(refundRequest.product) === String(product) &&
-          String(refundRequest.productColor).toLowerCase() ===
-            productColor.trim().toLowerCase() &&
-          String(refundRequest.productSize).toLowerCase() ===
-            productSize.trim().toLowerCase() &&
-          Number(refundRequest.productQuantity) === Number(productQuantity)
-      );
+    const isRefundRequestExist = orderDetails.refundRequests.find(
+      (refundRequest) =>
+        String(refundRequest.order) === String(order) &&
+        String(refundRequest.product) === String(product) &&
+        String(refundRequest.productColor).toLowerCase() ===
+          productColor.trim().toLowerCase() &&
+        String(refundRequest.productSize).toLowerCase() ===
+          productSize.trim().toLowerCase() &&
+        Number(refundRequest.productQuantity) === Number(productQuantity)
+    );
 
     // If a refund request for this product already exists, prevent a duplicate request
-    if (existingRefundRequestInRefundRequests) {
+    if (isRefundRequestExist) {
       await session.abortTransaction();
       return next(createError(400, "Refund already requested for this item!"));
     }
@@ -243,9 +182,15 @@ export const createRefundRequest = async (req, res, next) => {
 
     // Calculate refund amount
     const subTotalProductPrice = productPrice * productQuantity;
+    const serviceType = orderDetails.shippingAddress.service;
+    const productWeight = orderedProduct.quantity;
 
     const taxAmount = calculateTaxAmount(subTotalProductPrice);
-    const shippingFeeAmount = calculateShippingFee(subTotalProductPrice);
+    const shippingFeeAmount = calculatedShippingPrice(
+      subTotalProductPrice,
+      productWeight,
+      serviceType
+    );
     const discountAmount = calculateDiscount(subTotalProductPrice);
 
     const netRefundAmount = calculateGrandTotal(
@@ -313,10 +258,12 @@ export const createRefundRequest = async (req, res, next) => {
     // Update order
     orderDetails.refundRequests.push(newRefundRequest._id);
 
-    orderDetails.orderStatus = "Refund Requested";
+    const updateOrderStatus = "Refund Requested";
+
+    orderDetails.orderStatus = updateOrderStatus;
 
     orderDetails.statusHistory.push({
-      status: "Refund Requested",
+      status: updateOrderStatus,
       changedAt: requestedDate,
       message: `Your order, placed on ${new Date().toLocaleString()}, for the product ${
         product.title

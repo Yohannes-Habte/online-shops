@@ -47,6 +47,19 @@ export const paymentStatusEnum = [
   "cancelled",
 ];
 
+export const serviceEnum = [
+  "Standard",
+  "Express",
+  "Overnight",
+  "TwoDay",
+  "SameDay",
+  "Economy",
+  "Freight",
+  "International",
+  "NextDay",
+  "Scheduled",
+];
+
 export const currencyEnum = ["USD", "EUR", "GBP", "INR", "JPY", "AUD"];
 
 // Schema for individual order items
@@ -79,9 +92,11 @@ const shippingAddressSchema = new Schema(
     country: { type: String, required: true },
     state: { type: String, required: true },
     city: { type: String, required: true },
-    address: { type: String, required: true },
+    streetName: { type: String, required: true },
+    houseNumber: { type: String, required: true },
     zipCode: { type: String, required: true },
     phoneNumber: { type: String, required: true },
+    service: { type: String, enum: serviceEnum, required: true },
   },
   { timestamps: true }
 );
@@ -149,7 +164,8 @@ const orderSchema = new Schema(
 
     shippingAddress: { type: shippingAddressSchema, required: true },
     payment: { type: paymentSchema },
-    subtotal: { type: Number, required: true, min: 0 }, // Total price of ordered items before tax, shipping, and service fees
+    // subtotal is the total price of ordered items before tax, shipping, and service fees
+    subtotal: { type: Number, required: true, min: 0 }, 
     shippingFee: { type: Number, default: 0 },
     tax: { type: Number, default: 0 },
     serviceFee: { type: Number, default: 0 }, // Service charges for the app or platform
@@ -171,10 +187,7 @@ const orderSchema = new Schema(
 
     withdrawalRequests: [{ type: Schema.Types.ObjectId, ref: "Withdrawal" }],
 
-    cancellationReason: {
-      reason: { type: String, default: null },
-      cancellationDate: { type: Date, default: new Date() },
-    },
+    cancelledOrder: { type: Schema.Types.ObjectId, ref: "OrderCancellation" },
 
     deliveredAt: { type: Date },
     version: { type: Number, default: 1 },

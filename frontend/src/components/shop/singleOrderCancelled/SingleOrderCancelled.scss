@@ -1,0 +1,51 @@
+.single-order-cancelled-container {
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  color: #333;
+ 
+
+  .single-order-cancelled-title {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    color: #b30000;
+  }
+
+  .order-details {
+    line-height: 1.6;
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+
+    .cancelled-order-info {
+      margin: 0.5rem 0;
+    }
+
+    .cancelled-order-strong {
+      color: #000;
+    }
+  }
+
+  .cancelled-order-reviewer-notes-wrapper {
+    background-color: #fff0f0;
+    padding: 1rem;
+    border-left: 4px solid #b30000;
+    border-radius: 8px;
+
+    .reviewer-message-title {
+      margin-bottom: 0.5rem;
+      color: #b30000;
+    }
+
+    .cancelled-order-info {
+      margin: 0;
+    }
+  }
+
+  .error {
+    color: red;
+    text-align: center;
+  }
+}

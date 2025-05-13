@@ -7,7 +7,7 @@ import createError from "http-errors";
 
 export const createMessage = async (req, res, next) => {
   try {
-    console.log(req.body);
+   
     const {
       conversationId,
       text,

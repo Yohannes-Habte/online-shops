@@ -5,19 +5,39 @@ const { Schema, model } = mongoose;
 
 const statusEnum = ["Pending", "Approved", "Rejected"];
 
+const reasonEnum = [
+  "Ordered by mistake",
+  "Found a better price elsewhere",
+  "Item arrived late",
+  "Item not as described",
+  "Item was damaged or defective",
+  "Changed my mind",
+  "Duplicate order",
+  "Received the wrong item",
+  "Billing or payment issue",
+  "Other",
+];
+
 const orderCancellationSchema = new Schema(
   {
-    cancellationCode: { type: String, unique: true, required: true },
+    cancellationCode: { type: String, unique: true },
 
     orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
 
     requestedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-    cancellationStatus: { type: String, enum: statusEnum, required: true },
+    reason: { type: String, enum: reasonEnum, required: true },
 
-    reviewedAt: { type: Date, required: true },
+    // If other, specify the reason
+    otherReason: { type: String },
 
-    reviewerNotes: { type: String, required: true },
+    cancellationStatus: { type: String, enum: statusEnum },
+
+    reviewerNotes: { type: String },
+
+    reviewedDate: { type: Date },
+
+    reviewer: { type: Schema.Types.ObjectId, ref: "Shop" },
   },
 
   {

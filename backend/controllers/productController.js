@@ -30,7 +30,7 @@ export const createProduct = async (req, res, next) => {
     variants,
   } = req.body;
 
-  console.log("req.body", req.body);
+
 
   // Validate the shop ID
   if (!mongoose.isValidObjectId(shopId)) {

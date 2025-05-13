@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import TransactionForm from "../../forms/transaction/TransactionForm";
 import ShipmentForm from "../../forms/deliveryAddress/ShipmentForm";
+import UpdateOrderCancellation from "../../forms/updateOrderCancellation/UpdateOrderCancellation";
 
 const providers = [
   "UPS",
@@ -43,21 +44,6 @@ const providers = [
   "CAINIAO",
 ];
 
-const orderStatusArray = [
-  "Pending",
-  "Processing",
-  "Shipped",
-  "Delivered",
-  "Cancelled",
-  "Refund Requested",
-  "Awaiting Item Return",
-  "Returned",
-  "Refund Processing",
-  "Refund Rejected",
-  "Refund Accepted",
-  "Refunded",
-];
-
 const SingleOrderStatusUpdate = ({
   updateOrderStatus,
   status,
@@ -67,8 +53,6 @@ const SingleOrderStatusUpdate = ({
   handleChange,
   generateProcessingCode,
   getEstimatedDeliveryDate,
-  cancellationReason,
-  setCancellationReason,
   returnReason,
   setReturnReason,
   order,
@@ -79,12 +63,37 @@ const SingleOrderStatusUpdate = ({
   const [showReturnReason, setShowReturnReason] = useState(false);
   const [openTransaction, setOpenTransaction] = useState(false);
   const [openShippedStatus, setOpenShippedStatus] = useState(false);
+  const [statusManuallyChanged, setStatusManuallyChanged] = useState(false);
+
+  const refundStatuses = [
+    "Refund Requested",
+    "Awaiting Item Return",
+    "Refund Processing",
+    "Returned",
+    "Refund Rejected",
+    "Refund Accepted",
+    "Refunded",
+  ];
+
+const currentOrderStatus = refundStatuses.includes(order?.orderStatus)
+  ? order.orderStatus
+  : null;
+
+
+  const orderStatusArray = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+    ...(currentOrderStatus ? [currentOrderStatus] : []),
+  ];
 
   const statusHandler = (e) => {
     const newStatus = e.target.value;
     setStatus(newStatus);
+    setStatusManuallyChanged(true);
 
-    // Trigger Transaction Form popup when "Delivered" is selected
     if (newStatus === "Delivered") {
       setOpenTransaction(true);
     } else {
@@ -96,14 +105,20 @@ const SingleOrderStatusUpdate = ({
     } else {
       setOpenShippedStatus(false);
     }
+
+    if (newStatus === "Cancelled") {
+      setShowCancellationReason(true);
+    } else {
+      setShowCancellationReason(false);
+    }
   };
 
   // Toggle fields based on status selection
   useEffect(() => {
     setShowTrackingInfo(status === "Processing");
-    setShowCancellationReason(status === "Cancelled");
+    setShowCancellationReason(status === "Cancelled" && statusManuallyChanged);
     setShowReturnReason(status === "Returned");
-  }, [status]);
+  }, [status, statusManuallyChanged]);
 
   // Close all fields after updating status
   const handleOpenAndClose = () => {
@@ -202,22 +217,6 @@ const SingleOrderStatusUpdate = ({
           </div>
         )}
 
-        {/* Cancellation Reason Input */}
-        {showCancellationReason && (
-          <div className="textarea-container">
-            <LucideMessageCircle className="input-icon" />
-            <textarea
-              name="cancellationReason"
-              rows={4}
-              cols={30}
-              value={cancellationReason}
-              onChange={(e) => setCancellationReason(e.target.value)}
-              placeholder="Enter cancellation reason"
-              className="textarea-field"
-            />
-          </div>
-        )}
-
         {/* Return Reason Input */}
         {showReturnReason && (
           <div className="textarea-container">
@@ -242,6 +241,13 @@ const SingleOrderStatusUpdate = ({
           {processStatus ? "Updating..." : "Update Status"}
         </button>
       </form>
+
+      {showCancellationReason && (
+        <UpdateOrderCancellation
+          setShowCancellationReason={setShowCancellationReason}
+          order={order}
+        />
+      )}
 
       {openShippedStatus && (
         <ShipmentForm

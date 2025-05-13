@@ -1,0 +1,28 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.order-cancellation-form-modal {
+  @include modal;
+
+  .order-cancellation-form-popup {
+    @include popupBox;
+    padding: 1rem 2rem;
+
+    .close-cancellation-modal {
+      @include closeModal;
+    }
+
+    .order-cancellation-form-title {
+      @include title;
+    }
+
+    .order-cancellation-form {
+      @include flexColumn;
+
+      .order-cancellation-form-btn {
+        @include button3;
+        margin-top: 1rem;
+      }
+    }
+  }
+}

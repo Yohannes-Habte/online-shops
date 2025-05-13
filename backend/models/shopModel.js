@@ -4,8 +4,6 @@ import crypto from "crypto";
 
 const { Schema } = mongoose;
 
-
-
 const shopSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -36,6 +34,10 @@ const shopSchema = new Schema(
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
 
     shippings: [{ type: Schema.Types.ObjectId, ref: "Shipping" }],
+
+    cancelledOrders: [
+      { type: Schema.Types.ObjectId, ref: "OrderCancellation" },
+    ],
 
     refundRequests: [{ type: Schema.Types.ObjectId, ref: "RefundRequest" }],
 

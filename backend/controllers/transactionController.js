@@ -53,6 +53,10 @@ export const createTransaction = async (req, res, next) => {
     );
   }
 
+  if (!mongoose.isValidObjectId(order) && transactionType === "Payout") {
+    return next(createError(400, "Invalid order ID provided."));
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -100,9 +104,6 @@ export const createTransaction = async (req, res, next) => {
       transactionObject.cancelledReason = cancelledReason;
     }
 
-    const newTransaction = new Transaction(transactionObject);
-    await newTransaction.save({ session });
-
     const shopDetails = await Shop.findById(authShopId).session(session);
     if (!shopDetails) {
       await session.abortTransaction();
@@ -114,6 +115,34 @@ export const createTransaction = async (req, res, next) => {
       await session.abortTransaction();
       return next(createError(404, "Order not found"));
     }
+
+    const currentOrderStatus = [
+      "Pending",
+      "Processing",
+      "Delivered",
+      "Cancelled",
+      "Refund Requested",
+      "Awaiting Item Return",
+      "Returned",
+      "Refund Processing",
+      "Refund Rejected",
+      "Refund Accepted",
+      "Refunded",
+    ];
+
+    if (currentOrderStatus.includes(foundOrder.orderStatus)) {
+      await session.abortTransaction();
+      return next(
+        createError(
+          400,
+          `Transaction not allowed for orders with status ${foundOrder.orderStatus}`
+        )
+      );
+    }
+
+    // Create the transaction
+    const newTransaction = new Transaction(transactionObject);
+    await newTransaction.save({ session });
 
     if (transactionType === "Payout") {
       foundOrder.transaction = newTransaction._id;

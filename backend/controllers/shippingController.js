@@ -42,6 +42,7 @@ export const createShipping = async (req, res, next) => {
   try {
     // If the shipping exists, return an error
     const existingShipment = await Shipment.findOne({ order }).session(session);
+
     if (existingShipment) {
       await session.abortTransaction();
       return next(createError(400, "This order is already shipped."));
@@ -55,9 +56,33 @@ export const createShipping = async (req, res, next) => {
     }
 
     const orderDetails = await Order.findById(order).session(session);
+
     if (!orderDetails) {
       await session.abortTransaction();
       next(createError(404, "Order not found."));
+    }
+
+    // Validate order status
+    const orderShippingStatuses = [
+      "Pending",
+      "Shipped",
+      "Delivered",
+      "Returned",
+      "Refund Requested",
+      "Returned Items",
+      "Refund Processing",
+      "Refunded",
+      "Cancelled",
+    ];
+
+    if (orderShippingStatuses.includes(orderDetails.orderStatus)) {
+      await session.abortTransaction();
+      return next(
+        createError(
+          400,
+          `Order cannot be shipped if the current status is ${orderDetails.orderStatus}.`
+        )
+      );
     }
 
     const providerCode = uuidv4();

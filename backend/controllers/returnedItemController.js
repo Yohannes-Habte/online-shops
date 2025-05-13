@@ -10,17 +10,17 @@ import { addToStatusHistory } from "../utils/orderHelperFunctions.js";
 
 export const createReturnedItem = async (req, res, next) => {
   const {
-    isProductReturned,
-    condition,
-    comments,
-    refundAmount,
-    processedDate,
-    refundStatus,
-    rejectedReason,
-    processedBy,
     order,
     refundRequest,
+    isProductReturned,
     returnedDate,
+    condition,
+    refundStatus,
+    refundAmount,
+    comments,
+    processedDate,
+    rejectedReason,
+    processedBy,
     product,
   } = req.body;
 
@@ -35,9 +35,8 @@ export const createReturnedItem = async (req, res, next) => {
   }
 
   const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    session.startTransaction();
-
     const returnedItemId = uuidv4();
     let orderStatus;
 
@@ -61,16 +60,27 @@ export const createReturnedItem = async (req, res, next) => {
       ]
     );
 
-    if (!shopDetails) return next(createError(404, "Shop not found"));
-    if (!orderDetails) return next(createError(404, "Order not found"));
-    if (!refundRequestDetails)
-      return next(createError(404, "Refund Request not found"));
+    if (!shopDetails) {
+      session.abortTransaction();
+      return next(createError(404, "Shop not found"));
+    }
+
+    if (!orderDetails) {
+      session.abortTransaction();
+      return next(createError(404, "Order not found"));
+    }
+
+    if (!refundRequestDetails) {
+      session.abortTransaction();
+      return next(createError(404, "Refund request not found"));
+    }
 
     // Validate ownership
     const shopMismatch = orderDetails.orderedItems.some(
       (item) => item.shop.toString() !== authShopId.toString()
     );
     if (shopMismatch) {
+      session.abortTransaction();
       return next(
         createError(
           403,
@@ -79,15 +89,21 @@ export const createReturnedItem = async (req, res, next) => {
       );
     }
 
-    // Order must be eligible for refund
+    // Check if order is eligible for refund
     const invalidRefundStatuses = [
       "Pending",
       "Processing",
       "Shipped",
       "Delivered",
       "Cancelled",
+      "Returned",
+      "Refund Processing",
+      "Refund Rejected",
+      "Refund Accepted",
+      "Refunded",
     ];
     if (invalidRefundStatuses.includes(orderDetails.orderStatus)) {
+      session.abortTransaction();
       return next(
         createError(
           400,
@@ -101,6 +117,7 @@ export const createReturnedItem = async (req, res, next) => {
       (r) => String(r._id) === refundRequest
     );
     if (!existingRefund) {
+      session.abortTransaction();
       return next(createError(400, "Refund request not found in order."));
     }
 
@@ -109,11 +126,13 @@ export const createReturnedItem = async (req, res, next) => {
       (r) => String(r.refundRequest) === refundRequest
     );
     if (duplicateReturned) {
+      session.abortTransaction();
       return next(createError(400, "Refund request already processed."));
     }
 
     // Validate refund amount
     if (refundAmount <= 0 || refundAmount > orderDetails.payment.amountPaid) {
+      session.abortTransaction();
       return next(createError(400, "Invalid refund amount."));
     }
 
@@ -200,7 +219,7 @@ export const createReturnedItem = async (req, res, next) => {
 
     // Update order status history
     addToStatusHistory(orderDetails, orderStatus);
-    
+
     // Persist all updates
     await Promise.all([
       newReturnRequest.save({ session }),
@@ -217,13 +236,9 @@ export const createReturnedItem = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error processing refund:", error);
-    if (session?.inTransaction()) {
-      await session.abortTransaction();
-    }
+    await session.abortTransaction();
     return next(createError(500, "Internal Server Error"));
   } finally {
-    if (session) {
-      await session.endSession();
-    }
+    session.endSession();
   }
 };

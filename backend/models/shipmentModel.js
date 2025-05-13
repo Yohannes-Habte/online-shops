@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import { calculateBasePrice } from "../utils/shipmentPricing.js";
+import { calculateBaseShippingPrice } from "../utils/shipmentPricing.js";
 
 const { Schema, model } = mongoose;
 
-// --- Enums ---
 export const TRANSPORTATION_PROVIDERS = [
   "UPS",
   "FEDEX",
@@ -75,7 +74,7 @@ export const BUSINESS_REGION_CODES = [
   "MENA",
 ];
 
-// --- Sub-schema: Contact Info ---
+// Sub-schema: Contact Information
 const contactSchema = new Schema(
   {
     email: { type: String, required: true },
@@ -84,14 +83,14 @@ const contactSchema = new Schema(
   { _id: false }
 );
 
-// --- Shipment Schema ---
+// Shipment Schema
 const shipmentSchema = new Schema(
   {
     order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
 
     provider: { type: String, enum: TRANSPORTATION_PROVIDERS, required: true },
 
-    providerCode: { type: String, required: true },
+    providerCode: { type: String, required: true, unique: true },
 
     serviceType: {
       type: String,
@@ -134,18 +133,20 @@ const shipmentSchema = new Schema(
   }
 );
 
-// --- Mongoose Middleware: Calculate basePrice automatically ---
+// Calculate basePrice automatically before saving
 shipmentSchema.pre("validate", function (next) {
   if (
     this.isNew ||
     this.isModified("weightKg") ||
     this.isModified("serviceType")
   ) {
-    this.basePrice = calculateBasePrice(this.weightKg, this.serviceType);
+    this.basePrice = calculateBaseShippingPrice(
+      this.weightKg,
+      this.serviceType
+    );
   }
   next();
 });
 
-// --- Model
 const Shipment = model("Shipment", shipmentSchema);
 export default Shipment;

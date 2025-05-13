@@ -99,6 +99,59 @@ export const SelectField = ({
   );
 };
 
+// Labeled Select field component for any form
+export const LabeledSelectField = ({
+  label,
+  name,
+  value,
+  onChange,
+  errors,
+  options,
+  icon,
+  ariaLabel,
+}) => {
+  return (
+    <div className="form-select-container">
+      <label htmlFor={name} className="form-input-label">
+        {label}
+      </label>
+      <div className="select-with-icon-wrapper">
+        {icon && <span className="form-input-icon">{icon}</span>}
+        <select
+          name={name}
+          id={name}
+          value={value}
+          onChange={onChange}
+          className={classNames("form-input-field", {
+            "form-input-error": errors[name],
+          })}
+          aria-label={ariaLabel || label}
+          aria-describedby={errors[name] ? `${name}-error` : undefined}
+        >
+          <option value="" disabled>
+            Select {label}
+          </option>
+          {options.map((option, index) => {
+            const optionValue = typeof option === "string" ? option : option.value;
+            const optionLabel = typeof option === "string" ? option : option.label;
+            return (
+              <option key={index} value={optionValue}>
+                {optionLabel}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      {errors[name] && (
+        <p id={`${name}-error`} className="form-error-message">
+          {errors[name]}
+        </p>
+      )}
+    </div>
+  );
+};
+
+
 //  TextArea Field component for any form
 export const TextAreaField = ({
   label,

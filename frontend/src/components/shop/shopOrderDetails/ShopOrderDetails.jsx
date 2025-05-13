@@ -9,6 +9,8 @@ import SingleOrderItems from "../singleOrderItems/SingleOrderItems";
 import SingleOrderStatusUpdate from "../singleOrderStatusUpdate/SingleOrderStatusUpdate";
 import SingleOrderRefundRequest from "../singleOrderRefundRequest/SingleOrderRefundRequest";
 import SingleOrderReturnInfo from "../singleOrderRefunded/SingleOrderReturnInfo";
+import SingleWithdrawalRequest from "../singleWithdrawalRequest/SingleWithdrawalRequest";
+import SingleOrderCancelled from "../singleOrderCancelled/SingleOrderCancelled";
 
 const ShopOrderDetails = () => {
   const { id } = useParams();
@@ -17,7 +19,6 @@ const ShopOrderDetails = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("");
   const [processStatus, setProcessStatus] = useState(false);
-  const [cancellationReason, setCancellationReason] = useState("");
   const [returnReason, setReturnReason] = useState("");
   const [tracking, setTracking] = useState({
     carrier: "",
@@ -31,11 +32,9 @@ const ShopOrderDetails = () => {
     "Processing",
     "Shipped",
     "Delivered",
-    "Refund Requested",
-    "Awaiting Item Return",
+    "Cancelled",
     "Returned",
     "Refund Processing",
-    "Refund Accepted",
     "Refunded",
   ];
 
@@ -150,8 +149,6 @@ const ShopOrderDetails = () => {
 
     const updateData = { orderStatus: status, tracking: tracking };
 
-    if (status === "Cancelled")
-      updateData.cancellationReason = cancellationReason;
     if (status === "Returned") updateData.returnReason = returnReason;
 
     if (status === "Processing") {
@@ -176,10 +173,6 @@ const ShopOrderDetails = () => {
       setOrder((prevOrder) => ({
         ...prevOrder,
         orderStatus: status,
-        cancellationReason:
-          status === "Cancelled"
-            ? cancellationReason
-            : prevOrder.cancellationReason,
         returnReason:
           status === "Returned" ? returnReason : prevOrder.returnReason,
         tracking:
@@ -231,35 +224,37 @@ const ShopOrderDetails = () => {
         handleChange={handleChange}
         generateProcessingCode={generateProcessingCode}
         getEstimatedDeliveryDate={getEstimatedDeliveryDate}
-        cancellationReason={cancellationReason}
-        setCancellationReason={setCancellationReason}
         returnReason={returnReason}
         setReturnReason={setReturnReason}
         order={order}
         processStatus={processStatus}
       />
 
-      {order?.orderStatus === "Cancelled" && order?.cancellationReason && (
-        <section className="order-cancellation-reason-wrapper">
-          <h2 className="order-cancellation-reason-title">
-            Order Cancellation Reason
-          </h2>
-          <p className="order-cancellation-reason-message">
-            {order.cancellationReason}
-          </p>
-        </section>
+      {order?.orderStatus === "Cancelled" && (
+        <SingleOrderCancelled order={order} />
       )}
 
-      {order?.orderStatus === "Returned" && order?.returnReason && (
-        <section className="order-return-reason-wrapper">
-          <h2 className="order-return-reason-title">Order Return Reason</h2>
-          <p className="order-return-reason-message">{order.returnReason}</p>
-        </section>
-      )}
+      {order?.orderStatus !== "Cancelled" &&
+        (order?.orderStatus === "Refund Requested" ||
+          order?.orderStatus === "Refund Processing" ||
+          order?.orderStatus === "Refund Rejected" ||
+          order?.orderStatus === "Refund Accepted") && (
+          <SingleOrderRefundRequest order={order} />
+        )}
 
-      <SingleOrderRefundRequest order={order} />
+      {order?.orderStatus !== "Cancelled" &&
+        (order?.orderStatus === "Refund Processing" ||
+          order?.orderStatus === "Refund Rejected" ||
+          order?.orderStatus === "Refund Accepted") && (
+          <SingleOrderReturnInfo order={order} />
+        )}
 
-      <SingleOrderReturnInfo order={order} />
+      {order?.orderStatus !== "Cancelled" &&
+        (order?.orderStatus === "Refund Processing" ||
+          order?.orderStatus === "Refund Rejected" ||
+          order?.orderStatus === "Refund Accepted") && (
+          <SingleWithdrawalRequest order={order} />
+        )}
     </section>
   );
 };
