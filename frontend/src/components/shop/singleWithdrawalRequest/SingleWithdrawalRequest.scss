@@ -1,0 +1,68 @@
+.shop-withdrawal-request-container {
+  padding: 2rem;
+  background-color: #f9f9fb;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+
+  .shop-withdrawal-request-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .withdrawal-info-wrapper {
+    background-color: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .withdrawal-info {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  .withdrawal-strong {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .withdrawal-info-asides-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1rem;
+
+    aside {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .withdrawal-info-left-block,
+    .withdrawal-info-right-block {
+      background-color: #f5f7fa;
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+  }
+
+  .withdrawal-notes {
+    margin-top: 1rem;
+    font-style: italic;
+    background-color: #fffbea;
+    padding: 1rem;
+    border-left: 4px solid #f1c40f;
+    border-radius: 0.5rem;
+    color: #7a6a03;
+  }
+}

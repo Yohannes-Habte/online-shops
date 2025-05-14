@@ -238,21 +238,24 @@ const ShopOrderDetails = () => {
         (order?.orderStatus === "Refund Requested" ||
           order?.orderStatus === "Refund Processing" ||
           order?.orderStatus === "Refund Rejected" ||
-          order?.orderStatus === "Refund Accepted") && (
+          order?.orderStatus === "Refund Accepted" ||
+          order.orderStatus === "Refunded") && (
           <SingleOrderRefundRequest order={order} />
         )}
 
       {order?.orderStatus !== "Cancelled" &&
         (order?.orderStatus === "Refund Processing" ||
           order?.orderStatus === "Refund Rejected" ||
-          order?.orderStatus === "Refund Accepted") && (
+          order?.orderStatus === "Refund Accepted" ||
+          order.orderStatus === "Refunded") && (
           <SingleOrderReturnInfo order={order} />
         )}
 
       {order?.orderStatus !== "Cancelled" &&
         (order?.orderStatus === "Refund Processing" ||
           order?.orderStatus === "Refund Rejected" ||
-          order?.orderStatus === "Refund Accepted") && (
+          order?.orderStatus === "Refund Accepted" ||
+          order.orderStatus === "Refunded") && (
           <SingleWithdrawalRequest order={order} />
         )}
     </section>

@@ -34,10 +34,16 @@ export const createWithdrawalRequest = async (req, res, next) => {
   if (shopId !== processedBy)
     return next(createError(400, "Shop ID does not match!"));
 
-  if (refundRequest && !mongoose.Types.ObjectId.isValid(refundRequest))
+  if (
+    withdrawalPurpose === "Customer Reimbursement" &&
+    !mongoose.Types.ObjectId.isValid(refundRequest)
+  )
     return next(createError(400, "Invalid refund ID!"));
 
-  if (returnRequest && !mongoose.Types.ObjectId.isValid(returnRequest)) {
+  if (
+    withdrawalPurpose === "Customer Reimbursement" &&
+    !mongoose.Types.ObjectId.isValid(returnRequest)
+  ) {
     return next(createError(400, "Invalid return ID!"));
   }
 
@@ -46,9 +52,6 @@ export const createWithdrawalRequest = async (req, res, next) => {
 
   if (!mongoose.Types.ObjectId.isValid(processedBy))
     return next(createError(400, "Invalid processedBy ID!"));
-
-  const seller = await Shop.findById(shopId);
-  if (!seller) return next(createError(400, "Seller not found!"));
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -139,4 +142,3 @@ export const createWithdrawalRequest = async (req, res, next) => {
     next(createError(500, "Failed to create withdrawal request!"));
   }
 };
-

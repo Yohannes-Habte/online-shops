@@ -197,7 +197,8 @@ export const createReturnedItem = async (req, res, next) => {
     ) {
       orderDetails.returnedItems.push(newReturnRequest._id);
       shopDetails.returnedItems.push(newReturnRequest._id);
-
+      orderDetails.grandTotal -= refundAmount;
+      orderDetails.payment.amountPaid -= refundAmount;
       shopDetails.netShopIncome = (
         shopDetails.netShopIncome - refundAmount
       ).toFixed(2);
