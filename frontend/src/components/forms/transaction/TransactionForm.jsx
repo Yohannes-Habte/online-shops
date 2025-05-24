@@ -58,16 +58,25 @@ const initialState = {
   processedBy: "",
 };
 
-const TransactionForm = ({ setOpenTransaction, order }) => {
+const TransactionForm = ({
+  setOpenTransaction,
+  order,
+  existingTransaction,
+}) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
-  console.log("Transaction Form order", order);
 
   const calculateShopCommission = (grandTotal) =>
     parseFloat((grandTotal * 0.01).toFixed(2));
 
   useEffect(() => {
-    if (order) {
+    if (existingTransaction) {
+      setFormData({
+        ...initialState,
+        ...existingTransaction,
+        transactionStatus: existingTransaction.transactionStatus || "",
+      });
+    } else if (order) {
       const orderedItem = order?.orderedItems?.[0];
       const returnedItem = order?.returnedItems?.[0];
 
@@ -157,36 +166,49 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
       return;
     }
 
+    const transactionPayload = {
+      shop: order?.orderedItems[0]?.shop?._id,
+      transactionType: formData.transactionType,
+      order: formData.order,
+      platformFees: formData.platformFees,
+      refundRequest: formData.refundRequest,
+      returnedItem: formData.returnedItem,
+      withdrawal: formData.withdrawal,
+      adjustmentReason: formData.adjustmentReason,
+      adjustmentNotes: formData.adjustmentNotes,
+      amount: order?.grandTotal || formData.amount,
+      currency: formData.currency,
+      method: formData.method,
+      paymentProvider: formData.paymentProvider,
+      transactionStatus: formData.transactionStatus,
+      cancelledReason: formData.cancelledReason,
+      processedDate: formData.processedDate,
+      processedBy: formData.processedBy,
+    };
+
     try {
-      const newTransaction = {
-        shop: order?.orderedItems[0]?.shop?._id,
-        transactionType: formData.transactionType,
-        order: formData.order,
-        platformFees: formData.platformFees,
-        refundRequest: formData.refundRequest,
-        returnedItem: formData.returnedItem,
-        withdrawal: formData.withdrawal,
-        adjustmentReason: formData.adjustmentReason,
-        adjustmentNotes: formData.adjustmentNotes,
-        amount: order?.grandTotal || formData.amount,
-        currency: formData.currency,
-        method: formData.method,
-        paymentProvider: formData.paymentProvider,
-        transactionStatus: formData.transactionStatus,
-        cancelledReason: formData.cancelledReason,
-        processedDate: formData.processedDate,
-        processedBy: formData.processedBy,
-      };
-      const res = await axios.post(
-        `${API}/transactions/create`,
-        newTransaction,
-        {
-          withCredentials: true,
+      // If an existing transaction is being updated, include its ID
+      if (existingTransaction?._id) {
+        const res = await axios.put(
+          `${API}/transactions/${existingTransaction._id}`,
+          transactionPayload,
+          { withCredentials: true }
+        );
+        if (res.status === 200) {
+          toast.success("Transaction updated successfully!");
         }
-      );
-      if (res.status === 201) {
-        toast.success("Transaction successfully created!");
-        setFormData(initialState);
+      } else {
+        const res = await axios.post(
+          `${API}/transactions/create`,
+          transactionPayload,
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.status === 201) {
+          toast.success("Transaction successfully created!");
+          setFormData(initialState);
+        }
       }
       setOpenTransaction(false);
     } catch (error) {
@@ -396,6 +418,10 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
             errors={errors}
             ariaLabel={"Transaction Status"}
             icon={<FaFlag />}
+            disabled={
+              existingTransaction &&
+              existingTransaction.transactionStatus !== "Processing"
+            }
           />
 
           {formData.transactionStatus === "Cancelled" && (

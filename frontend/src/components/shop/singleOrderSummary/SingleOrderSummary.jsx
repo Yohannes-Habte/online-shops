@@ -1,9 +1,7 @@
-import { useState } from "react";
 import TransactionForm from "../../forms/transaction/TransactionForm";
 import "./SingleOrderSummary.scss";
 
-const SingleOrderSummary = ({ order }) => {
-  const [isTransactionFormOpen, setIsTransactionFormOpen] = useState(false);
+const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
   return (
     <div className="order-summary-and-shipping-address-container">
       <section className="order-summary-wrapper">
@@ -23,14 +21,15 @@ const SingleOrderSummary = ({ order }) => {
         </p>
         <button
           className="transact-now-btn"
-          onClick={() => setIsTransactionFormOpen(true)}
+          onClick={() => setOpenTransaction(true)}
         >
-          Transact Now
+          Update Transaction
         </button>
-        {isTransactionFormOpen && (
+        {openTransaction && (
           <TransactionForm
             order={order}
-            setIsTransactionFormOpen={setIsTransactionFormOpen}
+            setOpenTransaction={setOpenTransaction}
+            existingTransaction={order?.transaction}
           />
         )}
       </section>

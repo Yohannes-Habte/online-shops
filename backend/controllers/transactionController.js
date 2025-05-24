@@ -174,6 +174,7 @@ export const createTransaction = async (req, res, next) => {
           "Cancelled by Admin due to transaction failure";
         foundOrder.payment.paymentStatus = "cancelled";
       } else if (transactionStatus === "Processing") {
+        foundOrder.orderStatus = "Delivered";
         foundOrder.payment.paymentStatus = "pending";
       }
 
@@ -247,6 +248,130 @@ export const createTransaction = async (req, res, next) => {
       success: true,
       transaction: newTransaction,
       message: "Transaction created successfully",
+    });
+  } catch (error) {
+    console.error("Transaction creation failed:", error);
+    await session.abortTransaction();
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  } finally {
+    session.endSession();
+  }
+};
+
+// Update transaction status
+export const updateTransaction = async (req, res, next) => {
+  const {
+    shop,
+    transactionType,
+    order,
+    amount,
+    currency,
+    method,
+    paymentProvider,
+    transactionStatus,
+    processedDate,
+    processedBy,
+  } = req.body;
+
+  const authShopId = req.shop.id;
+  const transactionId = req.params.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to create a transaction.")
+    );
+  }
+
+  if (!transactionId) {
+    return next(createError(400, "Transaction ID is required."));
+  }
+
+  if (!mongoose.isValidObjectId(transactionId)) {
+    return next(createError(400, "Invalid transaction ID provided."));
+  }
+
+  if (
+    !mongoose.isValidObjectId(authShopId) ||
+    !mongoose.isValidObjectId(shop)
+  ) {
+    return next(createError(400, "Invalid shop ID provided."));
+  }
+
+  if (authShopId !== shop) {
+    return next(
+      createError(
+        403,
+        "You are not authorized to create a transaction for this shop."
+      )
+    );
+  }
+
+  if (!mongoose.isValidObjectId(order) && transactionType === "Payout") {
+    return next(createError(400, "Invalid order ID provided."));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const generatedTransactionId = `${shop}-${order}-${transactionType}`;
+
+    const existingTransaction = await Transaction.findOne({
+      transactionId: generatedTransactionId,
+    }).session(session);
+
+    if (!existingTransaction) {
+      await session.abortTransaction();
+      return next(createError(400, "Transaction does not exists"));
+    }
+
+    const shopDetails = await Shop.findById(authShopId).session(session);
+    if (!shopDetails) {
+      await session.abortTransaction();
+      return next(createError(404, "Shop not found"));
+    }
+
+    const foundOrder = await Order.findById(order).session(session);
+    if (!foundOrder) {
+      await session.abortTransaction();
+      return next(createError(404, "Order not found"));
+    }
+
+    // Update the transaction
+    await Transaction.findByIdAndUpdate(
+      existingTransaction._id,
+      {
+        transactionId: generatedTransactionId,
+        shop,
+        transactionType,
+        amount,
+        currency,
+        method,
+        paymentProvider,
+        transactionStatus,
+        processedBy,
+      },
+      { new: true, session }
+    );
+
+
+    shopDetails.netShopIncome = shopDetails.netShopIncome + amount;
+    foundOrder.orderStatus = "Delivered";
+    foundOrder.payment.paymentStatus = "completed";
+
+    await shopDetails.save({ session });
+    await foundOrder.save({ session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      transaction: existingTransaction,
+      message: "Transaction updated successfully",
     });
   } catch (error) {
     console.error("Transaction creation failed:", error);

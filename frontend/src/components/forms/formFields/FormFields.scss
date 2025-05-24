@@ -45,6 +45,7 @@ $form-icon-bg-color: #e2e8f0;
 .select-with-icon-wrapper,
 .password-input-with-icon-wrapper,
 .file-upload-with-icon-wrapper {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -107,12 +108,21 @@ $form-icon-bg-color: #e2e8f0;
   height: 20px;
 }
 
-.form-checkbox-label,
 .form-radio-label {
   cursor: pointer;
 }
 
+.form-checkbox-label {
+  margin: 1rem 0;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
 .password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;

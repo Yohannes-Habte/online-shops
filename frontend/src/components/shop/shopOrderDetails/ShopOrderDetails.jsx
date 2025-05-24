@@ -26,6 +26,8 @@ const ShopOrderDetails = () => {
     estimatedDeliveryDate: null,
   });
 
+  const [openTransaction, setOpenTransaction] = useState(false);
+
   // Allowed order status sequence
   const orderStatusSequence = [
     "Pending",
@@ -213,7 +215,11 @@ const ShopOrderDetails = () => {
 
       <SingleOrderItems order={order} />
 
-      <SingleOrderSummary order={order} />
+      <SingleOrderSummary
+        order={order}
+        openTransaction={openTransaction}
+        setOpenTransaction={setOpenTransaction}
+      />
 
       <SingleOrderStatusUpdate
         updateOrderStatus={updateOrderStatus}
@@ -228,6 +234,8 @@ const ShopOrderDetails = () => {
         setReturnReason={setReturnReason}
         order={order}
         processStatus={processStatus}
+        openTransaction={openTransaction}
+        setOpenTransaction={setOpenTransaction}
       />
 
       {order?.orderStatus === "Cancelled" && (

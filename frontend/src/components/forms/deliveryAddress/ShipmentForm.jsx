@@ -22,8 +22,7 @@ import {
   FiTrendingUp,
   FiFileText,
 } from "react-icons/fi";
-
-
+import { handleError } from "../../../utils/errorHandler/ErrorMessage";
 
 const providerTrackingTemplates = {
   UPS: "https://www.ups.com/track?loc=en_US&tracknum={{trackingNumber}}",
@@ -177,8 +176,13 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
     if (order) {
       setFormData((prevData) => ({
         ...prevData,
+        provider: order.tracking.carrier || "",
         weightKg: orderWeight,
         serviceType: order.shippingAddress.service,
+        contact: {
+          email: order.customer.email || "",
+          phone: order.shippingAddress.phoneNumber || "",
+        },
       }));
     }
   }, [order]);
@@ -343,12 +347,18 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
         toast.success("Shipment created successfully!");
         setSuccess(true);
         resetForm();
+        setOpenShippedStatus(false);
       } else {
         setErrors({ server: "Failed to create shipment." });
+        setOpenShippedStatus(false);
       }
     } catch (error) {
-      console.error("Error creating shipment:", error);
-      setErrors({ server: "Network error. Please try again." });
+      const { message } = handleError(error);
+      setErrors({
+        server: message || "An error occurred while creating shipment.",
+      });
+      toast.error(message || "An error occurred while creating shipment.");
+      setOpenShippedStatus(false);
     } finally {
       setShippingLoading(false);
     }

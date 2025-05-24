@@ -57,11 +57,12 @@ const SingleOrderStatusUpdate = ({
   setReturnReason,
   order,
   processStatus,
+  openTransaction,
+  setOpenTransaction,
 }) => {
   const [showTrackingInfo, setShowTrackingInfo] = useState(false);
   const [showCancellationReason, setShowCancellationReason] = useState(false);
   const [showReturnReason, setShowReturnReason] = useState(false);
-  const [openTransaction, setOpenTransaction] = useState(false);
   const [openShippedStatus, setOpenShippedStatus] = useState(false);
   const [statusManuallyChanged, setStatusManuallyChanged] = useState(false);
 
@@ -75,10 +76,9 @@ const SingleOrderStatusUpdate = ({
     "Refunded",
   ];
 
-const currentOrderStatus = refundStatuses.includes(order?.orderStatus)
-  ? order.orderStatus
-  : null;
-
+  const currentOrderStatus = refundStatuses.includes(order?.orderStatus)
+    ? order.orderStatus
+    : null;
 
   const orderStatusArray = [
     "Pending",

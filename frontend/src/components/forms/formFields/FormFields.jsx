@@ -132,8 +132,10 @@ export const LabeledSelectField = ({
             Select {label}
           </option>
           {options.map((option, index) => {
-            const optionValue = typeof option === "string" ? option : option.value;
-            const optionLabel = typeof option === "string" ? option : option.label;
+            const optionValue =
+              typeof option === "string" ? option : option.value;
+            const optionLabel =
+              typeof option === "string" ? option : option.label;
             return (
               <option key={index} value={optionValue}>
                 {optionLabel}
@@ -150,7 +152,6 @@ export const LabeledSelectField = ({
     </div>
   );
 };
-
 
 //  TextArea Field component for any form
 export const TextAreaField = ({
@@ -357,18 +358,19 @@ export const FileUploadField = ({
         id={name}
         accept={accept}
         onChange={onChange}
-        value={value}
         className={`form-file-upload-input-field ${customClass} ${
           errors[name] ? "input-error" : ""
         }`}
         aria-labelledby={`${name}-label`}
-        aria-describedby={`${name}-error`} // Link input with error message
+        aria-describedby={`${name}-error`}
       />
 
-      {/* Optional: Add a button or placeholder text here */}
-      <span className="file-upload-placeholder">
-        {value ? value.split("\\").pop() : "No file selected"}
-      </span>
+      {/* Show selected file name */}
+      {value && (
+        <span className="file-upload-placeholder">
+          {value.name || value.split("\\").pop()}
+        </span>
+      )}
     </div>
 
     {errors[name] && (
@@ -378,6 +380,7 @@ export const FileUploadField = ({
     )}
   </div>
 );
+
 // Radio Field component for any form
 export const RadioField = ({
   label,

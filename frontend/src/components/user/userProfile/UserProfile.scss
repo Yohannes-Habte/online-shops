@@ -1,461 +1,82 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
-.profile-form-container {
-  width: 100%;
-  margin: 1rem auto;
-  @include shadow3;
+// UserProfile.scss
 
-  .profile-form-title {
-    @include subTitle;
+.user-profile-form-container {
+  @include shadow1;
+  max-width: 600px;
+  margin: 2rem auto;
+  background-color: $white;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 1rem;
+  }
+}
+
+.user-profile-form-title {
+  @include subTitle;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.user-profile-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  .user-profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f0f0f0;
+    border: 2px solid #ccc;
+    font-size: 3rem;
+    color: #aaa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.user-profile-fieldset {
+  border: none;
+  padding: 0;
+
+  .user-profile-legend {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #555;
     text-align: center;
-    font-size: $afs;
-  }
-
-  .image-container {
-    @include flexCenter;
-    margin: 1rem 0 2rem 0;
-    position: relative;
-
-    .image {
-      width: 5rem;
-      height: 5rem;
-      object-fit: cover;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .image-upload {
-      color: $red;
-      position: absolute;
-      bottom: -1.6rem;
-
-      .image-upload-error {
-        color: $red;
-      }
-
-      .percentage-upload {
-        color: $green;
-      }
-
-      .successful-upload {
-        color: $green;
-      }
-    }
-  }
-
-  // Form styling
-  .profile-fieldset {
-    @include fieldset;
-
-    .profile-legend {
-      @include legend;
-      font-size: $sfs;
-    }
-
-    .profile-form {
-      width: $mobile;
-      margin: auto;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      .input-container {
-        position: relative;
-        @include inputContainer;
-
-        .input-field {
-          @include inputField;
-          margin-bottom: $radius;
-
-          &::placeholder {
-            color: gray;
-          }
-        }
-
-        .input-label {
-          position: absolute;
-          top: 0;
-          left: 2rem;
-          color: rgba(204, 204, 204, 0);
-        }
-
-        .input-highlight {
-          position: absolute;
-          bottom: 0.2rem;
-          left: 0;
-          height: 2px;
-          width: 0;
-          background-color: $yellow;
-          transition: all 0.3s ease;
-        }
-
-        .input-field:focus + .input-label {
-          top: -5px;
-          font-size: 12px;
-          color: #007bff;
-        }
-
-        .input-field:focus + .input-label + .input-highlight {
-          width: 100%;
-        }
-
-        .icon {
-          position: absolute;
-          top: 1.1rem;
-          left: 0.5rem;
-          font-size: 1rem;
-        }
-
-        // displaying password
-        .password-display {
-          position: absolute;
-          top: 50%;
-          right: 1rem;
-          transform: translatey(-50%);
-          font-size: 1.3rem;
-          cursor: pointer;
-        }
-      }
-
-      .input-consent {
-        @include inputContainer;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 0.5rem;
-        margin: 1rem 0;
-
-        .profile-input-checkbox {
-          height: 1.6rem;
-          width: 1.3rem;
-        }
-
-        .accept {
-          font-size: $afs;
-        }
-
-        .terms-of-user {
-          font-size: $afs;
-          color: $blue;
-        }
-      }
-
-      .input-field-error {
-        color: $red;
-        font-size: $sfsx;
-      }
-
-      .file-container {
-        .input-field {
-          background-color: white;
-        }
-      }
-
-      .update-profile-btn {
-        @include button3;
-
-        &:hover {
-          background-color: $button-hover3;
-        }
-      }
-    }
   }
 }
 
-/* Tablet screen size */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  .profile-form-container {
-    width: 100%;
-    margin: 1rem auto;
-    @include shadow3;
+.user-profile-update-form {
 
-    .profile-form-title {
-      @include subTitle;
-      text-align: center;
+  .update-user-profile-btn {
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #0056b3;
     }
 
-    .image-container {
-      @include flexCenter;
-      margin: 1rem 0 2rem 0;
-      position: relative;
-
-      .image {
-        width: 5rem;
-        height: 5rem;
-        object-fit: cover;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      .image-upload {
-        color: $red;
-        position: absolute;
-        bottom: -1.6rem;
-
-        .image-upload-error {
-          color: $red;
-        }
-
-        .percentage-upload {
-          color: $green;
-        }
-
-        .successful-upload {
-          color: $green;
-        }
-      }
-    }
-
-    // Form styling
-    .profile-fieldset {
-      @include fieldset;
-
-      .profile-legend {
-        @include legend;
-        font-size: $sfsx;
-      }
-
-      .profile-form {
-        width: $tablet;
-        margin: auto;
-        flex-direction: column;
-        gap: 0.5rem;
-
-        .input-container {
-          position: relative;
-          @include inputContainer;
-
-          .input-field {
-            @include inputField;
-            margin-bottom: $radius;
-            padding-left: 2rem;
-
-            &::placeholder {
-              color: gray;
-            }
-          }
-
-          .input-label {
-            position: absolute;
-            top: 0;
-            left: 2rem;
-            color: rgba(204, 204, 204, 0);
-          }
-
-          .input-highlight {
-            position: absolute;
-            bottom: 0.2rem;
-            left: 0;
-            height: 2px;
-            width: 0;
-            background-color: $yellow;
-            transition: all 0.3s ease;
-          }
-
-          .input-field:focus + .input-label {
-            top: -5px;
-            font-size: 12px;
-            color: #007bff;
-          }
-
-          .input-field:focus + .input-label + .input-highlight {
-            width: 100%;
-          }
-
-          .icon {
-            position: absolute;
-            top: 1.1rem;
-            left: 0.5rem;
-            font-size: 1rem;
-          }
-
-          // displaying password
-          .password-display {
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translatey(-50%);
-            font-size: 1.3rem;
-            cursor: pointer;
-          }
-        }
-
-        .input-consent {
-          @include inputContainer;
-          display: flex;
-          flex-direction: row;
-          justify-content: flex-start;
-          gap: 0.5rem;
-
-          .profile-consent-input {
-            height: 1.6rem;
-            width: 1.3rem;
-          }
-
-          .accept {
-            font-size: $afs;
-          }
-
-          .terms-of-user {
-            font-size: $afs;
-            color: $blue;
-          }
-        }
-
-        .update-profile-btn {
-          @include button3;
-        }
-      }
-    }
-  }
-}
-
-/* Laptop screen size */
-@media screen and (min-width: 1024px) {
-  .profile-form-container {
-    width: 100%;
-    margin: 1rem auto;
-    @include shadow3;
-
-    .profile-form-title {
-      @include subTitle;
-      text-align: center;
-    }
-
-    .image-container {
-      @include flexCenter;
-      margin: 1rem 0 2rem 0;
-      position: relative;
-
-      .image {
-        width: 5rem;
-        height: 5rem;
-        object-fit: cover;
-        border-radius: 50%;
-        cursor: pointer;
-      }
-
-      .image-upload {
-        color: $red;
-        position: absolute;
-        bottom: -1.6rem;
-
-        .image-upload-error {
-          color: $red;
-        }
-
-        .percentage-upload {
-          color: $green;
-        }
-
-        .successful-upload {
-          color: $green;
-        }
-      }
-    }
-
-    // Form styling
-    .profile-fieldset {
-      @include fieldset;
-
-      .profile-legend {
-        @include legend;
-        font-size: $sfsx;
-        text-align: center;
-      }
-
-      .profile-form {
-        width: $laptop;
-        margin: auto;
-        display: flex;
-        flex-direction: column;
-
-        .input-container {
-          position: relative;
-          @include inputContainer;
-
-          .input-field {
-            @include inputField;
-            margin-bottom: $radius;
-            padding-left: 2rem;
-
-            &::placeholder {
-              color: gray;
-            }
-          }
-
-          .input-label {
-            position: absolute;
-            top: 0;
-            left: 2rem;
-            color: rgba(204, 204, 204, 0);
-          }
-
-          .input-highlight {
-            position: absolute;
-            bottom: 0.2rem;
-            left: 0;
-            height: 2px;
-            width: 0;
-            background-color: $yellow;
-            transition: all 0.3s ease;
-          }
-
-          .input-field:focus + .input-label {
-            top: -5px;
-            font-size: 12px;
-            color: #007bff;
-          }
-
-          .input-field:focus + .input-label + .input-highlight {
-            width: 100%;
-          }
-
-          .icon {
-            position: absolute;
-            top: 1.1rem;
-            left: 0.5rem;
-            font-size: 1rem;
-          }
-
-          // displaying password
-          .password-display {
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translatey(-50%);
-            font-size: 1.3rem;
-            cursor: pointer;
-          }
-        }
-
-        .input-consent {
-          @include inputContainer;
-          display: flex;
-          flex-direction: row;
-          justify-content: flex-start;
-          gap: 0.5rem;
-          padding-left: 0.5rem;
-
-          .profile-consent-input {
-            height: 1.6rem;
-            width: 1.3rem;
-          }
-
-          .accept {
-            font-size: $afs;
-          }
-
-          .terms-of-user {
-            font-size: $afs;
-            color: $blue;
-          }
-        }
-
-        .update-profile-btn {
-          @include button3;
-        }
-      }
+    &:disabled {
+      background-color: #b0c4de;
+      cursor: not-allowed;
     }
   }
 }
