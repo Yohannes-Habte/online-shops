@@ -132,7 +132,6 @@ const initialFormState = {
   serviceType: "",
   weightKg: "",
   insuranceSupported: "",
-  additionalFees: 0,
   trackingNumber: "",
   trackingUrlTemplate: "",
   contact: { email: "", phone: "" },
@@ -160,7 +159,6 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
     serviceType,
     weightKg,
     insuranceSupported,
-    additionalFees,
     trackingNumber,
     trackingUrlTemplate,
     contact,
@@ -176,13 +174,13 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
     if (order) {
       setFormData((prevData) => ({
         ...prevData,
-        provider: order.tracking.carrier || "",
         weightKg: orderWeight,
         serviceType: order.shippingAddress.service,
         contact: {
           email: order.customer.email || "",
           phone: order.shippingAddress.phoneNumber || "",
         },
+        notes: `Your order (ID: ${order._id}) has been successfully shipped. Thank you for shopping with us!`,
       }));
     }
   }, [order]);
@@ -258,23 +256,31 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
     const newErrors = {};
 
     if (!provider) newErrors.provider = "Provider is required.";
+
     if (!serviceType) newErrors.serviceType = "Service type is required.";
+
     if (!weightKg || isNaN(weightKg) || weightKg <= 0)
       newErrors.weightKg = "Valid weight is required.";
+
     if (insuranceSupported === "")
       newErrors.insuranceSupported = "Insurance is required.";
-    if (insuranceSupported && (!additionalFees || isNaN(additionalFees)))
-      newErrors.additionalFees = "Valid additional fees are required.";
+
     if (!contact.email)
       newErrors["contact.email"] = "Contact email is required.";
+
     if (!contact.phone)
       newErrors["contact.phone"] = "Contact phone is required.";
+
     if (!continent) newErrors.continent = "Continent is required.";
+
     if (!region) newErrors.region = "Region is required.";
+
     if (!shippingStatus)
       newErrors.shippingStatus = "Shipping status is required.";
+
     if (!expectedDeliveryDate)
       newErrors.expectedDeliveryDate = "Expected delivery date is required.";
+
     if (!notes) newErrors.notes = "Notes are required.";
 
     setErrors(newErrors);
@@ -322,7 +328,6 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
         serviceType,
         weightKg: orderWeight,
         insuranceSupported,
-        additionalFees: parseFloat(additionalFees),
         trackingNumber: usedTrackingNumber,
         trackingUrlTemplate, // Keep the raw template
         trackingUrl: finalTrackingUrl, // Final URL generated
@@ -389,7 +394,7 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
         >
           <div className="customer-delivery-address-inputs-wrapper">
             <SelectField
-              label="Shipping Service Provider"
+              label={`Shipping Service Provider: ${order?.tracking?.carrier }`}
               name="provider"
               value={provider}
               onChange={handleChange}
@@ -444,18 +449,6 @@ const ShipmentForm = ({ setOpenShippedStatus, order }) => {
                 </div>
               </div>
             </div>
-            {insuranceSupported && (
-              <InputField
-                label="Additional Fees ($)"
-                name="additionalFees"
-                type="number"
-                value={additionalFees}
-                onChange={handleChange}
-                errors={errors}
-                icon={<FiTag />}
-                placeholder="Additional fees in USD"
-              />
-            )}
 
             <InputField
               label="Contact Email"

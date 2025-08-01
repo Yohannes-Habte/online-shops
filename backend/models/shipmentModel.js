@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { calculateBaseShippingPrice } from "../utils/shipmentPricing.js";
+import { calculateInsuranceFee } from "../utils/insurancePricing.js";
 
 const { Schema, model } = mongoose;
 
@@ -104,7 +105,7 @@ const shipmentSchema = new Schema(
 
     insuranceSupported: { type: Boolean, default: false },
 
-    additionalFees: { type: Number, default: 0 },
+    insuranceFee: { type: Number, default: 0 },
 
     trackingNumber: { type: String, required: true },
 
@@ -144,6 +145,14 @@ shipmentSchema.pre("validate", function (next) {
       this.weightKg,
       this.serviceType
     );
+  }
+  next();
+});
+
+// Calculate insurance fee if insurance is supported
+shipmentSchema.pre("validate", function (next) {
+  if (this.insuranceSupported) {
+    this.insuranceFee = calculateInsuranceFee(this.basePrice);
   }
   next();
 });

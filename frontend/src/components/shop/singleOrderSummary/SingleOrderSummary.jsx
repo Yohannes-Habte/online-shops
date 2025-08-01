@@ -19,6 +19,14 @@ const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
         <p className="order-summary-info">
           Grand Total: ${order?.grandTotal?.toFixed(2)}
         </p>
+
+        <p className="order-summary-info">
+          Provider:{" "}
+          <strong style={{ color: "#1e40af" }}>
+            {order?.tracking?.carrier || "N/A"}
+          </strong>
+        </p>
+
         <button
           className="transact-now-btn"
           onClick={() => setOpenTransaction(true)}
