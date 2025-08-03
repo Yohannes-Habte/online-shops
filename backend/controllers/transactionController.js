@@ -8,6 +8,7 @@ import RefundRequest from "../models/refundRequestModel.js";
 import ReturnRequest from "../models/ReturnRequestModel.js";
 import Withdrawal from "../models/withdrawModel.js";
 
+// Create a new transaction
 export const createTransaction = async (req, res, next) => {
   const {
     shop,
@@ -260,6 +261,132 @@ export const createTransaction = async (req, res, next) => {
   }
 };
 
+// Get all transaction for all shops
+export const getAllShopTransactions = async (req, res, next) => {
+  const authShopId = req.shop.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to view these transactions.")
+    );
+  }
+
+  try {
+    const transactions = await Transaction.find({ shop: authShopId });
+    res.status(200).json({
+      success: true,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transactions:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+// Get all transactions for a shop
+export const getAllTransactions = async (req, res, next) => {
+  const authShopId = req.shop.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to view transactions.")
+    );
+  }
+
+  try {
+    const transactions = await Transaction.find({ shop: authShopId });
+    res.status(200).json({
+      success: true,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transactions:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+// Get a single transaction by ID
+export const getTransactionById = async (req, res, next) => {
+  const authShopId = req.shop.id;
+  const transactionId = req.params.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to view this transaction.")
+    );
+  }
+
+  if (!transactionId) {
+    return next(createError(400, "Transaction ID is required."));
+  }
+
+  if (!mongoose.isValidObjectId(transactionId)) {
+    return next(createError(400, "Invalid transaction ID provided."));
+  }
+
+  try {
+    const transaction = await Transaction.findOne({
+      _id: transactionId,
+      shop: authShopId,
+    });
+
+    if (!transaction) {
+      return next(createError(404, "Transaction not found."));
+    }
+
+    res.status(200).json({
+      success: true,
+      transaction,
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transaction:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+// Get all transactions for a specific order
+export const getTransactionsByOrder = async (req, res, next) => {
+  const authShopId = req.shop.id;
+  const orderId = req.params.id;
+
+  if (!authShopId) {
+    return next(
+      createError(401, "You are not authorized to view these transactions.")
+    );
+  }
+
+  if (!orderId) {
+    return next(createError(400, "Order ID is required."));
+  }
+
+  if (!mongoose.isValidObjectId(orderId)) {
+    return next(createError(400, "Invalid order ID provided."));
+  }
+
+  try {
+    const transactions = await Transaction.find({
+      shop: authShopId,
+      order: orderId,
+    });
+
+    res.status(200).json({
+      success: true,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transactions:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
 // Update transaction status
 export const updateTransaction = async (req, res, next) => {
   const {
@@ -316,7 +443,13 @@ export const updateTransaction = async (req, res, next) => {
   session.startTransaction();
 
   try {
-    const generatedTransactionId = `${shop}-${order}-${transactionType}`;
+    const foundOrder = await Order.findById(order).session(session);
+    if (!foundOrder) {
+      await session.abortTransaction();
+      return next(createError(404, "Order not found"));
+    }
+
+    console.log("Found Order for an update:", foundOrder);
 
     const existingTransaction = await Transaction.findOne({
       transactionId: generatedTransactionId,
@@ -331,12 +464,6 @@ export const updateTransaction = async (req, res, next) => {
     if (!shopDetails) {
       await session.abortTransaction();
       return next(createError(404, "Shop not found"));
-    }
-
-    const foundOrder = await Order.findById(order).session(session);
-    if (!foundOrder) {
-      await session.abortTransaction();
-      return next(createError(404, "Order not found"));
     }
 
     // Update the transaction
@@ -355,7 +482,6 @@ export const updateTransaction = async (req, res, next) => {
       },
       { new: true, session }
     );
-
 
     shopDetails.netShopIncome = shopDetails.netShopIncome + amount;
     foundOrder.orderStatus = "Delivered";

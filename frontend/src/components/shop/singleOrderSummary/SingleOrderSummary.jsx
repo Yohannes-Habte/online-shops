@@ -1,7 +1,9 @@
-import TransactionForm from "../../forms/transaction/TransactionForm";
+import { useState } from "react";
+import UpdateTransaction from "../../forms/updateTransaction/UpdateTransaction";
 import "./SingleOrderSummary.scss";
 
-const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
+const SingleOrderSummary = ({ order }) => {
+  const [openUpdateTransaction, setOpenUpdateTransaction] = useState(false);
   return (
     <div className="order-summary-and-shipping-address-container">
       <section className="order-summary-wrapper">
@@ -21,6 +23,10 @@ const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
         </p>
 
         <p className="order-summary-info">
+          Service: {order?.shippingAddress?.service}
+        </p>
+
+        <p className="order-summary-info">
           Provider:{" "}
           <strong style={{ color: "#1e40af" }}>
             {order?.tracking?.carrier || "N/A"}
@@ -29,15 +35,17 @@ const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
 
         <button
           className="transact-now-btn"
-          onClick={() => setOpenTransaction(true)}
+          onClick={() => setOpenUpdateTransaction(true)}
         >
           Update Transaction
         </button>
-        {openTransaction && (
-          <TransactionForm
+        {openUpdateTransaction && (
+          <UpdateTransaction
             order={order}
-            setOpenTransaction={setOpenTransaction}
-            existingTransaction={order?.transaction}
+            setOpenUpdateTransaction={setOpenUpdateTransaction}
+            transactionId={order?.transaction?._id}
+            currentTransactionType={order?.transaction?.transactionType}
+            currentTransactionStatus={order?.transaction?.transactionStatus}
           />
         )}
       </section>
@@ -45,14 +53,24 @@ const SingleOrderSummary = ({ order, openTransaction, setOpenTransaction }) => {
       <section className="shipping-address-wrapper">
         <h2 className="shipping-address-title">Shipping Address</h2>
         <p className="shipping-address-info">
-          {order?.shippingAddress?.address}
+          Street: {order?.shippingAddress?.streetName}
+        </p>
+
+        <p className="shipping-address-info">
+          House Number: {order?.shippingAddress?.houseNumber}
+        </p>
+
+        <p className="shipping-address-info">
+          Zip Code: {order?.shippingAddress?.zipCode}
         </p>
         <p className="shipping-address-info">
-          {order?.shippingAddress?.zipCode}, {order?.shippingAddress?.city}
+          City: {order?.shippingAddress?.city}
         </p>
-        <p className="shipping-address-info">{order?.shippingAddress?.state}</p>
         <p className="shipping-address-info">
-          {order?.shippingAddress?.country}
+          State: {order?.shippingAddress?.state}
+        </p>
+        <p className="shipping-address-info">
+          Country: {order?.shippingAddress?.country}
         </p>
         <p className="shipping-address-info">
           Phone: {order?.shippingAddress?.phoneNumber}

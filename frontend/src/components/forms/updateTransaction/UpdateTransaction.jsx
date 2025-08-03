@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./TransactionForm.scss";
+import "./UpdateTransaction.scss";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
@@ -58,7 +58,13 @@ const initialState = {
   processedBy: "",
 };
 
-const TransactionForm = ({ setOpenTransaction, order }) => {
+const UpdateTransaction = ({
+  setOpenUpdateTransaction,
+  order,
+  transactionId,
+  currentTransactionType,
+  currentTransactionStatus,
+}) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
 
@@ -66,24 +72,23 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
     parseFloat((grandTotal * 0.01).toFixed(2));
 
   useEffect(() => {
-    const orderedItem = order?.orderedItems?.[0];
-    const returnedItem = order?.returnedItems?.[0];
-
-    setFormData((prev) => ({
-      ...prev,
-      shop: orderedItem?.shop?._id,
-      order: order._id,
-      amount: order?.grandTotal || "",
-      platformFees: calculateShopCommission(order?.grandTotal || 0),
-      refundRequest: order?.refundRequest?._id || "",
-      returnedItem: returnedItem?._id || "",
-      currency: order?.payment?.currency || "",
-      method: order?.payment?.method || "",
-      paymentProvider: order?.payment?.provider || "",
-      processedBy: order?.customer?._id || "",
-      processedDate: new Date().toISOString().slice(0, 10),
-    }));
-  }, [order]);
+    if (transactionId) {
+      setFormData((prev) => ({
+        ...prev,
+        shop: order?.orderedItem?.shop?._id,
+        order: order._id,
+        amount: order?.grandTotal || "",
+        platformFees: calculateShopCommission(order?.grandTotal || 0),
+        refundRequest: order?.refundRequest?._id || "",
+        returnedItem: order?.returnedItem?._id || "",
+        currency: order?.payment?.currency || "",
+        method: order?.payment?.method || "",
+        paymentProvider: order?.payment?.provider || "",
+        processedBy: order?.customer?._id || "",
+        processedDate: new Date().toISOString().slice(0, 10),
+      }));
+    }
+  }, [order, transactionId, currentTransactionType, currentTransactionStatus]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -175,20 +180,19 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
     };
 
     try {
-      const res = await axios.post(
-        `${API}/transactions/create`,
-        transactionPayload,
-        {
-          withCredentials: true,
-        }
-      );
-      
-      if (res.status === 201) {
-        toast.success("Transaction successfully created!");
-        setFormData(initialState);
-      }
+      // If an existing transaction is being updated, include its ID
+      if (transactionId) {
+        const res = await axios.put(
+          `${API}/transactions/${transactionId}`,
+          transactionPayload,
+          { withCredentials: true }
+        );
 
-      setOpenTransaction(false);
+        if (res.status === 200) {
+          toast.success("Transaction updated successfully!");
+        }
+      }
+      setOpenUpdateTransaction(false);
     } catch (error) {
       toast.error("Error: " + error?.response?.data?.message || error.message);
     }
@@ -198,7 +202,7 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
     <div className="shop-transaction-form-modal">
       <section className="shop-transaction-form-container">
         <span
-          onClick={() => setOpenTransaction(false)}
+          onClick={() => setOpenUpdateTransaction(false)}
           className="close-transaction-form-modal"
         >
           X
@@ -420,4 +424,4 @@ const TransactionForm = ({ setOpenTransaction, order }) => {
   );
 };
 
-export default TransactionForm;
+export default UpdateTransaction;

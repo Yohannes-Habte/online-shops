@@ -21,6 +21,7 @@
 
     .transact-now-btn {
       @include button2;
+      margin-top: 0.5rem;
 
       &:hover {
         background-color: #0056b3;
@@ -29,11 +30,10 @@
   }
 
   .shipping-address-wrapper {
-    padding-bottom: 1rem;
-
     .shipping-address-title {
       @include subTitle;
       padding: 0;
+      margin: 0;
     }
 
     .shipping-address-info {
