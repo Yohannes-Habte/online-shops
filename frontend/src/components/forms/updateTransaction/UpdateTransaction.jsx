@@ -62,8 +62,6 @@ const UpdateTransaction = ({
   setOpenUpdateTransaction,
   order,
   transactionId,
-  currentTransactionType,
-  currentTransactionStatus,
 }) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
@@ -75,8 +73,10 @@ const UpdateTransaction = ({
     if (transactionId) {
       setFormData((prev) => ({
         ...prev,
-        shop: order?.orderedItem?.shop?._id,
         order: order._id,
+        transaction_id: transactionId,
+        transactionType: order?.transaction?.transactionType || "",
+        transactionStatus: order?.transaction?.transactionStatus || "",
         amount: order?.grandTotal || "",
         platformFees: calculateShopCommission(order?.grandTotal || 0),
         refundRequest: order?.refundRequest?._id || "",
@@ -88,7 +88,7 @@ const UpdateTransaction = ({
         processedDate: new Date().toISOString().slice(0, 10),
       }));
     }
-  }, [order, transactionId, currentTransactionType, currentTransactionStatus]);
+  }, [order, transactionId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,7 +160,6 @@ const UpdateTransaction = ({
     }
 
     const transactionPayload = {
-      shop: order?.orderedItems[0]?.shop?._id,
       transactionType: formData.transactionType,
       order: formData.order,
       platformFees: formData.platformFees,

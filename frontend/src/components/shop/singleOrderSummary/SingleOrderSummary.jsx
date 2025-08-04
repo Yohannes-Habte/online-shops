@@ -44,8 +44,6 @@ const SingleOrderSummary = ({ order }) => {
             order={order}
             setOpenUpdateTransaction={setOpenUpdateTransaction}
             transactionId={order?.transaction?._id}
-            currentTransactionType={order?.transaction?.transactionType}
-            currentTransactionStatus={order?.transaction?.transactionStatus}
           />
         )}
       </section>

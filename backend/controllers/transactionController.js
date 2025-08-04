@@ -261,136 +261,9 @@ export const createTransaction = async (req, res, next) => {
   }
 };
 
-// Get all transaction for all shops
-export const getAllShopTransactions = async (req, res, next) => {
-  const authShopId = req.shop.id;
-
-  if (!authShopId) {
-    return next(
-      createError(401, "You are not authorized to view these transactions.")
-    );
-  }
-
-  try {
-    const transactions = await Transaction.find({ shop: authShopId });
-    res.status(200).json({
-      success: true,
-      transactions,
-    });
-  } catch (error) {
-    console.error("Failed to retrieve transactions:", error);
-    next(
-      createError(error.status || 500, error.message || "Internal Server Error")
-    );
-  }
-};
-
-// Get all transactions for a shop
-export const getAllTransactions = async (req, res, next) => {
-  const authShopId = req.shop.id;
-
-  if (!authShopId) {
-    return next(
-      createError(401, "You are not authorized to view transactions.")
-    );
-  }
-
-  try {
-    const transactions = await Transaction.find({ shop: authShopId });
-    res.status(200).json({
-      success: true,
-      transactions,
-    });
-  } catch (error) {
-    console.error("Failed to retrieve transactions:", error);
-    next(
-      createError(error.status || 500, error.message || "Internal Server Error")
-    );
-  }
-};
-
-// Get a single transaction by ID
-export const getTransactionById = async (req, res, next) => {
-  const authShopId = req.shop.id;
-  const transactionId = req.params.id;
-
-  if (!authShopId) {
-    return next(
-      createError(401, "You are not authorized to view this transaction.")
-    );
-  }
-
-  if (!transactionId) {
-    return next(createError(400, "Transaction ID is required."));
-  }
-
-  if (!mongoose.isValidObjectId(transactionId)) {
-    return next(createError(400, "Invalid transaction ID provided."));
-  }
-
-  try {
-    const transaction = await Transaction.findOne({
-      _id: transactionId,
-      shop: authShopId,
-    });
-
-    if (!transaction) {
-      return next(createError(404, "Transaction not found."));
-    }
-
-    res.status(200).json({
-      success: true,
-      transaction,
-    });
-  } catch (error) {
-    console.error("Failed to retrieve transaction:", error);
-    next(
-      createError(error.status || 500, error.message || "Internal Server Error")
-    );
-  }
-};
-
-// Get all transactions for a specific order
-export const getTransactionsByOrder = async (req, res, next) => {
-  const authShopId = req.shop.id;
-  const orderId = req.params.id;
-
-  if (!authShopId) {
-    return next(
-      createError(401, "You are not authorized to view these transactions.")
-    );
-  }
-
-  if (!orderId) {
-    return next(createError(400, "Order ID is required."));
-  }
-
-  if (!mongoose.isValidObjectId(orderId)) {
-    return next(createError(400, "Invalid order ID provided."));
-  }
-
-  try {
-    const transactions = await Transaction.find({
-      shop: authShopId,
-      order: orderId,
-    });
-
-    res.status(200).json({
-      success: true,
-      transactions,
-    });
-  } catch (error) {
-    console.error("Failed to retrieve transactions:", error);
-    next(
-      createError(error.status || 500, error.message || "Internal Server Error")
-    );
-  }
-};
-
 // Update transaction status
 export const updateTransaction = async (req, res, next) => {
   const {
-    shop,
     transactionType,
     order,
     amount,
@@ -419,23 +292,11 @@ export const updateTransaction = async (req, res, next) => {
     return next(createError(400, "Invalid transaction ID provided."));
   }
 
-  if (
-    !mongoose.isValidObjectId(authShopId) ||
-    !mongoose.isValidObjectId(shop)
-  ) {
+  if (!mongoose.isValidObjectId(authShopId)) {
     return next(createError(400, "Invalid shop ID provided."));
   }
 
-  if (authShopId !== shop) {
-    return next(
-      createError(
-        403,
-        "You are not authorized to create a transaction for this shop."
-      )
-    );
-  }
-
-  if (!mongoose.isValidObjectId(order) && transactionType === "Payout") {
+  if (!mongoose.isValidObjectId(order)) {
     return next(createError(400, "Invalid order ID provided."));
   }
 
@@ -449,11 +310,9 @@ export const updateTransaction = async (req, res, next) => {
       return next(createError(404, "Order not found"));
     }
 
-    console.log("Found Order for an update:", foundOrder);
-
-    const existingTransaction = await Transaction.findOne({
-      transactionId: generatedTransactionId,
-    }).session(session);
+    const existingTransaction = await Transaction.findById(
+      transactionId
+    ).session(session);
 
     if (!existingTransaction) {
       await session.abortTransaction();
@@ -470,14 +329,14 @@ export const updateTransaction = async (req, res, next) => {
     await Transaction.findByIdAndUpdate(
       existingTransaction._id,
       {
-        transactionId: generatedTransactionId,
-        shop,
+        transactionId: transactionId,
         transactionType,
         amount,
         currency,
         method,
         paymentProvider,
         transactionStatus,
+        processedDate,
         processedBy,
       },
       { new: true, session }
@@ -509,3 +368,135 @@ export const updateTransaction = async (req, res, next) => {
     session.endSession();
   }
 };
+
+// Get all transactions for a shop
+export const getAllTransactions = async (req, res, next) => {
+  const isAdmin = req.user.id;
+
+  if (!isAdmin) {
+    return next(
+      createError(401, "You are not authorized to view transactions.")
+    );
+  }
+
+  try {
+    // Optional: Pagination (basic example)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    // Fetch transactions sorted by date (descending)
+    const transactions = await Transaction.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(); // Use lean() for performance if no Mongoose methods are needed
+
+    const total = await Transaction.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      transactions,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transactions:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+// Get all transactions for a specific shop
+export const getAllShopTransactions = async (req, res, next) => {
+  try {
+    const authShopId = req.shop?.id;
+
+    if (!authShopId) {
+      return next(
+        createError(401, "Unauthorized access. Shop authentication required.")
+      );
+    }
+
+    // Optional: Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    // Optional: Sorting and filtering
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.order === "asc" ? 1 : -1;
+
+    const query = { shop: authShopId };
+
+    const transactions = await Transaction.find(query)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Transaction.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      transactions,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transactions:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+
+// Get a single transaction by ID for an authenticated shop
+export const getTransactionById = async (req, res, next) => {
+  const authShopId = req.shop?.id;
+  const transactionId = req.params.id;
+
+  // Ensure shop is authenticated
+  if (!authShopId) {
+    return next(createError(401, "Unauthorized. Shop authentication required."));
+  }
+
+  // Validate transaction ID
+  if (!transactionId || !mongoose.isValidObjectId(transactionId)) {
+    return next(createError(400, "Invalid or missing transaction ID."));
+  }
+
+  try {
+    // Fetch the transaction scoped to the shop
+    const transaction = await Transaction.findOne({
+      _id: transactionId,
+      shop: authShopId,
+    }).lean(); // Use lean for performance if you don’t need Mongoose document methods
+
+    if (!transaction) {
+      return next(createError(404, "Transaction not found."));
+    }
+
+    res.status(200).json({
+      success: true,
+      transaction,
+    });
+  } catch (error) {
+    console.error("Failed to retrieve transaction:", error);
+    next(
+      createError(error.status || 500, error.message || "Internal Server Error")
+    );
+  }
+};
+
+
